@@ -1,0 +1,31 @@
+{
+  "name": "datenportal_webapp_spec_v6_full_agent_context",
+  "created": "2026-06-14",
+  "package_base": "ch.so.agi.datenportal",
+  "contains": [
+    "full v5 detailed specification",
+    "ui implementation contract",
+    "current mockups",
+    "complete AGENTS.md",
+    "repo-local skills for Codex/OpenCode",
+    "OpenCode commands",
+    "validation helper"
+  ],
+  "skills": [
+    "commit-after-dod",
+    "datenportal-ui-contract",
+    "datenportal-webapp",
+    "jte-htmx-ui",
+    "lucene-search",
+    "phase-delivery",
+    "spring-boot-reload-security",
+    "xtf-publishedcatalog"
+  ],
+  "authoritative_docs": [
+    "AGENTS.md",
+    "datenportal_webapp_agent_spec_detailed_v5.md",
+    "docs/ui-implementation-contract.md",
+    "docs/component-map.md",
+    "docs/skills-overview.md"
+  ]
+}
