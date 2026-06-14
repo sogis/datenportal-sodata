@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: datenportal-sodata
+gg:
+  jte:
+    development-mode: true

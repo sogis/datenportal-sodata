@@ -1,47 +1,55 @@
-# Datenportal Webapp Specification + Agent Context v6
+# Datenportal Webapp
 
-This package combines the full v5 Datenportal webapp specification with the complete repo-local agent context:
+Bootstrap der serverseitig gerenderten Datenportal-Webanwendung für den Kanton Solothurn.
 
-- full technical specification
-- current UI implementation contract
-- current mockup references
-- complete `AGENTS.md`
-- all recommended skills for Codex/OpenCode
-- OpenCode command files
-- validation helper
+## Phase 0 Status
 
-## Most important files
+Phase 0 liefert nur das technische Grundgerüst:
 
-| File | Purpose |
-|---|---|
-| `AGENTS.md` | Root instruction file for Codex/OpenCode. Tells agents how to work in this repo. |
-| `datenportal_webapp_agent_spec_detailed_v5.md` | Full detailed specification with architecture, classes, methods and phases. |
-| `docs/ui-implementation-contract.md` | Authoritative UI contract based on the current screenshots. |
-| `docs/component-map.md` | Mapping from UI elements to controllers, ViewModels and JTE templates. |
-| `docs/skills-overview.md` | Explains all included skills. |
-| `docs/installation-and-usage.md` | Copy/unzip instructions for the target repo. |
-| `.agents/skills/*/SKILL.md` | Repo-local skills for Codex/OpenCode. |
-| `.opencode/commands/*.md` | Optional OpenCode project commands. |
-| `spec/mockups/current/*.png` | Authoritative UI screenshots for the current UI contract. |
-| `tools/validate-agent-package.py` | Checks that the package was copied completely. |
+- Java 25
+- Spring Boot 4.1.0
+- Gradle Groovy DSL
+- JTE-Templates
+- JTE im Development-Mode für den Bootstrap
+- lokal vendortes HTMX
+- minimale Katalogseite auf `/` und `/datasets`
+- semantischer Header-/Breadcrumb-Fallback
 
-## Included skills
+Noch nicht enthalten:
 
-- `datenportal-webapp`
-- `phase-delivery`
-- `xtf-publishedcatalog`
-- `jte-htmx-ui`
-- `datenportal-ui-contract`
-- `lucene-search`
-- `spring-boot-reload-security`
-- `commit-after-dod`
+- XTF-/PublishedCatalog-Parsing
+- Lucene-Suche
+- Reload-Endpunkt
+- Listenansicht, Kartenansicht oder Detailseiten
+- finale `so-web-components`-Integration
 
-## Quick validation
+## Voraussetzungen
 
-After copying into the target repository, run:
+- JDK 25
+
+Der Build verwendet den Gradle Wrapper; eine lokale Gradle-Installation ist nicht erforderlich.
+
+## Starten
 
 ```bash
-python3 tools/validate-agent-package.py
+./gradlew bootRun
 ```
 
-The package intentionally does not include licensed font binaries. The specification allows the project maintainers to add licensed font assets from the official licensed source.
+Danach sind die minimalen Phase-0-Seiten erreichbar unter:
+
+- `http://localhost:8080/`
+- `http://localhost:8080/datasets`
+
+## Tests Und Checks
+
+```bash
+./gradlew test
+./gradlew clean check
+```
+
+## Relevante Dokumente
+
+- `AGENTS.md`
+- `datenportal_webapp_agent_spec_detailed_v5.md`
+- `docs/ui-implementation-contract.md`
+- `docs/architecture.md`

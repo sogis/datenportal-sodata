@@ -1,0 +1,35 @@
+.dp-catalog-intro {
+  padding-top: var(--dp-space-4);
+}
+
+.dp-page-title {
+  margin: 0 0 var(--dp-space-4);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.dp-lead,
+.dp-lead-secondary {
+  max-width: 52rem;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.dp-lead-secondary {
+  margin-top: var(--dp-space-2);
+}
+
+.dp-results-placeholder {
+  margin-top: var(--dp-space-6);
+  padding: var(--dp-space-6);
+  border: 1px solid var(--dp-color-border);
+  border-radius: var(--dp-radius-md);
+  background: var(--dp-color-surface);
+  box-shadow: var(--dp-shadow-card);
+}
+
+.dp-results-placeholder p {
+  margin: 0;
+  color: var(--dp-color-text-muted);
+}

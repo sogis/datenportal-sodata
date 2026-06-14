@@ -1,0 +1,22 @@
+:root {
+  --dp-color-text: #20364a;
+  --dp-color-text-muted: #536779;
+  --dp-color-accent: #d20a11;
+  --dp-color-border: #d9e0e6;
+  --dp-color-surface: #ffffff;
+  --dp-color-surface-muted: #f7f9fb;
+  --dp-color-badge: #eef2f5;
+  --dp-color-focus: #0b5fff;
+  --dp-shadow-card: 0 8px 24px rgba(32, 54, 74, 0.06);
+  --dp-radius-sm: 0.375rem;
+  --dp-radius-md: 0.75rem;
+  --dp-space-1: 0.25rem;
+  --dp-space-2: 0.5rem;
+  --dp-space-3: 0.75rem;
+  --dp-space-4: 1rem;
+  --dp-space-5: 1.5rem;
+  --dp-space-6: 2rem;
+  --dp-space-8: 3rem;
+  --dp-content-width: 76rem;
+  --dp-font-sans: "Helvetica Neue", Arial, sans-serif;
+}

@@ -79,12 +79,15 @@ gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.jar
 
 # Avoid ignore Gradle wrappper properties
 !gradle-wrapper.properties
+!gradle/wrapper/gradle-wrapper.properties
 
 # Cache of project
 .gradletasknamecache
+jte-classes/
 
 # Eclipse Gradle plugin generated files
 # Eclipse Core
@@ -117,4 +120,3 @@ gradle-app.setting
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-
