@@ -1,6 +1,7 @@
 package ch.so.agi.datenportal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,12 +46,17 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void pageContainsLocalAssetsAndResultsPlaceholder() throws Exception {
+    void pageContainsLocalAssetsAndStaticCatalogEntries() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/css/app.css\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("src=\"/js/htmx.min.js\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"dataset-results\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Phase 0: Das Projektgerüst läuft.")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Steuerfuss Gemeinden")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Gemeindegrenzen")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Aktuelle Ausgabe: Mai 2026")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("CSV (aktuelle Ausgabe)")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Parquet")))
+                .andExpect(content().string(not(org.hamcrest.Matchers.containsString("Phase 0: Das Projektgerüst läuft."))));
     }
 }

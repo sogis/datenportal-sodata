@@ -1,35 +1,41 @@
 # Architektur
 
-## Phase 0
+## Phase 1
 
-Die Anwendung startet in Phase 0 als kleine Spring-Boot-Webanwendung mit JTE und lokalem HTMX-Asset.
+Die Anwendung läuft in Phase 1 als serverseitig gerenderte Spring-Boot-Webanwendung mit JTE, lokalem HTMX-Asset und einem ersten immutable Katalog-Read-Model.
 JTE läuft in dieser Phase bewusst im Development-Mode, damit das Bootstrap ohne separate Precompile-Strategie lauffähig ist.
 
 Aktuell materialisierte Pakete:
 
 - `ch.so.agi.datenportal`
+- `ch.so.agi.datenportal.catalog.domain`
+- `ch.so.agi.datenportal.catalog.service`
 - `ch.so.agi.datenportal.web`
 - `ch.so.agi.datenportal.web.view`
 
 ## Verantwortlichkeiten
 
 - `DatenportalApplication` startet die Webanwendung.
-- `CatalogController` rendert die minimale Katalog-Startseite auf `/` und `/datasets`.
+- `CatalogService` hält den aktuell aktiven `CatalogSnapshot` in-memory und bietet lesende Zugriffe für Web und spätere Phasen.
+- `StaticCatalogFactory` erzeugt einen deterministischen Beispielkatalog für lokale Entwicklung und Tests.
+- `CatalogController` rendert die Katalog-Startseite auf `/` und `/datasets` mit echten Top-Level-Einträgen.
+- `CatalogPageVmFactory` mappt Domainobjekte in einfache, UI-orientierte ViewModels.
 - `PageChromeFactory`, `HeaderViewModelFactory` und `BreadcrumbFactory` bereiten das wiederverwendbare Page-Chrome vor.
-- JTE rendert Layout und semantische Fallback-Komponenten für Header und Breadcrumb.
-- Die CSS-Struktur ist bereits in Token-, Basis-, Layout-, Komponenten- und Katalogdateien getrennt, obwohl fachlich erst ein Minimalzustand umgesetzt ist.
+- `CatalogSnapshot` kapselt den veröffentlichten Read-Model-Stand inklusive sichtbarer Top-Level-Einträge und identifizierbarer Ausgaben.
+- `DatasetEntry`, `DatasetSeriesEntry` und `DatasetIssueEntry` bilden normale Datensätze, Datenreihen und einzelne Ausgaben immutable ab.
+- JTE rendert Layout, Page Chrome und eine erste minimale Tabellenansicht mit Downloadbuttons.
 
 ## Bewusste Grenzen
 
-Phase 0 enthält noch keine fachliche Kataloglogik. Insbesondere fehlen:
+Phase 1 enthält bewusst noch keine Laufzeitquelle ausserhalb des Codes. Insbesondere fehlen:
 
-- Snapshot-/Read-Model
 - Parser- oder XTF-spezifische Klassen
 - Such- oder Filterlogik
 - HTMX-Fragmente mit echter Interaktion
 - Detailseiten
 - Reload- oder Admin-Endpunkte
+- Lucene-Index oder atomischer Reload-Swap
 
 ## Nächster Sinnvoller Schritt
 
-Die nächste Phase sollte das Domain-Read-Model ohne XTF einführen und die minimale Startseite mit ersten statischen Katalogdaten an echte ViewModels anbinden.
+Die nächste fachliche Phase sollte die Katalogquelle abstrahieren, XTF/XML parsen und den statischen Snapshot durch ein validiertes Startup-Loading ersetzen.

@@ -1,0 +1,65 @@
+package ch.so.agi.datenportal.catalog.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import ch.so.agi.datenportal.catalog.domain.AccessLevel;
+import ch.so.agi.datenportal.catalog.domain.Catalog;
+import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
+import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
+import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
+import ch.so.agi.datenportal.catalog.domain.DistributionLink;
+import ch.so.agi.datenportal.catalog.domain.Office;
+import ch.so.agi.datenportal.catalog.domain.Theme;
+import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+
+class CatalogServiceTest {
+
+    @Test
+    void returnsInitialStaticSnapshotAndReadAccessors() {
+        CatalogService catalogService = new CatalogService(new StaticCatalogFactory());
+
+        assertThat(catalogService.currentSnapshot().sourceDescription()).isEqualTo("StaticCatalogFactory");
+        assertThat(catalogService.visibleEntries())
+                .extracting(entry -> entry.identifier())
+                .containsExactly(
+                        "steuerfuss-gemeinden",
+                        "gemeindegrenzen",
+                        "verkehrszaehlstellen",
+                        "bevoelkerungsstatistik");
+        assertThat(catalogService.findVisibleEntry("gemeindegrenzen")).isPresent();
+        assertThat(catalogService.findAnyEntry("gemeindegrenzen-2026-05")).isPresent();
+    }
+
+    @Test
+    void replaceSnapshotSwapsReadableState() {
+        CatalogService catalogService = new CatalogService(new StaticCatalogFactory());
+        CatalogSnapshot replacement = CatalogSnapshot.of(
+                new Catalog(
+                        List.of(new DatasetEntry(
+                                "replacement-dataset",
+                                "Replacement",
+                                "Beschreibung",
+                                new Office("office", "Amt", Optional.empty()),
+                                new Office("office", "Amt", Optional.empty()),
+                                List.of(new Theme("theme", "Thema")),
+                                List.of("Replacement"),
+                                LocalDate.parse("2026-06-01"),
+                                AccessLevel.OPEN,
+                                List.of(new DistributionLink(URI.create("https://example.com/replacement.csv"), DistributionFormat.CSV)))),
+                        List.of()),
+                Instant.parse("2026-06-14T09:00:00Z"),
+                "replacement");
+
+        catalogService.replaceSnapshot(replacement);
+
+        assertThat(catalogService.currentSnapshot().sourceDescription()).isEqualTo("replacement");
+        assertThat(catalogService.visibleEntries())
+                .extracting(entry -> entry.identifier())
+                .containsExactly("replacement-dataset");
+    }
+}

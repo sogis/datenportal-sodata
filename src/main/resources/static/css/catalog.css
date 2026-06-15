@@ -20,7 +20,7 @@
   margin-top: var(--dp-space-2);
 }
 
-.dp-results-placeholder {
+.dp-results {
   margin-top: var(--dp-space-6);
   padding: var(--dp-space-6);
   border: 1px solid var(--dp-color-border);
@@ -29,7 +29,96 @@
   box-shadow: var(--dp-shadow-card);
 }
 
-.dp-results-placeholder p {
-  margin: 0;
+.dp-results-summary {
+  margin: 0 0 var(--dp-space-5);
   color: var(--dp-color-text-muted);
+  font-weight: 600;
+}
+
+.dp-entry-table-wrapper {
+  overflow-x: auto;
+}
+
+.dp-entry-table {
+  width: 100%;
+  min-width: 48rem;
+  border-collapse: collapse;
+}
+
+.dp-entry-table th,
+.dp-entry-table td {
+  padding: var(--dp-space-4) var(--dp-space-3);
+  border-top: 1px solid var(--dp-color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.dp-entry-table thead th {
+  padding-top: 0;
+  border-top: 0;
+  color: var(--dp-color-text-muted);
+  font-size: 0.95rem;
+}
+
+.dp-entry-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.dp-entry-description,
+.dp-entry-current-issue,
+.dp-results-empty {
+  margin: var(--dp-space-2) 0 0;
+}
+
+.dp-entry-description,
+.dp-results-empty {
+  color: var(--dp-color-text-muted);
+}
+
+.dp-entry-current-issue {
+  font-weight: 600;
+}
+
+.dp-type-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 var(--dp-space-3);
+  border: 1px solid var(--dp-color-border);
+  border-radius: var(--dp-radius-sm);
+  background: var(--dp-color-badge);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.dp-download-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dp-space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dp-download-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 var(--dp-space-3);
+  border: 1px solid var(--dp-color-border);
+  border-radius: var(--dp-radius-sm);
+  background: var(--dp-color-surface-muted);
+  font-weight: 600;
+}
+
+@media (max-width: 800px) {
+  .dp-results {
+    padding: var(--dp-space-4);
+  }
+
+  .dp-entry-table {
+    min-width: 40rem;
+  }
 }

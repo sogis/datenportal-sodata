@@ -2,9 +2,9 @@
 
 Bootstrap der serverseitig gerenderten Datenportal-Webanwendung für den Kanton Solothurn.
 
-## Phase 0 Status
+## Phase 1 Status
 
-Phase 0 liefert nur das technische Grundgerüst:
+Phase 1 ergänzt das technische Grundgerüst um ein erstes fachliches Read-Model:
 
 - Java 25
 - Spring Boot 4.1.0
@@ -12,7 +12,11 @@ Phase 0 liefert nur das technische Grundgerüst:
 - JTE-Templates
 - JTE im Development-Mode für den Bootstrap
 - lokal vendortes HTMX
-- minimale Katalogseite auf `/` und `/datasets`
+- immutable Katalog-Domainmodell unter `catalog.domain`
+- `CatalogSnapshot` und lesender `CatalogService`
+- statische Katalogquelle via `StaticCatalogFactory`
+- Katalogseite auf `/` und `/datasets` mit echten Entwicklungsdaten
+- normale Datensätze und Datenreihen mit CSV-/XLSX-/Parquet-Downloads
 - semantischer Header-/Breadcrumb-Fallback
 
 Noch nicht enthalten:
@@ -20,7 +24,7 @@ Noch nicht enthalten:
 - XTF-/PublishedCatalog-Parsing
 - Lucene-Suche
 - Reload-Endpunkt
-- Listenansicht, Kartenansicht oder Detailseiten
+- Filter, HTMX-Fragmente, Kartenansicht oder Detailseiten
 - finale `so-web-components`-Integration
 
 ## Voraussetzungen
@@ -35,7 +39,7 @@ Der Build verwendet den Gradle Wrapper; eine lokale Gradle-Installation ist nich
 ./gradlew bootRun
 ```
 
-Danach sind die minimalen Phase-0-Seiten erreichbar unter:
+Danach ist die Phase-1-Katalogseite erreichbar unter:
 
 - `http://localhost:8080/`
 - `http://localhost:8080/datasets`
@@ -46,6 +50,17 @@ Danach sind die minimalen Phase-0-Seiten erreichbar unter:
 ./gradlew test
 ./gradlew clean check
 ```
+
+## Entwicklungsdaten
+
+Phase 1 verwendet bewusst keine XTF-Quelle. Die Anwendung startet mit einem deterministischen statischen Snapshot aus `ch.so.agi.datenportal.catalog.service.StaticCatalogFactory`.
+
+Der Snapshot enthält:
+
+- normale Datensätze
+- Datenreihen mit einzelnen Ausgaben
+- eine explizit aktuelle Ausgabe
+- eine Datenreihe ohne explizite aktuelle Ausgabe, damit die Fallback-Logik auf die neueste Ausgabe getestet bleibt
 
 ## Relevante Dokumente
 
