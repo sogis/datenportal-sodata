@@ -15,12 +15,36 @@ public record DatasetSeriesEntry(
         List<Theme> themes,
         List<String> keywords,
         AccessLevel accessLevel,
+        CatalogEntryMetadata metadata,
         List<DatasetIssueEntry> issues) implements CatalogEntry {
 
     private static final Comparator<DatasetIssueEntry> ISSUE_ORDER =
             Comparator.comparing(DatasetIssueEntry::modified)
                     .reversed()
                     .thenComparing(DatasetIssueEntry::identifier);
+
+    public DatasetSeriesEntry(
+            String identifier,
+            String title,
+            String description,
+            Office publisher,
+            Office creator,
+            List<Theme> themes,
+            List<String> keywords,
+            AccessLevel accessLevel,
+            List<DatasetIssueEntry> issues) {
+        this(
+                identifier,
+                title,
+                description,
+                publisher,
+                creator,
+                themes,
+                keywords,
+                accessLevel,
+                CatalogEntryMetadata.empty(),
+                issues);
+    }
 
     public DatasetSeriesEntry {
         Objects.requireNonNull(identifier, "identifier must not be null");
@@ -31,6 +55,7 @@ public record DatasetSeriesEntry(
         themes = List.copyOf(themes);
         keywords = List.copyOf(keywords);
         Objects.requireNonNull(accessLevel, "accessLevel must not be null");
+        Objects.requireNonNull(metadata, "metadata must not be null");
         issues = List.copyOf(issues);
 
         if (issues.isEmpty()) {

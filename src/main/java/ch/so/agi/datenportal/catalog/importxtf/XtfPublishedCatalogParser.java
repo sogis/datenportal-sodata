@@ -2,12 +2,15 @@ package ch.so.agi.datenportal.catalog.importxtf;
 
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
+import ch.so.agi.datenportal.catalog.domain.ContactPoint;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
+import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import java.io.InputStream;
 import java.net.URI;
@@ -185,7 +188,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "description" -> series.description = readRequiredText(reader, childPath);
                     case "publisher" -> series.publisher = parseOfficeContainer(reader, childPath);
                     case "creator" -> series.creator = parseOfficeContainer(reader, childPath);
-                    case "contactPoint" -> parseContactPointContainer(reader, childPath);
+                    case "contactPoint" -> series.contactPoint = parseContactPointContainer(reader, childPath);
                     case "themes" -> {
                         RawTheme theme = parseThemeContainer(reader, childPath);
                         if (theme != null) {
@@ -200,8 +203,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "accessRights" -> series.accessLevel = parseAccessRightsContainer(reader, childPath);
                     case "publicationStatus" -> series.publicationStatus = readRequiredText(reader, childPath);
                     case "origin" -> series.origin = readOptionalText(reader, childPath).orElse(null);
-                    case "accrualPeriodicity" -> parseAccrualPeriodicityContainer(reader, childPath);
-                    case "temporalCoverage" -> parseTemporalCoverageContainer(reader, childPath);
+                    case "accrualPeriodicity" -> series.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
+                    case "temporalCoverage" -> series.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
                     case "issues" -> series.issues.addAll(parseIssuesContainer(reader, childPath));
                     default -> skipElement(reader);
                 }
@@ -229,7 +232,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "description" -> dataset.description = readRequiredText(reader, childPath);
                     case "publisher" -> dataset.publisher = parseOfficeContainer(reader, childPath);
                     case "creator" -> dataset.creator = parseOfficeContainer(reader, childPath);
-                    case "contactPoint" -> parseContactPointContainer(reader, childPath);
+                    case "contactPoint" -> dataset.contactPoint = parseContactPointContainer(reader, childPath);
                     case "themes" -> {
                         RawTheme theme = parseThemeContainer(reader, childPath);
                         if (theme != null) {
@@ -244,8 +247,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "accessRights" -> dataset.accessLevel = parseAccessRightsContainer(reader, childPath);
                     case "publicationStatus" -> dataset.publicationStatus = readRequiredText(reader, childPath);
                     case "origin" -> dataset.origin = readOptionalText(reader, childPath).orElse(null);
-                    case "accrualPeriodicity" -> parseAccrualPeriodicityContainer(reader, childPath);
-                    case "temporalCoverage" -> parseTemporalCoverageContainer(reader, childPath);
+                    case "accrualPeriodicity" -> dataset.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
+                    case "temporalCoverage" -> dataset.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
                     case "distributions" -> {
                         RawDistribution distribution = parseDistributionContainer(reader, childPath);
                         if (distribution != null) {
@@ -302,7 +305,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "description" -> issue.description = readRequiredText(reader, childPath);
                     case "publisher" -> issue.publisher = parseOfficeContainer(reader, childPath);
                     case "creator" -> issue.creator = parseOfficeContainer(reader, childPath);
-                    case "contactPoint" -> parseContactPointContainer(reader, childPath);
+                    case "contactPoint" -> issue.contactPoint = parseContactPointContainer(reader, childPath);
                     case "themes" -> {
                         RawTheme theme = parseThemeContainer(reader, childPath);
                         if (theme != null) {
@@ -317,8 +320,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "accessRights" -> issue.accessLevel = parseAccessRightsContainer(reader, childPath);
                     case "publicationStatus" -> issue.publicationStatus = readRequiredText(reader, childPath);
                     case "origin" -> issue.origin = readOptionalText(reader, childPath).orElse(null);
-                    case "accrualPeriodicity" -> parseAccrualPeriodicityContainer(reader, childPath);
-                    case "temporalCoverage" -> parseTemporalCoverageContainer(reader, childPath);
+                    case "accrualPeriodicity" -> issue.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
+                    case "temporalCoverage" -> issue.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
                     case "distributions" -> {
                         RawDistribution distribution = parseDistributionContainer(reader, childPath);
                         if (distribution != null) {
@@ -479,76 +482,81 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         throw new XMLStreamException("AccessRights element is not closed");
     }
 
-    private void parseContactPointContainer(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+    private RawContactPoint parseContactPointContainer(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
         while (reader.hasNext()) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
                 if ("ContactPoint".equals(reader.getLocalName())) {
-                    parseContactPoint(reader, path.push("ContactPoint"));
-                } else {
-                    skipElement(reader);
+                    return parseContactPoint(reader, path.push("ContactPoint"));
                 }
+                skipElement(reader);
                 continue;
             }
 
             if (event == XMLStreamConstants.END_ELEMENT && "contactPoint".equals(reader.getLocalName())) {
-                return;
+                return null;
             }
         }
 
         throw new XMLStreamException("contactPoint element is not closed");
     }
 
-    private void parseContactPoint(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+    private RawContactPoint parseContactPoint(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+        RawContactPoint contactPoint = new RawContactPoint(path);
+
         while (reader.hasNext()) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
                 String localName = reader.getLocalName();
                 XtfElementPath childPath = path.push(localName);
                 switch (localName) {
-                    case "name", "organizationUnit", "phone" -> readOptionalText(reader, childPath);
-                    case "email", "url" -> parseOptionalUri(reader, childPath);
+                    case "name" -> contactPoint.name = readOptionalText(reader, childPath).orElse(null);
+                    case "organizationUnit" -> contactPoint.organizationUnit = readOptionalText(reader, childPath).orElse(null);
+                    case "phone" -> contactPoint.phone = readOptionalText(reader, childPath).orElse(null);
+                    case "email" -> contactPoint.email = parseOptionalUri(reader, childPath);
+                    case "url" -> contactPoint.url = parseOptionalUri(reader, childPath);
                     default -> skipElement(reader);
                 }
                 continue;
             }
 
             if (event == XMLStreamConstants.END_ELEMENT && "ContactPoint".equals(reader.getLocalName())) {
-                return;
+                return contactPoint;
             }
         }
 
         throw new XMLStreamException("ContactPoint element is not closed");
     }
 
-    private void parseAccrualPeriodicityContainer(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+    private Optional<String> parseAccrualPeriodicityContainer(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
         while (reader.hasNext()) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
                 if ("AccrualPeriodicity".equals(reader.getLocalName())) {
-                    parseAccrualPeriodicity(reader, path.push("AccrualPeriodicity"));
-                } else {
-                    skipElement(reader);
+                    return parseAccrualPeriodicity(reader, path.push("AccrualPeriodicity"));
                 }
+                skipElement(reader);
                 continue;
             }
 
             if (event == XMLStreamConstants.END_ELEMENT && "accrualPeriodicity".equals(reader.getLocalName())) {
-                return;
+                return Optional.empty();
             }
         }
 
         throw new XMLStreamException("accrualPeriodicity element is not closed");
     }
 
-    private void parseAccrualPeriodicity(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+    private Optional<String> parseAccrualPeriodicity(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+        String localFrequency = null;
+
         while (reader.hasNext()) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
                 String localName = reader.getLocalName();
                 XtfElementPath childPath = path.push(localName);
                 switch (localName) {
-                    case "localFrequency" -> readRequiredText(reader, childPath);
+                    case "localFrequency" -> localFrequency = readRequiredText(reader, childPath);
                     case "frequencyUri" -> parseOptionalUri(reader, childPath);
                     default -> skipElement(reader);
                 }
@@ -556,48 +564,51 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
             }
 
             if (event == XMLStreamConstants.END_ELEMENT && "AccrualPeriodicity".equals(reader.getLocalName())) {
-                return;
+                return Optional.ofNullable(localFrequency);
             }
         }
 
         throw new XMLStreamException("AccrualPeriodicity element is not closed");
     }
 
-    private void parseTemporalCoverageContainer(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+    private Optional<RawTemporalCoverage> parseTemporalCoverageContainer(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
         while (reader.hasNext()) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
                 if ("TemporalCoverage".equals(reader.getLocalName())) {
-                    parseTemporalCoverage(reader, path.push("TemporalCoverage"));
-                } else {
-                    skipElement(reader);
+                    return Optional.of(parseTemporalCoverage(reader, path.push("TemporalCoverage")));
                 }
+                skipElement(reader);
                 continue;
             }
 
             if (event == XMLStreamConstants.END_ELEMENT && "temporalCoverage".equals(reader.getLocalName())) {
-                return;
+                return Optional.empty();
             }
         }
 
         throw new XMLStreamException("temporalCoverage element is not closed");
     }
 
-    private void parseTemporalCoverage(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+    private RawTemporalCoverage parseTemporalCoverage(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+        RawTemporalCoverage temporalCoverage = new RawTemporalCoverage();
+
         while (reader.hasNext()) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
                 String localName = reader.getLocalName();
                 XtfElementPath childPath = path.push(localName);
                 switch (localName) {
-                    case "startDate", "endDate", "referenceDate" -> parseOptionalDate(reader, childPath);
+                    case "startDate" -> temporalCoverage.startDate = parseOptionalDate(reader, childPath);
+                    case "endDate" -> temporalCoverage.endDate = parseOptionalDate(reader, childPath);
+                    case "referenceDate" -> temporalCoverage.referenceDate = parseOptionalDate(reader, childPath);
                     default -> skipElement(reader);
                 }
                 continue;
             }
 
             if (event == XMLStreamConstants.END_ELEMENT && "TemporalCoverage".equals(reader.getLocalName())) {
-                return;
+                return temporalCoverage;
             }
         }
 
@@ -747,6 +758,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         RawOffice creator;
         final List<RawTheme> themes = new ArrayList<>();
         final List<String> keywords = new ArrayList<>();
+        RawContactPoint contactPoint;
         URI landingPage;
         LocalDate issued;
         LocalDate modified;
@@ -754,6 +766,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         AccessLevel accessLevel;
         String publicationStatus;
         String origin;
+        String accrualPeriodicity;
+        RawTemporalCoverage temporalCoverage;
 
         RawEntry(XtfElementPath path) {
             this.path = path;
@@ -799,6 +813,16 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
             return distributions.stream()
                     .map(RawDistribution::toDomain)
                     .toList();
+        }
+
+        final CatalogEntryMetadata metadataDomain() {
+            return new CatalogEntryMetadata(
+                    Optional.ofNullable(landingPage),
+                    Optional.ofNullable(issued),
+                    Optional.ofNullable(licenseUri),
+                    Optional.ofNullable(contactPoint).map(RawContactPoint::toDomain),
+                    Optional.ofNullable(accrualPeriodicity),
+                    Optional.ofNullable(temporalCoverage).map(RawTemporalCoverage::toDomain));
         }
 
         private static void require(Object value, XtfElementPath path) {
@@ -850,6 +874,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     keywordValues(),
                     modified,
                     accessLevel,
+                    metadataDomain(),
                     distributionDomains(distributions));
         }
     }
@@ -876,6 +901,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     themeDomains(),
                     keywordValues(),
                     accessLevel,
+                    metadataDomain(),
                     issues.stream().map(RawIssue::toDomain).toList());
         }
     }
@@ -905,9 +931,45 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     keywordValues(),
                     modified,
                     accessLevel,
+                    metadataDomain(),
                     distributionDomains(distributions),
                     issueLabel,
                     currentIssue);
+        }
+    }
+
+    private static final class RawContactPoint {
+        final XtfElementPath path;
+        String name;
+        String organizationUnit;
+        Optional<URI> email = Optional.empty();
+        String phone;
+        Optional<URI> url = Optional.empty();
+
+        RawContactPoint(XtfElementPath path) {
+            this.path = path;
+        }
+
+        ContactPoint toDomain() {
+            if (name == null || name.isBlank()) {
+                throw validationError(path.push("name"), "Required field is missing.");
+            }
+            return new ContactPoint(
+                    name,
+                    Optional.ofNullable(organizationUnit),
+                    email,
+                    Optional.ofNullable(phone),
+                    url);
+        }
+    }
+
+    private static final class RawTemporalCoverage {
+        Optional<LocalDate> startDate = Optional.empty();
+        Optional<LocalDate> endDate = Optional.empty();
+        Optional<LocalDate> referenceDate = Optional.empty();
+
+        TemporalCoverage toDomain() {
+            return new TemporalCoverage(startDate, endDate, referenceDate);
         }
     }
 

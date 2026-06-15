@@ -47,10 +47,12 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | UI-Bereich | JTE | Java | Tests |
 |---|---|---|---|
 | Datensatzdetail | `pages/datasetDetail.jte` | `DatasetDetailPageVm` | keine Datenvorschau |
-| Serienausgabedetail | `pages/seriesIssueDetail.jte` | `SeriesIssueDetailPageVm` | weitere Ausgaben |
-| Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadButtonVm` | CSV/XLSX/Parquet |
+| Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | aktuelle und historische Ausgaben |
+| Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Rücklink zur Datenreihe und weitere Ausgaben |
+| Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
-| weitere Ausgaben | `components/otherIssues.jte` | `OtherIssueVm` | aktuelle/ältere Ausgaben |
+| weitere Ausgaben | `components/seriesIssues.jte` | `SeriesIssuesVm` | aktuelle/ältere Ausgaben |
+| Fehlerseite | `pages/notFound.jte` | `CatalogErrorControllerAdvice` | unbekannte Identifier liefern 404 |
 
 ## CSS
 

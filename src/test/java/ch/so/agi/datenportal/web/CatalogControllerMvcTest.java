@@ -84,6 +84,8 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("dp-card-grid")))
                 .andExpect(content().string(containsString("dp-result-card")))
                 .andExpect(content().string(containsString("Open Data")))
+                .andExpect(content().string(containsString("href=\"/datasets/ch.so.bauinventar\"")))
+                .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate\"")))
                 .andExpect(content().string(not(containsString("dp-entry-table-wrapper"))));
     }
 
@@ -119,6 +121,8 @@ class CatalogControllerMvcTest {
         mockMvc.perform(get("/datasets").param("expanded", "ch.so.abstimmungsresultate"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("aria-expanded=\"true\"")))
+                .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate\"")))
+                .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\"")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2026")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2025")))
                 .andExpect(content().string(containsString("CSV (aktuelle Ausgabe) herunterladen: Abstimmungsresultate")))

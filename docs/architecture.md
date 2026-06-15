@@ -100,3 +100,31 @@ Datenreihen werden als ein Top-Level-Dokument indexiert. Historische und aktuell
 Reindexing ist für spätere Reload-Phasen vorbereitet: Für jeden neuen Katalogstand wird ein vollständiger neuer In-Memory-Index gebaut und erst mit dem neuen `CatalogSnapshot` veröffentlicht. Beim späteren `CatalogService.replaceSnapshot(...)` wird der alte Snapshot nach dem atomaren Austausch geschlossen; dadurch wird auch der alte Lucene-Index freigegeben. Ein Reload-Endpunkt ist in Phase 4 weiterhin nicht enthalten.
 
 Phase 4 enthält nur service-seitige Pagination in `SearchQuery`/`SearchResult`. Die sichtbare Katalogseite rendert weiterhin alle Treffer und gibt keine `page`- oder `size`-Links aus.
+
+## Phase 5
+
+Phase 5 ergänzt öffentliche Detailseiten für normale Datensätze, Datenreihen und einzelne Ausgaben. Die Seiten bleiben serverseitig gerendert, verwenden denselben Page Chrome wie die Katalogseite und enthalten keine Datenvorschau, Diagramme, Preview-Tabellen oder zusätzliche JavaScript-Insel.
+
+Neu materialisierte Web-Komponenten:
+
+- `CatalogDetailController` für `/datasets/{identifier}`, `/series/{seriesIdentifier}`, `/series/{seriesIdentifier}/issues/current` und `/series/{seriesIdentifier}/issues/{issueIdentifier}`
+- `DetailPageVmFactory` für `DatasetDetailPageVm`, `SeriesDetailPageVm` und `IssueDetailPageVm`
+- Detail-ViewModels für Downloadbereiche, Metadatenabschnitte und Ausgabenlisten
+- `CatalogNotFoundException` und `CatalogErrorControllerAdvice` für saubere 404-Seiten mit normalem Page Chrome
+- JTE-Seiten `datasetDetail.jte`, `seriesDetail.jte`, `issueDetail.jte` und `notFound.jte`
+- JTE-Komponenten `detailHero.jte`, `detailBadges.jte`, `detailDownloadPanel.jte`, `metadataSection.jte` und `seriesIssues.jte`
+
+Routen- und Linkregeln:
+
+- Normale Datensätze verlinken auf `/datasets/{identifier}`.
+- Datenreihen-Root-Einträge verlinken auf `/series/{seriesIdentifier}`.
+- Die Root-Seite einer Datenreihe zeigt die aktuelle Ausgabe prominent, verlinkt `/series/{seriesIdentifier}/issues/current` und listet alle Ausgaben.
+- Einzelne Ausgaben verlinken auf `/series/{seriesIdentifier}/issues/{issueIdentifier}` und zeigen Rücklink sowie weitere Ausgaben derselben Datenreihe.
+- Falsche Routentypen, unbekannte Identifier und Issue-Identifier unter der falschen Serie liefern 404.
+
+Das Domain-Read-Model wurde gezielt um `CatalogEntryMetadata`, `ContactPoint` und `TemporalCoverage` erweitert. `XtfPublishedCatalogParser` übernimmt die bereits im PublishedCatalog vorhandenen Felder `issued`, `licenseUri`, `landingPage`, `contactPoint`, `accrualPeriodicity` und `temporalCoverage` in diese Metadaten. Diese Erweiterung dient ausschliesslich Detailseiten und verändert keine Lucene-Felder, keine Suchlogik und keine Reload-Semantik.
+
+Bewusste Grenzen:
+
+- Der Badge `Struktur beschrieben` wird weiterhin nicht synthetisch angezeigt, weil dafür noch keine belastbare Datenquelle im Read-Model existiert.
+- Räumlicher Bezug und Sprache werden nur angezeigt, wenn sie später im Domain-Read-Model materialisiert werden.

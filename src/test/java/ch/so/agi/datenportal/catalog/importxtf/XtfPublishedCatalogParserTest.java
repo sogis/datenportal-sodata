@@ -9,6 +9,8 @@ import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -43,6 +45,14 @@ class XtfPublishedCatalogParserTest {
                 .extracting(theme -> theme.displayName())
                 .containsExactly("Bau und Wohnungswesen", "Kultur Medien Informationsgesellschaft Sport");
         assertThat(dataset.keywords()).containsExactly("Bauinventar", "Kulturgüter", "Gebäude");
+        assertThat(dataset.metadata().issued()).contains(LocalDate.parse("2026-05-19"));
+        assertThat(dataset.metadata().licenseUri()).contains(URI.create("https://creativecommons.org/licenses/by/4.0/"));
+        assertThat(dataset.metadata().landingPage()).contains(URI.create("https://data.so.ch/dataset/ch.so.bauinventar"));
+        assertThat(dataset.metadata().contactPoint()).get()
+                .satisfies(contact -> {
+                    assertThat(contact.name()).isEqualTo("Amt für Raumplanung");
+                    assertThat(contact.email()).contains(URI.create("mailto:arp@bd.so.ch"));
+                });
         assertThat(dataset.primaryDistributions())
                 .extracting(distribution -> distribution.format())
                 .containsExactly(DistributionFormat.CSV, DistributionFormat.XLSX, DistributionFormat.PARQUET);
@@ -64,6 +74,12 @@ class XtfPublishedCatalogParserTest {
         assertThat(series.currentIssue()).get()
                 .extracting(issue -> issue.identifier())
                 .isEqualTo("ch.so.abstimmungsresultate_2026");
+        assertThat(series.metadata().accrualPeriodicity()).contains("asNeeded");
+        assertThat(series.metadata().temporalCoverage()).get()
+                .satisfies(coverage -> {
+                    assertThat(coverage.startDate()).contains(LocalDate.parse("2023-01-01"));
+                    assertThat(coverage.endDate()).contains(LocalDate.parse("2026-12-31"));
+                });
         assertThat(series.currentIssueLabelForDisplay()).isEqualTo("2026");
         assertThat(series.issuesNewestFirst())
                 .extracting(issue -> issue.identifier())

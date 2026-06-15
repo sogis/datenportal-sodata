@@ -121,14 +121,13 @@ public final class ResultsVmFactory {
 
     private String detailHref(CatalogEntry entry) {
         if (entry instanceof DatasetSeriesEntry series) {
-            return "/series/" + urlFactory.pathSegment(series.identifier()) + "/issues/current";
+            return urlFactory.seriesDetail(series.identifier());
         }
-        return entry.detailPath();
+        return urlFactory.datasetDetail(entry.identifier());
     }
 
     private String issueDetailHref(DatasetSeriesEntry series, DatasetIssueEntry issue) {
-        return "/series/" + urlFactory.pathSegment(series.identifier())
-                + "/issues/" + urlFactory.pathSegment(issue.identifier());
+        return urlFactory.issueDetail(series.identifier(), issue.identifier());
     }
 
     private static String themeLabel(CatalogEntry entry) {

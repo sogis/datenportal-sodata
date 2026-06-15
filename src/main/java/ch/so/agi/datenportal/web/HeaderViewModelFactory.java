@@ -9,6 +9,14 @@ import org.springframework.stereotype.Component;
 public class HeaderViewModelFactory {
 
     public HeaderVm forCatalogPage() {
+        return forDataPage();
+    }
+
+    public HeaderVm forDetailPage() {
+        return forDataPage();
+    }
+
+    private HeaderVm forDataPage() {
         return new HeaderVm(
                 "Daten",
                 "/",

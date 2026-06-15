@@ -25,6 +25,8 @@ public sealed interface CatalogEntry permits DatasetEntry, DatasetSeriesEntry, D
 
     AccessLevel accessLevel();
 
+    CatalogEntryMetadata metadata();
+
     CatalogEntryType type();
 
     List<DistributionLink> distributionsForListing();

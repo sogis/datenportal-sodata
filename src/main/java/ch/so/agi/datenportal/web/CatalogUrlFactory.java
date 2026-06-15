@@ -66,6 +66,22 @@ public final class CatalogUrlFactory {
         return encode(value);
     }
 
+    public String datasetDetail(String identifier) {
+        return "/datasets/" + pathSegment(identifier);
+    }
+
+    public String seriesDetail(String seriesIdentifier) {
+        return "/series/" + pathSegment(seriesIdentifier);
+    }
+
+    public String currentIssueDetail(String seriesIdentifier) {
+        return seriesDetail(seriesIdentifier) + "/issues/current";
+    }
+
+    public String issueDetail(String seriesIdentifier, String issueIdentifier) {
+        return seriesDetail(seriesIdentifier) + "/issues/" + pathSegment(issueIdentifier);
+    }
+
     private static LinkedHashMap<String, List<String>> baseQuery(CatalogQueryParams params) {
         var normalized = params.normalized();
         var query = new LinkedHashMap<String, List<String>>();

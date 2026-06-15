@@ -16,10 +16,36 @@ public record DatasetEntry(
         List<String> keywords,
         LocalDate modified,
         AccessLevel accessLevel,
+        CatalogEntryMetadata metadata,
         List<DistributionLink> distributions) implements CatalogEntry {
 
     private static final Comparator<DistributionLink> DISTRIBUTION_ORDER =
             Comparator.comparingInt(link -> link.format().displayOrder());
+
+    public DatasetEntry(
+            String identifier,
+            String title,
+            String description,
+            Office publisher,
+            Office creator,
+            List<Theme> themes,
+            List<String> keywords,
+            LocalDate modified,
+            AccessLevel accessLevel,
+            List<DistributionLink> distributions) {
+        this(
+                identifier,
+                title,
+                description,
+                publisher,
+                creator,
+                themes,
+                keywords,
+                modified,
+                accessLevel,
+                CatalogEntryMetadata.empty(),
+                distributions);
+    }
 
     public DatasetEntry {
         Objects.requireNonNull(identifier, "identifier must not be null");
@@ -31,6 +57,7 @@ public record DatasetEntry(
         keywords = List.copyOf(keywords);
         Objects.requireNonNull(modified, "modified must not be null");
         Objects.requireNonNull(accessLevel, "accessLevel must not be null");
+        Objects.requireNonNull(metadata, "metadata must not be null");
         distributions = List.copyOf(distributions);
     }
 
