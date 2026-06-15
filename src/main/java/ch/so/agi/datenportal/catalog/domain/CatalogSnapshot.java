@@ -16,6 +16,7 @@ public record CatalogSnapshot(
         Map<String, CatalogEntry> allEntriesByIdentifier,
         Instant loadedAt,
         String sourceDescription,
+        String contentHash,
         CatalogSearchIndex searchIndex) implements AutoCloseable {
 
     private static final Comparator<CatalogEntry> VISIBLE_ENTRY_ORDER =
@@ -30,11 +31,12 @@ public record CatalogSnapshot(
         allEntriesByIdentifier = Map.copyOf(allEntriesByIdentifier);
         Objects.requireNonNull(loadedAt, "loadedAt must not be null");
         Objects.requireNonNull(sourceDescription, "sourceDescription must not be null");
+        Objects.requireNonNull(contentHash, "contentHash must not be null");
         Objects.requireNonNull(searchIndex, "searchIndex must not be null");
     }
 
     public static CatalogSnapshot of(Catalog catalog, Instant loadedAt, String sourceDescription) {
-        return of(catalog, loadedAt, sourceDescription, CatalogSearchIndex.empty());
+        return of(catalog, loadedAt, sourceDescription, "", CatalogSearchIndex.empty());
     }
 
     public static CatalogSnapshot of(
@@ -42,9 +44,19 @@ public record CatalogSnapshot(
             Instant loadedAt,
             String sourceDescription,
             CatalogSearchIndex searchIndex) {
+        return of(catalog, loadedAt, sourceDescription, "", searchIndex);
+    }
+
+    public static CatalogSnapshot of(
+            Catalog catalog,
+            Instant loadedAt,
+            String sourceDescription,
+            String contentHash,
+            CatalogSearchIndex searchIndex) {
         Objects.requireNonNull(catalog, "catalog must not be null");
         Objects.requireNonNull(loadedAt, "loadedAt must not be null");
         Objects.requireNonNull(sourceDescription, "sourceDescription must not be null");
+        Objects.requireNonNull(contentHash, "contentHash must not be null");
         Objects.requireNonNull(searchIndex, "searchIndex must not be null");
 
         var visibleEntries = catalog.topLevelEntries().stream()
@@ -68,6 +80,7 @@ public record CatalogSnapshot(
                 allEntriesByIdentifier,
                 loadedAt,
                 sourceDescription,
+                contentHash,
                 searchIndex);
     }
 

@@ -4,7 +4,13 @@ spring:
 
 datenportal:
   catalog:
-    source: classpath:published_catalog_full_54_entries.xtf
+    source-type: classpath
+    classpath-location: published_catalog_full_54_entries.xtf
+    http-connect-timeout: 5s
+    http-read-timeout: 30s
+    max-size: 50MB
+  admin:
+    reload-token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN:}
   search:
     max-results: 500
     default-page-size: 20

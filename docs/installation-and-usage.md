@@ -65,7 +65,8 @@ Standardkonfiguration in `src/main/resources/application.yml`:
 ```yaml
 datenportal:
   catalog:
-    source: classpath:published_catalog_full_54_entries.xtf
+    source-type: classpath
+    classpath-location: published_catalog_full_54_entries.xtf
 ```
 
 Die Datei `spec/fixtures/published_catalog_full_54_entries.xtf` ist dafür als zusätzliche Main-Resource auf dem Classpath eingebunden. Damit startet die Anwendung und auch `@SpringBootTest` standardmässig mit der Full Fixture.
@@ -75,11 +76,46 @@ Unterstützte Quellen in Phase 2:
 - `classpath:published_catalog_full_54_entries.xtf`
 - `file:./pfad/zum/catalog.xtf`
 
+Ab Phase 7 ist zusätzlich eine HTTP-Quelle verfügbar:
+
+```bash
+./gradlew bootRun --args='--datenportal.catalog.source-type=http --datenportal.catalog.http-url=http://localhost:18080/catalog.xtf'
+```
+
+Die alte Property `datenportal.catalog.source` bleibt als Übergang weiter gültig, zum Beispiel `--datenportal.catalog.source=file:./tmp/catalog.xtf`.
+
 Beispiel für einen lokalen Dateipfad:
 
 ```bash
 ./gradlew bootRun --args='--datenportal.catalog.source=file:./tmp/catalog.xtf'
 ```
+
+## Runtime Reload ab Phase 7
+
+Der geschützte Reload-Endpunkt ist deaktiviert, solange kein Token konfiguriert ist:
+
+```bash
+export DATENPORTAL_ADMIN_RELOAD_TOKEN='change-me'
+./gradlew bootRun
+```
+
+Reload:
+
+```bash
+curl -X POST \
+  -H "X-Reload-Token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN}" \
+  http://localhost:8080/admin/catalog/reload
+```
+
+Status:
+
+```bash
+curl \
+  -H "X-Reload-Token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN}" \
+  http://localhost:8080/admin/catalog/status
+```
+
+Fehlerhafte Downloads, ungültiges XML/XTF, Validierungsfehler und Reindexing-Fehler lassen den alten Katalog aktiv.
 
 Wichtige Eigenschaften des Startup-Loadings:
 

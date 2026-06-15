@@ -37,19 +37,20 @@ public class CatalogController {
             HttpServletRequest request,
             Model model) {
         var normalized = params.normalized();
-        var snapshot = catalogService.currentSnapshot();
-        var searchResult = catalogSearchService.search(snapshot, normalized.toSearchQuery());
-        var facets = facetService.compute(snapshot);
-        CatalogPageVm page = homePageVmFactory.create(snapshot, searchResult, normalized, facets);
-        model.addAttribute("page", page);
+        return catalogService.withSnapshot(snapshot -> {
+            var searchResult = catalogSearchService.search(snapshot, normalized.toSearchQuery());
+            var facets = facetService.compute(snapshot);
+            CatalogPageVm page = homePageVmFactory.create(snapshot, searchResult, normalized, facets);
+            model.addAttribute("page", page);
 
-        if (HtmxRequest.targetsResults(request)) {
-            model.addAttribute("results", page.results());
-            model.addAttribute("filterPanel", page.filterPanel());
-            model.addAttribute("queryParams", page.queryParams());
-            return "fragments/catalogResults";
-        }
+            if (HtmxRequest.targetsResults(request)) {
+                model.addAttribute("results", page.results());
+                model.addAttribute("filterPanel", page.filterPanel());
+                model.addAttribute("queryParams", page.queryParams());
+                return "fragments/catalogResults";
+            }
 
-        return "pages/catalog";
+            return "pages/catalog";
+        });
     }
 }

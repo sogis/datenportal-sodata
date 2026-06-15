@@ -128,3 +128,34 @@ Bewusste Grenzen:
 
 - Der Badge `Struktur beschrieben` wird weiterhin nicht synthetisch angezeigt, weil dafür noch keine belastbare Datenquelle im Read-Model existiert.
 - Räumlicher Bezug und Sprache werden nur angezeigt, wenn sie später im Domain-Read-Model materialisiert werden.
+
+## Phase 7
+
+Phase 7 ergänzt den betrieblichen Reload-Mechanismus. Die Anwendung kann den PublishedCatalog jetzt wahlweise aus dem Classpath, aus einer Datei oder per HTTP laden. Die alte Property `datenportal.catalog.source` bleibt als Legacy-Alias erhalten; die neuen Properties `datenportal.catalog.source-type`, `classpath-location`, `http-url`, HTTP-Timeouts und `max-size` sind die bevorzugte Konfiguration.
+
+Neu materialisierte Komponenten:
+
+- `HttpCatalogSource` lädt die XTF/XML-Datei per HTTP GET, setzt Connect- und Request-Timeouts, erzwingt die konfigurierte Maximalgrösse und sanitisiert die Source-Beschreibung für Logs.
+- `CatalogBytesReader` liest alle Quellen einheitlich, berechnet SHA-256 und setzt den Fetch-Zeitpunkt.
+- `CatalogSnapshotBuilder` kapselt die gemeinsame Pipeline aus Parsing, Validierung, Lucene-Reindexing und Snapshot-Erzeugung.
+- `CatalogReloadService` serialisiert Reloads, publiziert nur vollständig gebaute Kandidaten und hält den letzten erfolgreichen sowie fehlgeschlagenen Reload-Status.
+- `AdminCatalogController` stellt `POST /admin/catalog/reload` und `GET /admin/catalog/status` als JSON-Endpunkte bereit.
+- `ReloadTokenVerifier` schützt beide Endpunkte mit dem Header `X-Reload-Token`.
+
+Atomare Veröffentlichung:
+
+1. `CatalogSource` lädt die vollständigen Kandidaten-Bytes.
+2. `XtfPublishedCatalogParser` parst in ein neues Domain-Modell.
+3. `CatalogValidator` prüft den Kandidaten vollständig.
+4. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index.
+5. `CatalogSnapshotBuilder` erzeugt einen neuen immutable `CatalogSnapshot` inklusive Content-Hash.
+6. `CatalogService.replaceSnapshot(...)` tauscht Snapshot und Index unter Write-Lock aus.
+
+Öffentliche Controller verwenden `CatalogService.withSnapshot(...)`. Dadurch laufen Suche, Facetten und ViewModel-Aufbau innerhalb eines Read-Locks. Ein Reload wartet beim Austausch auf aktive Leser und schliesst den alten Lucene-Index erst danach. Fehlerhafte Downloads, ungültiges XML, Validierungsfehler oder Indexfehler verändern den aktiven Snapshot nicht.
+
+Sicherheit:
+
+- Der Reload-Token kommt ausschliesslich aus `datenportal.admin.reload-token`, typischerweise via `DATENPORTAL_ADMIN_RELOAD_TOKEN`.
+- Fehlender oder falscher Token liefert `401 Unauthorized`.
+- Ein leerer konfigurierter Token deaktiviert die Admin-Endpunkte mit `503 Service Unavailable`.
+- Tokens, credential-haltige URLs, Query-Parameter und Fragments werden nicht geloggt.

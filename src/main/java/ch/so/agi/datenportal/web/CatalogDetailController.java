@@ -24,28 +24,34 @@ public final class CatalogDetailController {
 
     @GetMapping("/datasets/{identifier}")
     public String datasetDetail(@PathVariable String identifier, Model model) {
-        var entry = catalogService.findAnyEntry(identifier)
-                .orElseThrow(() -> notFound(identifier));
-        if (!(entry instanceof DatasetEntry dataset)) {
-            throw notFound(identifier);
-        }
+        return catalogService.withSnapshot(snapshot -> {
+            var entry = snapshot.findAnyEntry(identifier)
+                    .orElseThrow(() -> notFound(identifier));
+            if (!(entry instanceof DatasetEntry dataset)) {
+                throw notFound(identifier);
+            }
 
-        model.addAttribute("page", detailPageVmFactory.dataset(dataset));
-        return "pages/datasetDetail";
+            model.addAttribute("page", detailPageVmFactory.dataset(dataset));
+            return "pages/datasetDetail";
+        });
     }
 
     @GetMapping("/series/{seriesIdentifier}")
     public String seriesDetail(@PathVariable String seriesIdentifier, Model model) {
-        DatasetSeriesEntry series = findSeries(seriesIdentifier);
-        model.addAttribute("page", detailPageVmFactory.series(series));
-        return "pages/seriesDetail";
+        return catalogService.withSnapshot(snapshot -> {
+            DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
+            model.addAttribute("page", detailPageVmFactory.series(series));
+            return "pages/seriesDetail";
+        });
     }
 
     @GetMapping("/series/{seriesIdentifier}/issues/current")
     public String currentIssueDetail(@PathVariable String seriesIdentifier, Model model) {
-        DatasetSeriesEntry series = findSeries(seriesIdentifier);
-        model.addAttribute("page", detailPageVmFactory.issue(series, series.currentIssueOrThrow()));
-        return "pages/issueDetail";
+        return catalogService.withSnapshot(snapshot -> {
+            DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
+            model.addAttribute("page", detailPageVmFactory.issue(series, series.currentIssueOrThrow()));
+            return "pages/issueDetail";
+        });
     }
 
     @GetMapping("/series/{seriesIdentifier}/issues/{issueIdentifier}")
@@ -53,18 +59,20 @@ public final class CatalogDetailController {
             @PathVariable String seriesIdentifier,
             @PathVariable String issueIdentifier,
             Model model) {
-        DatasetSeriesEntry series = findSeries(seriesIdentifier);
-        DatasetIssueEntry issue = series.issues().stream()
-                .filter(candidate -> candidate.identifier().equals(issueIdentifier))
-                .findFirst()
-                .orElseThrow(() -> notFound(issueIdentifier));
+        return catalogService.withSnapshot(snapshot -> {
+            DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
+            DatasetIssueEntry issue = series.issues().stream()
+                    .filter(candidate -> candidate.identifier().equals(issueIdentifier))
+                    .findFirst()
+                    .orElseThrow(() -> notFound(issueIdentifier));
 
-        model.addAttribute("page", detailPageVmFactory.issue(series, issue));
-        return "pages/issueDetail";
+            model.addAttribute("page", detailPageVmFactory.issue(series, issue));
+            return "pages/issueDetail";
+        });
     }
 
-    private DatasetSeriesEntry findSeries(String seriesIdentifier) {
-        var entry = catalogService.findAnyEntry(seriesIdentifier)
+    private static DatasetSeriesEntry findSeries(ch.so.agi.datenportal.catalog.domain.CatalogSnapshot snapshot, String seriesIdentifier) {
+        var entry = snapshot.findAnyEntry(seriesIdentifier)
                 .orElseThrow(() -> notFound(seriesIdentifier));
         if (!(entry instanceof DatasetSeriesEntry series)) {
             throw notFound(seriesIdentifier);

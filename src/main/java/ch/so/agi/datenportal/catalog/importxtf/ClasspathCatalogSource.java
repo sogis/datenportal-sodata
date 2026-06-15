@@ -1,18 +1,32 @@
 package ch.so.agi.datenportal.catalog.importxtf;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.util.Objects;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.unit.DataSize;
 
 public final class ClasspathCatalogSource implements CatalogSource {
 
     private final ResourceLoader resourceLoader;
     private final String classpathLocation;
+    private final DataSize maxSize;
+    private final Clock clock;
 
     public ClasspathCatalogSource(ResourceLoader resourceLoader, String classpathLocation) {
+        this(resourceLoader, classpathLocation, DataSize.ofMegabytes(50), Clock.systemUTC());
+    }
+
+    public ClasspathCatalogSource(
+            ResourceLoader resourceLoader,
+            String classpathLocation,
+            DataSize maxSize,
+            Clock clock) {
         this.resourceLoader = Objects.requireNonNull(resourceLoader, "resourceLoader must not be null");
         this.classpathLocation = normalize(classpathLocation);
+        this.maxSize = Objects.requireNonNull(maxSize, "maxSize must not be null");
+        this.clock = Objects.requireNonNull(clock, "clock must not be null");
     }
 
     @Override
@@ -23,7 +37,7 @@ public final class ClasspathCatalogSource implements CatalogSource {
         }
 
         try (var inputStream = resource.getInputStream()) {
-            return new CatalogBytes(inputStream.readAllBytes(), description());
+            return CatalogBytesReader.read(inputStream, description(), maxSize, clock);
         } catch (IOException ex) {
             throw new CatalogSourceException("Failed to load classpath catalog resource: " + description(), ex);
         }

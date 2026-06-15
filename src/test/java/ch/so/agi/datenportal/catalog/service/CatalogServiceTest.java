@@ -10,11 +10,18 @@ import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.Theme;
+import ch.so.agi.datenportal.search.CatalogSearchIndex;
+import ch.so.agi.datenportal.search.SearchHit;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 class CatalogServiceTest {
@@ -61,6 +68,65 @@ class CatalogServiceTest {
                 .containsExactly("replacement-dataset");
     }
 
+    @Test
+    void replaceSnapshotWaitsForActiveSnapshotReadersBeforeClosingOldIndex() throws Exception {
+        var oldIndex = new CloseTrackingSearchIndex();
+        CatalogSnapshot initial = CatalogSnapshot.of(
+                createInitialSnapshot().catalog(),
+                Instant.parse("2026-06-14T08:00:00Z"),
+                "initial",
+                "initial-hash",
+                oldIndex);
+        CatalogService catalogService = new CatalogService(initial);
+        CatalogSnapshot replacement = CatalogSnapshot.of(
+                new Catalog(
+                        List.of(new DatasetEntry(
+                                "new-dataset",
+                                "New",
+                                "Beschreibung",
+                                new Office("office", "Amt", Optional.empty()),
+                                new Office("office", "Amt", Optional.empty()),
+                                List.of(new Theme("theme", "Thema")),
+                                List.of("New"),
+                                LocalDate.parse("2026-06-01"),
+                                AccessLevel.OPEN,
+                                List.of(new DistributionLink(URI.create("https://example.com/new.csv"), DistributionFormat.CSV)))),
+                        List.of()),
+                Instant.parse("2026-06-14T09:00:00Z"),
+                "replacement");
+
+        CountDownLatch readerStarted = new CountDownLatch(1);
+        CountDownLatch releaseReader = new CountDownLatch(1);
+        var executor = Executors.newFixedThreadPool(2);
+        try {
+            CompletableFuture<String> reader = CompletableFuture.supplyAsync(() -> catalogService.withSnapshot(snapshot -> {
+                readerStarted.countDown();
+                try {
+                    releaseReader.await(2, TimeUnit.SECONDS);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+                return snapshot.sourceDescription();
+            }), executor);
+            assertThat(readerStarted.await(2, TimeUnit.SECONDS)).isTrue();
+
+            CompletableFuture<Void> writer = CompletableFuture.runAsync(() -> catalogService.replaceSnapshot(replacement), executor);
+            Thread.sleep(100);
+
+            assertThat(writer.isDone()).isFalse();
+            assertThat(oldIndex.closed()).isFalse();
+
+            releaseReader.countDown();
+
+            assertThat(reader.get(2, TimeUnit.SECONDS)).isEqualTo("initial");
+            writer.get(2, TimeUnit.SECONDS);
+            assertThat(oldIndex.closed()).isTrue();
+            assertThat(catalogService.currentSnapshot().sourceDescription()).isEqualTo("replacement");
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
     private static CatalogSnapshot createInitialSnapshot() {
         return CatalogSnapshot.of(
                 new Catalog(
@@ -99,5 +165,29 @@ class CatalogServiceTest {
                                         true))))),
                 Instant.parse("2026-06-14T08:00:00Z"),
                 "initial");
+    }
+
+    private static final class CloseTrackingSearchIndex implements CatalogSearchIndex {
+
+        private final AtomicBoolean closed = new AtomicBoolean();
+
+        @Override
+        public List<SearchHit> search(String userQuery, int maxResults) {
+            return List.of();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public void close() {
+            closed.set(true);
+        }
+
+        boolean closed() {
+            return closed.get();
+        }
     }
 }

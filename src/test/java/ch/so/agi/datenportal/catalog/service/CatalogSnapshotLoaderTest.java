@@ -38,10 +38,11 @@ class CatalogSnapshotLoaderTest {
     void loadedSnapshotContainsBuiltSearchIndex() {
         var loader = new CatalogSnapshotLoader(
                 source(),
-                (inputStream, sourceDescription) -> catalog(),
-                new CatalogValidator(),
-                new CatalogSearchIndexBuilder(new CatalogDocumentMapper()),
-                CLOCK);
+                new CatalogSnapshotBuilder(
+                        (inputStream, sourceDescription) -> catalog(),
+                        new CatalogValidator(),
+                        new CatalogSearchIndexBuilder(new CatalogDocumentMapper()),
+                        CLOCK));
 
         var snapshot = loader.load(new CatalogBytes("<TRANSFER/>".getBytes(StandardCharsets.UTF_8), "test"));
 
@@ -55,10 +56,11 @@ class CatalogSnapshotLoaderTest {
     void indexBuildFailurePreventsSnapshotCreation() {
         var loader = new CatalogSnapshotLoader(
                 source(),
-                (inputStream, sourceDescription) -> catalog(),
-                new CatalogValidator(),
-                new FailingSearchIndexBuilder(),
-                CLOCK);
+                new CatalogSnapshotBuilder(
+                        (inputStream, sourceDescription) -> catalog(),
+                        new CatalogValidator(),
+                        new FailingSearchIndexBuilder(),
+                        CLOCK));
 
         assertThatThrownBy(() -> loader.load(new CatalogBytes("<TRANSFER/>".getBytes(StandardCharsets.UTF_8), "test")))
                 .isInstanceOf(CatalogSearchIndexBuildException.class);
