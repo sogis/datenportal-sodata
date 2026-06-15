@@ -20,5 +20,6 @@ class DatenportalApplicationTests {
         assertThat(catalogService.visibleEntries()).hasSize(54);
         assertThat(catalogService.findVisibleEntry("ch.so.bauinventar")).isPresent();
         assertThat(catalogService.findAnyEntry("ch.so.abstimmungsresultate_2026")).isPresent();
+        assertThat(catalogService.currentSnapshot().searchIndex().isEmpty()).isFalse();
     }
 }

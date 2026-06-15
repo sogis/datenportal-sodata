@@ -1,5 +1,6 @@
 package ch.so.agi.datenportal.catalog.domain;
 
+import ch.so.agi.datenportal.search.CatalogSearchIndex;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -14,7 +15,8 @@ public record CatalogSnapshot(
         Map<String, CatalogEntry> visibleEntriesByIdentifier,
         Map<String, CatalogEntry> allEntriesByIdentifier,
         Instant loadedAt,
-        String sourceDescription) {
+        String sourceDescription,
+        CatalogSearchIndex searchIndex) implements AutoCloseable {
 
     private static final Comparator<CatalogEntry> VISIBLE_ENTRY_ORDER =
             Comparator.comparing(CatalogEntry::modified)
@@ -28,12 +30,22 @@ public record CatalogSnapshot(
         allEntriesByIdentifier = Map.copyOf(allEntriesByIdentifier);
         Objects.requireNonNull(loadedAt, "loadedAt must not be null");
         Objects.requireNonNull(sourceDescription, "sourceDescription must not be null");
+        Objects.requireNonNull(searchIndex, "searchIndex must not be null");
     }
 
     public static CatalogSnapshot of(Catalog catalog, Instant loadedAt, String sourceDescription) {
+        return of(catalog, loadedAt, sourceDescription, CatalogSearchIndex.empty());
+    }
+
+    public static CatalogSnapshot of(
+            Catalog catalog,
+            Instant loadedAt,
+            String sourceDescription,
+            CatalogSearchIndex searchIndex) {
         Objects.requireNonNull(catalog, "catalog must not be null");
         Objects.requireNonNull(loadedAt, "loadedAt must not be null");
         Objects.requireNonNull(sourceDescription, "sourceDescription must not be null");
+        Objects.requireNonNull(searchIndex, "searchIndex must not be null");
 
         var visibleEntries = catalog.topLevelEntries().stream()
                 .sorted(VISIBLE_ENTRY_ORDER)
@@ -55,7 +67,8 @@ public record CatalogSnapshot(
                 visibleEntriesByIdentifier,
                 allEntriesByIdentifier,
                 loadedAt,
-                sourceDescription);
+                sourceDescription,
+                searchIndex);
     }
 
     public Optional<CatalogEntry> findVisibleEntry(String identifier) {
@@ -68,6 +81,11 @@ public record CatalogSnapshot(
 
     public boolean isEmpty() {
         return visibleEntries.isEmpty();
+    }
+
+    @Override
+    public void close() {
+        searchIndex.close();
     }
 
     private static void register(Map<String, CatalogEntry> entries, CatalogEntry entry) {

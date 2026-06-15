@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 
 @Configuration
-@EnableConfigurationProperties(CatalogProperties.class)
+@EnableConfigurationProperties({CatalogProperties.class, SearchProperties.class})
 public class CatalogImportConfiguration {
 
     @Bean

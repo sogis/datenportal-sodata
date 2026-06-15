@@ -34,6 +34,9 @@ public final class CatalogService {
     }
 
     public void replaceSnapshot(CatalogSnapshot snapshot) {
-        snapshotReference.set(Objects.requireNonNull(snapshot, "snapshot must not be null"));
+        var previous = snapshotReference.getAndSet(Objects.requireNonNull(snapshot, "snapshot must not be null"));
+        if (previous != snapshot) {
+            previous.close();
+        }
     }
 }

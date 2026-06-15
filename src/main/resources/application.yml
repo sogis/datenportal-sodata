@@ -5,6 +5,10 @@ spring:
 datenportal:
   catalog:
     source: classpath:published_catalog_full_54_entries.xtf
+  search:
+    max-results: 500
+    default-page-size: 20
+    max-page-size: 100
 
 gg:
   jte:

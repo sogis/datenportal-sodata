@@ -24,11 +24,11 @@ Aktuell materialisierte Pakete:
 - `ClasspathCatalogSource` und `FileCatalogSource` laden die rohen XTF-Bytes aus Classpath oder Dateisystem.
 - `XtfPublishedCatalogParser` liest PublishedCatalog per namespace-aware StAX, ist prefix-unabhängig und erzwingt XML-Sicherheitsregeln ohne DTD oder externe Entities.
 - `CatalogValidator` prüft das gemappte Domain-Modell auf fachliche Mindestregeln wie eindeutige Identifier, vorhandene Distributions und aktuelle Ausgaben.
-- `CatalogSnapshotLoader` baut aus Quelle, Parser und Validator den initialen `CatalogSnapshot`.
-- `CatalogService` hält den aktuell aktiven `CatalogSnapshot` in-memory und bietet lesende Zugriffe für Web und spätere Reload-Phasen.
-- `CatalogController` rendert die Katalog-Startseite auf `/` und `/datasets` mit Top-Level-Einträgen aus dem geladenen Snapshot.
+- `CatalogSnapshotLoader` baut aus Quelle, Parser, Validator und Lucene-Index-Builder den initialen `CatalogSnapshot`.
+- `CatalogService` hält den aktuell aktiven `CatalogSnapshot` in-memory, tauscht ihn atomar aus und schliesst beim Austausch den alten Suchindex.
+- `CatalogController` rendert die Katalog-Startseite auf `/` und `/datasets` mit Top-Level-Einträgen aus dem geladenen Snapshot und Lucene-backed Suche.
 - `HomePageVmFactory`, `FilterVmFactory` und `ResultsVmFactory` mappen Domainobjekte und Suchresultate in UI-orientierte ViewModels.
-- `CatalogSnapshot` kapselt den veröffentlichten Read-Model-Stand inklusive sichtbarer Top-Level-Einträge und identifizierbarer Ausgaben.
+- `CatalogSnapshot` kapselt den veröffentlichten Read-Model-Stand inklusive sichtbarer Top-Level-Einträge, identifizierbarer Ausgaben und aktivem `CatalogSearchIndex`.
 - `DatasetEntry`, `DatasetSeriesEntry` und `DatasetIssueEntry` bilden normale Datensätze, Datenreihen und einzelne Ausgaben immutable ab.
 
 ## Startup-Ablauf
@@ -37,10 +37,11 @@ Aktuell materialisierte Pakete:
 2. `CatalogSource` lädt die vollständige XTF-Datei in `CatalogBytes`.
 3. `XtfPublishedCatalogParser` prüft Header-Modell, XML-Struktur und Pflichtfelder und mappt auf das bestehende Domain-Read-Model.
 4. `CatalogValidator` prüft das resultierende `Catalog` fachlich.
-5. `CatalogSnapshotLoader` erzeugt daraus den initialen `CatalogSnapshot`.
-6. `CatalogService` veröffentlicht diesen Snapshot für Controller und spätere Phasen.
+5. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index aus allen sichtbaren Top-Level-Einträgen.
+6. `CatalogSnapshotLoader` erzeugt daraus den initialen `CatalogSnapshot` inklusive Suchindex.
+7. `CatalogService` veröffentlicht diesen Snapshot für Controller und spätere Phasen.
 
-Fehlschläge beim Laden, Parsen oder Validieren sind fail-fast: Die Anwendung startet in Phase 2 nicht mit leerem Katalog.
+Fehlschläge beim Laden, Parsen, Validieren oder Indexieren sind fail-fast: Die Anwendung startet nicht mit leerem Katalog oder teilweisem Suchindex.
 
 ## Bewusste Grenzen
 
@@ -70,3 +71,32 @@ Die Filter folgen der URL-Konvention des UI-Vertrags: Mehrfachwerte werden als w
 HTMX ist nur progressive Enhancement. Normale GET-Requests liefern die vollständige Seite, HTMX-Requests mit `HX-Target=dataset-results` liefern nur `fragments/catalogResults.jte`.
 
 Phase 3 enthält bewusst keine Frontend-Pagination. Alle passenden Top-Level-Einträge werden sortiert gerendert; manuell gesendete `page`- oder `size`-Parameter werden nicht modelliert und nicht in Links zurückgegeben.
+
+## Phase 4
+
+Phase 4 ersetzt die In-Memory-Textsuche durch einen Lucene-backed Suchindex, ohne die Phase-3-UI neu zu schneiden. `CatalogSearchService` ist der fachliche Einstiegspunkt für Query, Filter, Sortierung und service-seitige Pagination. Leere Suchanfragen verwenden weiterhin direkt `CatalogSnapshot.visibleEntries()`, damit die bestehende Sortier- und Filterlogik erhalten bleibt.
+
+Neu materialisierte Suchkomponenten:
+
+- `CatalogSearchIndex` als austauschbare Index-Abstraktion.
+- `LuceneCatalogSearchIndex` mit `ByteBuffersDirectory`, `GermanAnalyzer`, `IndexReader` und `IndexSearcher`.
+- `CatalogSearchIndexBuilder` für vollständiges Reindexing aus sichtbaren Top-Level-Einträgen.
+- `CatalogDocumentMapper` für Lucene-Documents aus `DatasetEntry` und `DatasetSeriesEntry`.
+- `SearchHit` und `PageRequest` als vorbereitete Ergebnis- und Paging-Objekte.
+- `SearchProperties` unter `datenportal.search` mit `max-results`, `default-page-size` und `max-page-size`.
+
+Indexierte Felder sind zentral in `CatalogSearchFields` dokumentiert. Wichtige Felder sind `entry_id`, `entry_type`, `identifier_exact`, `identifier_text`, `title`, `title_exact`, `description`, `keywords`, `theme_text`, `theme_exact`, `office_text`, `office_exact`, `formats`, `modified_date_epoch_day`, `open_data`, `structure_described`, `issue_years`, `issue_text` und `all_text`.
+
+Ranking:
+
+- Exakte Identifier erhalten den höchsten Boost.
+- Titel und Identifier-Text ranken vor Keywords.
+- Keywords und Issue-Metadaten ranken vor Thema/Amt.
+- Beschreibung und `all_text` sind schwache Fallback-Felder.
+- Bei `sort=title-asc` oder `sort=modified-desc` bestimmt weiterhin die fachliche Sortierung die Reihenfolge; Lucene bildet nur die Treffermenge.
+
+Datenreihen werden als ein Top-Level-Dokument indexiert. Historische und aktuelle Ausgaben fliessen über `issue_text` und `issue_years` in die Suchbarkeit der Datenreihe ein, werden aber nicht als eigene Top-Level-Treffer zurückgegeben.
+
+Reindexing ist für spätere Reload-Phasen vorbereitet: Für jeden neuen Katalogstand wird ein vollständiger neuer In-Memory-Index gebaut und erst mit dem neuen `CatalogSnapshot` veröffentlicht. Beim späteren `CatalogService.replaceSnapshot(...)` wird der alte Snapshot nach dem atomaren Austausch geschlossen; dadurch wird auch der alte Lucene-Index freigegeben. Ein Reload-Endpunkt ist in Phase 4 weiterhin nicht enthalten.
+
+Phase 4 enthält nur service-seitige Pagination in `SearchQuery`/`SearchResult`. Die sichtbare Katalogseite rendert weiterhin alle Treffer und gibt keine `page`- oder `size`-Links aus.

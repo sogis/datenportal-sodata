@@ -2,9 +2,9 @@
 
 Serverseitig gerenderte Datenportal-Webanwendung für den Kanton Solothurn.
 
-## Phase 3 Status
+## Phase 4 Status
 
-Phase 3 ergänzt das technische Grundgerüst, das Domain-Read-Model und den PublishedCatalog-XTF-Import um eine funktionale Katalogseite:
+Phase 4 ergänzt das technische Grundgerüst, das Domain-Read-Model und den PublishedCatalog-XTF-Import um eine Lucene-backed Katalogseite:
 
 - Java 25
 - Spring Boot 4.1.0
@@ -14,7 +14,9 @@ Phase 3 ergänzt das technische Grundgerüst, das Domain-Read-Model und den Publ
 - immutable Katalog-Domainmodell unter `catalog.domain`
 - PublishedCatalog-XTF-Fixture als konfigurierbare Classpath-Katalogquelle
 - Katalogseite auf `/` und `/datasets`
-- serverseitige In-Memory-Suche ohne Lucene
+- serverseitige Lucene-Suche mit In-Memory-Index
+- Reindexing beim Startup aus dem geladenen `CatalogSnapshot`
+- Ranking mit starken Identifier-/Titel-Treffern und schwächeren Beschreibungstreffern
 - Mehrfachfilter für Thema, Fachstelle/Amt, Publikationsdatum und Ressourcentyp
 - aktive Filterchips mit Einzel-Entfernen-Links
 - Listenansicht als Default und Kartenansicht über `view=cards`
@@ -24,7 +26,6 @@ Phase 3 ergänzt das technische Grundgerüst, das Domain-Read-Model und den Publ
 
 Noch nicht enthalten:
 
-- Lucene-Suche
 - Reload-Endpunkt
 - Frontend-Pagination
 - Detailseiten
@@ -49,7 +50,7 @@ Danach ist die Katalogseite erreichbar unter:
 
 ## Query-Parameter
 
-Die Katalogseite unterstützt in Phase 3:
+Die Katalogseite unterstützt in Phase 4:
 
 - `q=<text>`
 - `theme=<themeId>` wiederholt
@@ -60,7 +61,7 @@ Die Katalogseite unterstützt in Phase 3:
 - `view=list|cards`
 - `expanded=<seriesId>` wiederholt
 
-`page` und `size` werden in Phase 3 nicht verwendet und nicht in Links erhalten.
+`page` und `size` sind service-seitig im Suchmodell vorbereitet, werden aber in Phase 4 noch nicht in der UI verwendet und nicht in Links erhalten.
 
 ## Tests Und Checks
 
@@ -77,11 +78,15 @@ Standardkonfiguration in `src/main/resources/application.yml`:
 datenportal:
   catalog:
     source: classpath:published_catalog_full_54_entries.xtf
+  search:
+    max-results: 500
+    default-page-size: 20
+    max-page-size: 100
 ```
 
 Die Datei `spec/fixtures/published_catalog_full_54_entries.xtf` ist als zusätzliche Main-Resource auf dem Classpath eingebunden. Damit startet die Anwendung und auch `@SpringBootTest` standardmässig mit der Full Fixture.
 
-Unterstützte Quellen in Phase 3:
+Unterstützte Quellen in Phase 4:
 
 - `classpath:published_catalog_full_54_entries.xtf`
 - `file:./pfad/zum/catalog.xtf`
