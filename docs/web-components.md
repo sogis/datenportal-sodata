@@ -1,10 +1,10 @@
 # Web Components
 
-Phase 6 integrates the canton chrome through the vendored npm package `so-web-components@0.1.9`.
+Die Anwendung integriert den kantonalen Header und das Breadcrumb über das vendorte npm-Paket `so-web-components@0.1.9`.
 
 ## Runtime Assets
 
-Assets are served by Spring Boot from:
+Assets werden von Spring Boot aus statischen Ressourcen ausgeliefert:
 
 ```text
 src/main/resources/static/vendor/so-web-components/0.1.9/
@@ -17,15 +17,9 @@ src/main/resources/static/vendor/so-web-components/0.1.9/
   README.md
 ```
 
-The package was copied from npm package `so-web-components@0.1.9` with integrity:
+Das Paket wurde aus `so-web-components@0.1.9` übernommen. Die App benötigt standardmässig kein CDN.
 
-```text
-sha512-y9jqygazx5PVvSxDQWMp+JLV29ajZaJWP5UvCQOTL6WAMcBrocxUbHsira3/Hz8EliVlW1reixuVLDl45SD+BQ==
-```
-
-No CDN is required for the default application runtime.
-
-## Configuration
+## Konfiguration
 
 ```yaml
 datenportal:
@@ -36,23 +30,38 @@ datenportal:
     use-cdn: false
 ```
 
-- `enabled=true` renders `<so-header>` and `<so-breadcrumb>` as the primary page chrome.
-- `enabled=false` renders only semantic JTE fallback markup and does not include Web Component assets.
-- `use-cdn=false` is the production-like default. `use-cdn=true` is only for local experiments with a pinned version.
+- `enabled=true` rendert `<so-header>` und `<so-breadcrumb>` als primären Page Chrome.
+- `enabled=false` rendert nur semantische JTE-Fallbacks.
+- `use-cdn=false` ist der produktionsnahe Standard.
+- `use-cdn=true` ist nur für lokale Experimente mit gepinnter Version vorgesehen.
 
 ## Templates
 
-The page chrome is centralized in `src/main/jte/layouts/main.jte`.
+Der Page Chrome ist in `src/main/jte/layouts/main.jte` zentralisiert.
 
-- `components/chrome/webComponentsLoader.jte` includes Web Component JS/CSS once per full page.
-- `components/chrome/soHeader.jte` renders `<so-header>` and a `noscript` fallback.
-- `components/chrome/soBreadcrumb.jte` renders `<so-breadcrumb>` and a `noscript` fallback.
-- `components/chrome/headerFallback.jte` and `components/chrome/breadcrumbFallback.jte` are used directly when Web Components are disabled.
+- `components/chrome/webComponentsLoader.jte` lädt JS/CSS nur auf vollständigen Seiten.
+- `components/chrome/soHeader.jte` rendert `<so-header>` und einen `noscript`-Fallback.
+- `components/chrome/soBreadcrumb.jte` rendert `<so-breadcrumb>` und einen `noscript`-Fallback.
+- `components/chrome/headerFallback.jte` und `components/chrome/breadcrumbFallback.jte` werden direkt verwendet, wenn Web Components deaktiviert sind.
 
-HTMX fragments must not include layout chrome or asset tags.
+HTMX-Fragmente enthalten keinen Page Chrome und keine Asset-Tags.
+
+## Caching
+
+`/vendor/so-web-components/**` wird mit langer TTL ausgeliefert:
+
+```text
+Cache-Control: public, max-age=31536000
+```
+
+Das ist akzeptabel, weil die Pfade die Web-Component-Version enthalten. Bei einem Versionswechsel wird der Pfad über `datenportal.web-components.version` beziehungsweise `asset-base-path` geändert.
 
 ## Fonts
 
-The vendored `styles/fonts.css` is the stylesheet published by `so-web-components@0.1.9`. No additional font binaries are committed under `src/main/resources/static/assets/fonts/`.
+Die vendorte `styles/fonts.css` stammt aus `so-web-components@0.1.9`. Aktuell werden keine zusätzlichen Font-Binaries unter `src/main/resources/static/assets/fonts/` committed.
 
-Do not add placeholder font files. If maintainers provide separate licensed canton font files later, place them under `src/main/resources/static/assets/fonts/` and update `fonts.css` with web paths only, never absolute local paths.
+Keine Platzhalter-Fontdateien hinzufügen. Falls Maintainer lizenzierte kantonale Fontdateien bereitstellen, werden sie unter `src/main/resources/static/assets/fonts/` abgelegt und `fonts.css` verwendet Web-Pfade, nie absolute lokale Pfade.
+
+## Content Security Policy
+
+Die globale CSP erlaubt Skripte und Assets von `self`. `style-src` erlaubt zusätzlich Inline-Styles, weil die aktuellen Web Components Shadow-DOM-Styles erzeugen. Externe CDN-Assets sollten produktiv nicht verwendet werden.

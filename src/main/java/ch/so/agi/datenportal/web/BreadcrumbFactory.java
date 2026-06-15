@@ -42,8 +42,12 @@ public class BreadcrumbFactory {
     }
 
     public BreadcrumbVm notFound() {
+        return error("Seite nicht gefunden");
+    }
+
+    public BreadcrumbVm error(String label) {
         var items = catalogItems();
-        items.add(new BreadcrumbItemVm("Seite nicht gefunden", Optional.empty(), true));
+        items.add(new BreadcrumbItemVm(label, Optional.empty(), true));
         return new BreadcrumbVm(items);
     }
 

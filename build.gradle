@@ -32,6 +32,7 @@ sourceSets {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'gg.jte:jte-spring-boot-starter-4:3.2.4'
 
@@ -51,6 +52,10 @@ tasks.named('test') {
 jte {
     generate()
     binaryStaticContent = true
+}
+
+springBoot {
+    buildInfo()
 }
 
 tasks.named('wrapper') {

@@ -1,161 +1,132 @@
 # Architektur
 
-## Phase 2
+Die Anwendung ist eine serverseitig gerenderte Spring-Boot-Webanwendung mit JTE, HTMX als Progressive Enhancement, `so-web-components` für Header/Breadcrumb und einem immutable In-Memory-Katalog.
 
-Die Anwendung läuft ab Phase 2 weiterhin als serverseitig gerenderte Spring-Boot-Webanwendung mit JTE, lokalem HTMX-Asset und immutablem Katalog-Read-Model, lädt den Katalog aber nicht mehr aus einer hartcodierten `StaticCatalogFactory`.
-Stattdessen wird beim Spring-Startup eine PublishedCatalog-XTF-Datei aus einer konfigurierten Quelle geladen, sicher geparst, validiert und als `CatalogSnapshot` veröffentlicht.
+## Laufzeitmodell
 
-JTE läuft weiterhin bewusst im Development-Mode, damit das Projekt ohne zusätzliche Precompile-Strategie lokal lauffähig bleibt.
+Beim Start oder Reload wird die PublishedCatalog-XTF/XML-Quelle vollständig geladen, sicher geparst, validiert, in ein Domain-Read-Model überführt und mit einem vollständig neu gebauten Lucene-Index als `CatalogSnapshot` veröffentlicht.
 
-Aktuell materialisierte Pakete:
+Der aktive Snapshot enthält:
 
-- `ch.so.agi.datenportal`
-- `ch.so.agi.datenportal.config`
-- `ch.so.agi.datenportal.catalog.domain`
-- `ch.so.agi.datenportal.catalog.importxtf`
-- `ch.so.agi.datenportal.catalog.service`
-- `ch.so.agi.datenportal.web`
-- `ch.so.agi.datenportal.web.view`
+- normale Datensätze
+- Datenreihen
+- Ausgaben von Datenreihen
+- sichtbare Top-Level-Einträge
+- Lookup-Maps für Detailseiten
+- Ladezeitpunkt, Source-Beschreibung und Content-Hash
+- aktiven `CatalogSearchIndex`
 
-## Verantwortlichkeiten
+`CatalogService` hält den Snapshot in-memory und tauscht ihn atomar unter einem Read/Write-Lock. Öffentliche Controller verwenden `withSnapshot(...)`, damit Suche, Facetten und ViewModel-Aufbau konsistent denselben Katalogstand sehen.
 
-- `CatalogImportConfiguration` verdrahtet `CatalogProperties`, `CatalogSource`, Parser und initialen Snapshot für den Spring-Startup.
-- `CatalogProperties` steuert die Katalogquelle über `datenportal.catalog.source`.
-- `ClasspathCatalogSource` und `FileCatalogSource` laden die rohen XTF-Bytes aus Classpath oder Dateisystem.
-- `XtfPublishedCatalogParser` liest PublishedCatalog per namespace-aware StAX, ist prefix-unabhängig und erzwingt XML-Sicherheitsregeln ohne DTD oder externe Entities.
-- `CatalogValidator` prüft das gemappte Domain-Modell auf fachliche Mindestregeln wie eindeutige Identifier, vorhandene Distributions und aktuelle Ausgaben.
-- `CatalogSnapshotLoader` baut aus Quelle, Parser, Validator und Lucene-Index-Builder den initialen `CatalogSnapshot`.
-- `CatalogService` hält den aktuell aktiven `CatalogSnapshot` in-memory, tauscht ihn atomar aus und schliesst beim Austausch den alten Suchindex.
-- `CatalogController` rendert die Katalog-Startseite auf `/` und `/datasets` mit Top-Level-Einträgen aus dem geladenen Snapshot und Lucene-backed Suche.
-- `HomePageVmFactory`, `FilterVmFactory` und `ResultsVmFactory` mappen Domainobjekte und Suchresultate in UI-orientierte ViewModels.
-- `CatalogSnapshot` kapselt den veröffentlichten Read-Model-Stand inklusive sichtbarer Top-Level-Einträge, identifizierbarer Ausgaben und aktivem `CatalogSearchIndex`.
-- `DatasetEntry`, `DatasetSeriesEntry` und `DatasetIssueEntry` bilden normale Datensätze, Datenreihen und einzelne Ausgaben immutable ab.
+## Materialisierte Pakete
 
-## Startup-Ablauf
+```text
+ch.so.agi.datenportal
+  admin.actuator
+  admin.reload
+  catalog.domain
+  catalog.importxtf
+  catalog.service
+  config
+  search
+  support
+  web
+  web.view
+```
 
-1. Spring bindet `datenportal.catalog.source`.
-2. `CatalogSource` lädt die vollständige XTF-Datei in `CatalogBytes`.
-3. `XtfPublishedCatalogParser` prüft Header-Modell, XML-Struktur und Pflichtfelder und mappt auf das bestehende Domain-Read-Model.
-4. `CatalogValidator` prüft das resultierende `Catalog` fachlich.
-5. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index aus allen sichtbaren Top-Level-Einträgen.
-6. `CatalogSnapshotLoader` erzeugt daraus den initialen `CatalogSnapshot` inklusive Suchindex.
-7. `CatalogService` veröffentlicht diesen Snapshot für Controller und spätere Phasen.
+Wichtige Verantwortlichkeiten:
 
-Fehlschläge beim Laden, Parsen, Validieren oder Indexieren sind fail-fast: Die Anwendung startet nicht mit leerem Katalog oder teilweisem Suchindex.
+- `catalog.importxtf`: Katalogquellen, Byte-Lesen, XTF/XML-Parser, XML-Sicherheit und Validierung.
+- `catalog.service`: Snapshot-Building, initialer Load, atomarer Reload und aktiver Snapshot.
+- `search`: Lucene-Dokumente, Indexaufbau, Suche, Filter, Sortierung und Facetten.
+- `web`: Controller, Query-Parameter, ViewModel-Factories, Page Chrome, Fehlerseiten.
+- `admin.reload`: geschützte JSON-Endpunkte für Reload und Status.
+- `admin.actuator`: Health- und Info-Beiträge für Betrieb.
+- `config`: Properties, statisches Asset-Caching und Security-Header.
+
+## Startup
+
+1. Spring bindet `datenportal.catalog.*`.
+2. `CatalogSource` lädt die vollständigen Katalogbytes.
+3. `XtfPublishedCatalogParser` parst namespace-aware und XXE-sicher.
+4. `CatalogValidator` prüft Pflichtregeln.
+5. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index.
+6. `CatalogSnapshotBuilder` erzeugt den immutable `CatalogSnapshot`.
+7. `CatalogService` stellt den Snapshot für Web, Suche und Actuator bereit.
+
+Fehlschläge beim initialen Laden sind fail-fast. Die Anwendung startet nicht still mit leerem Katalog.
+
+## Reload
+
+`POST /admin/catalog/reload` ist über `X-Reload-Token` geschützt. Der Token stammt aus `datenportal.admin.reload-token`, typischerweise `DATENPORTAL_ADMIN_RELOAD_TOKEN`.
+
+Reload-Ablauf:
+
+1. Quelle laden.
+2. Kandidat parsen.
+3. Kandidat validieren.
+4. Kandidaten-Index bauen.
+5. Kandidaten-Snapshot erzeugen.
+6. Snapshot und Index atomar veröffentlichen.
+
+Bei Fehlern bleibt der alte Snapshot samt altem Lucene-Index aktiv. Parallel laufende Reloads werden mit `409 Conflict` abgelehnt.
+
+## Web Layer
+
+Die Katalogseite auf `/` und `/datasets` rendert Suche, Mehrfachfilter, Listenansicht, Kartenansicht und HTMX-Fragmente. Detailseiten liegen unter:
+
+```text
+/datasets/{identifier}
+/series/{seriesIdentifier}
+/series/{seriesIdentifier}/issues/current
+/series/{seriesIdentifier}/issues/{issueIdentifier}
+```
+
+JTE-Templates erhalten nur vorbereitete ViewModels. Fachlogik bleibt in Domain, Services und Factories.
+
+## Fehlerseiten
+
+Fachliche 404s über `CatalogNotFoundException`, statische 404s und der generische Boot-Fehlerpfad werden kontrolliert gerendert:
+
+- `pages/notFound.jte` für 404
+- `pages/error.jte` für 5xx und andere Fehler
+
+Beide nutzen den normalen Page Chrome mit Header/Breadcrumb. Stacktraces, Exception-Klassen und interne Pfade werden nicht an Nutzer ausgeliefert.
+
+## Actuator
+
+Exponiert sind nur:
+
+```text
+/actuator/health
+/actuator/info
+```
+
+Eigene Health-Komponenten:
+
+- `catalogSnapshot`: aktiver Snapshot und Counts.
+- `catalogReload`: Reload-Laufstatus und letzter erfolgreicher/fehlgeschlagener Reload.
+- `catalogSearchIndex`: Verfügbarkeit des aktiven Lucene-Index.
+
+Der Info-Endpunkt enthält App-Name, Package-Basis, Java-Version und optional Gradle-Build-Informationen.
+
+## Static Assets und Header
+
+Statische CSS-, HTMX-, Web-Component-, Font- und optionale Bildpfade werden über `StaticAssetCachingConfiguration` mit Cache-Headern ausgeliefert. Versionierte Web-Component-Assets erhalten eine lange TTL, nicht fingerprinted CSS eine kurze TTL.
+
+`SecurityHeadersConfiguration` setzt grundlegende sichere Response-Header:
+
+- `X-Content-Type-Options`
+- `Referrer-Policy`
+- `X-Frame-Options`
+- `Permissions-Policy`
+- `Content-Security-Policy`
 
 ## Bewusste Grenzen
 
-Phase 2 enthält bewusst noch keine:
-
-- HTTP-Quelle
-- Lucene-Suche oder Filterlogik
-- Reload-Endpunkte oder atomischen Snapshot/Index-Swap
-- Persistenz zusätzlicher XTF-Metadaten wie Kontakt, Lizenz oder Temporal Coverage im Domain-Modell
-- generische INTERLIS-Framework-Abstraktion
-
-Diese Metadaten werden bereits gelesen und validiert, aber noch nicht in das Phase-1-Read-Model übernommen.
-
-## Phase 3
-
-Phase 3 ergänzt die Startseite um eine serverseitige Katalogabfrage ohne Lucene. Die Query-Parameter werden in `CatalogQueryParams` normalisiert und in eine fachliche `SearchQuery` überführt. `CatalogQueryService` sucht und filtert ausschliesslich im aktiven `CatalogSnapshot`; dadurch bleibt die Phase unabhängig von Indexaufbau und Reload.
-
-Neu materialisierte Pakete und Komponenten:
-
-- `ch.so.agi.datenportal.search` mit `SearchQuery`, `SearchFilters`, `ModifiedDateRange`, `SortMode`, `SearchResult`, `FacetService` und `CatalogQueryService`
-- `CatalogQueryParams`, `ViewMode`, `HtmxRequest` und `CatalogUrlFactory` im Web-Layer
-- UI-ViewModels für Filtergruppen, aktive Filterchips, Resultcontrols, Listenzeilen, Ausgabezeilen und Cards
-- JTE-Fragmente für Resultbereich, Filterbar, aktive Chips, View Toggle, Tabellenansicht und Kartenansicht
-
-Die Filter folgen der URL-Konvention des UI-Vertrags: Mehrfachwerte werden als wiederholte Query-Parameter übertragen. Die Such- und Filterlogik verwendet AND zwischen Kategorien und OR innerhalb einer Kategorie. Die Textsuche normalisiert Gross-/Kleinschreibung und Akzente und durchsucht Titel, Beschreibung, Keywords, Themen, Fachstelle/Amt sowie bei Datenreihen auch Ausgabe-Titel und Ausgabe-Labels.
-
-HTMX ist nur progressive Enhancement. Normale GET-Requests liefern die vollständige Seite, HTMX-Requests mit `HX-Target=dataset-results` liefern nur `fragments/catalogResults.jte`.
-
-Phase 3 enthält bewusst keine Frontend-Pagination. Alle passenden Top-Level-Einträge werden sortiert gerendert; manuell gesendete `page`- oder `size`-Parameter werden nicht modelliert und nicht in Links zurückgegeben.
-
-## Phase 4
-
-Phase 4 ersetzt die In-Memory-Textsuche durch einen Lucene-backed Suchindex, ohne die Phase-3-UI neu zu schneiden. `CatalogSearchService` ist der fachliche Einstiegspunkt für Query, Filter, Sortierung und service-seitige Pagination. Leere Suchanfragen verwenden weiterhin direkt `CatalogSnapshot.visibleEntries()`, damit die bestehende Sortier- und Filterlogik erhalten bleibt.
-
-Neu materialisierte Suchkomponenten:
-
-- `CatalogSearchIndex` als austauschbare Index-Abstraktion.
-- `LuceneCatalogSearchIndex` mit `ByteBuffersDirectory`, `GermanAnalyzer`, `IndexReader` und `IndexSearcher`.
-- `CatalogSearchIndexBuilder` für vollständiges Reindexing aus sichtbaren Top-Level-Einträgen.
-- `CatalogDocumentMapper` für Lucene-Documents aus `DatasetEntry` und `DatasetSeriesEntry`.
-- `SearchHit` und `PageRequest` als vorbereitete Ergebnis- und Paging-Objekte.
-- `SearchProperties` unter `datenportal.search` mit `max-results`, `default-page-size` und `max-page-size`.
-
-Indexierte Felder sind zentral in `CatalogSearchFields` dokumentiert. Wichtige Felder sind `entry_id`, `entry_type`, `identifier_exact`, `identifier_text`, `title`, `title_exact`, `description`, `keywords`, `theme_text`, `theme_exact`, `office_text`, `office_exact`, `formats`, `modified_date_epoch_day`, `open_data`, `structure_described`, `issue_years`, `issue_text` und `all_text`.
-
-Ranking:
-
-- Exakte Identifier erhalten den höchsten Boost.
-- Titel und Identifier-Text ranken vor Keywords.
-- Keywords und Issue-Metadaten ranken vor Thema/Amt.
-- Beschreibung und `all_text` sind schwache Fallback-Felder.
-- Bei `sort=title-asc` oder `sort=modified-desc` bestimmt weiterhin die fachliche Sortierung die Reihenfolge; Lucene bildet nur die Treffermenge.
-
-Datenreihen werden als ein Top-Level-Dokument indexiert. Historische und aktuelle Ausgaben fliessen über `issue_text` und `issue_years` in die Suchbarkeit der Datenreihe ein, werden aber nicht als eigene Top-Level-Treffer zurückgegeben.
-
-Reindexing ist für spätere Reload-Phasen vorbereitet: Für jeden neuen Katalogstand wird ein vollständiger neuer In-Memory-Index gebaut und erst mit dem neuen `CatalogSnapshot` veröffentlicht. Beim späteren `CatalogService.replaceSnapshot(...)` wird der alte Snapshot nach dem atomaren Austausch geschlossen; dadurch wird auch der alte Lucene-Index freigegeben. Ein Reload-Endpunkt ist in Phase 4 weiterhin nicht enthalten.
-
-Phase 4 enthält nur service-seitige Pagination in `SearchQuery`/`SearchResult`. Die sichtbare Katalogseite rendert weiterhin alle Treffer und gibt keine `page`- oder `size`-Links aus.
-
-## Phase 5
-
-Phase 5 ergänzt öffentliche Detailseiten für normale Datensätze, Datenreihen und einzelne Ausgaben. Die Seiten bleiben serverseitig gerendert, verwenden denselben Page Chrome wie die Katalogseite und enthalten keine Datenvorschau, Diagramme, Preview-Tabellen oder zusätzliche JavaScript-Insel.
-
-Neu materialisierte Web-Komponenten:
-
-- `CatalogDetailController` für `/datasets/{identifier}`, `/series/{seriesIdentifier}`, `/series/{seriesIdentifier}/issues/current` und `/series/{seriesIdentifier}/issues/{issueIdentifier}`
-- `DetailPageVmFactory` für `DatasetDetailPageVm`, `SeriesDetailPageVm` und `IssueDetailPageVm`
-- Detail-ViewModels für Downloadbereiche, Metadatenabschnitte und Ausgabenlisten
-- `CatalogNotFoundException` und `CatalogErrorControllerAdvice` für saubere 404-Seiten mit normalem Page Chrome
-- JTE-Seiten `datasetDetail.jte`, `seriesDetail.jte`, `issueDetail.jte` und `notFound.jte`
-- JTE-Komponenten `detailHero.jte`, `detailBadges.jte`, `detailDownloadPanel.jte`, `metadataSection.jte` und `seriesIssues.jte`
-
-Routen- und Linkregeln:
-
-- Normale Datensätze verlinken auf `/datasets/{identifier}`.
-- Datenreihen-Root-Einträge verlinken auf `/series/{seriesIdentifier}`.
-- Die Root-Seite einer Datenreihe zeigt die aktuelle Ausgabe prominent, verlinkt `/series/{seriesIdentifier}/issues/current` und listet alle Ausgaben.
-- Einzelne Ausgaben verlinken auf `/series/{seriesIdentifier}/issues/{issueIdentifier}` und zeigen Rücklink sowie weitere Ausgaben derselben Datenreihe.
-- Falsche Routentypen, unbekannte Identifier und Issue-Identifier unter der falschen Serie liefern 404.
-
-Das Domain-Read-Model wurde gezielt um `CatalogEntryMetadata`, `ContactPoint` und `TemporalCoverage` erweitert. `XtfPublishedCatalogParser` übernimmt die bereits im PublishedCatalog vorhandenen Felder `issued`, `licenseUri`, `landingPage`, `contactPoint`, `accrualPeriodicity` und `temporalCoverage` in diese Metadaten. Diese Erweiterung dient ausschliesslich Detailseiten und verändert keine Lucene-Felder, keine Suchlogik und keine Reload-Semantik.
-
-Bewusste Grenzen:
-
-- Der Badge `Struktur beschrieben` wird weiterhin nicht synthetisch angezeigt, weil dafür noch keine belastbare Datenquelle im Read-Model existiert.
-- Räumlicher Bezug und Sprache werden nur angezeigt, wenn sie später im Domain-Read-Model materialisiert werden.
-
-## Phase 7
-
-Phase 7 ergänzt den betrieblichen Reload-Mechanismus. Die Anwendung kann den PublishedCatalog jetzt wahlweise aus dem Classpath, aus einer Datei oder per HTTP laden. Die alte Property `datenportal.catalog.source` bleibt als Legacy-Alias erhalten; die neuen Properties `datenportal.catalog.source-type`, `classpath-location`, `http-url`, HTTP-Timeouts und `max-size` sind die bevorzugte Konfiguration.
-
-Neu materialisierte Komponenten:
-
-- `HttpCatalogSource` lädt die XTF/XML-Datei per HTTP GET, setzt Connect- und Request-Timeouts, erzwingt die konfigurierte Maximalgrösse und sanitisiert die Source-Beschreibung für Logs.
-- `CatalogBytesReader` liest alle Quellen einheitlich, berechnet SHA-256 und setzt den Fetch-Zeitpunkt.
-- `CatalogSnapshotBuilder` kapselt die gemeinsame Pipeline aus Parsing, Validierung, Lucene-Reindexing und Snapshot-Erzeugung.
-- `CatalogReloadService` serialisiert Reloads, publiziert nur vollständig gebaute Kandidaten und hält den letzten erfolgreichen sowie fehlgeschlagenen Reload-Status.
-- `AdminCatalogController` stellt `POST /admin/catalog/reload` und `GET /admin/catalog/status` als JSON-Endpunkte bereit.
-- `ReloadTokenVerifier` schützt beide Endpunkte mit dem Header `X-Reload-Token`.
-
-Atomare Veröffentlichung:
-
-1. `CatalogSource` lädt die vollständigen Kandidaten-Bytes.
-2. `XtfPublishedCatalogParser` parst in ein neues Domain-Modell.
-3. `CatalogValidator` prüft den Kandidaten vollständig.
-4. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index.
-5. `CatalogSnapshotBuilder` erzeugt einen neuen immutable `CatalogSnapshot` inklusive Content-Hash.
-6. `CatalogService.replaceSnapshot(...)` tauscht Snapshot und Index unter Write-Lock aus.
-
-Öffentliche Controller verwenden `CatalogService.withSnapshot(...)`. Dadurch laufen Suche, Facetten und ViewModel-Aufbau innerhalb eines Read-Locks. Ein Reload wartet beim Austausch auf aktive Leser und schliesst den alten Lucene-Index erst danach. Fehlerhafte Downloads, ungültiges XML, Validierungsfehler oder Indexfehler verändern den aktiven Snapshot nicht.
-
-Sicherheit:
-
-- Der Reload-Token kommt ausschliesslich aus `datenportal.admin.reload-token`, typischerweise via `DATENPORTAL_ADMIN_RELOAD_TOKEN`.
-- Fehlender oder falscher Token liefert `401 Unauthorized`.
-- Ein leerer konfigurierter Token deaktiviert die Admin-Endpunkte mit `503 Service Unavailable`.
-- Tokens, credential-haltige URLs, Query-Parameter und Fragments werden nicht geloggt.
+- Keine Datenbank.
+- Kein Login-System.
+- Kein Admin-UI.
+- Keine CI/CD-Pipeline.
+- Keine Datenvorschau.
+- Keine fachlichen Such- oder UI-Erweiterungen in Phase 8.

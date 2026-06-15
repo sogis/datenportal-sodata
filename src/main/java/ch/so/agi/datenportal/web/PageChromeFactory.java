@@ -55,10 +55,14 @@ public class PageChromeFactory {
     }
 
     public PageChromeVm notFoundPage() {
+        return errorPage("Seite nicht gefunden | Datenportal", "Seite nicht gefunden");
+    }
+
+    public PageChromeVm errorPage(String pageTitle, String breadcrumbLabel) {
         return new PageChromeVm(
-                "Seite nicht gefunden | Datenportal",
+                pageTitle,
                 headerViewModelFactory.forDetailPage(),
-                breadcrumbFactory.notFound(),
+                breadcrumbFactory.error(breadcrumbLabel),
                 webAssetsVmFactory.create());
     }
 }

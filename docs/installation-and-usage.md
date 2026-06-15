@@ -1,105 +1,40 @@
-# Installation in the target repository
+# Installation und Nutzung
 
-Assume this ZIP was downloaded to `/tmp/datenportal_webapp_spec_v6_full_agent_context.zip` and the target repository is your Datenportal repo.
+Dieses Dokument ist nur noch eine kompakte Orientierung. Für den aktuellen MVP-Stand gelten:
 
-## Variant A: copy into an empty or new repository
+- `README.md` für Quickstart und Projektüberblick
+- `docs/configuration.md` für alle Laufzeit-Properties
+- `docs/operations.md` für Betrieb, Reload, Health/Info und Smoke-Tests
+- `docs/web-components.md` für Header-/Breadcrumb-Assets
 
-```bash
-cd /path/to/datenportal-repo
-unzip /tmp/datenportal_webapp_spec_v6_full_agent_context.zip -d /tmp/datenportal-agent-package
-cp -R /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/. .
-python3 tools/validate-agent-package.py
-```
-
-This copies the full specification package into the repository root.
-
-## Variant B: merge into an existing repository carefully
+## Lokaler Start
 
 ```bash
-cd /path/to/datenportal-repo
-unzip /tmp/datenportal_webapp_spec_v6_full_agent_context.zip -d /tmp/datenportal-agent-package
-
-# Inspect first
-find /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context -maxdepth 3 -type f | sort
-
-# Copy agent instructions and skills
-cp /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/AGENTS.md ./AGENTS.md
-mkdir -p .agents .opencode docs spec/mockups/current tools
-cp -R /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/.agents/skills .agents/
-cp -R /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/.opencode/commands .opencode/
-
-# Copy specification and docs
-cp /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/datenportal_webapp_agent_spec_detailed_v5.md ./
-cp -R /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/docs/. docs/
-
-# Copy current mockup references
-cp -R /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/spec/mockups/current/. spec/mockups/current/
-
-# Copy validation helper
-cp /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/tools/validate-agent-package.py tools/
-python3 tools/validate-agent-package.py
+./gradlew bootRun
 ```
 
-## Variant C: compare before overwriting AGENTS.md
+Die Anwendung lädt standardmässig `published_catalog_full_54_entries.xtf` vom Classpath.
 
-If your repository already has an `AGENTS.md`, compare first:
+## Alternative Katalogquellen
+
+Datei:
 
 ```bash
-cd /path/to/datenportal-repo
-unzip /tmp/datenportal_webapp_spec_v6_full_agent_context.zip -d /tmp/datenportal-agent-package
-diff -u AGENTS.md /tmp/datenportal-agent-package/datenportal_webapp_spec_v6_full_agent_context/AGENTS.md || true
+./gradlew bootRun --args='--datenportal.catalog.source-type=file --datenportal.catalog.file-location=./tmp/catalog.xtf'
 ```
 
-Then merge manually or replace the file deliberately.
-
-## Codex usage
-
-Codex should read `AGENTS.md` automatically when it is in the repository root. The repo-local skills are under `.agents/skills/`.
-
-## Lokale Laufzeit ab Phase 2
-
-Der Katalog wird beim Start aus einer konfigurierten PublishedCatalog-XTF-Datei geladen.
-
-Standardkonfiguration in `src/main/resources/application.yml`:
-
-```yaml
-datenportal:
-  catalog:
-    source-type: classpath
-    classpath-location: published_catalog_full_54_entries.xtf
-```
-
-Die Datei `spec/fixtures/published_catalog_full_54_entries.xtf` ist dafür als zusätzliche Main-Resource auf dem Classpath eingebunden. Damit startet die Anwendung und auch `@SpringBootTest` standardmässig mit der Full Fixture.
-
-Unterstützte Quellen in Phase 2:
-
-- `classpath:published_catalog_full_54_entries.xtf`
-- `file:./pfad/zum/catalog.xtf`
-
-Ab Phase 7 ist zusätzlich eine HTTP-Quelle verfügbar:
+HTTP:
 
 ```bash
 ./gradlew bootRun --args='--datenportal.catalog.source-type=http --datenportal.catalog.http-url=http://localhost:18080/catalog.xtf'
 ```
 
-Die alte Property `datenportal.catalog.source` bleibt als Übergang weiter gültig, zum Beispiel `--datenportal.catalog.source=file:./tmp/catalog.xtf`.
-
-Beispiel für einen lokalen Dateipfad:
-
-```bash
-./gradlew bootRun --args='--datenportal.catalog.source=file:./tmp/catalog.xtf'
-```
-
-## Runtime Reload ab Phase 7
-
-Der geschützte Reload-Endpunkt ist deaktiviert, solange kein Token konfiguriert ist:
+## Runtime Reload
 
 ```bash
 export DATENPORTAL_ADMIN_RELOAD_TOKEN='change-me'
 ./gradlew bootRun
 ```
-
-Reload:
 
 ```bash
 curl -X POST \
@@ -107,50 +42,11 @@ curl -X POST \
   http://localhost:8080/admin/catalog/reload
 ```
 
-Status:
-
-```bash
-curl \
-  -H "X-Reload-Token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN}" \
-  http://localhost:8080/admin/catalog/status
-```
-
-Fehlerhafte Downloads, ungültiges XML/XTF, Validierungsfehler und Reindexing-Fehler lassen den alten Katalog aktiv.
-
-Wichtige Eigenschaften des Startup-Loadings:
-
-- fail-fast bei fehlender Quelle, ungültigem XML oder Validierungsfehlern
-- namespace-aware PublishedCatalog-Parser
-- XXE/DTD deaktiviert
-- Read-Model bleibt das bestehende immutable Domain-Modell aus Phase 1
-
-Für die Verifikation der Importphase sind mindestens vorgesehen:
+## Checks
 
 ```bash
 ./gradlew test
 ./gradlew check
 ```
 
-Useful first prompt:
-
-```text
-Read AGENTS.md, datenportal_webapp_agent_spec_detailed_v5.md, docs/ui-implementation-contract.md and the relevant skills. Then plan Phase 1 without editing files.
-```
-
-## OpenCode usage
-
-OpenCode can also use the repo files directly. This package additionally contains project-local commands under `.opencode/commands/`.
-
-Useful prompts:
-
-```text
-/plan-phase Implement the catalog startup skeleton and package structure.
-```
-
-```text
-/implement-ui-contract Implement the list-view start page according to the UI contract.
-```
-
-```text
-/dod-commit Commit the completed phase after running the DoD checks.
-```
+Der lokale Smoke-Test ist in `docs/operations.md` beschrieben.

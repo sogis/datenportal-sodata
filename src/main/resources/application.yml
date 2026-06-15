@@ -2,6 +2,38 @@ spring:
   application:
     name: datenportal-sodata
 
+server:
+  server-header: ""
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+    whitelabel:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: false
+    info:
+      enabled: true
+  info:
+    env:
+      enabled: false
+    java:
+      enabled: true
+    os:
+      enabled: false
+  health:
+    diskspace:
+      enabled: false
+
 datenportal:
   catalog:
     source-type: classpath

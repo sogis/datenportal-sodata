@@ -2,9 +2,11 @@
 
 Serverseitig gerenderte Datenportal-Webanwendung für den Kanton Solothurn.
 
-## Phase 6 Status
+## MVP-Status
 
-Phase 6 ergänzt die bestehende PublishedCatalog-, Such-, Listen-/Karten- und Detailseiten-Anwendung um die finale Header-/Breadcrumb-Integration via `so-web-components`:
+Die Anwendung lädt PublishedCatalog-XTF/XML, baut einen immutable `CatalogSnapshot` und einen Lucene-Index, rendert Katalog- und Detailseiten mit Spring Boot, JTE und HTMX und integriert Header/Breadcrumb über vendorte `so-web-components`.
+
+Enthalten:
 
 - Java 25
 - Spring Boot 4.1.0
@@ -12,27 +14,26 @@ Phase 6 ergänzt die bestehende PublishedCatalog-, Such-, Listen-/Karten- und De
 - JTE-Templates im Development-Mode
 - lokal vendortes HTMX
 - lokal vendortes `so-web-components@0.1.9`
-- immutable Katalog-Domainmodell unter `catalog.domain`
-- PublishedCatalog-XTF-Fixture als konfigurierbare Classpath-Katalogquelle
 - Katalogseite auf `/` und `/datasets`
-- serverseitige Lucene-Suche mit In-Memory-Index
-- Reindexing beim Startup aus dem geladenen `CatalogSnapshot`
-- Ranking mit starken Identifier-/Titel-Treffern und schwächeren Beschreibungstreffern
-- Mehrfachfilter für Thema, Fachstelle/Amt, Publikationsdatum und Ressourcentyp
-- aktive Filterchips mit Einzel-Entfernen-Links
-- Listenansicht als Default und Kartenansicht über `view=cards`
-- Datenreihen-Expansion über `expanded=<seriesId>`
-- normale Datensätze und Datenreihen mit CSV-/XLSX-/Parquet-Downloads
+- Lucene-backed Suche, Sortierung und Filter
+- Listenansicht, Kartenansicht und Datenreihen-Expansion
 - Detailseiten für Datensätze, Datenreihen und Ausgaben
-- Header und Breadcrumb über `so-web-components`
-- semantischer Header-/Breadcrumb-Fallback über `datenportal.web-components.enabled=false`
+- Classpath-, Datei- und HTTP-Katalogquelle
+- geschützter Runtime-Reload unter `/admin/catalog/reload`
+- Status unter `/admin/catalog/status`
+- kontrollierte 404- und Fehlerseiten
+- Actuator Health/Info
+- Cache-Header für statische Assets
+- grundlegende Security-Header
 
-Noch nicht enthalten:
+Nicht enthalten:
 
-- Reload-Endpunkt
-- Frontend-Pagination
-- HTTP-XTF-Quelle
-- Adminbereich
+- Datenbank
+- Login-System
+- Admin-UI
+- Docker-/Kubernetes-Deployment
+- CI/CD-Pipeline
+- Datenvorschau
 
 ## Voraussetzungen
 
@@ -46,41 +47,30 @@ Der Build verwendet den Gradle Wrapper; eine lokale Gradle-Installation ist nich
 ./gradlew bootRun
 ```
 
-Danach ist die Katalogseite erreichbar unter:
+Danach erreichbar:
 
 - `http://localhost:8080/`
 - `http://localhost:8080/datasets`
+- `http://localhost:8080/actuator/health`
+- `http://localhost:8080/actuator/info`
 
-## Query-Parameter
-
-Die Katalogseite unterstützt in Phase 6:
-
-- `q=<text>`
-- `theme=<themeId>` wiederholt
-- `office=<officeId>` wiederholt
-- `modified=last30|last6months|thisYear|lastYear|older` wiederholt
-- `resourceType=csv|xlsx|parquet` wiederholt
-- `sort=modified-desc|title-asc|relevance`
-- `view=list|cards`
-- `expanded=<seriesId>` wiederholt
-
-`page` und `size` sind service-seitig im Suchmodell vorbereitet, werden aber in Phase 6 noch nicht in der UI verwendet und nicht in Links erhalten.
-
-## Tests Und Checks
+Bei belegtem Port:
 
 ```bash
-./gradlew test
-./gradlew clean check
+./gradlew bootRun --args='--server.port=8081'
 ```
 
-## Entwicklungsdaten
+## Konfiguration
 
 Standardkonfiguration in `src/main/resources/application.yml`:
 
 ```yaml
 datenportal:
   catalog:
-    source: classpath:published_catalog_full_54_entries.xtf
+    source-type: classpath
+    classpath-location: published_catalog_full_54_entries.xtf
+  admin:
+    reload-token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN:}
   search:
     max-results: 500
     default-page-size: 20
@@ -92,25 +82,52 @@ datenportal:
     use-cdn: false
 ```
 
-Die Datei `spec/fixtures/published_catalog_full_54_entries.xtf` ist als zusätzliche Main-Resource auf dem Classpath eingebunden. Damit startet die Anwendung und auch `@SpringBootTest` standardmässig mit der Full Fixture.
+Die Datei `spec/fixtures/published_catalog_full_54_entries.xtf` ist als Main-Resource auf dem Classpath eingebunden.
 
-Unterstützte Katalogquellen in Phase 6:
+Weitere Details:
 
-- `classpath:published_catalog_full_54_entries.xtf`
-- `file:./pfad/zum/catalog.xtf`
+- `docs/configuration.md`
+- `docs/operations.md`
+- `docs/web-components.md`
+- `docs/architecture.md`
 
-Die Web-Component-Assets liegen unter:
+## Reload
 
-```text
-src/main/resources/static/vendor/so-web-components/0.1.9/
+```bash
+export DATENPORTAL_ADMIN_RELOAD_TOKEN='change-me'
+./gradlew bootRun
 ```
 
-Produktionsnahe Deployments verwenden die vendored Assets. `datenportal.web-components.use-cdn=true` ist nur für lokale Tests vorgesehen.
+```bash
+curl -X POST \
+  -H "X-Reload-Token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN}" \
+  http://localhost:8080/admin/catalog/reload
+```
+
+Status:
+
+```bash
+curl \
+  -H "X-Reload-Token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN}" \
+  http://localhost:8080/admin/catalog/status
+```
+
+## Checks
+
+```bash
+./gradlew test
+./gradlew check
+```
+
+Für den lokalen Smoke-Test siehe `docs/operations.md`.
 
 ## Relevante Dokumente
 
 - `AGENTS.md`
 - `datenportal_webapp_agent_spec_detailed_v5.md`
 - `docs/ui-implementation-contract.md`
+- `docs/component-map.md`
 - `docs/architecture.md`
+- `docs/configuration.md`
+- `docs/operations.md`
 - `docs/web-components.md`
