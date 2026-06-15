@@ -1,6 +1,11 @@
 spring:
   application:
     name: datenportal-sodata
+
+datenportal:
+  catalog:
+    source: classpath:published_catalog_full_54_entries.xtf
+
 gg:
   jte:
     development-mode: true

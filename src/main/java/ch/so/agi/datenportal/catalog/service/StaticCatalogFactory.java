@@ -15,9 +15,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Component;
 
-@Component
 public final class StaticCatalogFactory {
 
     private static final Instant SNAPSHOT_LOADED_AT = Instant.parse("2026-06-14T08:00:00Z");

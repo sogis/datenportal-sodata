@@ -46,15 +46,15 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void pageContainsLocalAssetsAndStaticCatalogEntries() throws Exception {
+    void pageContainsLocalAssetsAndFixtureBackedCatalogEntries() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/css/app.css\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("src=\"/js/htmx.min.js\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"dataset-results\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Steuerfuss Gemeinden")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Gemeindegrenzen")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Aktuelle Ausgabe: Mai 2026")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Bauinventar")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Abstimmungsresultate")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Aktuelle Ausgabe: 2026")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("CSV (aktuelle Ausgabe)")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Parquet")))
                 .andExpect(content().string(not(org.hamcrest.Matchers.containsString("Phase 0: Das Projektgerüst läuft."))));

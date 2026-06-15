@@ -17,4 +17,16 @@ public enum AccessLevel {
     public boolean isOpen() {
         return this == OPEN;
     }
+
+    public static AccessLevel fromModelValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Access level must not be null");
+        }
+
+        return switch (value.trim().toLowerCase()) {
+            case "open" -> OPEN;
+            case "restricted" -> RESTRICTED;
+            default -> throw new IllegalArgumentException("Unsupported access level: " + value);
+        };
+    }
 }

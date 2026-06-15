@@ -25,4 +25,18 @@ public enum DistributionFormat {
     public boolean isPrimary() {
         return this != OTHER;
     }
+
+    public static DistributionFormat fromModelValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Distribution format must not be null");
+        }
+
+        return switch (value.trim().toLowerCase()) {
+            case "csv" -> CSV;
+            case "xlsx" -> XLSX;
+            case "parquet" -> PARQUET;
+            case "other" -> OTHER;
+            default -> throw new IllegalArgumentException("Unsupported distribution format: " + value);
+        };
+    }
 }

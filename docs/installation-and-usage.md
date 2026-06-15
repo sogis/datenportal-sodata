@@ -56,6 +56,45 @@ Then merge manually or replace the file deliberately.
 
 Codex should read `AGENTS.md` automatically when it is in the repository root. The repo-local skills are under `.agents/skills/`.
 
+## Lokale Laufzeit ab Phase 2
+
+Der Katalog wird beim Start aus einer konfigurierten PublishedCatalog-XTF-Datei geladen.
+
+Standardkonfiguration in `src/main/resources/application.yml`:
+
+```yaml
+datenportal:
+  catalog:
+    source: classpath:published_catalog_full_54_entries.xtf
+```
+
+Die Datei `spec/fixtures/published_catalog_full_54_entries.xtf` ist dafür als zusätzliche Main-Resource auf dem Classpath eingebunden. Damit startet die Anwendung und auch `@SpringBootTest` standardmässig mit der Full Fixture.
+
+Unterstützte Quellen in Phase 2:
+
+- `classpath:published_catalog_full_54_entries.xtf`
+- `file:./pfad/zum/catalog.xtf`
+
+Beispiel für einen lokalen Dateipfad:
+
+```bash
+./gradlew bootRun --args='--datenportal.catalog.source=file:./tmp/catalog.xtf'
+```
+
+Wichtige Eigenschaften des Startup-Loadings:
+
+- fail-fast bei fehlender Quelle, ungültigem XML oder Validierungsfehlern
+- namespace-aware PublishedCatalog-Parser
+- XXE/DTD deaktiviert
+- Read-Model bleibt das bestehende immutable Domain-Modell aus Phase 1
+
+Für die Verifikation der Importphase sind mindestens vorgesehen:
+
+```bash
+./gradlew test
+./gradlew check
+```
+
 Useful first prompt:
 
 ```text

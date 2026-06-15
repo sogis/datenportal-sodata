@@ -13,8 +13,8 @@ public final class CatalogService {
 
     private final AtomicReference<CatalogSnapshot> snapshotReference;
 
-    public CatalogService(StaticCatalogFactory staticCatalogFactory) {
-        this.snapshotReference = new AtomicReference<>(staticCatalogFactory.createSnapshot());
+    public CatalogService(CatalogSnapshot initialSnapshot) {
+        this.snapshotReference = new AtomicReference<>(Objects.requireNonNull(initialSnapshot, "initialSnapshot must not be null"));
     }
 
     public CatalogSnapshot currentSnapshot() {
