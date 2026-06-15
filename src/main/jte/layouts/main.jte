@@ -8,13 +8,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${chrome.pageTitle()}</title>
-  <link rel="stylesheet" href="/css/app.css">
-  <script src="/js/htmx.min.js" defer></script>
+  @template.components.chrome.webComponentsLoader(assets = chrome.assets())
+  <link rel="stylesheet" href="${chrome.assets().appCss()}">
+  <script src="${chrome.assets().htmxJs()}" defer></script>
 </head>
 <body class="dp-page">
   <a class="dp-skip-link" href="#main-content">Zum Inhalt springen</a>
-  @template.components.chrome.header(header = chrome.header())
-  @template.components.chrome.breadcrumb(breadcrumb = chrome.breadcrumb())
+  @template.components.chrome.soHeader(header = chrome.header(), webComponentsEnabled = chrome.assets().webComponentsEnabled())
+  @template.components.chrome.soBreadcrumb(breadcrumb = chrome.breadcrumb(), webComponentsEnabled = chrome.assets().webComponentsEnabled())
   <main id="main-content" class="dp-main" tabindex="-1">
     ${content}
   </main>

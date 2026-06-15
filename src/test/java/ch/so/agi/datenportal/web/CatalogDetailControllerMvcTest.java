@@ -23,6 +23,9 @@ class CatalogDetailControllerMvcTest {
     void datasetDetailRendersTitleDescriptionDownloadsMetadataAndBreadcrumb() throws Exception {
         mockMvc.perform(get("/datasets/ch.so.bauinventar"))
                 .andExpect(status().isOk())
+                .andExpect(content().string(containsString("<so-header")))
+                .andExpect(content().string(containsString("<so-breadcrumb>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets\">Daten &amp; Statistiken</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("Bauinventar")))
                 .andExpect(content().string(containsString("Inventar schützenswerter und erhaltenswerter Bauten.")))
                 .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datensatz</span>")))
@@ -63,6 +66,11 @@ class CatalogDetailControllerMvcTest {
     void currentIssueDetailRendersConcreteIssueAndLinksToSeriesAndOtherIssues() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/current"))
                 .andExpect(status().isOk())
+                .andExpect(content().string(containsString("<so-header")))
+                .andExpect(content().string(containsString("<so-breadcrumb>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets\">Daten &amp; Statistiken</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate\">Abstimmungsresultate</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Abstimmungsresultate 2026</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2026")))
                 .andExpect(content().string(containsString("Datenreihe:")))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate\"")))

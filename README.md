@@ -2,15 +2,16 @@
 
 Serverseitig gerenderte Datenportal-Webanwendung für den Kanton Solothurn.
 
-## Phase 4 Status
+## Phase 6 Status
 
-Phase 4 ergänzt das technische Grundgerüst, das Domain-Read-Model und den PublishedCatalog-XTF-Import um eine Lucene-backed Katalogseite:
+Phase 6 ergänzt die bestehende PublishedCatalog-, Such-, Listen-/Karten- und Detailseiten-Anwendung um die finale Header-/Breadcrumb-Integration via `so-web-components`:
 
 - Java 25
 - Spring Boot 4.1.0
 - Gradle Groovy DSL
 - JTE-Templates im Development-Mode
 - lokal vendortes HTMX
+- lokal vendortes `so-web-components@0.1.9`
 - immutable Katalog-Domainmodell unter `catalog.domain`
 - PublishedCatalog-XTF-Fixture als konfigurierbare Classpath-Katalogquelle
 - Katalogseite auf `/` und `/datasets`
@@ -22,14 +23,16 @@ Phase 4 ergänzt das technische Grundgerüst, das Domain-Read-Model und den Publ
 - Listenansicht als Default und Kartenansicht über `view=cards`
 - Datenreihen-Expansion über `expanded=<seriesId>`
 - normale Datensätze und Datenreihen mit CSV-/XLSX-/Parquet-Downloads
-- semantischer Header-/Breadcrumb-Fallback
+- Detailseiten für Datensätze, Datenreihen und Ausgaben
+- Header und Breadcrumb über `so-web-components`
+- semantischer Header-/Breadcrumb-Fallback über `datenportal.web-components.enabled=false`
 
 Noch nicht enthalten:
 
 - Reload-Endpunkt
 - Frontend-Pagination
-- Detailseiten
-- finale `so-web-components`-Integration
+- HTTP-XTF-Quelle
+- Adminbereich
 
 ## Voraussetzungen
 
@@ -50,7 +53,7 @@ Danach ist die Katalogseite erreichbar unter:
 
 ## Query-Parameter
 
-Die Katalogseite unterstützt in Phase 4:
+Die Katalogseite unterstützt in Phase 6:
 
 - `q=<text>`
 - `theme=<themeId>` wiederholt
@@ -61,7 +64,7 @@ Die Katalogseite unterstützt in Phase 4:
 - `view=list|cards`
 - `expanded=<seriesId>` wiederholt
 
-`page` und `size` sind service-seitig im Suchmodell vorbereitet, werden aber in Phase 4 noch nicht in der UI verwendet und nicht in Links erhalten.
+`page` und `size` sind service-seitig im Suchmodell vorbereitet, werden aber in Phase 6 noch nicht in der UI verwendet und nicht in Links erhalten.
 
 ## Tests Und Checks
 
@@ -82,14 +85,27 @@ datenportal:
     max-results: 500
     default-page-size: 20
     max-page-size: 100
+  web-components:
+    enabled: true
+    version: "0.1.9"
+    asset-base-path: "/vendor/so-web-components/0.1.9"
+    use-cdn: false
 ```
 
 Die Datei `spec/fixtures/published_catalog_full_54_entries.xtf` ist als zusätzliche Main-Resource auf dem Classpath eingebunden. Damit startet die Anwendung und auch `@SpringBootTest` standardmässig mit der Full Fixture.
 
-Unterstützte Quellen in Phase 4:
+Unterstützte Katalogquellen in Phase 6:
 
 - `classpath:published_catalog_full_54_entries.xtf`
 - `file:./pfad/zum/catalog.xtf`
+
+Die Web-Component-Assets liegen unter:
+
+```text
+src/main/resources/static/vendor/so-web-components/0.1.9/
+```
+
+Produktionsnahe Deployments verwenden die vendored Assets. `datenportal.web-components.use-cdn=true` ist nur für lokale Tests vorgesehen.
 
 ## Relevante Dokumente
 
@@ -97,3 +113,4 @@ Unterstützte Quellen in Phase 4:
 - `datenportal_webapp_agent_spec_detailed_v5.md`
 - `docs/ui-implementation-contract.md`
 - `docs/architecture.md`
+- `docs/web-components.md`

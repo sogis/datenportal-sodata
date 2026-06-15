@@ -2,6 +2,7 @@ package ch.so.agi.datenportal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.so.agi.datenportal.config.WebComponentsProperties;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
@@ -11,16 +12,23 @@ import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.Theme;
+import ch.so.agi.datenportal.support.JsonAttributeEncoder;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.DefaultResourceLoader;
 
 class DetailPageVmFactoryTest {
 
     private final DetailPageVmFactory factory = new DetailPageVmFactory(
-            new PageChromeFactory(new HeaderViewModelFactory(), new BreadcrumbFactory()),
+            new PageChromeFactory(
+                    new HeaderViewModelFactory(new JsonAttributeEncoder()),
+                    new BreadcrumbFactory(),
+                    new WebAssetsVmFactory(
+                            new WebComponentsProperties(true, "0.1.9", null, false),
+                            new DefaultResourceLoader())),
             new CatalogUrlFactory());
 
     @Test

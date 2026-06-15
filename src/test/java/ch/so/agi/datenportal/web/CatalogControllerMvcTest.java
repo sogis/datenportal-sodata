@@ -26,6 +26,9 @@ class CatalogControllerMvcTest {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<html lang=\"de\">")))
+                .andExpect(content().string(containsString("<so-header")))
+                .andExpect(content().string(containsString("<so-breadcrumb>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item")))
                 .andExpect(content().string(containsString("Daten &amp; Statistiken")))
                 .andExpect(content().string(containsString("id=\"main-content\"")))
                 .andExpect(content().string(containsString("aria-label=\"Breadcrumb\"")))
@@ -57,6 +60,10 @@ class CatalogControllerMvcTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("href=\"/css/app.css\"")))
                 .andExpect(content().string(containsString("src=\"/js/htmx.min.js\"")))
+                .andExpect(content().string(containsString("src=\"/vendor/so-web-components/0.1.9/index.js\"")))
+                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/reset.css\"")))
+                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/fonts.css\"")))
+                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/tokens.css\"")))
                 .andExpect(content().string(containsString("id=\"dataset-results\"")))
                 .andExpect(content().string(containsString("name=\"q\"")))
                 .andExpect(content().string(containsString("name=\"theme\"")))
@@ -142,5 +149,35 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(not(containsString("<html"))))
                 .andExpect(content().string(not(containsString("dp-site-header"))))
                 .andExpect(content().string(not(containsString("Zum Inhalt springen"))));
+    }
+
+    @Test
+    void webComponentAssetsAreIncludedOnceAndContainNoLocalPaths() throws Exception {
+        MvcResult result = mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String html = result.getResponse().getContentAsString();
+
+        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/index.js")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/styles/reset.css")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/styles/fonts.css")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/styles/tokens.css")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/css/app.css")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/js/htmx.min.js")).isEqualTo(1);
+        assertThat(html)
+                .doesNotContain("/Users/")
+                .doesNotContain("file:")
+                .doesNotContainPattern("[A-Za-z]:\\\\");
+    }
+
+    private static int countOccurrences(String value, String needle) {
+        int count = 0;
+        int index = 0;
+        while ((index = value.indexOf(needle, index)) >= 0) {
+            count++;
+            index += needle.length();
+        }
+        return count;
     }
 }

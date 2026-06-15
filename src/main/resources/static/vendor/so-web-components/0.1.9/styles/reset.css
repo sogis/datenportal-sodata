@@ -1,0 +1,7 @@
+/* Minimal reset for components & demos */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; }
+img { max-width: 100%; height: auto; display: block; }
+button, input { font: inherit; }
+a { color: inherit; }

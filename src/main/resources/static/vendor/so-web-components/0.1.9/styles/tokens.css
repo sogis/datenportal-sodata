@@ -1,0 +1,67 @@
+:root{
+  /* Colors (requested) */
+  --so-bg: #fff;
+  --so-fg: rgb(47, 72, 88);
+  --so-border-color: rgb(223, 223, 223);
+  --so-link-color: inherit;
+  --so-link-hover-color: #e01f26;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; /* mac Firefox */
+
+  /* Typography (requested) */
+  --so-font-family: Frutiger, sans-serif;
+  --so-font-size: 16px;
+  --so-line-height: 1.5;
+
+  /* Spacing scale */
+  --so-space-1: 0.25rem;
+  --so-space-2: 0.5rem;
+  --so-space-3: 0.75rem;
+  --so-space-4: 1rem;
+  --so-space-5: 1.25rem;
+  --so-space-6: 1.5rem;
+  --so-space-7: 1.75rem;
+  --so-space-8: 2rem;
+  --so-space-10: 2.5rem;
+  --so-space-12: 3rem;
+
+  /* Container system inspired by so.ch pattern */
+  --so-container-padding: var(--so-space-6);
+  --so-container-size-small: 57rem;     /* ~912px */
+  --so-container-size-medium: 86.25rem; /* ~1380px */
+  --so-container-size-full: 120rem;     /* ~1920px */
+
+  /* Header */
+  --so-header-height: 4.25rem;
+  --so-header-border: rgba(0,0,0,0.08);
+  --so-header-radius: 9999px; /* round icon buttons */
+
+  /* Breakpoints */
+  --so-bp-md: 768px;
+  --so-bp-lg: 992px;
+}
+
+/* Gutters get larger on desktop */
+@media (min-width: 992px){
+  :root{ --so-container-padding: var(--so-space-6); }
+}
+
+/* Reusable container utility (optional) */
+.so-container{
+  width: 100%;
+  max-width: var(--so-container-size, var(--so-container-size-medium));
+  margin-inline: auto;
+  padding-inline: var(--so-container-padding);
+}
+
+
+a{
+  color: var(--so-link-color);
+  text-decoration: underline;
+}
+
+a:hover,
+a:focus-visible{
+  color: var(--so-link-hover-color);
+}

@@ -9,4 +9,6 @@ public record HeaderVm(
         String siteClaim,
         List<NavItemVm> primaryNav,
         List<NavItemVm> utilityNav,
+        String primaryNavJson,
+        String utilityNavJson,
         String componentConfigJson) {}

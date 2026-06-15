@@ -6,10 +6,10 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 
 | UI-Bereich | JTE | Java | Tests |
 |---|---|---|---|
-| Web-Component-Loader | `components/webComponentsLoader.jte` | `WebComponentsProperties` | Asset-Pfad vorhanden |
-| Header | `components/soHeader.jte` | `HeaderVm`, `HeaderViewModelFactory` | enthält `<so-header` oder Fallback |
-| Breadcrumb | `components/soBreadcrumb.jte` | `BreadcrumbVm`, `BreadcrumbFactory` | Detailseite enthält letztes Breadcrumb-Element |
-| Layout | `layouts/base.jte` | `PageChromeVm`, `PageChromeFactory` | Skip-Link und `main#main-content` |
+| Web-Component-Loader | `components/chrome/webComponentsLoader.jte` | `WebComponentsProperties`, `WebAssetsVmFactory`, `WebAssetsVm` | Asset-Pfad vorhanden |
+| Header | `components/chrome/soHeader.jte`, `components/chrome/headerFallback.jte` | `HeaderVm`, `HeaderViewModelFactory` | enthält `<so-header` oder Fallback |
+| Breadcrumb | `components/chrome/soBreadcrumb.jte`, `components/chrome/breadcrumbFallback.jte` | `BreadcrumbVm`, `BreadcrumbFactory` | Detailseite enthält letztes Breadcrumb-Element |
+| Layout | `layouts/main.jte` | `PageChromeVm`, `PageChromeFactory` | Skip-Link und `main#main-content` |
 
 ## Katalogseite
 
