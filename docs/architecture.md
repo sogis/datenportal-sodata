@@ -27,7 +27,7 @@ Aktuell materialisierte Pakete:
 - `CatalogSnapshotLoader` baut aus Quelle, Parser und Validator den initialen `CatalogSnapshot`.
 - `CatalogService` hält den aktuell aktiven `CatalogSnapshot` in-memory und bietet lesende Zugriffe für Web und spätere Reload-Phasen.
 - `CatalogController` rendert die Katalog-Startseite auf `/` und `/datasets` mit Top-Level-Einträgen aus dem geladenen Snapshot.
-- `CatalogPageVmFactory` mappt Domainobjekte in einfache, UI-orientierte ViewModels.
+- `HomePageVmFactory`, `FilterVmFactory` und `ResultsVmFactory` mappen Domainobjekte und Suchresultate in UI-orientierte ViewModels.
 - `CatalogSnapshot` kapselt den veröffentlichten Read-Model-Stand inklusive sichtbarer Top-Level-Einträge und identifizierbarer Ausgaben.
 - `DatasetEntry`, `DatasetSeriesEntry` und `DatasetIssueEntry` bilden normale Datensätze, Datenreihen und einzelne Ausgaben immutable ab.
 
@@ -53,3 +53,20 @@ Phase 2 enthält bewusst noch keine:
 - generische INTERLIS-Framework-Abstraktion
 
 Diese Metadaten werden bereits gelesen und validiert, aber noch nicht in das Phase-1-Read-Model übernommen.
+
+## Phase 3
+
+Phase 3 ergänzt die Startseite um eine serverseitige Katalogabfrage ohne Lucene. Die Query-Parameter werden in `CatalogQueryParams` normalisiert und in eine fachliche `SearchQuery` überführt. `CatalogQueryService` sucht und filtert ausschliesslich im aktiven `CatalogSnapshot`; dadurch bleibt die Phase unabhängig von Indexaufbau und Reload.
+
+Neu materialisierte Pakete und Komponenten:
+
+- `ch.so.agi.datenportal.search` mit `SearchQuery`, `SearchFilters`, `ModifiedDateRange`, `SortMode`, `SearchResult`, `FacetService` und `CatalogQueryService`
+- `CatalogQueryParams`, `ViewMode`, `HtmxRequest` und `CatalogUrlFactory` im Web-Layer
+- UI-ViewModels für Filtergruppen, aktive Filterchips, Resultcontrols, Listenzeilen, Ausgabezeilen und Cards
+- JTE-Fragmente für Resultbereich, Filterbar, aktive Chips, View Toggle, Tabellenansicht und Kartenansicht
+
+Die Filter folgen der URL-Konvention des UI-Vertrags: Mehrfachwerte werden als wiederholte Query-Parameter übertragen. Die Such- und Filterlogik verwendet AND zwischen Kategorien und OR innerhalb einer Kategorie. Die Textsuche normalisiert Gross-/Kleinschreibung und Akzente und durchsucht Titel, Beschreibung, Keywords, Themen, Fachstelle/Amt sowie bei Datenreihen auch Ausgabe-Titel und Ausgabe-Labels.
+
+HTMX ist nur progressive Enhancement. Normale GET-Requests liefern die vollständige Seite, HTMX-Requests mit `HX-Target=dataset-results` liefern nur `fragments/catalogResults.jte`.
+
+Phase 3 enthält bewusst keine Frontend-Pagination. Alle passenden Top-Level-Einträge werden sortiert gerendert; manuell gesendete `page`- oder `size`-Parameter werden nicht modelliert und nicht in Links zurückgegeben.

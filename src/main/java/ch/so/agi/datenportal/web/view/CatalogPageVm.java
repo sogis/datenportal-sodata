@@ -1,19 +1,12 @@
 package ch.so.agi.datenportal.web.view;
 
-import java.util.List;
+import ch.so.agi.datenportal.web.CatalogQueryParams;
 
 public record CatalogPageVm(
         PageChromeVm chrome,
         String title,
         String lead,
         String secondaryLead,
-        List<CatalogEntrySummaryVm> entries) {
-
-    public CatalogPageVm {
-        entries = List.copyOf(entries);
-    }
-
-    public boolean hasEntries() {
-        return !entries.isEmpty();
-    }
-}
+        CatalogQueryParams queryParams,
+        FilterPanelVm filterPanel,
+        ResultsVm results) {}

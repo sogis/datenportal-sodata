@@ -32,7 +32,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datenreihen-Root | `components/entryRow.jte` | `EntryRowVm.series=true` | `aria-expanded`, Plus/Minus |
 | Ausgabezeile | `components/issueRow.jte` | `IssueRowVm` | Downloads ohne aktuelle-Ausgabe-Text |
 | Downloadbutton | `components/downloadButton.jte` | `DownloadButtonVm` | zugänglicher Name |
-| Pagination | `components/pagination.jte` | `PaginationVm` | Query bleibt erhalten |
+| Pagination | nach Phase 3 zurückgestellt | noch kein Frontend-VM | Phase 3 rendert alle Treffer ohne Pagination |
 
 ## Kartenansicht
 
@@ -62,4 +62,3 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | `components.css` | Buttons, Badges, Chips, Cards |
 | `catalog.css` | Filter, Toolbar, Tabelle, Cards |
 | `detail.css` | Detailseiten und Metadatenbereiche |
-

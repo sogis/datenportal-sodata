@@ -1,6 +1,7 @@
 package ch.so.agi.datenportal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -21,14 +22,19 @@ class CatalogControllerMvcTest {
     private MockMvc mockMvc;
 
     @Test
-    void homePageReturns200() throws Exception {
+    void homePageReturnsFullPageWithDefaultListViewAndNoPagination() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Daten &amp; Statistiken")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Zum Inhalt springen")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"main-content\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("aria-label=\"Breadcrumb\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Hauptnavigation")));
+                .andExpect(content().string(containsString("<html lang=\"de\">")))
+                .andExpect(content().string(containsString("Daten &amp; Statistiken")))
+                .andExpect(content().string(containsString("id=\"main-content\"")))
+                .andExpect(content().string(containsString("aria-label=\"Breadcrumb\"")))
+                .andExpect(content().string(containsString("Thema / Datensatz")))
+                .andExpect(content().string(containsString("Listenansicht")))
+                .andExpect(content().string(containsString("aria-current=\"page\"")))
+                .andExpect(content().string(not(containsString("dp-pagination"))))
+                .andExpect(content().string(not(containsString("page="))))
+                .andExpect(content().string(not(containsString("size="))));
     }
 
     @Test
@@ -46,17 +52,91 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void pageContainsLocalAssetsAndFixtureBackedCatalogEntries() throws Exception {
+    void pageContainsSearchFiltersFixtureEntriesAndCurrentIssueDownloads() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/css/app.css\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("src=\"/js/htmx.min.js\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"dataset-results\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Bauinventar")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Abstimmungsresultate")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Aktuelle Ausgabe: 2026")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("CSV (aktuelle Ausgabe)")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Parquet")))
-                .andExpect(content().string(not(org.hamcrest.Matchers.containsString("Phase 0: Das Projektgerüst läuft."))));
+                .andExpect(content().string(containsString("href=\"/css/app.css\"")))
+                .andExpect(content().string(containsString("src=\"/js/htmx.min.js\"")))
+                .andExpect(content().string(containsString("id=\"dataset-results\"")))
+                .andExpect(content().string(containsString("name=\"q\"")))
+                .andExpect(content().string(containsString("name=\"theme\"")))
+                .andExpect(content().string(containsString("name=\"office\"")))
+                .andExpect(content().string(containsString("name=\"modified\"")))
+                .andExpect(content().string(containsString("name=\"resourceType\"")))
+                .andExpect(content().string(containsString("Bauinventar")))
+                .andExpect(content().string(containsString("Abstimmungsresultate")))
+                .andExpect(content().string(containsString("CSV (aktuelle Ausgabe)")))
+                .andExpect(content().string(containsString("Parquet")));
+    }
+
+    @Test
+    void searchQueryFiltersResults() throws Exception {
+        mockMvc.perform(get("/datasets").param("q", "Bauinventar"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Bauinventar")))
+                .andExpect(content().string(not(containsString("Abstimmungsresultate"))));
+    }
+
+    @Test
+    void cardViewRendersCardsAndOpenDataBadges() throws Exception {
+        mockMvc.perform(get("/datasets").param("view", "cards"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("dp-card-grid")))
+                .andExpect(content().string(containsString("dp-result-card")))
+                .andExpect(content().string(containsString("Open Data")))
+                .andExpect(content().string(not(containsString("dp-entry-table-wrapper"))));
+    }
+
+    @Test
+    void activeFilterChipsRemoveSingleValuesAndKeepRelevantParameters() throws Exception {
+        mockMvc.perform(get("/datasets")
+                        .param("theme", "Bau_und_Wohnungswesen")
+                        .param("theme", "Kultur_Medien_Informationsgesellschaft_Sport")
+                        .param("office", "arp")
+                        .param("view", "cards")
+                        .param("sort", "title-asc"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Aktive Filter")))
+                .andExpect(content().string(containsString("Thema: Bau und Wohnungswesen")))
+                .andExpect(content().string(containsString("Fachstelle / Amt: Amt für Raumplanung")))
+                .andExpect(content().string(containsString("theme=Kultur_Medien_Informationsgesellschaft_Sport")))
+                .andExpect(content().string(containsString("office=arp")))
+                .andExpect(content().string(containsString("view=cards")))
+                .andExpect(content().string(containsString("sort=title-asc")));
+    }
+
+    @Test
+    void listRowsUseSameGreyTypeBadgeAndNoTitleColumnIcons() throws Exception {
+        mockMvc.perform(get("/datasets"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datensatz</span>")))
+                .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datenreihe</span>")))
+                .andExpect(content().string(not(containsString("dp-entry-icon"))));
+    }
+
+    @Test
+    void expandedSeriesRendersIssueRowsWithoutCurrentIssueDownloadSuffix() throws Exception {
+        mockMvc.perform(get("/datasets").param("expanded", "ch.so.abstimmungsresultate"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("aria-expanded=\"true\"")))
+                .andExpect(content().string(containsString("Abstimmungsresultate 2026")))
+                .andExpect(content().string(containsString("Abstimmungsresultate 2025")))
+                .andExpect(content().string(containsString("CSV (aktuelle Ausgabe) herunterladen: Abstimmungsresultate")))
+                .andExpect(content().string(containsString("CSV herunterladen: Abstimmungsresultate 2025")))
+                .andExpect(content().string(not(containsString("CSV (aktuelle Ausgabe) herunterladen: Abstimmungsresultate 2025"))));
+    }
+
+    @Test
+    void htmxRequestReturnsOnlyResultsFragment() throws Exception {
+        mockMvc.perform(get("/datasets")
+                        .header("HX-Request", "true")
+                        .header("HX-Target", "dataset-results")
+                        .param("view", "cards"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("id=\"dataset-results\"")))
+                .andExpect(content().string(containsString("dp-card-grid")))
+                .andExpect(content().string(not(containsString("<html"))))
+                .andExpect(content().string(not(containsString("dp-site-header"))))
+                .andExpect(content().string(not(containsString("Zum Inhalt springen"))));
     }
 }
