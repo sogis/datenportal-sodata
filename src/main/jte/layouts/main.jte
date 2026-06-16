@@ -11,6 +11,7 @@
   @template.components.chrome.webComponentsLoader(assets = chrome.assets())
   <link rel="stylesheet" href="${chrome.assets().appCss()}">
   <script src="${chrome.assets().htmxJs()}" defer></script>
+  <script src="${chrome.assets().appJs()}" defer></script>
 </head>
 <body class="dp-page">
   <a class="dp-skip-link" href="#main-content">Zum Inhalt springen</a>

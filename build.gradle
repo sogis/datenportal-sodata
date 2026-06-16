@@ -20,6 +20,7 @@ repositories {
 
 ext {
     luceneVersion = '10.3.2'
+    playwrightVersion = '1.60.0'
 }
 
 sourceSets {
@@ -40,13 +41,41 @@ dependencies {
     implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"
     implementation "org.apache.lucene:lucene-queryparser:${luceneVersion}"
 
+    testImplementation "com.microsoft.playwright:playwright:${playwrightVersion}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'playwright'
+    }
+}
+
+def playwrightBrowsersPath = layout.projectDirectory.dir('.gradle/playwright-browsers').asFile.absolutePath
+
+tasks.register('installPlaywrightChromium', JavaExec) {
+    group = 'verification'
+    description = 'Installs the Chromium browser used by Playwright tests.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.microsoft.playwright.CLI'
+    args 'install', 'chromium'
+    environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
+}
+
+tasks.register('playwrightTest', Test) {
+    group = 'verification'
+    description = 'Runs Playwright browser tests.'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    maxParallelForks = 1
+    shouldRunAfter tasks.named('test')
+    dependsOn tasks.named('installPlaywrightChromium')
+    environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
+    useJUnitPlatform {
+        includeTags 'playwright'
+    }
 }
 
 jte {
@@ -56,6 +85,10 @@ jte {
 
 springBoot {
     buildInfo()
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('playwrightTest')
 }
 
 tasks.named('wrapper') {

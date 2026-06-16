@@ -250,7 +250,7 @@ MVP-Filter:
 3. Publikationsdatum
 4. Ressourcentyp
 
-Publikationsdatum darf als vordefinierte Mehrfachauswahl umgesetzt werden, zum Beispiel:
+Publikationsdatum wird im MVP als vordefinierter Single-Select mit Presets umgesetzt:
 
 - Letzte 30 Tage
 - Letzte 6 Monate
@@ -258,11 +258,22 @@ Publikationsdatum darf als vordefinierte Mehrfachauswahl umgesetzt werden, zum B
 - Letztes Jahr
 - Älter
 
+URL-seitig gilt:
+
+- `modified` enthält höchstens einen Wert.
+- Wiederholte oder ungültige Werte werden serverseitig auf den ersten gültigen Preset-Wert normalisiert.
+- Ein expliziter "alle"-Zustand wird durch fehlenden Parameter ausgedrückt.
+
 Später kann daraus eine Datumsbereich-Auswahl werden.
 
-### 4.2 Mehrfachauswahl-Best-Practice
+### 4.2 Filter-UX
 
-Jede Filtergruppe ist ein aufklappbarer Button/Popover oder ein `details`-Element mit Checkboxen.
+Die Filtergruppen werden serverseitig definiert und in zwei Präsentationen verwendet:
+
+- Desktop: Trigger-Buttons mit HTMX-Popover pro Filtergruppe.
+- Mobile: vollhohes Filter-Sheet mit `details`-/Accordion-Sektionen.
+
+Es gibt keinen globalen clientseitigen Filter-State. Entwürfe leben nur in den geöffneten Formularen der Popover oder des mobilen Sheets, bis `Anwenden` ausgelöst wird.
 
 Pflichtverhalten:
 
@@ -273,6 +284,9 @@ Pflichtverhalten:
 - Jeder aktive Chip kann einzeln entfernt werden.
 - Es gibt `Filter zurücksetzen`.
 - Ausgewählte Filterwerte bleiben bei Suche, Pagination, Ansichtwechsel und Sortierung erhalten.
+- `Ressourcentyp` akzeptiert nur die kanonischen Werte `dataset` und `series`.
+- Bei Desktop darf immer nur ein Popover gleichzeitig offen sein.
+- `Escape` und Outside-Click schliessen offene Desktop-Popover ohne Übernahme des Draft-State.
 - Filter sind keyboard-bedienbar.
 
 ### 4.3 URL-Format
@@ -280,7 +294,7 @@ Pflichtverhalten:
 Mehrfachwerte werden als wiederholte Query-Parameter codiert:
 
 ```text
-/datasets?theme=bevoelkerung&theme=umwelt&office=agi&office=afu&view=list
+/datasets?theme=bevoelkerung&theme=umwelt&office=agi&office=afu&resourceType=dataset&resourceType=series&view=list
 ```
 
 Nicht verwenden:
@@ -290,6 +304,13 @@ theme=bevoelkerung,umwelt
 ```
 
 Begründung: Wiederholte Parameter sind robust, HTML-form-kompatibel und in Spring MVC direkt als `List<String>` bindbar.
+
+Zusätzlich gilt:
+
+- `modified` ist ein einzelner Preset-Parameter, z. B. `/datasets?modified=last30`.
+- `page` und `size` sind Teil desselben Request-Modells wie Suche, Filter, Sortierung und Ansicht.
+- Jede Suche-/Filter-/Sortier-/Ansichtsänderung setzt `page=1`.
+- `expanded` wird nur für explizite Row-Toggles verwendet und bei Suche/Filter/Sort/View/Page verworfen.
 
 ### 4.4 HTMX-Verhalten
 
@@ -301,12 +322,19 @@ Filterformular:
   method="get"
   action="/datasets"
   hx-get="/datasets"
-  hx-target="#dataset-results"
-  hx-select="#dataset-results"
+  hx-target="#dataset-results-shell"
+  hx-swap="outerHTML"
   hx-push-url="true">
 ```
 
-Ohne JavaScript muss ein Button `Anwenden` sichtbar oder zumindest bedienbar sein. Mit HTMX darf zusätzlich auf `change` aktualisiert werden.
+Pflicht:
+
+- `GET /datasets` liefert bei HTMX-Requests das Resultatfragment mit `#dataset-results-shell` als Hauptziel.
+- `GET /datasets/filter-popover` liefert genau eine Desktop-Filtergruppe.
+- `GET /datasets/mobile-filters` liefert das mobile Filter-Sheet.
+- Resultatresponses dürfen zusätzlich `#filter-toolbar`, `#mobile-filter-button`, `#active-filter-chips`, `#results-summary`, `#dataset-results-shell` und `#pagination` per `hx-swap-oob` aktualisieren.
+- Das Öffnen eines Desktop-Popovers darf keinen Layout-Sprung der Ergebnisliste verursachen.
+- Ohne JavaScript bleibt der fachliche GET-Flow über Formulare und `Anwenden` nutzbar.
 
 ### 4.5 ViewModels
 
@@ -475,8 +503,7 @@ public record ResultsVm(
     long totalResults,
     List<EntryRowVm> rows,
     List<EntryCardVm> cards,
-    PaginationVm pagination,
-    ResultsToolbarVm toolbar
+    ResultControlsVm controls
 ) {}
 
 public record EntryRowVm(
@@ -523,12 +550,18 @@ src/main/jte/fragments/catalogResults.jte
 src/main/jte/components/filterBar.jte
 src/main/jte/components/activeFilterChips.jte
 src/main/jte/components/viewToggle.jte
-src/main/jte/components/resultsToolbar.jte
+src/main/jte/components/resultControls.jte
+src/main/jte/components/resultsShell.jte
+src/main/jte/components/mobileFilterButton.jte
+src/main/jte/components/queryStateInputs.jte
+src/main/jte/components/filterFieldList.jte
 src/main/jte/components/entryTable.jte
 src/main/jte/components/entryRow.jte
 src/main/jte/components/issueRow.jte
 src/main/jte/components/downloadButton.jte
 src/main/jte/components/pagination.jte
+src/main/jte/fragments/filterPopover.jte
+src/main/jte/fragments/mobileFilters.jte
 ```
 
 ---
@@ -790,13 +823,13 @@ public record CatalogQueryParams(
     String q,
     List<String> theme,
     List<String> office,
-    List<String> publicationDate,
+    List<String> modified,
     List<String> resourceType,
-    ViewMode view,
-    List<String> expandedSeries,
+    String view,
+    List<String> expanded,
     int page,
     int size,
-    SortMode sort
+    String sort
 ) {
     public CatalogQueryParams normalized() { ... }
     public boolean hasActiveFilters() { ... }
@@ -811,13 +844,23 @@ public class CatalogController {
     @GetMapping({"/", "/datasets"})
     public String catalog(CatalogQueryParams params, HttpServletRequest request, Model model) { ... }
 }
+
+@Controller
+@RequestMapping("/datasets")
+public class CatalogFilterController {
+    @GetMapping("/filter-popover")
+    public String filterPopover(...) { ... }
+
+    @GetMapping("/mobile-filters")
+    public String mobileFilters(...) { ... }
+}
 ```
 
 Verhalten:
 
 - Normaler Request rendert `pages/catalog.jte`.
 - HTMX-Request rendert `fragments/catalogResults.jte` oder ein äquivalentes Fragment.
-- `expandedSeries` steuert, welche Datenreihen aufgeklappt sind.
+- `expanded` steuert, welche Datenreihen aufgeklappt sind.
 - Die Root-Datenreihen bleiben Top-Level-Resultate; Ausgaben erscheinen nur aufgeklappt.
 
 ```java
@@ -905,6 +948,7 @@ Mindestens automatisiert oder manuell dokumentieren:
 - Filtergruppen sind per Tastatur bedienbar.
 - Row Toggle hat sichtbaren Fokus.
 - Downloadlinks haben eindeutige Namen.
+- Playwright deckt mindestens folgende Browserflüsse ab: Desktop-Popover ohne Y-Shift, URL-/Reload-Wiederherstellung, Escape/Outside-Click mit Fokus-Rückgabe und Mobile-Sheet Apply/Reset.
 
 ### 11.3 Keine Pixeltests im MVP
 
@@ -952,4 +996,3 @@ Keine Screenshot-Pixelvergleiche im MVP. Stattdessen HTML-Struktur, Klassen, ARI
 - Serienausgabe-Detailseite mit weiteren Ausgaben.
 - MetadataSections.
 - Tests.
-

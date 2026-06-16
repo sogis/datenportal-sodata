@@ -10,7 +10,7 @@ public record SearchProperties(
         int maxPageSize) {
 
     private static final int DEFAULT_MAX_RESULTS = 500;
-    private static final int DEFAULT_PAGE_SIZE = 20;
+    private static final int DEFAULT_PAGE_SIZE = 10;
     private static final int DEFAULT_MAX_PAGE_SIZE = 100;
 
     public SearchProperties {

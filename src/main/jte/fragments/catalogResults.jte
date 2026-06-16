@@ -4,14 +4,10 @@
 @param ResultsVm results
 @param FilterPanelVm filterPanel
 @param CatalogQueryParams queryParams
-<div id="dataset-results" class="dp-results">
-  @template.components.activeFilterChips(filterPanel = filterPanel)
-  @template.components.resultControls(results = results, queryParams = queryParams)
-  @if(results.isEmpty())
-    <p class="dp-results-empty">Keine Einträge gefunden.</p>
-  @elseif(results.isCards())
-    @template.components.entryCardGrid(cards = results.cards())
-  @else
-    @template.components.entryTable(rows = results.rows())
-  @endif
+<div id="dataset-results-shell" class="dp-results-shell">
+  @template.components.resultsShell(results = results, queryParams = queryParams, resetHref = filterPanel.resetHref())
 </div>
+@template.components.filterBar(filterPanel = filterPanel, queryParams = queryParams, outOfBand = true)
+@template.components.activeFilterChips(filterPanel = filterPanel, outOfBand = true)
+@template.components.resultControls(results = results, queryParams = queryParams, filterPanel = filterPanel, outOfBand = true)
+@template.components.pagination(results = results, queryParams = queryParams, outOfBand = true)

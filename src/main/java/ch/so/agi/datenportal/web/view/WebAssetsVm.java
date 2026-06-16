@@ -8,7 +8,8 @@ public record WebAssetsVm(
         Optional<String> webComponentsIndexJs,
         List<String> webComponentStylesheets,
         String appCss,
-        String htmxJs) {
+        String htmxJs,
+        String appJs) {
 
     public WebAssetsVm {
         webComponentsIndexJs = webComponentsIndexJs == null ? Optional.empty() : webComponentsIndexJs;

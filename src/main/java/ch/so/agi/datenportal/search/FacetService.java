@@ -1,8 +1,8 @@
 package ch.so.agi.datenportal.search;
 
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryType;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
-import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import java.time.Clock;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -39,15 +39,19 @@ public final class FacetService {
                                 .count()))
                 .toList();
 
-        var resourceTypes = java.util.Arrays.stream(DistributionFormat.values())
-                .filter(DistributionFormat::isPrimary)
-                .map(format -> new FacetValue(
-                        format.name().toLowerCase(),
-                        format.label(),
+        var resourceTypes = java.util.List.of(
+                new FacetValue(
+                        "dataset",
+                        CatalogEntryType.DATASET.label(),
                         snapshot.visibleEntries().stream()
-                                .filter(entry -> entry.hasDistribution(format))
-                                .count()))
-                .toList();
+                                .filter(entry -> entry.type() == CatalogEntryType.DATASET)
+                                .count()),
+                new FacetValue(
+                        "series",
+                        CatalogEntryType.DATASET_SERIES.label(),
+                        snapshot.visibleEntries().stream()
+                                .filter(entry -> entry.type() == CatalogEntryType.DATASET_SERIES)
+                                .count()));
 
         return new Facets(
                 toSortedFacetValues(themes),

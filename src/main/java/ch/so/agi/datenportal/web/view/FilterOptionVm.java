@@ -4,4 +4,5 @@ public record FilterOptionVm(
         String value,
         String label,
         long resultCount,
-        boolean selected) {}
+        boolean selected,
+        boolean disabled) {}

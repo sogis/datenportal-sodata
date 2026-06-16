@@ -18,10 +18,14 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Seite | `pages/catalog.jte` | `CatalogController`, `CatalogPageVm` | `/` rendert Titel und Suche |
 | Resultatfragment | `fragments/catalogResults.jte` | `HtmxRequest` | HTMX liefert Fragment |
 | Suche | `components/searchForm.jte` | `CatalogQueryParams.q` | Query bleibt erhalten |
-| Filterbar | `components/filterBar.jte` | `FilterPanelVmFactory` | Mehrfachfilter sichtbar |
-| aktive Filterchips | `components/activeFilterChips.jte` | `ActiveFilterVm` | einzelner Remove-Href |
+| Filterbar | `components/filterBar.jte` | `FilterVmFactory`, `FilterPanelVm` | Desktop-Trigger und Reset sichtbar |
+| Desktop-Popover | `fragments/filterPopover.jte`, `components/filterFieldList.jte` | `CatalogFilterController`, `FilterGroupVm` | nur angeforderte Gruppe, HTMX-Formular |
+| Mobile-Sheet | `fragments/mobileFilters.jte`, `components/mobileFilterButton.jte` | `CatalogFilterController`, `FilterPanelVm` | Narrow viewport, Apply/Reset |
+| aktive Filterchips | `components/activeFilterChips.jte` | `FilterChipVm` | einzelner Remove-Href |
 | Ansichttoggle | `components/viewToggle.jte` | `ViewToggleVm` | `aria-current` korrekt |
-| Toolbar | `components/resultsToolbar.jte` | `ResultsToolbarVm` | Result count und Sortierung |
+| Result Controls | `components/resultControls.jte` | `ResultControlsVm` | Result count, Sortierung, Mobile-Button |
+| Resultat-Shell | `components/resultsShell.jte` | `ResultsVm` | stabiler HTMX-Target-Bereich |
+| Pagination | `components/pagination.jte` | `PaginationVm`, `PaginationItemVm` | Seite/Grösse erhalten Filterzustand |
 
 ## Listenansicht
 
@@ -32,7 +36,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datenreihen-Root | `components/entryRow.jte` | `EntryRowVm.series=true` | `aria-expanded`, Plus/Minus |
 | Ausgabezeile | `components/issueRow.jte` | `IssueRowVm` | Downloads ohne aktuelle-Ausgabe-Text |
 | Downloadbutton | `components/downloadButton.jte` | `DownloadButtonVm` | zugänglicher Name |
-| Pagination | nach Phase 3 zurückgestellt | noch kein Frontend-VM | Phase 3 rendert alle Treffer ohne Pagination |
+| Pagination | `components/pagination.jte` | `PaginationVm` | Default `size=10`, View/Sort/Filter bleiben erhalten |
 
 ## Kartenansicht
 

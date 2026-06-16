@@ -1,29 +1,30 @@
 package ch.so.agi.datenportal.search;
 
-import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryType;
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public record SearchFilters(
         Set<String> themes,
         Set<String> offices,
-        Set<ModifiedDateRange> modifiedRanges,
-        Set<DistributionFormat> resourceTypes) {
+        Optional<ModifiedDateRange> modifiedRange,
+        Set<CatalogEntryType> resourceTypes) {
 
     public SearchFilters {
         themes = copyStringSet(themes);
         offices = copyStringSet(offices);
-        modifiedRanges = Set.copyOf(Objects.requireNonNullElse(modifiedRanges, Set.of()));
+        modifiedRange = Objects.requireNonNullElse(modifiedRange, Optional.empty());
         resourceTypes = Set.copyOf(Objects.requireNonNullElse(resourceTypes, Set.of()));
     }
 
     public static SearchFilters empty() {
-        return new SearchFilters(Set.of(), Set.of(), Set.of(), Set.of());
+        return new SearchFilters(Set.of(), Set.of(), Optional.empty(), Set.of());
     }
 
     public boolean isEmpty() {
-        return themes.isEmpty() && offices.isEmpty() && modifiedRanges.isEmpty() && resourceTypes.isEmpty();
+        return themes.isEmpty() && offices.isEmpty() && modifiedRange.isEmpty() && resourceTypes.isEmpty();
     }
 
     private static Set<String> copyStringSet(Set<String> values) {

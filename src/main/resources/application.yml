@@ -45,7 +45,7 @@ datenportal:
     reload-token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN:}
   search:
     max-results: 500
-    default-page-size: 20
+    default-page-size: 10
     max-page-size: 100
   web-components:
     enabled: true

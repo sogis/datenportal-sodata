@@ -95,9 +95,15 @@ Nach Änderungen an Betrieb, UI oder Reload:
 
 ```bash
 ./gradlew test
+./gradlew playwrightTest
 ./gradlew check
 ./gradlew bootRun
 ```
+
+Hinweis zu Playwright:
+
+- `playwrightTest` installiert beim ersten Lauf die benötigten Browser unter `.gradle/playwright-browsers`.
+- Danach nutzt `check` dieselbe lokale Browser-Installation wieder.
 
 Manuelle Prüfung mit laufender App:
 

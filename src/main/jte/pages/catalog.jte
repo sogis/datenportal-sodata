@@ -6,33 +6,19 @@
       <h1 class="dp-page-title">${page.title()}</h1>
       <p class="dp-lead">${page.lead()}</p>
       <p class="dp-lead-secondary">${page.secondaryLead()}</p>
-
-      <form
-        class="dp-catalog-form"
-        method="get"
-        action="/datasets"
-        hx-get="/datasets"
-        hx-target="#dataset-results"
-        hx-select="#dataset-results"
-        hx-push-url="true">
+      <div class="dp-catalog-shell">
         @template.components.searchForm(queryParams = page.queryParams())
-        @template.components.filterBar(filterPanel = page.filterPanel())
-        <input type="hidden" name="view" value="${page.queryParams().viewValue()}">
-        <input type="hidden" name="sort" value="${page.queryParams().sortValue()}">
-        @for(var expanded : page.queryParams().expanded())
-          <input type="hidden" name="expanded" value="${expanded}">
-        @endfor
-        <div class="dp-filter-actions">
-          <button class="dp-button dp-button--primary" type="submit">Anwenden</button>
-          <a class="dp-button dp-button--secondary" href="${page.filterPanel().resetHref()}">Filter zurücksetzen</a>
+        @template.components.filterBar(filterPanel = page.filterPanel(), queryParams = page.queryParams(), outOfBand = false)
+        @template.components.activeFilterChips(filterPanel = page.filterPanel(), outOfBand = false)
+        @template.components.resultControls(results = page.results(), queryParams = page.queryParams(), filterPanel = page.filterPanel(), outOfBand = false)
+        <div id="dataset-results-shell" class="dp-results-shell">
+          @template.components.resultsShell(results = page.results(), queryParams = page.queryParams(), resetHref = page.filterPanel().resetHref())
         </div>
-      </form>
-
-      @template.fragments.catalogResults(
-        results = page.results(),
-        filterPanel = page.filterPanel(),
-        queryParams = page.queryParams()
-      )
+        @template.components.pagination(results = page.results(), queryParams = page.queryParams(), outOfBand = false)
+      </div>
+      <div id="filter-popover-host" class="dp-filter-host" hidden></div>
+      <div id="mobile-filter-panel-host" class="dp-filter-host" hidden></div>
+      <div id="dataset-loading" class="dp-loading-indicator htmx-indicator">Datensätze werden geladen ...</div>
     </div>
   </section>
 `)

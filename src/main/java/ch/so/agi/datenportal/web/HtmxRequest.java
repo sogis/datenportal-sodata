@@ -18,6 +18,6 @@ public final class HtmxRequest {
 
     public static boolean targetsResults(HttpServletRequest request) {
         return isHtmx(request)
-                && target(request).map("dataset-results"::equals).orElse(false);
+                && target(request).map("dataset-results-shell"::equals).orElse(false);
     }
 }

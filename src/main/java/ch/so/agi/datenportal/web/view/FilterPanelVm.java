@@ -6,7 +6,9 @@ public record FilterPanelVm(
         List<FilterGroupVm> groups,
         List<FilterChipVm> chips,
         String resetHref,
-        boolean hasActiveFilters) {
+        boolean hasActiveFilters,
+        int activeValueCount,
+        String mobileFilterHref) {
 
     public FilterPanelVm {
         groups = List.copyOf(groups);

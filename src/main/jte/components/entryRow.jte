@@ -6,6 +6,11 @@
       <a
         class="dp-expand-button"
         href="${row.expandHref()}"
+        hx-get="${row.expandHref()}"
+        hx-target="#dataset-results-shell"
+        hx-swap="outerHTML"
+        hx-push-url="true"
+        hx-indicator="#dataset-loading"
         role="button"
         aria-expanded="${row.expanded() ? "true" : "false"}"
         aria-controls="issues-${row.id()}"

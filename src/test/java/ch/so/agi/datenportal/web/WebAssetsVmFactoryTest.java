@@ -25,6 +25,7 @@ class WebAssetsVmFactoryTest {
         assertThat(assets.webComponentStylesheets()).doesNotHaveDuplicates();
         assertThat(assets.appCss()).isEqualTo("/css/app.css");
         assertThat(assets.htmxJs()).isEqualTo("/js/htmx.min.js");
+        assertThat(assets.appJs()).isEqualTo("/js/catalog-filters.js");
     }
 
     @Test
@@ -39,6 +40,7 @@ class WebAssetsVmFactoryTest {
         assertThat(assets.webComponentStylesheets()).isEmpty();
         assertThat(assets.appCss()).isEqualTo("/css/app.css");
         assertThat(assets.htmxJs()).isEqualTo("/js/htmx.min.js");
+        assertThat(assets.appJs()).isEqualTo("/js/catalog-filters.js");
     }
 
     @Test

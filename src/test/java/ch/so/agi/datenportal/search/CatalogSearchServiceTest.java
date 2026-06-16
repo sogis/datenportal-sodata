@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryType;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
@@ -21,6 +22,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +36,7 @@ class CatalogSearchServiceTest {
     private static final Theme ECON = new Theme("ECON", "Wirtschaft und Finanzen");
     private static final Theme GOVE = new Theme("GOVE", "Regierung und Verwaltung");
 
-    private final CatalogSearchService service = new CatalogSearchService(new SearchProperties(500, 20, 100), CLOCK);
+    private final CatalogSearchService service = new CatalogSearchService(new SearchProperties(500, 10, 100), CLOCK);
 
     @Test
     void emptyQueryReturnsAllEntriesSortedByModifiedDescending() {
@@ -83,7 +85,7 @@ class CatalogSearchServiceTest {
 
     @Test
     void filtersUseOrWithinCategoryAndAndAcrossCategories() {
-        var filters = new SearchFilters(Set.of("REGI", "GOVE"), Set.of("agi"), Set.of(), Set.of());
+        var filters = new SearchFilters(Set.of("REGI", "GOVE"), Set.of("agi"), Optional.empty(), Set.of());
 
         SearchResult result = service.search(snapshot(), new SearchQuery("", filters, SortMode.TITLE_ASC));
 
@@ -94,8 +96,8 @@ class CatalogSearchServiceTest {
 
     @Test
     void filtersByModifiedDateRanges() {
-        var recent = new SearchFilters(Set.of(), Set.of(), Set.of(ModifiedDateRange.LAST_30_DAYS), Set.of());
-        var older = new SearchFilters(Set.of(), Set.of(), Set.of(ModifiedDateRange.OLDER), Set.of());
+        var recent = new SearchFilters(Set.of(), Set.of(), Optional.of(ModifiedDateRange.LAST_30_DAYS), Set.of());
+        var older = new SearchFilters(Set.of(), Set.of(), Optional.of(ModifiedDateRange.OLDER), Set.of());
 
         assertThat(service.search(snapshot(), new SearchQuery("", recent, SortMode.MODIFIED_DESC)).entries())
                 .extracting(CatalogEntry::identifier)
@@ -107,13 +109,13 @@ class CatalogSearchServiceTest {
 
     @Test
     void filtersByResourceType() {
-        var filters = new SearchFilters(Set.of(), Set.of(), Set.of(), Set.of(DistributionFormat.PARQUET));
+        var filters = new SearchFilters(Set.of(), Set.of(), Optional.empty(), Set.of(CatalogEntryType.DATASET_SERIES));
 
         SearchResult result = service.search(snapshot(), new SearchQuery("", filters, SortMode.TITLE_ASC));
 
         assertThat(result.entries())
                 .extracting(CatalogEntry::identifier)
-                .containsExactly("gemeindegrenzen", "verkehrszaehlstellen");
+                .containsExactly("gemeindegrenzen");
     }
 
     @Test

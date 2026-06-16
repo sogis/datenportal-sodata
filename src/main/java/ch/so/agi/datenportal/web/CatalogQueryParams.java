@@ -1,6 +1,6 @@
 package ch.so.agi.datenportal.web;
 
-import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryType;
 import ch.so.agi.datenportal.search.ModifiedDateRange;
 import ch.so.agi.datenportal.search.SearchFilters;
 import ch.so.agi.datenportal.search.SearchQuery;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class CatalogQueryParams {
@@ -20,6 +21,8 @@ public class CatalogQueryParams {
     private List<String> resourceType = List.of();
     private String sort = SortMode.defaultMode().parameterValue();
     private String view = ViewMode.defaultMode().parameterValue();
+    private int page = 1;
+    private int size = 0;
     private List<String> expanded = List.of();
 
     public String getQ() {
@@ -78,6 +81,22 @@ public class CatalogQueryParams {
         this.view = view == null ? "" : view;
     }
 
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
     public List<String> getExpanded() {
         return expanded;
     }
@@ -126,6 +145,14 @@ public class CatalogQueryParams {
         return viewMode().parameterValue();
     }
 
+    public int page() {
+        return page;
+    }
+
+    public int size() {
+        return size;
+    }
+
     public Set<String> selectedThemes() {
         return new LinkedHashSet<>(theme);
     }
@@ -134,25 +161,19 @@ public class CatalogQueryParams {
         return new LinkedHashSet<>(office);
     }
 
-    public Set<ModifiedDateRange> selectedModifiedRanges() {
-        var ranges = new LinkedHashSet<ModifiedDateRange>();
-        modified.stream()
+    public Optional<ModifiedDateRange> selectedModifiedRange() {
+        return modified.stream()
                 .map(ModifiedDateRange::fromParameterValue)
-                .flatMap(java.util.Optional::stream)
-                .forEach(ranges::add);
-        return ranges;
+                .flatMap(Optional::stream)
+                .findFirst();
     }
 
-    public Set<DistributionFormat> selectedResourceTypes() {
-        var formats = new LinkedHashSet<DistributionFormat>();
+    public Set<CatalogEntryType> selectedResourceTypes() {
+        var types = new LinkedHashSet<CatalogEntryType>();
         for (String value : resourceType) {
-            try {
-                formats.add(DistributionFormat.fromModelValue(value));
-            } catch (IllegalArgumentException ignored) {
-                // Unknown query values are ignored during normalization.
-            }
+            toResourceType(value).ifPresent(types::add);
         }
-        return formats;
+        return types;
     }
 
     public SearchQuery toSearchQuery() {
@@ -161,9 +182,10 @@ public class CatalogQueryParams {
                 new SearchFilters(
                         selectedThemes(),
                         selectedOffices(),
-                        selectedModifiedRanges(),
+                        selectedModifiedRange(),
                         selectedResourceTypes()),
-                sortMode());
+                sortMode(),
+                ch.so.agi.datenportal.search.PageRequest.of(Math.max(1, page()), Math.max(0, size())));
     }
 
     public CatalogQueryParams normalized() {
@@ -171,14 +193,16 @@ public class CatalogQueryParams {
         normalized.setQ(q().trim());
         normalized.setTheme(copyDistinct(theme));
         normalized.setOffice(copyDistinct(office));
-        normalized.setModified(selectedModifiedRanges().stream()
-                .map(ModifiedDateRange::parameterValue)
-                .toList());
+        normalized.setModified(selectedModifiedRange()
+                .map(range -> List.of(range.parameterValue()))
+                .orElseGet(List::of));
         normalized.setResourceType(selectedResourceTypes().stream()
-                .map(format -> format.name().toLowerCase())
+                .map(CatalogQueryParams::toResourceTypeValue)
                 .toList());
         normalized.setSort(sortValue());
         normalized.setView(viewValue());
+        normalized.setPage(Math.max(1, page()));
+        normalized.setSize(Math.max(0, size()));
         normalized.setExpanded(copyDistinct(expanded));
         return normalized;
     }
@@ -199,5 +223,25 @@ public class CatalogQueryParams {
                 .filter(value -> !value.isEmpty())
                 .forEach(distinct::add);
         return new ArrayList<>(distinct);
+    }
+
+    private static Optional<CatalogEntryType> toResourceType(String value) {
+        if (value == null || value.isBlank()) {
+            return Optional.empty();
+        }
+
+        return switch (value.trim().toLowerCase()) {
+            case "dataset" -> Optional.of(CatalogEntryType.DATASET);
+            case "series" -> Optional.of(CatalogEntryType.DATASET_SERIES);
+            default -> Optional.empty();
+        };
+    }
+
+    private static String toResourceTypeValue(CatalogEntryType type) {
+        return switch (type) {
+            case DATASET -> "dataset";
+            case DATASET_SERIES -> "series";
+            case DATASET_ISSUE -> "issue";
+        };
     }
 }

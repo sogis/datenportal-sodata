@@ -3,6 +3,7 @@ package ch.so.agi.datenportal.web;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.so.agi.datenportal.config.WebComponentsProperties;
+import ch.so.agi.datenportal.config.SearchProperties;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
@@ -29,7 +30,7 @@ class DetailPageVmFactoryTest {
                     new WebAssetsVmFactory(
                             new WebComponentsProperties(true, "0.1.9", null, false),
                             new DefaultResourceLoader())),
-            new CatalogUrlFactory());
+            new CatalogUrlFactory(new SearchProperties(500, 10, 100)));
 
     @Test
     void datasetMetadataSectionsContainOnlyAvailableValues() {

@@ -6,6 +6,7 @@ import ch.so.agi.datenportal.search.Facets;
 import ch.so.agi.datenportal.search.ModifiedDateRange;
 import ch.so.agi.datenportal.web.view.FilterChipVm;
 import ch.so.agi.datenportal.web.view.FilterGroupVm;
+import ch.so.agi.datenportal.web.view.FilterGroupType;
 import ch.so.agi.datenportal.web.view.FilterOptionVm;
 import ch.so.agi.datenportal.web.view.FilterPanelVm;
 import java.util.ArrayList;
@@ -28,10 +29,10 @@ public final class FilterVmFactory {
     public FilterPanelVm create(CatalogQueryParams params, Facets facets) {
         var normalized = params.normalized();
         var groups = List.of(
-                group("theme", "Thema", "theme", "Alle Themen", normalized.theme(), facets.themes()),
-                group("office", "Fachstelle / Amt", "office", "Alle Fachstellen", normalized.office(), facets.offices()),
-                group("modified", "Publikationsdatum", "modified", "Alle Zeiträume", normalized.modified(), facets.modifiedRanges()),
-                group("resourceType", "Ressourcentyp", "resourceType", "Alle Typen", normalized.resourceType(), facets.resourceTypes()));
+                group(normalized, "theme", "Thema", "theme", "Alle Themen", FilterGroupType.MULTI_SELECT, normalized.theme(), facets.themes()),
+                group(normalized, "office", "Fachstelle / Amt", "office", "Alle Fachstellen", FilterGroupType.MULTI_SELECT, normalized.office(), facets.offices()),
+                group(normalized, "modified", "Publikationsdatum", "modified", "Alle Zeiträume", FilterGroupType.SINGLE_SELECT, normalized.modified(), facets.modifiedRanges()),
+                group(normalized, "resourceType", "Ressourcentyp", "resourceType", "Alle Typen", FilterGroupType.MULTI_SELECT, normalized.resourceType(), facets.resourceTypes()));
 
         var chips = new ArrayList<FilterChipVm>();
         chips.addAll(chipsFor(normalized, "Thema", "theme", normalized.theme(), facets.themes()));
@@ -43,14 +44,18 @@ public final class FilterVmFactory {
                 groups,
                 chips,
                 urlFactory.resetFilters(normalized),
-                !chips.isEmpty());
+                !chips.isEmpty(),
+                chips.size(),
+                urlFactory.mobileFilters(normalized));
     }
 
     private FilterGroupVm group(
+            CatalogQueryParams params,
             String id,
             String label,
             String parameterName,
             String emptyLabel,
+            FilterGroupType type,
             List<String> selected,
             List<FacetValue> values) {
         var selectedSet = Set.copyOf(selected);
@@ -59,7 +64,8 @@ public final class FilterVmFactory {
                         value.value(),
                         value.label(),
                         value.count(),
-                        selectedSet.contains(value.value())))
+                        selectedSet.contains(value.value()),
+                        false))
                 .toList();
 
         return new FilterGroupVm(
@@ -68,6 +74,9 @@ public final class FilterVmFactory {
                 parameterName,
                 collapsedLabel(emptyLabel, selected, values),
                 selected.size(),
+                type,
+                urlFactory.filterPopover(params, id),
+                urlFactory.resetFilterGroup(params, parameterName),
                 options);
     }
 

@@ -22,7 +22,7 @@ class CatalogControllerMvcTest {
     private MockMvc mockMvc;
 
     @Test
-    void homePageReturnsFullPageWithDefaultListViewAndNoPagination() throws Exception {
+    void homePageReturnsFullPageWithDefaultListViewAndPagination() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<html lang=\"de\">")))
@@ -32,12 +32,17 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("Daten &amp; Statistiken")))
                 .andExpect(content().string(containsString("id=\"main-content\"")))
                 .andExpect(content().string(containsString("aria-label=\"Breadcrumb\"")))
+                .andExpect(content().string(containsString("id=\"catalog-search-form\"")))
+                .andExpect(content().string(containsString("id=\"filter-toolbar\"")))
+                .andExpect(content().string(containsString("id=\"result-controls\"")))
+                .andExpect(content().string(containsString("id=\"dataset-results-shell\"")))
+                .andExpect(content().string(containsString("id=\"pagination\"")))
+                .andExpect(content().string(containsString("id=\"mobile-filter-button\"")))
                 .andExpect(content().string(containsString("Thema / Datensatz")))
                 .andExpect(content().string(containsString("Listenansicht")))
                 .andExpect(content().string(containsString("aria-current=\"page\"")))
-                .andExpect(content().string(not(containsString("dp-pagination"))))
-                .andExpect(content().string(not(containsString("page="))))
-                .andExpect(content().string(not(containsString("size="))));
+                .andExpect(content().string(containsString("Zeilen pro Seite")))
+                .andExpect(content().string(containsString("/js/catalog-filters.js")));
     }
 
     @Test
@@ -55,25 +60,28 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void pageContainsSearchFiltersFixtureEntriesAndCurrentIssueDownloads() throws Exception {
+    void pageContainsSearchToolbarResultsAndCurrentIssueDownloads() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("href=\"/css/app.css\"")))
                 .andExpect(content().string(containsString("src=\"/js/htmx.min.js\"")))
+                .andExpect(content().string(containsString("src=\"/js/catalog-filters.js\"")))
                 .andExpect(content().string(containsString("src=\"/vendor/so-web-components/0.1.9/index.js\"")))
                 .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/reset.css\"")))
                 .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/fonts.css\"")))
                 .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/tokens.css\"")))
-                .andExpect(content().string(containsString("id=\"dataset-results\"")))
+                .andExpect(content().string(containsString("id=\"catalog-search-form\"")))
+                .andExpect(content().string(containsString("id=\"filter-trigger-theme\"")))
+                .andExpect(content().string(containsString("id=\"filter-trigger-office\"")))
+                .andExpect(content().string(containsString("id=\"filter-trigger-modified\"")))
+                .andExpect(content().string(containsString("id=\"filter-trigger-resourceType\"")))
+                .andExpect(content().string(containsString("id=\"dataset-results-shell\"")))
+                .andExpect(content().string(containsString("id=\"dataset-loading\"")))
                 .andExpect(content().string(containsString("name=\"q\"")))
-                .andExpect(content().string(containsString("name=\"theme\"")))
-                .andExpect(content().string(containsString("name=\"office\"")))
-                .andExpect(content().string(containsString("name=\"modified\"")))
-                .andExpect(content().string(containsString("name=\"resourceType\"")))
-                .andExpect(content().string(containsString("Bauinventar")))
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
+                .andExpect(content().string(containsString("dp-entry-row dp-entry-row--series")))
                 .andExpect(content().string(containsString("CSV (aktuelle Ausgabe)")))
-                .andExpect(content().string(containsString("Parquet")));
+                .andExpect(content().string(containsString("Parquet (aktuelle Ausgabe)")));
     }
 
     @Test
@@ -91,7 +99,6 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("dp-card-grid")))
                 .andExpect(content().string(containsString("dp-result-card")))
                 .andExpect(content().string(containsString("Open Data")))
-                .andExpect(content().string(containsString("href=\"/datasets/ch.so.bauinventar\"")))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate\"")))
                 .andExpect(content().string(not(containsString("dp-entry-table-wrapper"))));
     }
@@ -116,11 +123,22 @@ class CatalogControllerMvcTest {
 
     @Test
     void listRowsUseSameGreyTypeBadgeAndNoTitleColumnIcons() throws Exception {
-        mockMvc.perform(get("/datasets"))
+        var seriesHtml = mockMvc.perform(get("/datasets"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datensatz</span>")))
-                .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datenreihe</span>")))
-                .andExpect(content().string(not(containsString("dp-entry-icon"))));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        var datasetHtml = mockMvc.perform(get("/datasets").param("q", "Bauinventar"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(seriesHtml).contains("<span class=\"dp-type-badge\">Datenreihe</span>");
+        assertThat(datasetHtml).contains("<span class=\"dp-type-badge\">Datensatz</span>");
+        assertThat(seriesHtml).doesNotContain("dp-entry-icon");
+        assertThat(datasetHtml).doesNotContain("dp-entry-icon");
     }
 
     @Test
@@ -138,17 +156,74 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void htmxRequestReturnsOnlyResultsFragment() throws Exception {
+    void htmxRequestReturnsResultsFragmentWithOobAreas() throws Exception {
         mockMvc.perform(get("/datasets")
                         .header("HX-Request", "true")
-                        .header("HX-Target", "dataset-results")
+                        .header("HX-Target", "dataset-results-shell")
                         .param("view", "cards"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("id=\"dataset-results\"")))
+                .andExpect(content().string(containsString("id=\"dataset-results-shell\"")))
                 .andExpect(content().string(containsString("dp-card-grid")))
+                .andExpect(content().string(containsString("hx-swap-oob=\"true\"")))
+                .andExpect(content().string(containsString("id=\"filter-toolbar\"")))
+                .andExpect(content().string(containsString("id=\"result-controls\"")))
+                .andExpect(content().string(containsString("id=\"pagination\"")))
                 .andExpect(content().string(not(containsString("<html"))))
                 .andExpect(content().string(not(containsString("dp-site-header"))))
                 .andExpect(content().string(not(containsString("Zum Inhalt springen"))));
+    }
+
+    @Test
+    void filterPopoverRouteRendersOnlyRequestedGroup() throws Exception {
+        mockMvc.perform(get("/datasets/filter-popover")
+                        .param("filter", "theme")
+                        .param("theme", "Bau_und_Wohnungswesen"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("dp-filter-popover")))
+                .andExpect(content().string(containsString("data-filter-panel")))
+                .andExpect(content().string(containsString("name=\"theme\"")))
+                .andExpect(content().string(containsString("value=\"Bau_und_Wohnungswesen\"")))
+                .andExpect(content().string(containsString("checked")))
+                .andExpect(content().string(not(containsString("<html"))));
+    }
+
+    @Test
+    void mobileFiltersRouteRendersFilterSheetWithAllGroups() throws Exception {
+        mockMvc.perform(get("/datasets/mobile-filters")
+                        .param("modified", "last30")
+                        .param("resourceType", "series"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("dp-filter-sheet")))
+                .andExpect(content().string(containsString("Ergebnisse anzeigen")))
+                .andExpect(content().string(containsString("Alle zurücksetzen")))
+                .andExpect(content().string(containsString("name=\"modified\"")))
+                .andExpect(content().string(containsString("name=\"resourceType\"")))
+                .andExpect(content().string(not(containsString("<html"))));
+    }
+
+    @Test
+    void filterFragmentsAreNotAvailableOnRootAlias() throws Exception {
+        mockMvc.perform(get("/filter-popover").param("filter", "theme"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(get("/mobile-filters"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void paginationLinksAndPageSizeControlsPreserveRelevantState() throws Exception {
+        mockMvc.perform(get("/datasets")
+                        .param("theme", "Geografie")
+                        .param("view", "cards")
+                        .param("sort", "title-asc")
+                        .param("page", "2")
+                        .param("size", "20"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("theme=Geografie")))
+                .andExpect(content().string(containsString("view=cards")))
+                .andExpect(content().string(containsString("sort=title-asc")))
+                .andExpect(content().string(containsString("name=\"size\"")))
+                .andExpect(content().string(containsString("<option value=\"20\" selected>20</option>")));
     }
 
     @Test
@@ -165,6 +240,7 @@ class CatalogControllerMvcTest {
         assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/styles/tokens.css")).isEqualTo(1);
         assertThat(countOccurrences(html, "/css/app.css")).isEqualTo(1);
         assertThat(countOccurrences(html, "/js/htmx.min.js")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/js/catalog-filters.js")).isEqualTo(1);
         assertThat(html)
                 .doesNotContain("/Users/")
                 .doesNotContain("file:")

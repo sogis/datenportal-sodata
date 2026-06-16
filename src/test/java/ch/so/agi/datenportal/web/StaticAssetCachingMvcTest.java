@@ -35,6 +35,13 @@ class StaticAssetCachingMvcTest {
     }
 
     @Test
+    void appJsAssetUsesMediumCacheHeader() throws Exception {
+        mockMvc.perform(get("/js/catalog-filters.js"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=2592000"), containsString("public"))));
+    }
+
+    @Test
     void webComponentAssetUsesLongCacheHeaderAndStillServesContent() throws Exception {
         mockMvc.perform(get("/vendor/so-web-components/0.1.9/index.js"))
                 .andExpect(status().isOk())

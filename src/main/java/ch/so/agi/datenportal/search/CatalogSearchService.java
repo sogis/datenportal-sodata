@@ -2,7 +2,6 @@ package ch.so.agi.datenportal.search;
 
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
-import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.config.SearchProperties;
 import java.time.Clock;
 import java.util.Comparator;
@@ -84,13 +83,13 @@ public final class CatalogSearchService {
     }
 
     private boolean matchesModifiedRanges(CatalogEntry entry, SearchFilters filters) {
-        return filters.modifiedRanges().isEmpty()
-                || filters.modifiedRanges().stream().anyMatch(range -> range.matches(entry.modified(), clock));
+        return filters.modifiedRange().isEmpty()
+                || filters.modifiedRange().orElseThrow().matches(entry.modified(), clock);
     }
 
     private boolean matchesResourceTypes(CatalogEntry entry, SearchFilters filters) {
         return filters.resourceTypes().isEmpty()
-                || filters.resourceTypes().stream().anyMatch(entry::hasDistribution);
+                || filters.resourceTypes().contains(entry.type());
     }
 
     private List<CatalogEntry> applySort(List<CatalogEntry> entries, SearchQuery query) {
