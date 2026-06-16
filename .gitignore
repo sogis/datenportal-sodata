@@ -1,3 +1,5 @@
+.settings
+bin/
 # ---> macOS
 # General
 .DS_Store
