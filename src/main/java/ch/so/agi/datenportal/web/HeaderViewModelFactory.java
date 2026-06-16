@@ -17,11 +17,11 @@ public class HeaderViewModelFactory {
     }
 
     public HeaderVm forCatalogPage() {
-        return create("Daten");
+        return create("Verwaltung");
     }
 
     public HeaderVm forDetailPage() {
-        return create("Daten");
+        return create("Verwaltung");
     }
 
     public HeaderVm create(String activeSection) {
@@ -41,18 +41,16 @@ public class HeaderViewModelFactory {
 
     private static List<NavItemVm> primaryNav(String activeSection) {
         return List.of(
-                navItem("Daten", "/datasets", activeSection),
-                navItem("Themen", "/themes", activeSection),
-                navItem("Statistiken", "/statistics", activeSection),
-                navItem("Karten", "/maps", activeSection),
-                navItem("APIs", "/apis", activeSection),
-                navItem("Über uns", "/about", activeSection));
+                navItem("Services", "https://so.ch/services/", activeSection),
+                navItem("Verwaltung", "https://my.so.ch", activeSection));
     }
 
     private static List<NavItemVm> utilityNav() {
         return List.of(
-                new NavItemVm("Services", "https://so.ch/services/", false),
-                new NavItemVm("Verwaltung", "https://so.ch/verwaltung/", false),
+                new NavItemVm("Regierung", "https://so.ch/regierung/", false),
+                new NavItemVm("Gerichte", "https://so.ch/gerichte/", false),
+                new NavItemVm("Parlament", "https://so.ch/parlament/", false),
+                new NavItemVm("Karriere", "https://karriere.so.ch/", false),
                 new NavItemVm("my.so.ch", "https://my.so.ch/", false));
     }
 
