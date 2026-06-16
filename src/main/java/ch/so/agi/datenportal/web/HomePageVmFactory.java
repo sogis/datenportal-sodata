@@ -9,11 +9,12 @@ import org.springframework.stereotype.Component;
 @Component
 public final class HomePageVmFactory {
 
-    private static final String PAGE_TITLE = "Daten & Statistiken";
+    private static final String PAGE_TITLE = "Daten und Statistiken";
     private static final String LEAD =
-            "Finden und nutzen Sie offene Daten, Geodaten und Statistiken des Kantons Solothurn.";
+            "Finden, verstehen und nutzen Sie verlässliche Daten über Bevölkerung, Wirtschaft, Umwelt, Mobilität und mehr.";
     private static final String SECONDARY_LEAD =
-            "Alle Datensätze sind – sofern verfügbar – als Open Data mit freien Lizenzen nutzbar.";
+            //"Alle Datensätze sind – sofern verfügbar – als Open Data mit freien Lizenzen nutzbar.";
+            "";
 
     private final PageChromeFactory pageChromeFactory;
     private final FilterVmFactory filterVmFactory;
