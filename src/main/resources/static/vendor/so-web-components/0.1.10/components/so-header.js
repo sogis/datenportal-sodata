@@ -374,8 +374,8 @@ export class SoHeader extends HTMLElement {
       .mobile-panel{ display: none; border-top: 1px solid var(--so-border-color); }
       .mobile-panel-inner{ padding-block: 0.75rem 1.25rem; }
       @media (max-width: 768px){
-        .mobile-panel{
-          display: block;
+        .mobile-panel{ 
+          display: block; 
           border: 0;
         }
         .mobile-panel-inner[data-open="false"]{ display: none; }

@@ -84,7 +84,8 @@ Bei jedem Fehler bleibt der bisherige `CatalogSnapshot` samt bisherigem Lucene-I
 ```bash
 curl -I http://localhost:8080/css/app.css
 curl -I http://localhost:8080/js/htmx.min.js
-curl -I http://localhost:8080/vendor/so-web-components/0.1.9/index.js
+curl -I http://localhost:8080/vendor/so-web-components/0.1.10/index.js
+curl -I http://localhost:8080/vendor/so-web-components/0.1.10/styles/FrutigerLTW05-55Roman.woff2
 ```
 
 Erwartet wird ein `Cache-Control`-Header. Versionierte Web-Component-Assets haben eine lange TTL, CSS hat eine kurze TTL, weil die Pfade nicht fingerprinted sind.

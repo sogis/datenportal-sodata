@@ -259,9 +259,9 @@ datenportal:
     default-sort: modified-desc
   web-components:
     enabled: true
-    asset-base-path: /vendor/so-web-components/0.1.9
+    asset-base-path: /vendor/so-web-components/0.1.10
     use-cdn: false
-    version: 0.1.9
+    version: 0.1.10
 ```
 
 ### 4.2 `CatalogProperties`
@@ -1656,38 +1656,31 @@ MVP-Entscheid: **vendored static assets** statt npm-Build in der Spring-Boot-App
 Zielstruktur:
 
 ```text
-src/main/resources/static/vendor/so-web-components/0.1.9/
+src/main/resources/static/vendor/so-web-components/0.1.10/
   index.js
   styles/
     reset.css
     tokens.css
     fonts.css
-
-src/main/resources/static/assets/fonts/
-  <lizenzierte-fontdateien>
+    FrutigerLTW05-55Roman.woff2
+    FrutigerLTW05-75Black.woff2
 ```
 
 Wichtig:
 
-- Für dieses Projekt ist die Schriftlizenz gemäss Auftrag geklärt. Die lizenzierten Fontdateien dürfen im Ziel-Repository der Webanwendung eingebunden werden.
-- Die Fontdateien werden nicht aus dem Internet geladen, sondern aus dem lokal vorhandenen Datenportal-Designsystem bzw. aus der offiziellen internen Asset-Quelle übernommen.
-- Die Fontdateien liegen im Anwendungsrepo unter `src/main/resources/static/assets/fonts/`.
+- `so-web-components@0.1.10` liefert die benoetigten `woff2`-Dateien direkt im `styles/`-Verzeichnis mit.
+- Die Fontdateien werden nicht aus dem Internet geladen, sondern zusammen mit den Web-Component-Assets lokal ausgeliefert.
 - `fonts.css` muss relative URLs auf diese Dateien verwenden und darf keine absoluten lokalen Pfade wie `/Users/...` enthalten.
-- Der Agent darf die Fontdateien nur übernehmen, wenn sie im lokalen Projektkontext tatsächlich vorhanden sind. Wenn sie fehlen, muss er die erwartete Zielstruktur und `fonts.css` vorbereiten und im Abschlussbericht klar sagen, dass die Binärdateien lokal ergänzt werden müssen.
+- Es gibt keine separate globale Font-Ablage unter `src/main/resources/static/assets/fonts/`.
 - Für lokale Entwicklung darf testweise CDN für Web Components verwendet werden; produktionsnah nicht. Fonts werden auch lokal nie über externe CDN geladen.
 
 ### 12.2.1 Schriftintegration
 
-Die Webanwendung soll die im Datenportal-Designsystem vorgesehene lizenzierte Schrift verwenden. Der Agent muss die konkrete Font-Family und Dateinamen aus dem vorhandenen Designsystem übernehmen, statt Namen zu erfinden. Falls das Designsystem bereits eine `fonts.css` enthält, ist diese bevorzugt zu verwenden und nur an die Zielpfade der Spring-Boot-App anzupassen.
+Die Webanwendung soll die im Datenportal-Designsystem vorgesehene Schrift konsistent in App und Web Components verwenden. Fuer `so-web-components@0.1.10` ist die mitgelieferte `fonts.css` mit ihren `woff2`-Dateien die Source of Truth.
 
 Empfohlene Zielstruktur:
 
 ```text
-src/main/resources/static/assets/fonts/
-  README.md                 # kurze Herkunfts-/Lizenznotiz ohne Lizenzvertrag
-  *.woff2                   # bevorzugtes Webfont-Format
-  *.woff                    # nur falls im Designsystem vorhanden/benötigt
-
 src/main/resources/static/css/
   app.css
 
@@ -1695,17 +1688,18 @@ src/main/resources/static/vendor/so-web-components/<version>/styles/
   reset.css
   tokens.css
   fonts.css
+  FrutigerLTW05-55Roman.woff2
+  FrutigerLTW05-75Black.woff2
 ```
 
 Beispielprinzip für `fonts.css`:
 
 ```css
 @font-face {
-  font-family: '<Font-Family aus Designsystem>';
-  src: url('/assets/fonts/<dateiname>.woff2') format('woff2');
+  font-family: Frutiger;
+  src: url('./FrutigerLTW05-55Roman.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
 }
 ```
 
@@ -1715,8 +1709,7 @@ Akzeptanzkriterien:
 - Header- und Breadcrumb-Web-Components übernehmen die Designsystem-Tokens oder fügen sich optisch in die Schrift-/Token-Definition ein.
 - Keine Fontdatei wird von einer externen URL geladen.
 - Keine absoluten lokalen Pfade werden committet.
-- Falls die Fontdateien im Repo versioniert werden, enthält `src/main/resources/static/assets/fonts/README.md` eine kurze Herkunftsnotiz, z.B. “Lizenzierte Schriftdateien des Kantons Solothurn; nicht ausserhalb dieses Projekts weitergeben.”
-- Tests oder Smoke Checks prüfen mindestens, dass `/vendor/so-web-components/<version>/styles/fonts.css` und die referenzierten lokalen Font-URLs ausgeliefert werden.
+- Tests oder Smoke Checks prüfen mindestens, dass `/vendor/so-web-components/<version>/styles/fonts.css` und die referenzierten vendor-lokalen Font-URLs ausgeliefert werden.
 
 ### 12.3 `WebAssetsVm`
 
@@ -2590,8 +2583,9 @@ Fallback:
 ```text
 src/main/resources/static/css/app.css
 src/main/resources/static/js/htmx.min.js
-src/main/resources/static/vendor/so-web-components/0.1.9/index.js
-src/main/resources/static/vendor/so-web-components/0.1.9/styles/tokens.css
+src/main/resources/static/vendor/so-web-components/0.1.10/index.js
+src/main/resources/static/vendor/so-web-components/0.1.10/styles/tokens.css
+src/main/resources/static/vendor/so-web-components/0.1.10/styles/fonts.css
 ```
 
 HTMX kann vendored werden. Kein npm-Build im MVP.

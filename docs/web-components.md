@@ -1,23 +1,25 @@
 # Web Components
 
-Die Anwendung integriert den kantonalen Header und das Breadcrumb über das vendorte npm-Paket `so-web-components@0.1.9`.
+Die Anwendung integriert den kantonalen Header und das Breadcrumb über das vendorte npm-Paket `so-web-components@0.1.10`.
 
 ## Runtime Assets
 
 Assets werden von Spring Boot aus statischen Ressourcen ausgeliefert:
 
 ```text
-src/main/resources/static/vendor/so-web-components/0.1.9/
+src/main/resources/static/vendor/so-web-components/0.1.10/
   index.js
   components/
   styles/reset.css
   styles/fonts.css
   styles/tokens.css
+  styles/FrutigerLTW05-55Roman.woff2
+  styles/FrutigerLTW05-75Black.woff2
   LICENSE
   README.md
 ```
 
-Das Paket wurde aus `so-web-components@0.1.9` übernommen. Die App benötigt standardmässig kein CDN.
+Das Paket wurde aus `so-web-components@0.1.10` übernommen. Die App benötigt standardmässig kein CDN.
 
 ## Konfiguration
 
@@ -25,8 +27,8 @@ Das Paket wurde aus `so-web-components@0.1.9` übernommen. Die App benötigt sta
 datenportal:
   web-components:
     enabled: true
-    version: "0.1.9"
-    asset-base-path: "/vendor/so-web-components/0.1.9"
+    version: "0.1.10"
+    asset-base-path: "/vendor/so-web-components/0.1.10"
     use-cdn: false
 ```
 
@@ -58,9 +60,9 @@ Das ist akzeptabel, weil die Pfade die Web-Component-Version enthalten. Bei eine
 
 ## Fonts
 
-Die vendorte `styles/fonts.css` stammt aus `so-web-components@0.1.9`. Aktuell werden keine zusätzlichen Font-Binaries unter `src/main/resources/static/assets/fonts/` committed.
+Die vendorte `styles/fonts.css` stammt aus `so-web-components@0.1.10` und referenziert die mitgelieferten `woff2`-Dateien im selben `styles/`-Verzeichnis.
 
-Keine Platzhalter-Fontdateien hinzufügen. Falls Maintainer lizenzierte kantonale Fontdateien bereitstellen, werden sie unter `src/main/resources/static/assets/fonts/` abgelegt und `fonts.css` verwendet Web-Pfade, nie absolute lokale Pfade.
+Die Anwendung verwendet keine separate `/assets/fonts`-Sonderlösung mehr. Falls die Font-Assets künftig erneut angepasst werden müssen, bleiben sie versionsgebunden unter `src/main/resources/static/vendor/so-web-components/<version>/styles/`, und `fonts.css` verwendet nur relative Web-Pfade, nie absolute lokale Pfade.
 
 ## Content Security Policy
 

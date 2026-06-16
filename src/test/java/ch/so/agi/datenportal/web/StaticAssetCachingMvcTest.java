@@ -44,7 +44,7 @@ class StaticAssetCachingMvcTest {
 
     @Test
     void webComponentAssetUsesLongCacheHeaderAndStillServesContent() throws Exception {
-        mockMvc.perform(get("/vendor/so-web-components/0.1.9/index.js"))
+        mockMvc.perform(get("/vendor/so-web-components/0.1.10/index.js"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))))
                 .andExpect(content().string(containsString("customElements.define")))
@@ -52,23 +52,26 @@ class StaticAssetCachingMvcTest {
     }
 
     @Test
-    void vendoredFontsCssServesLocalFontReferencesWithoutEmbeddedBase64() throws Exception {
-        mockMvc.perform(get("/vendor/so-web-components/0.1.9/styles/fonts.css"))
+    void vendoredFontsCssServesRelativeWoff2ReferencesWithoutEmbeddedBase64() throws Exception {
+        mockMvc.perform(get("/vendor/so-web-components/0.1.10/styles/fonts.css"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(allOf(
-                        containsString("/assets/fonts/FrutigerLTW05-55Roman.woff2"),
-                        containsString("/assets/fonts/FrutigerLTW05-75Black.woff2"),
+                        containsString("./FrutigerLTW05-55Roman.woff2"),
+                        containsString("./FrutigerLTW05-75Black.woff2"),
+                        not(containsString("/assets/fonts/")),
                         not(containsString("data:")),
                         not(containsString("base64")))));
     }
 
     @Test
-    void vendoredFrutigerWoff2AssetsAreServed() throws Exception {
-        mockMvc.perform(get("/assets/fonts/FrutigerLTW05-55Roman.woff2"))
-                .andExpect(status().isOk());
+    void vendoredFrutigerWoff2AssetsAreServedWithLongCacheHeaders() throws Exception {
+        mockMvc.perform(get("/vendor/so-web-components/0.1.10/styles/FrutigerLTW05-55Roman.woff2"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))));
 
-        mockMvc.perform(get("/assets/fonts/FrutigerLTW05-75Black.woff2"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/vendor/so-web-components/0.1.10/styles/FrutigerLTW05-75Black.woff2"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))));
     }
 
     @Test

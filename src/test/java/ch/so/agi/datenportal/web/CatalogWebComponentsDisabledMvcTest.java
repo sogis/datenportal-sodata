@@ -29,7 +29,7 @@ class CatalogWebComponentsDisabledMvcTest {
                 .andExpect(content().string(containsString("Daten &amp; Statistiken")))
                 .andExpect(content().string(not(containsString("<so-header"))))
                 .andExpect(content().string(not(containsString("<so-breadcrumb"))))
-                .andExpect(content().string(not(containsString("/vendor/so-web-components/0.1.9"))));
+                .andExpect(content().string(not(containsString("/vendor/so-web-components/0.1.10"))));
     }
 
     @Test

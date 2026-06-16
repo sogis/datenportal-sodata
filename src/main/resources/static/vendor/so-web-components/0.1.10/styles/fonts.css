@@ -1,0 +1,27 @@
+@font-face {
+    font-family: Frutiger;
+    font-style: normal;
+    font-weight: 300;
+    src: url("./FrutigerLTW05-55Roman.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Frutiger;
+    font-style: normal;
+    font-weight: 400;
+    src: url("./FrutigerLTW05-55Roman.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Frutiger;
+    font-style: normal;
+    font-weight: 700;
+    src: url("./FrutigerLTW05-75Black.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Frutiger;
+    font-style: normal;
+    font-weight: 900;
+    src: url("./FrutigerLTW05-75Black.woff2") format("woff2");
+}

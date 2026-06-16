@@ -28,7 +28,7 @@ class DetailPageVmFactoryTest {
                     new HeaderViewModelFactory(new JsonAttributeEncoder()),
                     new BreadcrumbFactory(),
                     new WebAssetsVmFactory(
-                            new WebComponentsProperties(true, "0.1.9", null, false),
+                            new WebComponentsProperties(true, "0.1.10", null, false),
                             new DefaultResourceLoader())),
             new CatalogUrlFactory(new SearchProperties(500, 10, 100)));
 

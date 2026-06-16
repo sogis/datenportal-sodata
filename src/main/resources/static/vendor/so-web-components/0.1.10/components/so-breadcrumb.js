@@ -145,8 +145,8 @@ export class SoBreadcrumb extends HTMLElement {
       }
 
       .chevron{
-        width: 21px;
-        height: 21px;
+        width: 16px;
+        height: 16px;
         fill: #e01f26;
         flex: 0 0 auto;
         display: block;

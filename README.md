@@ -13,7 +13,7 @@ Enthalten:
 - Gradle Groovy DSL
 - JTE-Templates im Development-Mode
 - lokal vendortes HTMX
-- lokal vendortes `so-web-components@0.1.9`
+- lokal vendortes `so-web-components@0.1.10`
 - Katalogseite auf `/` und `/datasets`
 - Lucene-backed Suche, Sortierung und Filter
 - Listenansicht, Kartenansicht und Datenreihen-Expansion
@@ -77,8 +77,8 @@ datenportal:
     max-page-size: 100
   web-components:
     enabled: true
-    version: "0.1.9"
-    asset-base-path: "/vendor/so-web-components/0.1.9"
+    version: "0.1.10"
+    asset-base-path: "/vendor/so-web-components/0.1.10"
     use-cdn: false
 ```
 

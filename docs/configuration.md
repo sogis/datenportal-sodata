@@ -82,8 +82,8 @@ Die UI verwendet aktuell keine sichtbare Pagination, die Suchschicht normalisier
 datenportal:
   web-components:
     enabled: true
-    version: "0.1.9"
-    asset-base-path: "/vendor/so-web-components/0.1.9"
+    version: "0.1.10"
+    asset-base-path: "/vendor/so-web-components/0.1.10"
     use-cdn: false
 ```
 
@@ -157,7 +157,6 @@ Cache-Header:
 | Pfad | Cache-Control |
 |---|---|
 | `/vendor/so-web-components/**` | `public, max-age=31536000` |
-| `/assets/fonts/**` | `public, max-age=31536000` |
 | `/js/**` | `public, max-age=2592000` |
 | `/css/**` | `public, max-age=3600` |
 | `/images/**` | `public, max-age=2592000`, falls Bilder ausgeliefert werden |

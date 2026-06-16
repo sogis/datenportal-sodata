@@ -11,17 +11,17 @@ class WebAssetsVmFactoryTest {
     @Test
     void createsEnabledVendoredAssetsWithFontsWhenPresent() {
         var assets = new WebAssetsVmFactory(
-                        new WebComponentsProperties(true, "0.1.9", null, false),
+                        new WebComponentsProperties(true, "0.1.10", null, false),
                         new DefaultResourceLoader())
                 .create();
 
         assertThat(assets.webComponentsEnabled()).isTrue();
-        assertThat(assets.webComponentsIndexJs()).contains("/vendor/so-web-components/0.1.9/index.js");
+        assertThat(assets.webComponentsIndexJs()).contains("/vendor/so-web-components/0.1.10/index.js");
         assertThat(assets.webComponentStylesheets())
                 .containsExactly(
-                        "/vendor/so-web-components/0.1.9/styles/reset.css",
-                        "/vendor/so-web-components/0.1.9/styles/fonts.css",
-                        "/vendor/so-web-components/0.1.9/styles/tokens.css");
+                        "/vendor/so-web-components/0.1.10/styles/reset.css",
+                        "/vendor/so-web-components/0.1.10/styles/fonts.css",
+                        "/vendor/so-web-components/0.1.10/styles/tokens.css");
         assertThat(assets.webComponentStylesheets()).doesNotHaveDuplicates();
         assertThat(assets.appCss()).isEqualTo("/css/app.css");
         assertThat(assets.htmxJs()).isEqualTo("/js/htmx.min.js");
@@ -31,7 +31,7 @@ class WebAssetsVmFactoryTest {
     @Test
     void omitsWebComponentAssetsWhenDisabled() {
         var assets = new WebAssetsVmFactory(
-                        new WebComponentsProperties(false, "0.1.9", null, false),
+                        new WebComponentsProperties(false, "0.1.10", null, false),
                         new DefaultResourceLoader())
                 .create();
 

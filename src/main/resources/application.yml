@@ -49,8 +49,8 @@ datenportal:
     max-page-size: 100
   web-components:
     enabled: true
-    version: "0.1.9"
-    asset-base-path: "/vendor/so-web-components/0.1.9"
+    version: "0.1.10"
+    asset-base-path: "/vendor/so-web-components/0.1.10"
     use-cdn: false
 
 gg:

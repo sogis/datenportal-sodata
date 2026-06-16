@@ -66,10 +66,10 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("href=\"/css/app.css\"")))
                 .andExpect(content().string(containsString("src=\"/js/htmx.min.js\"")))
                 .andExpect(content().string(containsString("src=\"/js/catalog-filters.js\"")))
-                .andExpect(content().string(containsString("src=\"/vendor/so-web-components/0.1.9/index.js\"")))
-                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/reset.css\"")))
-                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/fonts.css\"")))
-                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.9/styles/tokens.css\"")))
+                .andExpect(content().string(containsString("src=\"/vendor/so-web-components/0.1.10/index.js\"")))
+                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.10/styles/reset.css\"")))
+                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.10/styles/fonts.css\"")))
+                .andExpect(content().string(containsString("href=\"/vendor/so-web-components/0.1.10/styles/tokens.css\"")))
                 .andExpect(content().string(containsString("id=\"catalog-search-form\"")))
                 .andExpect(content().string(containsString("id=\"filter-trigger-theme\"")))
                 .andExpect(content().string(containsString("id=\"filter-trigger-office\"")))
@@ -234,10 +234,10 @@ class CatalogControllerMvcTest {
 
         String html = result.getResponse().getContentAsString();
 
-        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/index.js")).isEqualTo(1);
-        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/styles/reset.css")).isEqualTo(1);
-        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/styles/fonts.css")).isEqualTo(1);
-        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.9/styles/tokens.css")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.10/index.js")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.10/styles/reset.css")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.10/styles/fonts.css")).isEqualTo(1);
+        assertThat(countOccurrences(html, "/vendor/so-web-components/0.1.10/styles/tokens.css")).isEqualTo(1);
         assertThat(countOccurrences(html, "/css/app.css")).isEqualTo(1);
         assertThat(countOccurrences(html, "/js/htmx.min.js")).isEqualTo(1);
         assertThat(countOccurrences(html, "/js/catalog-filters.js")).isEqualTo(1);

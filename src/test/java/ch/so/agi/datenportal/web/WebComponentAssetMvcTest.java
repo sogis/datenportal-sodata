@@ -21,7 +21,7 @@ class WebComponentAssetMvcTest {
 
     @Test
     void servesVendoredWebComponentEntrypoint() throws Exception {
-        mockMvc.perform(get("/vendor/so-web-components/0.1.9/index.js"))
+        mockMvc.perform(get("/vendor/so-web-components/0.1.10/index.js"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("customElements.define")))
                 .andExpect(content().string(containsString("so-header")));
@@ -29,9 +29,9 @@ class WebComponentAssetMvcTest {
 
     @Test
     void servesStylesWithoutLocalPaths() throws Exception {
-        assertNoLocalPaths("/vendor/so-web-components/0.1.9/styles/reset.css");
-        assertNoLocalPaths("/vendor/so-web-components/0.1.9/styles/fonts.css");
-        assertNoLocalPaths("/vendor/so-web-components/0.1.9/styles/tokens.css");
+        assertNoLocalPaths("/vendor/so-web-components/0.1.10/styles/reset.css");
+        assertNoLocalPaths("/vendor/so-web-components/0.1.10/styles/fonts.css");
+        assertNoLocalPaths("/vendor/so-web-components/0.1.10/styles/tokens.css");
     }
 
     private void assertNoLocalPaths(String path) throws Exception {
@@ -42,6 +42,7 @@ class WebComponentAssetMvcTest {
         assertThat(result.getResponse().getContentAsString())
                 .doesNotContain("/Users/")
                 .doesNotContain("file:")
+                .doesNotContain("/assets/fonts/")
                 .doesNotContainPattern("[A-Za-z]:\\\\");
     }
 }

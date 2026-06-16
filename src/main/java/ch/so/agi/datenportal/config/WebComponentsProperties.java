@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @ConfigurationProperties(prefix = "datenportal.web-components")
 public record WebComponentsProperties(
         @DefaultValue("true") boolean enabled,
-        @DefaultValue("0.1.9") String version,
+        @DefaultValue("0.1.10") String version,
         String assetBasePath,
         @DefaultValue("false") boolean useCdn) {
 
