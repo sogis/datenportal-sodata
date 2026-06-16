@@ -2,6 +2,7 @@ package ch.so.agi.datenportal.web;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -48,6 +49,26 @@ class StaticAssetCachingMvcTest {
                 .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))))
                 .andExpect(content().string(containsString("customElements.define")))
                 .andExpect(content().string(containsString("so-header")));
+    }
+
+    @Test
+    void vendoredFontsCssServesLocalFontReferencesWithoutEmbeddedBase64() throws Exception {
+        mockMvc.perform(get("/vendor/so-web-components/0.1.9/styles/fonts.css"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(allOf(
+                        containsString("/assets/fonts/FrutigerLTW05-55Roman.woff2"),
+                        containsString("/assets/fonts/FrutigerLTW05-75Black.woff2"),
+                        not(containsString("data:")),
+                        not(containsString("base64")))));
+    }
+
+    @Test
+    void vendoredFrutigerWoff2AssetsAreServed() throws Exception {
+        mockMvc.perform(get("/assets/fonts/FrutigerLTW05-55Roman.woff2"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/assets/fonts/FrutigerLTW05-75Black.woff2"))
+                .andExpect(status().isOk());
     }
 
     @Test
