@@ -19,7 +19,7 @@ public class BreadcrumbFactory {
                 List.of(
                         items.get(0),
                         items.get(1),
-                        new BreadcrumbItemVm("Daten & Statistiken", Optional.empty(), true)));
+                        new BreadcrumbItemVm("Daten und Statistiken", Optional.empty(), true)));
     }
 
     public BreadcrumbVm datasetDetail(DatasetEntry dataset) {
