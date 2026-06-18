@@ -7,7 +7,6 @@
       <tr>
         <th class="dp-entry-table__expand" scope="col"><span class="dp-visually-hidden">Ausgaben</span></th>
         <th scope="col">Thema / Datensatz</th>
-        <th scope="col">Typ</th>
         <th scope="col">Publikationsdatum</th>
         <th scope="col">Metadaten</th>
         <th scope="col">Daten herunterladen</th>

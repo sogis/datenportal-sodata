@@ -63,15 +63,16 @@ Alle öffentlichen Seiten verwenden den offiziellen Header und das offizielle Br
 
 ### 2.1.1 Breitenmodell
 
-Für die öffentliche UI gelten genau zwei globale Breiten:
+Für die öffentliche UI gelten drei Breiten-Tokens mit klar getrennten Aufgaben:
 
 - `--dp-page-max-width`: maximale Breite strukturierter Seiteninhalte wie Katalog, Tabellen, Karten, Detail-Layouts und Footer-Inhalt
+- `--dp-control-band-max-width`: gemeinsame Desktop-Breite für Suchfeld und Filterleiste im Katalog
 - `--dp-readable-width`: Lesebreite für längere Prosa wie Leadtexte und Beschreibungen
 
 Nicht erlaubt:
 
-- eine zusätzliche globale `content`-Breite zwischen Page Width und Readable Width
-- lokale Kappen, die Suche oder Resultatbereiche der Katalogseite deutlich unter die Page Width zwingen
+- zusätzliche globale Breiten-Tokens ausserhalb dieser drei Rollen
+- lokale Kappen, die Result Controls, Resultate oder Pagination der Katalogseite deutlich unter die Page Width zwingen
 
 Chrome-Regel:
 
@@ -253,8 +254,14 @@ Suche nach Datensätzen, Themen, Fachstellen, Schlagworten ...
 - Suchfeld ist ein GET-Formularfeld mit `name="q"`.
 - Suche/Filter funktionieren ohne JavaScript durch normalen Submit.
 - HTMX darf für progressive Enhancement verwendet werden.
-- Leadtexte nutzen die Lesebreite `--dp-readable-width`.
-- Suche, Filterleiste, Result Controls, Resultate und Pagination nutzen die volle `--dp-page-max-width`.
+- Mit JavaScript startet die Suche automatisch ab 3 Zeichen mit ca. `300ms` Debounce und aktualisiert Resultate, Controls und Pagination via HTMX.
+- Queries mit 1-2 Zeichen gelten fachlich als leer und dürfen serverseitig nicht als aktive Suche weitergetragen werden.
+- Das Suchfeld verwendet links ein Such-Icon und rechts ein `x`-Icon zum Zurücksetzen der Suche; ein separater Such-Button ist nicht Teil des UI.
+- Das Zurücksetzen entfernt nur den Suchbegriff, nicht aktive Filter, Ansicht, Sortierung oder Page-Size.
+- Leadtexte nutzen die Lesebreite `--dp-readable-width` von `76ch`.
+- Suchfeld und Desktop-Filterleiste teilen sich ein linksbündiges Control-Band mit `min(100%, var(--dp-control-band-max-width))`; der Default-Tokenwert ist `64rem`.
+- Im Katalog bleibt der Vertikalrhythmus zwischen den grossen Sektionen auf `--dp-space-5`; zwischen Result Controls und Resultattabelle wird er gezielt auf `--dp-space-4` verdichtet.
+- Result Controls, Resultate und Pagination nutzen weiterhin die volle `--dp-page-max-width`.
 
 ---
 
@@ -438,7 +445,7 @@ Referenz: `spec/mockups/current/startseite_liste.png`.
 Pflichtspalten:
 
 ```text
-Thema / Datensatz | Typ | Publikationsdatum | Metadaten | Daten herunterladen
+Thema / Datensatz | Publikationsdatum | Metadaten | Daten herunterladen
 ```
 
 Die erste Spalte enthält keine Themen-/Datensatz-Icons mehr. Ausnahme: Datenreihen erhalten ganz links einen Plus-/Minus-Button zum Aufklappen.
@@ -448,11 +455,11 @@ Die erste Spalte enthält keine Themen-/Datensatz-Icons mehr. Ausnahme: Datenrei
 Pflicht:
 
 - links kein Icon, nur optionaler leerer Spacer zur Ausrichtung mit Datenreihen
-- Titel fett, darunter Kurzbeschreibung
-- Typ-Badge `Datensatz` in Grau
-- Publikationsdatum
+- Titel fett in `18px`, darunter Kurzbeschreibung in `16px`
+- keine zusätzliche Themenzeile in der Listenansicht
+- Publikationsdatum in `18px`
 - Info-Link `(i)` zur Detailseite dieses Datensatzes
-- Downloadbuttons für verfügbare Formate, insbesondere `CSV`, `XLSX`, `Parquet`
+- Downloadbuttons für verfügbare Formate, insbesondere `CSV`, `XLSX`, `Parquet`, in `18px`
 - Wenn API vorhanden ist, zusätzlicher Button `API`
 
 ### 6.3 Datenreihen-Root-Zeile
@@ -463,10 +470,11 @@ Pflicht:
 - Klick auf Plus/Minus klappt Ausgaben auf/zu
 - Klick auf die Zeile klappt ebenfalls auf/zu
 - Klick auf Info-Link oder Download-Link darf die Zeile nicht toggeln
-- Typ-Badge `Datenreihe` hat exakt dasselbe graue Badge-Aussehen wie `Datensatz`
-- Publikationsdatum der aktuellen Ausgabe oder der Serien-Aktualisierung
+- Titel fett in `18px`, Beschreibung in `16px`
+- keine zusätzliche Themenzeile in der Listenansicht
+- Publikationsdatum der aktuellen Ausgabe oder der Serien-Aktualisierung in `18px`
 - Info-Link führt auf die Detailseite der aktuellen Ausgabe
-- Downloads zeigen die aktuellen Ausgaben direkt in derselben Spalte
+- Downloads zeigen die aktuellen Ausgaben direkt in derselben Spalte und bleiben in `18px`
 
 Downloadbeschriftung für Datenreihen-Root:
 
@@ -492,12 +500,12 @@ Beim Aufklappen einer Datenreihe erscheinen zusätzliche Tabellenzeilen direkt u
 Pflicht für Ausgabezeilen:
 
 - leicht eingerückt oder visuell als Kindzeile erkennbar
-- kein Typ-Badge zwingend nötig; falls vorhanden ebenfalls grau
-- Titel: z. B. `Gemeindegrenzen — Ausgabe 2025`
-- Beschreibung optional, kurz
-- Publikationsdatum der Ausgabe
+- kein Typ-Badge in der Listenansicht
+- Titel: z. B. `Gemeindegrenzen — Ausgabe 2025` in `18px`
+- Beschreibung optional, kurz, in `16px`
+- Publikationsdatum der Ausgabe in `18px`
 - Info-Link zur Detailseite genau dieser Ausgabe
-- Downloadbuttons `CSV`, `XLSX`, `Parquet` ohne Klammertext `aktuelle Ausgabe`
+- Downloadbuttons `CSV`, `XLSX`, `Parquet` ohne Klammertext `aktuelle Ausgabe`, in `18px`
 
 ### 6.5 Progressive Enhancement für Row Click
 
@@ -597,7 +605,7 @@ Die Card-Ansicht zeigt ein Grid. Die Card folgt dem Screenshot `cards.png`.
 
 Pflicht je Card:
 
-- graues Typ-Badge `Datensatz` oder `Datenreihe`, gleiches Aussehen wie Listenansicht
+- graues Typ-Badge `Datensatz` oder `Datenreihe`, gleiches graues Badge-Aussehen wie auf anderen Badge-Stellen der App
 - Badge `Open Data`, im MVP hardcodiert sichtbar
 - zusätzlicher Badge `Struktur beschrieben`, wenn Attribute beschrieben sind oder ein Datenmodell vorhanden ist
 - Titel und Beschreibung wie im Screenshot
@@ -806,9 +814,17 @@ src/main/resources/static/css/
   detail.css
 ```
 
-### 9.3 Typ-Badges
+### 9.3 Typografie
 
-`Datensatz` und `Datenreihe` müssen denselben Badge-Stil verwenden:
+- Die öffentliche UI verwendet `18px` als Standard-Schriftgrösse auf `body`.
+- Diese Basis wird nicht auf `html` gesetzt, damit `rem`-basierte Layout-, Abstand- und Breiten-Tokens stabil bleiben.
+- Im Katalog verwenden Filter-Trigger, Filter-Reset, Mobile-Filter-Button, Resultatsummary, View-Switcher sowie der komplette Sortierblock `16px`.
+- Das Suchfeld bleibt typografisch eigenständig und wird nicht auf `16px` abgesenkt.
+- In der Listenansicht verwenden Tabellenheader `18px`, Titel `18px`, Beschreibungen `16px`, Publikationsdatum `18px` und Downloadbuttons `18px`.
+
+### 9.4 Typ-Badges
+
+Wenn `Datensatz`- oder `Datenreihe`-Badges gerendert werden, verwenden sie denselben Badge-Stil. Dies gilt weiterhin für Kartenansicht und Detailseiten:
 
 ```css
 .dp-type-badge {
@@ -823,7 +839,7 @@ src/main/resources/static/css/
 
 Keine rote Hervorhebung für `Datenreihe`.
 
-### 9.4 Fokus und Accessibility
+### 9.5 Fokus und Accessibility
 
 - Alle interaktiven Elemente brauchen sichtbaren Fokus.
 - Tabellenzeilen mit Row Click dürfen nicht die Tastaturbedienung ersetzen.
@@ -952,12 +968,12 @@ Pflichttests:
 - `GET /` enthält Header-Web-Component oder Fallback.
 - `GET /` enthält Breadcrumb-Web-Component oder Fallback.
 - `GET /` rendert standardmässig Listenansicht.
-- Listenansicht enthält Spalten `Thema / Datensatz`, `Typ`, `Publikationsdatum`, `Metadaten`, `Daten herunterladen`.
-- Datensatz- und Datenreihe-Badge haben dieselbe CSS-Klasse `dp-type-badge`.
+- Listenansicht enthält Spalten `Thema / Datensatz`, `Publikationsdatum`, `Metadaten`, `Daten herunterladen`.
+- Listenansicht rendert weder `dp-type-badge` noch `dp-entry-themes`.
 - Datenreihe-Root-Zeile enthält Plus-/Minus-Button mit `aria-expanded`.
 - Datenreihe-Root-Zeile enthält Downloads mit Kontext `aktuelle Ausgabe`.
 - Aufgeklappte Datenreihe rendert Ausgabezeilen ohne Kontext `aktuelle Ausgabe`.
-- Kartenansicht rendert `Open Data` und `Struktur beschrieben` dort, wo fachlich zutreffend.
+- Kartenansicht rendert `dp-type-badge`, `Open Data` und `Struktur beschrieben` dort, wo fachlich zutreffend.
 - Detailseite enthält keine Datenvorschau.
 - Detailseite einer Serienausgabe enthält `Weitere Ausgaben`.
 

@@ -17,24 +17,24 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 |---|---|---|---|
 | Seite | `pages/catalog.jte` | `CatalogController`, `CatalogPageVm` | `/` rendert Titel und Suche |
 | Resultatfragment | `fragments/catalogResults.jte` | `HtmxRequest` | HTMX liefert Fragment |
-| Suche | `components/searchForm.jte` | `CatalogQueryParams.q` | Query bleibt erhalten |
-| Filterbar | `components/filterBar.jte` | `FilterVmFactory`, `FilterPanelVm` | Desktop-Trigger und Reset sichtbar |
+| Suche | `components/searchForm.jte` | `CatalogQueryParams.q` | Auto-Suche ab 3 Zeichen, Clear-Reset, No-JS-GET-Fallback, gemeinsames Desktop-Control-Band |
+| Filterbar | `components/filterBar.jte` | `FilterVmFactory`, `FilterPanelVm` | Desktop-Trigger und Reset sichtbar, bündig zum Suchfeld im Control-Band |
 | Desktop-Popover | `fragments/filterPopover.jte`, `components/filterFieldList.jte` | `CatalogFilterController`, `FilterGroupVm` | nur angeforderte Gruppe, HTMX-Formular |
 | Mobile-Sheet | `fragments/mobileFilters.jte`, `components/mobileFilterButton.jte` | `CatalogFilterController`, `FilterPanelVm` | Narrow viewport, Apply/Reset |
 | aktive Filterchips | `components/activeFilterChips.jte` | `FilterChipVm` | einzelner Remove-Href |
 | Ansichttoggle | `components/viewToggle.jte` | `ViewToggleVm` | `aria-current` korrekt |
-| Result Controls | `components/resultControls.jte` | `ResultControlsVm` | Result count, Sortierung, Mobile-Button |
-| Resultat-Shell | `components/resultsShell.jte` | `ResultsVm` | stabiler HTMX-Target-Bereich |
+| Result Controls | `components/resultControls.jte` | `ResultControlsVm` | Result count, Sortierung, Mobile-Button, im gemeinsamen Resultat-Stack |
+| Resultat-Shell | `components/resultsShell.jte` | `ResultsVm` | stabiler HTMX-Target-Bereich, verdichteter Abstand zu Result Controls |
 | Pagination | `components/pagination.jte` | `PaginationVm`, `PaginationItemVm` | Seite/Grösse erhalten Filterzustand |
 
 ## Listenansicht
 
 | UI-Bereich | JTE | Java | Tests |
 |---|---|---|---|
-| Tabelle | `components/entryTable.jte` | `ResultsVm.rows` | Spalten vorhanden |
-| Datensatz-Zeile | `components/entryRow.jte` | `EntryRowVm` | keine Themenicons |
+| Tabelle | `components/entryTable.jte` | `ResultsVm.rows` | reduzierte Spalten ohne Typ |
+| Datensatz-Zeile | `components/entryRow.jte` | `EntryRowVm` | keine Themenzeile und kein Typ-Badge |
 | Datenreihen-Root | `components/entryRow.jte` | `EntryRowVm.series=true` | `aria-expanded`, Plus/Minus |
-| Ausgabezeile | `components/issueRow.jte` | `IssueRowVm` | Downloads ohne aktuelle-Ausgabe-Text |
+| Ausgabezeile | `components/issueRow.jte` | `IssueRowVm` | Downloads ohne aktuelle-Ausgabe-Text, ohne Typ-Badge |
 | Downloadbutton | `components/downloadButton.jte` | `DownloadButtonVm` | zugänglicher Name |
 | Pagination | `components/pagination.jte` | `PaginationVm` | Default `size=10`, View/Sort/Filter bleiben erhalten |
 

@@ -9,6 +9,18 @@ import org.junit.jupiter.api.Test;
 class CatalogQueryParamsTest {
 
     @Test
+    void normalizedTreatsQueriesShorterThanThreeCharactersAsEmpty() {
+        var shortQuery = new CatalogQueryParams();
+        shortQuery.setQ(" ab ");
+
+        var validQuery = new CatalogQueryParams();
+        validQuery.setQ(" abc ");
+
+        assertThat(shortQuery.normalized().q()).isEmpty();
+        assertThat(validQuery.normalized().q()).isEqualTo("abc");
+    }
+
+    @Test
     void normalizedUsesFirstValidModifiedValueAndOnlyCanonicalResourceTypes() {
         var params = new CatalogQueryParams();
         params.setModified(java.util.List.of("invalid", "last30", "older"));

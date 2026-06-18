@@ -11,6 +11,7 @@ html {
 body {
   margin: 0;
   font-family: var(--dp-font-sans);
+  font-size: 18px;
   color: var(--dp-color-text);
   /*background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);*/
   background: #ffffff;

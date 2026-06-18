@@ -7,13 +7,19 @@
 
   const popoverHost = () => doc.getElementById("filter-popover-host");
   const sheetHost = () => doc.getElementById("mobile-filter-panel-host");
+  const searchForm = () => doc.getElementById("catalog-search-form");
+  const searchInput = () => doc.getElementById("catalog-search");
+  const searchClearButton = () => doc.getElementById("catalog-search-clear");
   const triggerSelector = "[data-filter-trigger], [data-mobile-filter-trigger]";
+  const SEARCH_DELAY_MS = 300;
 
   const state = {
     activeTrigger: null,
     activeKind: null,
     pendingTrigger: null,
     pendingKind: null,
+    searchTimer: null,
+    submittedSearchQuery: normalizedSearchValue(searchInput()?.value ?? ""),
   };
 
   function hosts() {
@@ -27,6 +33,60 @@
     if (trigger) {
       trigger.setAttribute("aria-expanded", String(expanded));
     }
+  }
+
+  function normalizedSearchValue(value) {
+    const trimmed = value.trim();
+    return trimmed.length >= 3 ? trimmed : "";
+  }
+
+  function clearPendingSearch() {
+    if (state.searchTimer !== null) {
+      window.clearTimeout(state.searchTimer);
+      state.searchTimer = null;
+    }
+  }
+
+  function submitSearch(immediate = false) {
+    const form = searchForm();
+    const input = searchInput();
+    if (!form || !input) {
+      return;
+    }
+
+    const effectiveQuery = normalizedSearchValue(input.value);
+    const dispatch = () => {
+      state.searchTimer = null;
+      state.submittedSearchQuery = effectiveQuery;
+      if (window.htmx) {
+        window.htmx.trigger(form, "submit");
+        return;
+      }
+      form.requestSubmit();
+    };
+
+    clearPendingSearch();
+    if (immediate) {
+      dispatch();
+      return;
+    }
+
+    state.searchTimer = window.setTimeout(dispatch, SEARCH_DELAY_MS);
+  }
+
+  function scheduleSearch() {
+    const input = searchInput();
+    if (!input) {
+      return;
+    }
+
+    const effectiveQuery = normalizedSearchValue(input.value);
+    if (effectiveQuery === state.submittedSearchQuery) {
+      clearPendingSearch();
+      return;
+    }
+
+    submitSearch(false);
   }
 
   function clearExpanded() {
@@ -182,6 +242,20 @@
       event.preventDefault();
       closeAll(true);
     }
+  });
+
+  searchInput()?.addEventListener("input", () => {
+    scheduleSearch();
+  });
+
+  searchClearButton()?.addEventListener("click", () => {
+    const input = searchInput();
+    if (!input) {
+      return;
+    }
+    input.value = "";
+    submitSearch(true);
+    input.focus();
   });
 
   doc.body.addEventListener("htmx:beforeRequest", (event) => {

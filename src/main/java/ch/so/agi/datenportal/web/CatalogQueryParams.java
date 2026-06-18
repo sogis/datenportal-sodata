@@ -14,6 +14,8 @@ import java.util.Set;
 
 public class CatalogQueryParams {
 
+    private static final int MIN_SEARCH_QUERY_LENGTH = 3;
+
     private String q = "";
     private List<String> theme = List.of();
     private List<String> office = List.of();
@@ -190,7 +192,7 @@ public class CatalogQueryParams {
 
     public CatalogQueryParams normalized() {
         var normalized = new CatalogQueryParams();
-        normalized.setQ(q().trim());
+        normalized.setQ(normalizeQuery(q()));
         normalized.setTheme(copyDistinct(theme));
         normalized.setOffice(copyDistinct(office));
         normalized.setModified(selectedModifiedRange()
@@ -209,6 +211,11 @@ public class CatalogQueryParams {
 
     public boolean hasActiveFilters() {
         return !theme.isEmpty() || !office.isEmpty() || !modified.isEmpty() || !resourceType.isEmpty();
+    }
+
+    private static String normalizeQuery(String value) {
+        var trimmed = value == null ? "" : value.trim();
+        return trimmed.length() >= MIN_SEARCH_QUERY_LENGTH ? trimmed : "";
     }
 
     private static List<String> copyList(List<String> values) {

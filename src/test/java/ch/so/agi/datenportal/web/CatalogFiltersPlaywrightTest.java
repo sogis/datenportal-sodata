@@ -83,7 +83,7 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
-    void desktopChromeAndCatalogUseFullWidthLayout() {
+    void desktopChromeUsesFullWidthWhileSearchAndFiltersShareControlBand() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets"));
@@ -92,15 +92,27 @@ class CatalogFiltersPlaywrightTest {
             BoundingBox breadcrumb = requireBoundingBox(page.locator("so-breadcrumb"));
             BoundingBox contentContainer = requireBoundingBox(page.locator("main .dp-container").first());
             BoundingBox search = requireBoundingBox(page.locator(".dp-search"));
+            BoundingBox filterToolbar = requireBoundingBox(page.locator("#filter-toolbar"));
+            BoundingBox filterTrigger = requireBoundingBox(page.locator("#filter-trigger-theme"));
+            BoundingBox resetButton = requireBoundingBox(page.locator(".dp-filter-reset-button"));
+            BoundingBox resultControls = requireBoundingBox(page.locator("#result-controls"));
             BoundingBox resultsShell = requireBoundingBox(page.locator("#dataset-results-shell"));
+            double gapAboveResults = requireGap(filterToolbar, resultControls);
+            double gapBeforeTable = requireGap(resultControls, resultsShell);
 
             assertThat(header.width).isGreaterThan(1430d);
             assertThat(breadcrumb.width).isGreaterThan(1430d);
             assertThat(contentContainer.width).isGreaterThan(1380d);
-            assertThat(search.width).isGreaterThan(1380d);
+            assertThat(search.width).isLessThan(contentContainer.width - 250d);
+            assertThat(search.width).isGreaterThan(980d);
+            assertThat(Math.abs(search.width - filterToolbar.width)).isLessThan(1.5d);
+            assertThat(Math.abs(search.x - filterToolbar.x)).isLessThan(1.5d);
             assertThat(resultsShell.width).isGreaterThan(1380d);
-            assertThat(Math.abs(search.width - contentContainer.width)).isLessThan(1.5d);
             assertThat(Math.abs(resultsShell.width - contentContainer.width)).isLessThan(1.5d);
+            assertThat(Math.abs(filterTrigger.y - resetButton.y)).isLessThan(1.5d);
+            assertThat(gapAboveResults).isGreaterThan(gapBeforeTable);
+            assertThat(Math.abs(gapAboveResults - 32d)).isLessThan(1.5d);
+            assertThat(Math.abs(gapBeforeTable - 16d)).isLessThan(1.5d);
         }
     }
 
@@ -182,6 +194,90 @@ class CatalogFiltersPlaywrightTest {
         }
     }
 
+    @Test
+    void autoSearchStartsAtThreeCharactersAndClearResetsCardView() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?view=cards"));
+
+            Locator searchInput = page.locator("#catalog-search");
+            Locator clearButton = page.locator("#catalog-search-clear");
+            String initialUrl = page.url();
+
+            assertThat(page.locator(".dp-card-grid").isVisible()).isTrue();
+            assertThat(page.locator(".dp-result-card:has-text('Abstimmungsresultate')").count()).isEqualTo(1);
+
+            searchInput.fill("Ba");
+            page.waitForTimeout(450);
+            assertThat(page.url()).isEqualTo(initialUrl);
+
+            searchInput.fill("Bauinventar");
+            waitForLocationSearchContains(page, "q=Bauinventar", "view=cards");
+            assertThat(page.locator(".dp-result-card:has-text('Bauinventar')").count()).isEqualTo(1);
+            assertThat(page.locator(".dp-result-card:has-text('Abstimmungsresultate')").count()).isEqualTo(0);
+
+            searchInput.fill("Ba");
+            waitForLocationSearchExcludes(page, "q=Bauinventar");
+            assertThat(page.locator(".dp-card-grid").isVisible()).isTrue();
+            assertThat(page.locator(".dp-result-card:has-text('Abstimmungsresultate')").count()).isEqualTo(1);
+
+            searchInput.fill("Bauinventar");
+            waitForLocationSearchContains(page, "q=Bauinventar", "view=cards");
+            clearButton.click();
+
+            waitForLocationSearchExcludes(page, "q=Bauinventar");
+            assertThat(page.locator(".dp-card-grid").isVisible()).isTrue();
+            assertThat(page.url()).contains("view=cards");
+            assertThat(searchInput.inputValue()).isEmpty();
+            assertThat(page.locator(".dp-result-card:has-text('Abstimmungsresultate')").count()).isEqualTo(1);
+        }
+    }
+
+    @Test
+    void searchFieldUsesRedUnderlineFocusInsteadOfGlobalBlueOutline() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            page.focus("#catalog-search");
+
+            assertThat((String) page.locator("#catalog-search")
+                            .evaluate("element => getComputedStyle(element).outlineColor"))
+                    .isNotEqualTo("rgb(11, 95, 255)");
+            assertThat((String) page.locator("#catalog-search")
+                            .evaluate("element => getComputedStyle(element).outlineStyle"))
+                    .isEqualTo("none");
+            assertThat((String) page.locator(".dp-search")
+                            .evaluate("element => getComputedStyle(element).borderBottomColor"))
+                    .isEqualTo("rgb(224, 31, 38)");
+        }
+    }
+
+    @Test
+    void catalogTypographyUsesGlobal18pxAndLocal16pxControlOverrides() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            assertThat(fontSize(page.locator("body"))).isEqualTo("18px");
+            assertThat(fontSize(page.locator("#filter-trigger-theme .dp-filter-trigger__label"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator("#filter-trigger-theme .dp-filter-trigger__state"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator(".dp-filter-reset-button"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator("#mobile-filter-button"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator(".dp-view-toggle__link").first())).isEqualTo("16px");
+            assertThat(fontSize(page.locator("#results-summary"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator("label[for='catalog-sort']"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator("#catalog-sort"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator(".dp-sort-form .dp-button"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator(".dp-entry-table thead th").nth(1))).isEqualTo("18px");
+            assertThat(fontSize(page.locator(".dp-entry-title").first())).isEqualTo("18px");
+            assertThat(fontSize(page.locator(".dp-entry-description").first())).isEqualTo("16px");
+            assertThat(fontSize(page.locator(".dp-entry-publication-date").first())).isEqualTo("18px");
+            assertThat(fontSize(page.locator(".dp-entry-downloads .dp-download-link").first())).isEqualTo("18px");
+            assertThat(page.locator(".dp-entry-themes").count()).isEqualTo(0);
+        }
+    }
+
     private String baseUrl(String path) {
         return "http://127.0.0.1:" + port + path;
     }
@@ -190,6 +286,14 @@ class CatalogFiltersPlaywrightTest {
         BoundingBox boundingBox = locator.boundingBox();
         assertThat(boundingBox).isNotNull();
         return boundingBox;
+    }
+
+    private static double requireGap(BoundingBox upper, BoundingBox lower) {
+        return lower.y - (upper.y + upper.height);
+    }
+
+    private static String fontSize(Locator locator) {
+        return (String) locator.evaluate("element => getComputedStyle(element).fontSize");
     }
 
     private static void waitForLocationSearchContains(Page page, String... fragments) {

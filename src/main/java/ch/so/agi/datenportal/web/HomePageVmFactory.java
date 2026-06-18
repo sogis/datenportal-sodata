@@ -11,7 +11,7 @@ public final class HomePageVmFactory {
 
     private static final String PAGE_TITLE = "Daten und Statistiken";
     private static final String LEAD =
-            "Finden, verstehen und nutzen Sie verlässliche Daten über Bevölkerung, Wirtschaft, Umwelt, Mobilität und mehr.";
+            "Finden, verstehen und nutzen Sie verlässliche Daten über Bevölkerung, Wirtschaft, Umwelt, Mobilität und mehr. Die Daten stehen in verschiedenen Formaten zur Verfügung und können als Open Data frei genutzt werden. Das Angebot wird laufend erweitert, damit weitere aktuelle und relevante Daten einfach zugänglich werden.";
     private static final String SECONDARY_LEAD =
             //"Alle Datensätze sind – sofern verfügbar – als Open Data mit freien Lizenzen nutzbar.";
             "";

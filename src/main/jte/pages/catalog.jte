@@ -7,12 +7,16 @@
       <p class="dp-lead">${page.lead()}</p>
       <p class="dp-lead-secondary">${page.secondaryLead()}</p>
       <div class="dp-catalog-shell">
-        @template.components.searchForm(queryParams = page.queryParams())
-        @template.components.filterBar(filterPanel = page.filterPanel(), queryParams = page.queryParams(), outOfBand = false)
+        <div class="dp-control-band">
+          @template.components.searchForm(queryParams = page.queryParams())
+          @template.components.filterBar(filterPanel = page.filterPanel(), queryParams = page.queryParams(), outOfBand = false)
+        </div>
         @template.components.activeFilterChips(filterPanel = page.filterPanel(), outOfBand = false)
-        @template.components.resultControls(results = page.results(), queryParams = page.queryParams(), filterPanel = page.filterPanel(), outOfBand = false)
-        <div id="dataset-results-shell" class="dp-results-shell">
-          @template.components.resultsShell(results = page.results(), queryParams = page.queryParams(), resetHref = page.filterPanel().resetHref())
+        <div class="dp-results-stack">
+          @template.components.resultControls(results = page.results(), queryParams = page.queryParams(), filterPanel = page.filterPanel(), outOfBand = false)
+          <div id="dataset-results-shell" class="dp-results-shell">
+            @template.components.resultsShell(results = page.results(), queryParams = page.queryParams(), resetHref = page.filterPanel().resetHref())
+          </div>
         </div>
         @template.components.pagination(results = page.results(), queryParams = page.queryParams(), outOfBand = false)
       </div>

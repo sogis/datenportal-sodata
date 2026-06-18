@@ -19,19 +19,15 @@
       </a>
     @endif
   </td>
-  <td>
+  <td class="dp-entry-summary">
     <p class="dp-entry-title">${row.title()}</p>
     <p class="dp-entry-description">${row.description()}</p>
-    @if(!row.themeLabel().isBlank())
-      <p class="dp-entry-themes">${row.themeLabel()}</p>
-    @endif
   </td>
-  <td><span class="dp-type-badge">${row.typeLabel()}</span></td>
-  <td>${row.publicationDateLabel()}</td>
+  <td class="dp-entry-publication-date">${row.publicationDateLabel()}</td>
   <td>
     <a class="dp-metadata-link" href="${row.detailHref()}" aria-label="Metadaten anzeigen: ${row.title()}">i</a>
   </td>
-  <td>
+  <td class="dp-entry-downloads">
     @template.components.downloadLink(downloads = row.downloads())
   </td>
 </tr>

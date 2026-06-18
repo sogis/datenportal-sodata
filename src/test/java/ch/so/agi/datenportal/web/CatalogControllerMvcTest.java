@@ -39,6 +39,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("id=\"pagination\"")))
                 .andExpect(content().string(containsString("id=\"mobile-filter-button\"")))
                 .andExpect(content().string(containsString("Thema / Datensatz")))
+                .andExpect(content().string(not(containsString("<th scope=\"col\">Typ</th>"))))
                 .andExpect(content().string(containsString("Listenansicht")))
                 .andExpect(content().string(containsString("aria-current=\"page\"")))
                 .andExpect(content().string(containsString("Zeilen pro Seite")))
@@ -78,10 +79,51 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("id=\"dataset-results-shell\"")))
                 .andExpect(content().string(containsString("id=\"dataset-loading\"")))
                 .andExpect(content().string(containsString("name=\"q\"")))
+                .andExpect(content().string(containsString("type=\"text\"")))
+                .andExpect(content().string(containsString("placeholder=\"Suche nach Datensätzen, Themen, Fachstellen, Schlagworten ...\"")))
+                .andExpect(content().string(containsString("id=\"catalog-search-clear\"")))
+                .andExpect(content().string(containsString("aria-label=\"Suche zurücksetzen\"")))
+                .andExpect(content().string(not(containsString("aria-label=\"Suche ausführen\""))))
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
                 .andExpect(content().string(containsString("dp-entry-row dp-entry-row--series")))
                 .andExpect(content().string(containsString("CSV (aktuelle Ausgabe)")))
                 .andExpect(content().string(containsString("Parquet (aktuelle Ausgabe)")));
+    }
+
+    @Test
+    void catalogPageGroupsSearchAndFilterToolbarInSharedControlBand() throws Exception {
+        MvcResult result = mockMvc.perform(get("/datasets"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String html = result.getResponse().getContentAsString();
+        int controlBandIndex = html.indexOf("class=\"dp-control-band\"");
+        int searchIndex = html.indexOf("id=\"catalog-search-form\"", controlBandIndex);
+        int filterToolbarIndex = html.indexOf("id=\"filter-toolbar\"", controlBandIndex);
+        int activeFiltersIndex = html.indexOf("id=\"active-filter-chips\"");
+
+        assertThat(controlBandIndex).isGreaterThanOrEqualTo(0);
+        assertThat(searchIndex).isGreaterThan(controlBandIndex);
+        assertThat(filterToolbarIndex).isGreaterThan(searchIndex);
+        assertThat(activeFiltersIndex).isGreaterThan(filterToolbarIndex);
+    }
+
+    @Test
+    void catalogPageGroupsResultControlsAndResultsInSharedResultsStack() throws Exception {
+        MvcResult result = mockMvc.perform(get("/datasets"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String html = result.getResponse().getContentAsString();
+        int resultsStackIndex = html.indexOf("class=\"dp-results-stack\"");
+        int resultControlsIndex = html.indexOf("id=\"result-controls\"", resultsStackIndex);
+        int resultsShellIndex = html.indexOf("id=\"dataset-results-shell\"", resultsStackIndex);
+        int paginationIndex = html.indexOf("id=\"pagination\"");
+
+        assertThat(resultsStackIndex).isGreaterThanOrEqualTo(0);
+        assertThat(resultControlsIndex).isGreaterThan(resultsStackIndex);
+        assertThat(resultsShellIndex).isGreaterThan(resultControlsIndex);
+        assertThat(paginationIndex).isGreaterThan(resultsShellIndex);
     }
 
     @Test
@@ -90,6 +132,16 @@ class CatalogControllerMvcTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Bauinventar")))
                 .andExpect(content().string(not(containsString("Abstimmungsresultate"))));
+    }
+
+    @Test
+    void shortSearchQueryIsRenderedAsEmptyAndDoesNotFilterResults() throws Exception {
+        mockMvc.perform(get("/datasets").param("q", "ab"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("value=\"\"")))
+                .andExpect(content().string(not(containsString("value=\"ab\""))))
+                .andExpect(content().string(containsString("Abstimmungsresultate")))
+                .andExpect(content().string(containsString("Gemeindegrenzen Kanton Solothurn")));
     }
 
     @Test
@@ -122,23 +174,36 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void listRowsUseSameGreyTypeBadgeAndNoTitleColumnIcons() throws Exception {
-        var seriesHtml = mockMvc.perform(get("/datasets"))
+    void listViewOmitsTypeBadgesAndThemesWhileCardsKeepTypeBadges() throws Exception {
+        var listHtml = mockMvc.perform(get("/datasets"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        var datasetHtml = mockMvc.perform(get("/datasets").param("q", "Bauinventar"))
+        var expandedHtml = mockMvc.perform(get("/datasets").param("expanded", "ch.so.abstimmungsresultate"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        assertThat(seriesHtml).contains("<span class=\"dp-type-badge\">Datenreihe</span>");
-        assertThat(datasetHtml).contains("<span class=\"dp-type-badge\">Datensatz</span>");
-        assertThat(seriesHtml).doesNotContain("dp-entry-icon");
-        assertThat(datasetHtml).doesNotContain("dp-entry-icon");
+        var cardsHtml = mockMvc.perform(get("/datasets").param("view", "cards"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(listHtml)
+                .contains("<th scope=\"col\">Thema / Datensatz</th>")
+                .contains("<th scope=\"col\">Publikationsdatum</th>")
+                .contains("<th scope=\"col\">Metadaten</th>")
+                .contains("<th scope=\"col\">Daten herunterladen</th>")
+                .doesNotContain("<th scope=\"col\">Typ</th>")
+                .doesNotContain("dp-type-badge")
+                .doesNotContain("dp-entry-themes")
+                .doesNotContain("dp-entry-icon");
+        assertThat(expandedHtml).doesNotContain("dp-type-badge");
+        assertThat(cardsHtml).contains("dp-type-badge");
     }
 
     @Test
