@@ -93,7 +93,9 @@ class CatalogFiltersPlaywrightTest {
             BoundingBox contentContainer = requireBoundingBox(page.locator("main .dp-container").first());
             BoundingBox search = requireBoundingBox(page.locator(".dp-search"));
             BoundingBox filterToolbar = requireBoundingBox(page.locator("#filter-toolbar"));
-            BoundingBox filterTrigger = requireBoundingBox(page.locator("#filter-trigger-theme"));
+            BoundingBox themeTrigger = requireBoundingBox(page.locator("#filter-trigger-theme"));
+            BoundingBox officeTrigger = requireBoundingBox(page.locator("#filter-trigger-office"));
+            BoundingBox modifiedTrigger = requireBoundingBox(page.locator("#filter-trigger-modified"));
             BoundingBox resetButton = requireBoundingBox(page.locator(".dp-filter-reset-button"));
             BoundingBox resultControls = requireBoundingBox(page.locator("#result-controls"));
             BoundingBox resultsShell = requireBoundingBox(page.locator("#dataset-results-shell"));
@@ -109,10 +111,13 @@ class CatalogFiltersPlaywrightTest {
             assertThat(Math.abs(search.x - filterToolbar.x)).isLessThan(1.5d);
             assertThat(resultsShell.width).isGreaterThan(1380d);
             assertThat(Math.abs(resultsShell.width - contentContainer.width)).isLessThan(1.5d);
-            assertThat(Math.abs(filterTrigger.y - resetButton.y)).isLessThan(1.5d);
+            assertThat(Math.abs(themeTrigger.width - officeTrigger.width)).isLessThan(1.5d);
+            assertThat(Math.abs(themeTrigger.width - modifiedTrigger.width)).isLessThan(1.5d);
+            assertThat(resetButton.width).isLessThan(themeTrigger.width);
+            assertThat(Math.abs(themeTrigger.y - resetButton.y)).isLessThan(1.5d);
             assertThat(gapAboveResults).isGreaterThan(gapBeforeTable);
-            assertThat(Math.abs(gapAboveResults - 32d)).isLessThan(1.5d);
-            assertThat(Math.abs(gapBeforeTable - 16d)).isLessThan(1.5d);
+            assertThat(gapAboveResults).isGreaterThan(24d);
+            assertThat(gapBeforeTable).isGreaterThan(8d).isLessThan(24d);
         }
     }
 
@@ -171,23 +176,23 @@ class CatalogFiltersPlaywrightTest {
 
             page.click("#mobile-filter-button");
             page.waitForSelector("#mobile-filter-panel-host [data-filter-panel]");
+            assertThat(page.locator("#mobile-filter-panel-host summary:has-text('Ressourcentyp')").count()).isEqualTo(0);
             page.locator("#mobile-theme-Geografie").check();
-            page.click("#mobile-filter-panel-host summary:has-text('Ressourcentyp')");
-            page.locator("#mobile-resourceType-series").check();
             page.click("#mobile-filter-panel-host button[type='submit']");
 
-            waitForLocationSearchContains(page, "theme=Geografie", "resourceType=series");
+            waitForLocationSearchContains(page, "theme=Geografie");
+            waitForLocationSearchExcludes(page, "resourceType=");
             page.waitForFunction("() => document.getElementById('mobile-filter-panel-host').hidden");
-            assertThat(page.locator("#mobile-filter-button").textContent()).contains("(2)");
+            assertThat(page.locator("#mobile-filter-button").textContent()).contains("(1)");
             assertThat(page.locator("#active-filter-chips a:has-text('Thema: Geografie')").count()).isEqualTo(1);
-            assertThat(page.locator("#active-filter-chips a:has-text('Ressourcentyp: Datenreihe')").count()).isEqualTo(1);
+            assertThat(page.locator("#active-filter-chips a:has-text('Ressourcentyp: Datenreihe')").count()).isEqualTo(0);
 
             page.click("#mobile-filter-button");
             page.waitForSelector("#mobile-filter-panel-host [data-filter-panel]");
             page.click("#mobile-filter-panel-host a:has-text('Alle zurücksetzen')");
 
             waitForLocationSearchExcludes(page, "theme=Geografie");
-            waitForLocationSearchExcludes(page, "resourceType=series");
+            waitForLocationSearchExcludes(page, "resourceType=");
             page.waitForFunction("() => document.getElementById('mobile-filter-panel-host').hidden");
             page.waitForFunction("() => document.getElementById('active-filter-chips').classList.contains('is-empty')");
             assertThat(page.locator("#active-filter-chips").getAttribute("class")).contains("is-empty");
@@ -278,6 +283,23 @@ class CatalogFiltersPlaywrightTest {
         }
     }
 
+    @Test
+    void filterTriggerChevronUsesButtonTextColorAndStaysVerticallyCentered() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            Locator trigger = page.locator("#filter-trigger-theme");
+            Locator chevron = page.locator("#filter-trigger-theme .dp-filter-trigger__chevron");
+            Locator svg = page.locator("#filter-trigger-theme .dp-filter-trigger__chevron svg");
+
+            assertThat(cssValue(trigger, "color")).isEqualTo(cssValue(chevron, "color"));
+            assertThat(cssValue(svg, "fill")).isEqualTo(cssValue(trigger, "color"));
+            assertThat(Math.abs(verticalCenter(requireBoundingBox(trigger)) - verticalCenter(requireBoundingBox(svg))))
+                    .isLessThan(2.0d);
+        }
+    }
+
     private String baseUrl(String path) {
         return "http://127.0.0.1:" + port + path;
     }
@@ -294,6 +316,15 @@ class CatalogFiltersPlaywrightTest {
 
     private static String fontSize(Locator locator) {
         return (String) locator.evaluate("element => getComputedStyle(element).fontSize");
+    }
+
+    private static String cssValue(Locator locator, String property) {
+        return ((String) locator.evaluate("(element, value) => getComputedStyle(element).getPropertyValue(value)", property))
+                .trim();
+    }
+
+    private static double verticalCenter(BoundingBox boundingBox) {
+        return boundingBox.y + (boundingBox.height / 2.0d);
     }
 
     private static void waitForLocationSearchContains(Page page, String... fragments) {

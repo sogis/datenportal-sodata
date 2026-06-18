@@ -26,11 +26,6 @@
     <input type="hidden" name="modified" value="${value}">
   @endfor
 @endif
-@if(includeFilters && !"resourceType".equals(excludeFilterParameter))
-  @for(var value : queryParams.resourceType())
-    <input type="hidden" name="resourceType" value="${value}">
-  @endfor
-@endif
 @if(includeSort)
   <input type="hidden" name="sort" value="${queryParams.sortValue()}">
 @endif

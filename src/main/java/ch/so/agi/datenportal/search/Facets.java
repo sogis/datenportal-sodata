@@ -5,13 +5,11 @@ import java.util.List;
 public record Facets(
         List<FacetValue> themes,
         List<FacetValue> offices,
-        List<FacetValue> modifiedRanges,
-        List<FacetValue> resourceTypes) {
+        List<FacetValue> modifiedRanges) {
 
     public Facets {
         themes = List.copyOf(themes);
         offices = List.copyOf(offices);
         modifiedRanges = List.copyOf(modifiedRanges);
-        resourceTypes = List.copyOf(resourceTypes);
     }
 }

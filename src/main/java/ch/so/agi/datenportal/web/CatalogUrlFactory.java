@@ -146,7 +146,6 @@ public final class CatalogUrlFactory {
         putAllIfPresent(query, "theme", normalized.theme());
         putAllIfPresent(query, "office", normalized.office());
         putAllIfPresent(query, "modified", normalized.modified());
-        putAllIfPresent(query, "resourceType", normalized.resourceType());
         query.put("view", List.of(normalized.viewValue()));
         query.put("sort", List.of(normalized.sortValue()));
         putPageIfPresent(query, normalized.page());

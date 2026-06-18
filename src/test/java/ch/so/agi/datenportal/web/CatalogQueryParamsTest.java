@@ -2,7 +2,6 @@ package ch.so.agi.datenportal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ch.so.agi.datenportal.catalog.domain.CatalogEntryType;
 import ch.so.agi.datenportal.search.ModifiedDateRange;
 import org.junit.jupiter.api.Test;
 
@@ -21,19 +20,14 @@ class CatalogQueryParamsTest {
     }
 
     @Test
-    void normalizedUsesFirstValidModifiedValueAndOnlyCanonicalResourceTypes() {
+    void normalizedUsesFirstValidModifiedValue() {
         var params = new CatalogQueryParams();
         params.setModified(java.util.List.of("invalid", "last30", "older"));
-        params.setResourceType(java.util.List.of("dataset", "csv", "series", "dataset"));
 
         var normalized = params.normalized();
 
         assertThat(normalized.modified()).containsExactly("last30");
-        assertThat(normalized.resourceType()).containsExactly("dataset", "series");
         assertThat(normalized.selectedModifiedRange()).contains(ModifiedDateRange.LAST_30_DAYS);
-        assertThat(normalized.selectedResourceTypes()).containsExactlyInAnyOrder(
-                CatalogEntryType.DATASET,
-                CatalogEntryType.DATASET_SERIES);
     }
 
     @Test
@@ -47,6 +41,7 @@ class CatalogQueryParamsTest {
         assertThat(query.pageRequest().paged()).isTrue();
         assertThat(query.pageRequest().page()).isEqualTo(3);
         assertThat(query.pageRequest().size()).isEqualTo(25);
+        assertThat(query.filters().resourceTypes()).isEmpty();
     }
 
     @Test

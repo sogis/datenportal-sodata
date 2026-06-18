@@ -75,7 +75,10 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("id=\"filter-trigger-theme\"")))
                 .andExpect(content().string(containsString("id=\"filter-trigger-office\"")))
                 .andExpect(content().string(containsString("id=\"filter-trigger-modified\"")))
-                .andExpect(content().string(containsString("id=\"filter-trigger-resourceType\"")))
+                .andExpect(content().string(not(containsString("id=\"filter-trigger-resourceType\""))))
+                .andExpect(content().string(containsString("class=\"bi bi-chevron-down\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-arrow-clockwise\"")))
+                .andExpect(content().string(containsString("fill=\"currentColor\"")))
                 .andExpect(content().string(containsString("id=\"dataset-results-shell\"")))
                 .andExpect(content().string(containsString("id=\"dataset-loading\"")))
                 .andExpect(content().string(containsString("name=\"q\"")))
@@ -84,10 +87,21 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("id=\"catalog-search-clear\"")))
                 .andExpect(content().string(containsString("aria-label=\"Suche zurücksetzen\"")))
                 .andExpect(content().string(not(containsString("aria-label=\"Suche ausführen\""))))
+                .andExpect(content().string(not(containsString("dp-filter-trigger__chevron\" aria-hidden=\"true\">⌄"))))
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
                 .andExpect(content().string(containsString("dp-entry-row dp-entry-row--series")))
                 .andExpect(content().string(containsString("CSV (aktuelle Ausgabe)")))
                 .andExpect(content().string(containsString("Parquet (aktuelle Ausgabe)")));
+    }
+
+    @Test
+    void resourceTypeQueryParameterIsIgnoredByCatalogPage() throws Exception {
+        mockMvc.perform(get("/datasets").param("resourceType", "series"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("id=\"filter-toolbar\"")))
+                .andExpect(content().string(containsString("Abstimmungsresultate")))
+                .andExpect(content().string(not(containsString("Ressourcentyp"))))
+                .andExpect(content().string(not(containsString("resourceType=series"))));
     }
 
     @Test
@@ -262,7 +276,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("Ergebnisse anzeigen")))
                 .andExpect(content().string(containsString("Alle zurücksetzen")))
                 .andExpect(content().string(containsString("name=\"modified\"")))
-                .andExpect(content().string(containsString("name=\"resourceType\"")))
+                .andExpect(content().string(not(containsString("name=\"resourceType\""))))
                 .andExpect(content().string(not(containsString("<html"))));
     }
 

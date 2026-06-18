@@ -1,9 +1,7 @@
 package ch.so.agi.datenportal.web;
 
-import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.search.FacetValue;
 import ch.so.agi.datenportal.search.Facets;
-import ch.so.agi.datenportal.search.ModifiedDateRange;
 import ch.so.agi.datenportal.web.view.FilterChipVm;
 import ch.so.agi.datenportal.web.view.FilterGroupVm;
 import ch.so.agi.datenportal.web.view.FilterGroupType;
@@ -31,14 +29,12 @@ public final class FilterVmFactory {
         var groups = List.of(
                 group(normalized, "theme", "Thema", "theme", "Alle Themen", FilterGroupType.MULTI_SELECT, normalized.theme(), facets.themes()),
                 group(normalized, "office", "Fachstelle / Amt", "office", "Alle Fachstellen", FilterGroupType.MULTI_SELECT, normalized.office(), facets.offices()),
-                group(normalized, "modified", "Publikationsdatum", "modified", "Alle Zeiträume", FilterGroupType.SINGLE_SELECT, normalized.modified(), facets.modifiedRanges()),
-                group(normalized, "resourceType", "Ressourcentyp", "resourceType", "Alle Typen", FilterGroupType.MULTI_SELECT, normalized.resourceType(), facets.resourceTypes()));
+                group(normalized, "modified", "Publikationsdatum", "modified", "Alle Zeiträume", FilterGroupType.SINGLE_SELECT, normalized.modified(), facets.modifiedRanges()));
 
         var chips = new ArrayList<FilterChipVm>();
         chips.addAll(chipsFor(normalized, "Thema", "theme", normalized.theme(), facets.themes()));
         chips.addAll(chipsFor(normalized, "Fachstelle / Amt", "office", normalized.office(), facets.offices()));
         chips.addAll(chipsFor(normalized, "Publikationsdatum", "modified", normalized.modified(), facets.modifiedRanges()));
-        chips.addAll(chipsFor(normalized, "Ressourcentyp", "resourceType", normalized.resourceType(), facets.resourceTypes()));
 
         return new FilterPanelVm(
                 groups,

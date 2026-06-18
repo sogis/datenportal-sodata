@@ -2134,7 +2134,6 @@ Filter müssen Mehrfachauswahl unterstützen. Betroffen sind mindestens:
 - Thema
 - Fachstelle / Amt
 - Publikationsdatum / Zeitraum
-- Ressourcentyp
 
 URL-Konvention:
 

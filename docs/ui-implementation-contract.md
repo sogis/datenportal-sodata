@@ -223,7 +223,6 @@ q=
 themes=[]
 offices=[]
 publicationDate=[]
-resourceTypes=[]
 expandedSeries=[]
 page=1
 size=10
@@ -276,7 +275,6 @@ MVP-Filter:
 1. Thema
 2. Fachstelle / Amt
 3. Publikationsdatum
-4. Ressourcentyp
 
 Publikationsdatum wird im MVP als vordefinierter Single-Select mit Presets umgesetzt:
 
@@ -306,13 +304,12 @@ Es gibt keinen globalen clientseitigen Filter-State. Entwürfe leben nur in den 
 Pflichtverhalten:
 
 - Jede Gruppe zeigt ihren Namen und den Zustand.
-- Wenn nichts gewählt ist: `Alle Themen`, `Alle Fachstellen`, `Alle Zeiträume`, `Alle Typen`.
+- Wenn nichts gewählt ist: `Alle Themen`, `Alle Fachstellen`, `Alle Zeiträume`.
 - Wenn Werte gewählt sind: erster Wert plus Anzahl, z. B. `Umwelt +2` oder `3 ausgewählt`.
 - Unter oder über der Resultatliste wird eine aktive Filter-Chip-Zeile angezeigt.
 - Jeder aktive Chip kann einzeln entfernt werden.
 - Es gibt `Filter zurücksetzen`.
 - Ausgewählte Filterwerte bleiben bei Suche, Pagination, Ansichtwechsel und Sortierung erhalten.
-- `Ressourcentyp` akzeptiert nur die kanonischen Werte `dataset` und `series`.
 - Bei Desktop darf immer nur ein Popover gleichzeitig offen sein.
 - `Escape` und Outside-Click schliessen offene Desktop-Popover ohne Übernahme des Draft-State.
 - Filter sind keyboard-bedienbar.
@@ -322,7 +319,7 @@ Pflichtverhalten:
 Mehrfachwerte werden als wiederholte Query-Parameter codiert:
 
 ```text
-/datasets?theme=bevoelkerung&theme=umwelt&office=agi&office=afu&resourceType=dataset&resourceType=series&view=list
+/datasets?theme=bevoelkerung&theme=umwelt&office=agi&office=afu&view=list
 ```
 
 Nicht verwenden:
@@ -861,7 +858,6 @@ public record CatalogQueryParams(
     List<String> theme,
     List<String> office,
     List<String> modified,
-    List<String> resourceType,
     String view,
     List<String> expanded,
     int page,

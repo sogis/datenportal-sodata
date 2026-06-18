@@ -1,7 +1,6 @@
 package ch.so.agi.datenportal.search;
 
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
-import ch.so.agi.datenportal.catalog.domain.CatalogEntryType;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import java.time.Clock;
 import java.util.Comparator;
@@ -39,25 +38,10 @@ public final class FacetService {
                                 .count()))
                 .toList();
 
-        var resourceTypes = java.util.List.of(
-                new FacetValue(
-                        "dataset",
-                        CatalogEntryType.DATASET.label(),
-                        snapshot.visibleEntries().stream()
-                                .filter(entry -> entry.type() == CatalogEntryType.DATASET)
-                                .count()),
-                new FacetValue(
-                        "series",
-                        CatalogEntryType.DATASET_SERIES.label(),
-                        snapshot.visibleEntries().stream()
-                                .filter(entry -> entry.type() == CatalogEntryType.DATASET_SERIES)
-                                .count()));
-
         return new Facets(
                 toSortedFacetValues(themes),
                 toSortedFacetValues(offices),
-                modifiedRanges,
-                resourceTypes);
+                modifiedRanges);
     }
 
     private static void increment(Map<String, MutableFacet> facets, String value, String label) {
