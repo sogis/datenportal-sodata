@@ -83,6 +83,46 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
+    void desktopChromeAndCatalogUseFullWidthLayout() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            BoundingBox header = requireBoundingBox(page.locator("so-header"));
+            BoundingBox breadcrumb = requireBoundingBox(page.locator("so-breadcrumb"));
+            BoundingBox contentContainer = requireBoundingBox(page.locator("main .dp-container").first());
+            BoundingBox search = requireBoundingBox(page.locator(".dp-search"));
+            BoundingBox resultsShell = requireBoundingBox(page.locator("#dataset-results-shell"));
+
+            assertThat(header.width).isGreaterThan(1430d);
+            assertThat(breadcrumb.width).isGreaterThan(1430d);
+            assertThat(contentContainer.width).isGreaterThan(1380d);
+            assertThat(search.width).isGreaterThan(1380d);
+            assertThat(resultsShell.width).isGreaterThan(1380d);
+            assertThat(Math.abs(search.width - contentContainer.width)).isLessThan(1.5d);
+            assertThat(Math.abs(resultsShell.width - contentContainer.width)).isLessThan(1.5d);
+        }
+    }
+
+    @Test
+    void detailPageUsesWideLayoutWithReadableDescription() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/ch.so.bauinventar"));
+
+            BoundingBox contentContainer = requireBoundingBox(page.locator("main .dp-container").first());
+            BoundingBox hero = requireBoundingBox(page.locator(".dp-detail-hero"));
+            BoundingBox description = requireBoundingBox(page.locator(".dp-detail-description"));
+
+            assertThat(contentContainer.width).isGreaterThan(1380d);
+            assertThat(hero.width).isGreaterThan(1380d);
+            assertThat(Math.abs(hero.width - contentContainer.width)).isLessThan(1.5d);
+            assertThat(description.width).isLessThan(900d);
+            assertThat(description.width).isLessThan(hero.width - 300d);
+        }
+    }
+
+    @Test
     void desktopPopoverEscapeAndOutsideClickDiscardDraftStateAndReturnFocusToTrigger() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();

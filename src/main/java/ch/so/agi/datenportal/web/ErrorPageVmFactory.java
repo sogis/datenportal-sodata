@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public final class ErrorPageVmFactory {
 
     private static final String CATALOG_HREF = "/datasets";
-    private static final String CATALOG_LABEL = "Zurück zu Daten & Statistiken";
+    private static final String CATALOG_LABEL = "Zurück zu Daten und Statistiken";
 
     private final PageChromeFactory pageChromeFactory;
 

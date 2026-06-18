@@ -1,7 +1,7 @@
 @import ch.so.agi.datenportal.web.view.HeaderVm
 @param HeaderVm header
 <header class="dp-site-header" role="banner">
-  <div class="dp-container dp-site-header__inner">
+  <div class="dp-site-header__inner">
     <div class="dp-site-brand">
       <a class="dp-site-brand__link" href="${header.logoHref()}">
         <span class="dp-site-brand__name">${header.siteName()}</span>

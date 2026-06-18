@@ -55,7 +55,7 @@ public class BreadcrumbFactory {
         return new ArrayList<>(List.of(
                 new BreadcrumbItemVm("so.ch", Optional.of("https://so.ch"), false),
                 new BreadcrumbItemVm("Datenportal", Optional.of("/datasets"), false),
-                new BreadcrumbItemVm("Daten & Statistiken", Optional.of("/datasets"), false)));
+                new BreadcrumbItemVm("Daten und Statistiken", Optional.of("/datasets"), false)));
     }
 
     private static String encode(String value) {

@@ -11,7 +11,7 @@
 
 .dp-lead,
 .dp-lead-secondary {
-  max-width: 54rem;
+  max-width: var(--dp-readable-width);
   margin: 0;
   font-size: 1.05rem;
 }
@@ -39,7 +39,7 @@
 .dp-search {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  width: min(100%, 52rem);
+  width: 100%;
   border: 1px solid var(--dp-color-border);
   border-radius: var(--dp-radius-sm);
   background: var(--dp-color-surface);

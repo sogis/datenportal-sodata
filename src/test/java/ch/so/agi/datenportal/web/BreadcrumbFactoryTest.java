@@ -23,7 +23,7 @@ class BreadcrumbFactoryTest {
         var breadcrumb = factory.catalog();
 
         assertThat(breadcrumb.items()).extracting("label")
-                .containsExactly("so.ch", "Datenportal", "Daten & Statistiken");
+                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken");
         assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
         assertThat(breadcrumb.items().getLast().href()).isEmpty();
     }
@@ -33,7 +33,7 @@ class BreadcrumbFactoryTest {
         var breadcrumb = factory.datasetDetail(dataset("dataset-1", "Bauinventar"));
 
         assertThat(breadcrumb.items()).extracting("label")
-                .containsExactly("so.ch", "Datenportal", "Daten & Statistiken", "Bauinventar");
+                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken", "Bauinventar");
         assertThat(breadcrumb.items().get(2).href()).contains("/datasets");
         assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
     }
@@ -46,7 +46,7 @@ class BreadcrumbFactoryTest {
         var breadcrumb = factory.issueDetail(series, issue);
 
         assertThat(breadcrumb.items()).extracting("label")
-                .containsExactly("so.ch", "Datenportal", "Daten & Statistiken", "Datenreihe", "Ausgabe 2026");
+                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken", "Datenreihe", "Ausgabe 2026");
         assertThat(breadcrumb.items().get(3).href()).contains("/series/series");
         assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
     }

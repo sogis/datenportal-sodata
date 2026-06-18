@@ -29,7 +29,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("<so-header")))
                 .andExpect(content().string(containsString("<so-breadcrumb>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item")))
-                .andExpect(content().string(containsString("Daten &amp; Statistiken")))
+                .andExpect(content().string(containsString("Daten und Statistiken")))
                 .andExpect(content().string(containsString("id=\"main-content\"")))
                 .andExpect(content().string(containsString("aria-label=\"Breadcrumb\"")))
                 .andExpect(content().string(containsString("id=\"catalog-search-form\"")))

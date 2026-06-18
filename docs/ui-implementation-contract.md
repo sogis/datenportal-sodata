@@ -61,6 +61,24 @@ Alle öffentlichen Seiten verwenden den offiziellen Header und das offizielle Br
 </body>
 ```
 
+### 2.1.1 Breitenmodell
+
+Für die öffentliche UI gelten genau zwei globale Breiten:
+
+- `--dp-page-max-width`: maximale Breite strukturierter Seiteninhalte wie Katalog, Tabellen, Karten, Detail-Layouts und Footer-Inhalt
+- `--dp-readable-width`: Lesebreite für längere Prosa wie Leadtexte und Beschreibungen
+
+Nicht erlaubt:
+
+- eine zusätzliche globale `content`-Breite zwischen Page Width und Readable Width
+- lokale Kappen, die Suche oder Resultatbereiche der Katalogseite deutlich unter die Page Width zwingen
+
+Chrome-Regel:
+
+- Header und Breadcrumb sind immer full width.
+- Web-Component-Header und -Breadcrumb dürfen keine zusätzliche `max-width`-Begrenzung durch JTE-Wrapper erhalten.
+- Semantische Fallbacks für Header und Breadcrumb dürfen Innenabstände haben, aber ebenfalls keine `max-width`-Begrenzung.
+
 ### 2.2 Header
 
 Der Header wird nicht in JTE nachgebaut, sondern über die Web Component integriert. Die visuelle Referenz ist `spec/mockups/current/web-components.png`.
@@ -79,6 +97,7 @@ Fallback:
 
 - Falls die Web Component lokal nicht geladen werden kann, darf ein semantischer Fallback gerendert werden.
 - Der Fallback ist nur technische Absicherung, nicht das Designziel.
+- Auch der Fallback bleibt full width; nur Innenabstände sind erlaubt.
 
 JTE-Komponente:
 
@@ -120,9 +139,9 @@ Das Breadcrumb wird ebenfalls über Web Components umgesetzt. Die visuelle Refer
 Pflichtpfade:
 
 ```text
-so.ch > Datenportal > Daten & Statistiken
-so.ch > Datenportal > Daten & Statistiken > <Titel>
-so.ch > Datenportal > Daten & Statistiken > <Datenreihe> > <Ausgabe>
+so.ch > Datenportal > Daten und Statistiken
+so.ch > Datenportal > Daten und Statistiken > <Titel>
+so.ch > Datenportal > Daten und Statistiken > <Datenreihe> > <Ausgabe>
 ```
 
 JTE-Komponente:
@@ -217,7 +236,7 @@ Der Screenshot `startseite_liste.png` ist die Referenz für diesen Zustand.
 Pflicht:
 
 - Breadcrumb via Web Component.
-- Titel: `Daten & Statistiken`.
+- Titel: `Daten und Statistiken`.
 - Leadtext:
 
 ```text
@@ -234,6 +253,8 @@ Suche nach Datensätzen, Themen, Fachstellen, Schlagworten ...
 - Suchfeld ist ein GET-Formularfeld mit `name="q"`.
 - Suche/Filter funktionieren ohne JavaScript durch normalen Submit.
 - HTMX darf für progressive Enhancement verwendet werden.
+- Leadtexte nutzen die Lesebreite `--dp-readable-width`.
+- Suche, Filterleiste, Result Controls, Resultate und Pagination nutzen die volle `--dp-page-max-width`.
 
 ---
 

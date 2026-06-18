@@ -3,7 +3,7 @@
 }
 
 .dp-container {
-  width: min(calc(100% - 2rem), var(--dp-content-width));
+  width: min(calc(100% - (2 * var(--dp-page-gutter))), var(--dp-page-max-width));
   margin: 0 auto;
 }
 
@@ -21,7 +21,9 @@
   gap: var(--dp-space-5);
   justify-content: space-between;
   align-items: flex-start;
-  padding: var(--dp-space-5) 0 var(--dp-space-4);
+  width: 100%;
+  margin: 0;
+  padding: var(--dp-space-5) var(--dp-page-gutter) var(--dp-space-4);
 }
 
 .dp-site-brand__link {
@@ -59,7 +61,7 @@
   gap: var(--dp-space-2);
   list-style: none;
   margin: 0;
-  padding: var(--dp-space-4) 0;
+  padding: var(--dp-space-4) var(--dp-page-gutter);
   color: var(--dp-color-text-muted);
 }
 
