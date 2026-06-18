@@ -134,7 +134,7 @@
   justify-content: space-between;
   width: 100%;
   min-height: 3.25rem;
-  padding: var(--dp-space-3);
+  padding: var(--dp-space-2);
   border: 1px solid var(--dp-color-border);
   border-radius: var(--dp-radius-sm);
   background: var(--dp-color-surface);
