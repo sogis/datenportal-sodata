@@ -72,7 +72,7 @@ Für die öffentliche UI gelten drei Breiten-Tokens mit klar getrennten Aufgaben
 Nicht erlaubt:
 
 - zusätzliche globale Breiten-Tokens ausserhalb dieser drei Rollen
-- lokale Kappen, die Result Controls, Resultate oder Pagination der Katalogseite deutlich unter die Page Width zwingen
+- lokale Kappen, die Result Controls oder Resultate der Katalogseite deutlich unter die Page Width zwingen
 
 Chrome-Regel:
 
@@ -224,8 +224,6 @@ themes=[]
 offices=[]
 publicationDate=[]
 expandedSeries=[]
-page=1
-size=10
 sort=newest
 ```
 
@@ -253,14 +251,14 @@ Suche nach Datensätzen, Themen, Fachstellen, Schlagworten ...
 - Suchfeld ist ein GET-Formularfeld mit `name="q"`.
 - Suche/Filter funktionieren ohne JavaScript durch normalen Submit.
 - HTMX darf für progressive Enhancement verwendet werden.
-- Mit JavaScript startet die Suche automatisch ab 3 Zeichen mit ca. `300ms` Debounce und aktualisiert Resultate, Controls und Pagination via HTMX.
+- Mit JavaScript startet die Suche automatisch ab 3 Zeichen mit ca. `300ms` Debounce und aktualisiert Resultate und Controls via HTMX.
 - Queries mit 1-2 Zeichen gelten fachlich als leer und dürfen serverseitig nicht als aktive Suche weitergetragen werden.
 - Das Suchfeld verwendet links ein Such-Icon und rechts ein `x`-Icon zum Zurücksetzen der Suche; ein separater Such-Button ist nicht Teil des UI.
-- Das Zurücksetzen entfernt nur den Suchbegriff, nicht aktive Filter, Ansicht, Sortierung oder Page-Size.
+- Das Zurücksetzen entfernt nur den Suchbegriff, nicht aktive Filter, Ansicht oder Sortierung.
 - Leadtexte nutzen die Lesebreite `--dp-readable-width` von `76ch`.
 - Suchfeld und Desktop-Filterleiste teilen sich ein linksbündiges Control-Band mit `min(100%, var(--dp-control-band-max-width))`; der Default-Tokenwert ist `64rem`.
 - Im Katalog bleibt der Vertikalrhythmus zwischen den grossen Sektionen auf `--dp-space-5`; zwischen Result Controls und Resultattabelle wird er gezielt auf `--dp-space-4` verdichtet.
-- Result Controls, Resultate und Pagination nutzen weiterhin die volle `--dp-page-max-width`.
+- Result Controls und Resultate nutzen weiterhin die volle `--dp-page-max-width`.
 
 ---
 
@@ -309,7 +307,7 @@ Pflichtverhalten:
 - Unter oder über der Resultatliste wird eine aktive Filter-Chip-Zeile angezeigt.
 - Jeder aktive Chip kann einzeln entfernt werden.
 - Es gibt `Filter zurücksetzen`.
-- Ausgewählte Filterwerte bleiben bei Suche, Pagination, Ansichtwechsel und Sortierung erhalten.
+- Ausgewählte Filterwerte bleiben bei Suche, Ansichtwechsel und Sortierung erhalten.
 - Bei Desktop darf immer nur ein Popover gleichzeitig offen sein.
 - `Escape` und Outside-Click schliessen offene Desktop-Popover ohne Übernahme des Draft-State.
 - Filter sind keyboard-bedienbar.
@@ -333,8 +331,7 @@ Begründung: Wiederholte Parameter sind robust, HTML-form-kompatibel und in Spri
 Zusätzlich gilt:
 
 - `modified` ist ein einzelner Preset-Parameter, z. B. `/datasets?modified=last30`.
-- `page` und `size` sind Teil desselben Request-Modells wie Suche, Filter, Sortierung und Ansicht.
-- Jede Suche-/Filter-/Sortier-/Ansichtsänderung setzt `page=1`.
+- `page` und `size` dürfen im Request-Modell für eine spätere Reaktivierung vorhanden sein, werden im aktuellen MVP-Katalog aber ignoriert und nicht in UI-Links oder Formularen weitergetragen.
 - `expanded` wird nur für explizite Row-Toggles verwendet und bei Suche/Filter/Sort/View/Page verworfen.
 
 ### 4.4 HTMX-Verhalten
@@ -357,7 +354,7 @@ Pflicht:
 - `GET /datasets` liefert bei HTMX-Requests das Resultatfragment mit `#dataset-results-shell` als Hauptziel.
 - `GET /datasets/filter-popover` liefert genau eine Desktop-Filtergruppe.
 - `GET /datasets/mobile-filters` liefert das mobile Filter-Sheet.
-- Resultatresponses dürfen zusätzlich `#filter-toolbar`, `#mobile-filter-button`, `#active-filter-chips`, `#results-summary`, `#dataset-results-shell` und `#pagination` per `hx-swap-oob` aktualisieren.
+- Resultatresponses dürfen zusätzlich `#filter-toolbar`, `#mobile-filter-button`, `#active-filter-chips`, `#results-summary` und `#dataset-results-shell` per `hx-swap-oob` aktualisieren.
 - Das Öffnen eines Desktop-Popovers darf keinen Layout-Sprung der Ergebnisliste verursachen.
 - Ohne JavaScript bleibt der fachliche GET-Flow über Formulare und `Anwenden` nutzbar.
 
@@ -585,7 +582,6 @@ src/main/jte/components/entryTable.jte
 src/main/jte/components/entryRow.jte
 src/main/jte/components/issueRow.jte
 src/main/jte/components/downloadButton.jte
-src/main/jte/components/pagination.jte
 src/main/jte/fragments/filterPopover.jte
 src/main/jte/fragments/mobileFilters.jte
 ```
@@ -869,6 +865,8 @@ public record CatalogQueryParams(
 }
 ```
 
+`page` und `size` dürfen im Request-Modell weiterhin existieren, werden im aktuellen öffentlichen Katalog-Flow aber nicht ausgewertet.
+
 ### 10.2 Controller
 
 ```java
@@ -977,7 +975,7 @@ Pflichttests:
 
 Mindestens automatisiert oder manuell dokumentieren:
 
-- Tab-Reihenfolge Suche → Filter → Ansichttoggle → Resultate → Pagination.
+- Tab-Reihenfolge Suche → Filter → Ansichttoggle → Resultate.
 - Filtergruppen sind per Tastatur bedienbar.
 - Row Toggle hat sichtbaren Fokus.
 - Downloadlinks haben eindeutige Namen.

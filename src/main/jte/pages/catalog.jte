@@ -18,7 +18,6 @@
             @template.components.resultsShell(results = page.results(), queryParams = page.queryParams(), resetHref = page.filterPanel().resetHref())
           </div>
         </div>
-        @template.components.pagination(results = page.results(), queryParams = page.queryParams(), outOfBand = false)
       </div>
       <div id="filter-popover-host" class="dp-filter-host" hidden></div>
       <div id="mobile-filter-panel-host" class="dp-filter-host" hidden></div>

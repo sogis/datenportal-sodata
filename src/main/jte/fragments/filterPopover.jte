@@ -30,8 +30,6 @@
         excludeFilterParameter = group.parameterName(),
         includeSort = true,
         includeView = true,
-        includePage = false,
-        includeSize = true,
         includeExpanded = false
       )
       @template.components.filterFieldList(group = group, inputIdPrefix = "popover-" + group.id())

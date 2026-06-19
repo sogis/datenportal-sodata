@@ -42,8 +42,6 @@
     excludeFilterParameter = "",
     includeSort = true,
     includeView = true,
-    includePage = false,
-    includeSize = true,
     includeExpanded = false
   )
 </form>

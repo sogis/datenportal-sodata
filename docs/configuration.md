@@ -70,11 +70,11 @@ Regeln:
 datenportal:
   search:
     max-results: 500
-    default-page-size: 20
+    default-page-size: 10
     max-page-size: 100
 ```
 
-Die UI verwendet aktuell keine sichtbare Pagination, die Suchschicht normalisiert Page-Requests aber bereits service-seitig.
+Die öffentliche Katalog-UI verwendet aktuell keine sichtbare Pagination und ignoriert `page`/`size` im Request bewusst. Die Suchschicht normalisiert Page-Requests weiterhin service-seitig, damit Pagination später ohne Umbau der unteren Schichten wieder aktiviert werden kann.
 
 ## Web Components
 

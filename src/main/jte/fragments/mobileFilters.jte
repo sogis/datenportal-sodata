@@ -31,8 +31,6 @@
         excludeFilterParameter = "",
         includeSort = true,
         includeView = true,
-        includePage = false,
-        includeSize = true,
         includeExpanded = false
       )
       <div class="dp-filter-sheet__groups">

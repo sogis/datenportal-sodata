@@ -22,7 +22,7 @@ class CatalogControllerMvcTest {
     private MockMvc mockMvc;
 
     @Test
-    void homePageReturnsFullPageWithDefaultListViewAndPagination() throws Exception {
+    void homePageReturnsFullPageWithDefaultListViewWithoutPagination() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<html lang=\"de\">")))
@@ -36,13 +36,13 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("id=\"filter-toolbar\"")))
                 .andExpect(content().string(containsString("id=\"result-controls\"")))
                 .andExpect(content().string(containsString("id=\"dataset-results-shell\"")))
-                .andExpect(content().string(containsString("id=\"pagination\"")))
                 .andExpect(content().string(containsString("id=\"mobile-filter-button\"")))
                 .andExpect(content().string(containsString("Thema / Datensatz")))
                 .andExpect(content().string(not(containsString("<th scope=\"col\">Typ</th>"))))
                 .andExpect(content().string(containsString("Listenansicht")))
                 .andExpect(content().string(containsString("aria-current=\"page\"")))
-                .andExpect(content().string(containsString("Zeilen pro Seite")))
+                .andExpect(content().string(not(containsString("id=\"pagination\""))))
+                .andExpect(content().string(not(containsString("Zeilen pro Seite"))))
                 .andExpect(content().string(containsString("/js/catalog-filters.js")));
     }
 
@@ -132,12 +132,11 @@ class CatalogControllerMvcTest {
         int resultsStackIndex = html.indexOf("class=\"dp-results-stack\"");
         int resultControlsIndex = html.indexOf("id=\"result-controls\"", resultsStackIndex);
         int resultsShellIndex = html.indexOf("id=\"dataset-results-shell\"", resultsStackIndex);
-        int paginationIndex = html.indexOf("id=\"pagination\"");
 
         assertThat(resultsStackIndex).isGreaterThanOrEqualTo(0);
         assertThat(resultControlsIndex).isGreaterThan(resultsStackIndex);
         assertThat(resultsShellIndex).isGreaterThan(resultControlsIndex);
-        assertThat(paginationIndex).isGreaterThan(resultsShellIndex);
+        assertThat(html).doesNotContain("id=\"pagination\"");
     }
 
     @Test
@@ -246,7 +245,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("hx-swap-oob=\"true\"")))
                 .andExpect(content().string(containsString("id=\"filter-toolbar\"")))
                 .andExpect(content().string(containsString("id=\"result-controls\"")))
-                .andExpect(content().string(containsString("id=\"pagination\"")))
+                .andExpect(content().string(not(containsString("id=\"pagination\""))))
                 .andExpect(content().string(not(containsString("<html"))))
                 .andExpect(content().string(not(containsString("dp-site-header"))))
                 .andExpect(content().string(not(containsString("Zum Inhalt springen"))));
@@ -290,7 +289,14 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void paginationLinksAndPageSizeControlsPreserveRelevantState() throws Exception {
+    void catalogPageIgnoresPageAndSizeParameters() throws Exception {
+        MvcResult baseline = mockMvc.perform(get("/datasets")
+                        .param("theme", "Geografie")
+                        .param("view", "cards")
+                        .param("sort", "title-asc"))
+                .andExpect(status().isOk())
+                .andReturn();
+
         mockMvc.perform(get("/datasets")
                         .param("theme", "Geografie")
                         .param("view", "cards")
@@ -298,11 +304,13 @@ class CatalogControllerMvcTest {
                         .param("page", "2")
                         .param("size", "20"))
                 .andExpect(status().isOk())
+                .andExpect(content().string(baseline.getResponse().getContentAsString()))
                 .andExpect(content().string(containsString("theme=Geografie")))
                 .andExpect(content().string(containsString("view=cards")))
                 .andExpect(content().string(containsString("sort=title-asc")))
-                .andExpect(content().string(containsString("name=\"size\"")))
-                .andExpect(content().string(containsString("<option value=\"20\" selected>20</option>")));
+                .andExpect(content().string(not(containsString("page=2"))))
+                .andExpect(content().string(not(containsString("size=20"))))
+                .andExpect(content().string(not(containsString("name=\"size\""))));
     }
 
     @Test

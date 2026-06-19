@@ -206,7 +206,6 @@ src/main/java/ch/so/agi/datenportal/
     DownloadButtonVm.java
     FilterPanelVm.java
     FilterOptionVm.java
-    PaginationVm.java
     DatasetDetailPageVm.java
     SeriesDetailPageVm.java
     MetadataGroupVm.java
@@ -254,7 +253,7 @@ datenportal:
     token: ${DATENPORTAL_RELOAD_TOKEN:dev-token-change-me}
   search:
     max-results: 500
-    default-page-size: 20
+    default-page-size: 10
     max-page-size: 100
     default-sort: modified-desc
   web-components:
@@ -1354,9 +1353,9 @@ modified=all|last30|last365
 type=dataset|series
 view=cards|list
 sort=relevance|modified-desc|title-asc
-page=1
-size=20
 ```
+
+Die öffentliche Katalog-UI verwendet im MVP keine sichtbare Pagination. `page` und `size` dürfen im Request-Modell für eine spätere Reaktivierung vorhanden sein, werden aktuell aber ignoriert und nicht kanonisch weitergetragen.
 
 ### 10.3 `CatalogQueryParams`
 
@@ -1368,15 +1367,11 @@ public record CatalogQueryParams(
     Optional<String> modified,
     Optional<String> type,
     Optional<String> view,
-    Optional<String> sort,
-    Optional<Integer> page,
-    Optional<Integer> size
+    Optional<String> sort
 ) {
     public SearchQuery toSearchQuery(SearchProperties searchProperties);
 
     public ViewMode viewMode();
-
-    public CatalogQueryParams withPage(int page);
 
     public String toQueryString();
 }
@@ -1552,7 +1547,6 @@ public record HomePageVm(
 public record ResultsVm(
     List<EntryCardVm> cards,
     List<EntryRowVm> rows,
-    PaginationVm pagination,
     int totalElements,
     ViewMode viewMode,
     CatalogQueryParams queryParams
@@ -1938,7 +1932,6 @@ src/main/jte/
   fragments/
     results.jte
     result-count.jte
-    pagination.jte
   components/
     soHeader.jte
     soBreadcrumb.jte
@@ -1985,7 +1978,7 @@ Parameter:
 
 Regeln:
 
-- Rendert **nur** Ergebniscontrols, Cards/List und Pagination.
+- Rendert **nur** Ergebniscontrols und Cards/List.
 - Kein `<html>`, kein `<body>`, kein Header.
 - Muss auch ohne umgebende Seite semantisch verständlich bleiben.
 
@@ -2672,7 +2665,7 @@ class HomeControllerTest {
     @Test void listViewShowsRows();
     @Test void filterByThemeWorks();
     @Test void htmxRequestReturnsResultsFragmentOnly();
-    @Test void pageKeepsQueryParametersInPaginationLinks();
+    @Test void catalogIgnoresPageAndSizeParameters();
 }
 
 @WebMvcTest(DatasetController.class)
@@ -2761,7 +2754,7 @@ Implementieren:
 - `SearchQuery`, `SearchFilters`, `ModifiedRange`, `SortMode`
 - `FacetService`
 - `HomePageVmFactory`, `ResultsVmFactory`
-- GET-Filter, Cards/List, Pagination
+- GET-Filter, Cards/List ohne sichtbare Pagination
 - HTMX-Fragmente
 
 Tests:
@@ -2879,7 +2872,7 @@ Umfang:
 - graue Typ-Badges für `Datensatz` und `Datenreihe`
 - keine Icons in der Titelspalte
 - direkte Downloadlinks
-- Pagination und Sortierung
+- Sortierung ohne sichtbare Pagination
 
 DoD:
 

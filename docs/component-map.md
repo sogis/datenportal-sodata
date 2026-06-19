@@ -25,7 +25,6 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Ansichttoggle | `components/viewToggle.jte` | `ViewToggleVm` | `aria-current` korrekt |
 | Result Controls | `components/resultControls.jte` | `ResultControlsVm` | Result count, Sortierung, Mobile-Button, im gemeinsamen Resultat-Stack |
 | Resultat-Shell | `components/resultsShell.jte` | `ResultsVm` | stabiler HTMX-Target-Bereich, verdichteter Abstand zu Result Controls |
-| Pagination | `components/pagination.jte` | `PaginationVm`, `PaginationItemVm` | Seite/Grösse erhalten Filterzustand |
 
 ## Listenansicht
 
@@ -36,7 +35,6 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datenreihen-Root | `components/entryRow.jte` | `EntryRowVm.series=true` | `aria-expanded`, Plus/Minus |
 | Ausgabezeile | `components/issueRow.jte` | `IssueRowVm` | Downloads ohne aktuelle-Ausgabe-Text, ohne Typ-Badge |
 | Downloadbutton | `components/downloadButton.jte` | `DownloadButtonVm` | zugänglicher Name |
-| Pagination | `components/pagination.jte` | `PaginationVm` | Default `size=10`, View/Sort/Filter bleiben erhalten |
 
 ## Kartenansicht
 

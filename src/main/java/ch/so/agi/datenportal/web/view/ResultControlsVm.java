@@ -8,8 +8,7 @@ public record ResultControlsVm(
         String cardsHref,
         boolean listActive,
         boolean cardsActive,
-        List<SortOptionVm> sortOptions,
-        PaginationVm pagination) {
+        List<SortOptionVm> sortOptions) {
 
     public ResultControlsVm {
         sortOptions = List.copyOf(sortOptions);

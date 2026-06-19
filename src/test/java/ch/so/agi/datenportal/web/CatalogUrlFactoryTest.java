@@ -2,12 +2,11 @@ package ch.so.agi.datenportal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ch.so.agi.datenportal.config.SearchProperties;
 import org.junit.jupiter.api.Test;
 
 class CatalogUrlFactoryTest {
 
-    private final CatalogUrlFactory urlFactory = new CatalogUrlFactory(new SearchProperties(500, 10, 100));
+    private final CatalogUrlFactory urlFactory = new CatalogUrlFactory();
 
     @Test
     void removeFilterPreservesOtherStateAndResetsPage() {
@@ -29,8 +28,8 @@ class CatalogUrlFactoryTest {
                 .contains("office=agi")
                 .contains("view=cards")
                 .contains("sort=title-asc")
-                .contains("size=20")
-                .doesNotContain("page=3")
+                .doesNotContain("page=")
+                .doesNotContain("size=")
                 .doesNotContain("expanded=");
     }
 
@@ -49,7 +48,8 @@ class CatalogUrlFactoryTest {
                 .contains("q=bauinventar")
                 .contains("view=cards")
                 .contains("sort=title-asc")
-                .contains("size=20")
+                .doesNotContain("page=")
+                .doesNotContain("size=")
                 .doesNotContain("theme=")
                 .doesNotContain("office=")
                 .doesNotContain("modified=")
@@ -57,12 +57,21 @@ class CatalogUrlFactoryTest {
     }
 
     @Test
-    void withPageSizeResetsPageAndOmitsDefaultSize() {
+    void withViewAndSortDoNotPropagatePageOrSize() {
         var params = new CatalogQueryParams();
         params.setPage(4);
         params.setSize(20);
+        params.setTheme(java.util.List.of("Geografie"));
 
-        assertThat(urlFactory.withPageSize(params, 10)).doesNotContain("page=").doesNotContain("size=");
-        assertThat(urlFactory.withPageSize(params, 50)).contains("size=50").doesNotContain("page=");
+        assertThat(urlFactory.withView(params, ViewMode.CARDS))
+                .contains("theme=Geografie")
+                .contains("view=cards")
+                .doesNotContain("page=")
+                .doesNotContain("size=");
+        assertThat(urlFactory.withSort(params, ch.so.agi.datenportal.search.SortMode.TITLE_ASC))
+                .contains("theme=Geografie")
+                .contains("sort=title-asc")
+                .doesNotContain("page=")
+                .doesNotContain("size=");
     }
 }

@@ -36,8 +36,6 @@
         excludeFilterParameter = "",
         includeSort = false,
         includeView = true,
-        includePage = false,
-        includeSize = true,
         includeExpanded = false
       )
       <button class="dp-button dp-button--secondary" type="submit">Sortieren</button>

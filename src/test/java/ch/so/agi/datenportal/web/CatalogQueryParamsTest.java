@@ -31,16 +31,16 @@ class CatalogQueryParamsTest {
     }
 
     @Test
-    void toSearchQueryCarriesPaginationValues() {
+    void toSearchQueryIgnoresPaginationValuesForCatalogFlow() {
         var params = new CatalogQueryParams();
         params.setPage(3);
         params.setSize(25);
 
         var query = params.normalized().toSearchQuery();
 
-        assertThat(query.pageRequest().paged()).isTrue();
-        assertThat(query.pageRequest().page()).isEqualTo(3);
-        assertThat(query.pageRequest().size()).isEqualTo(25);
+        assertThat(query.pageRequest().paged()).isFalse();
+        assertThat(query.pageRequest().page()).isEqualTo(1);
+        assertThat(query.pageRequest().size()).isEqualTo(0);
         assertThat(query.filters().resourceTypes()).isEmpty();
     }
 

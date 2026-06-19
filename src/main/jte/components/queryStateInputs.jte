@@ -5,8 +5,6 @@
 @param String excludeFilterParameter
 @param boolean includeSort
 @param boolean includeView
-@param boolean includePage
-@param boolean includeSize
 @param boolean includeExpanded
 @if(includeQuery && !queryParams.q().isBlank())
   <input type="hidden" name="q" value="${queryParams.q()}">
@@ -31,12 +29,6 @@
 @endif
 @if(includeView)
   <input type="hidden" name="view" value="${queryParams.viewValue()}">
-@endif
-@if(includePage && queryParams.page() > 1)
-  <input type="hidden" name="page" value="${queryParams.page()}">
-@endif
-@if(includeSize && queryParams.size() > 0)
-  <input type="hidden" name="size" value="${queryParams.size()}">
 @endif
 @if(includeExpanded)
   @for(var value : queryParams.expanded())

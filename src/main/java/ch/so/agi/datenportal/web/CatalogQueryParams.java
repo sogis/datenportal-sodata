@@ -1,6 +1,7 @@
 package ch.so.agi.datenportal.web;
 
 import ch.so.agi.datenportal.search.ModifiedDateRange;
+import ch.so.agi.datenportal.search.PageRequest;
 import ch.so.agi.datenportal.search.SearchFilters;
 import ch.so.agi.datenportal.search.SearchQuery;
 import ch.so.agi.datenportal.search.SortMode;
@@ -165,7 +166,7 @@ public class CatalogQueryParams {
                         selectedModifiedRange(),
                         Set.of()),
                 sortMode(),
-                ch.so.agi.datenportal.search.PageRequest.of(Math.max(1, page()), Math.max(0, size())));
+                PageRequest.unpaged());
     }
 
     public CatalogQueryParams normalized() {
@@ -178,8 +179,8 @@ public class CatalogQueryParams {
                 .orElseGet(List::of));
         normalized.setSort(sortValue());
         normalized.setView(viewValue());
-        normalized.setPage(Math.max(1, page()));
-        normalized.setSize(Math.max(0, size()));
+        normalized.setPage(1);
+        normalized.setSize(0);
         normalized.setExpanded(copyDistinct(expanded));
         return normalized;
     }

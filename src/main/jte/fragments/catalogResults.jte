@@ -10,4 +10,3 @@
 @template.components.filterBar(filterPanel = filterPanel, queryParams = queryParams, outOfBand = true)
 @template.components.activeFilterChips(filterPanel = filterPanel, outOfBand = true)
 @template.components.resultControls(results = results, queryParams = queryParams, filterPanel = filterPanel, outOfBand = true)
-@template.components.pagination(results = results, queryParams = queryParams, outOfBand = true)

@@ -1,6 +1,5 @@
 package ch.so.agi.datenportal.web;
 
-import ch.so.agi.datenportal.config.SearchProperties;
 import ch.so.agi.datenportal.search.SortMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -17,16 +16,9 @@ public final class CatalogUrlFactory {
     private static final String FILTER_POPOVER_PATH = "/datasets/filter-popover";
     private static final String MOBILE_FILTERS_PATH = "/datasets/mobile-filters";
 
-    private final SearchProperties searchProperties;
-
-    public CatalogUrlFactory(SearchProperties searchProperties) {
-        this.searchProperties = searchProperties;
-    }
-
     public String withView(CatalogQueryParams params, ViewMode viewMode) {
         var query = baseQuery(params, false);
         query.put("view", List.of(viewMode.parameterValue()));
-        query.remove("page");
         query.remove("expanded");
         return buildUrl(query);
     }
@@ -34,7 +26,6 @@ public final class CatalogUrlFactory {
     public String withSort(CatalogQueryParams params, SortMode sortMode) {
         var query = baseQuery(params, false);
         query.put("sort", List.of(sortMode.parameterValue()));
-        query.remove("page");
         query.remove("expanded");
         return buildUrl(query);
     }
@@ -48,7 +39,6 @@ public final class CatalogUrlFactory {
         } else {
             query.put(parameterName, values);
         }
-        query.remove("page");
         query.remove("expanded");
         return buildUrl(query);
     }
@@ -59,37 +49,13 @@ public final class CatalogUrlFactory {
         putIfPresent(query, "q", normalized.q());
         query.put("view", List.of(normalized.viewValue()));
         query.put("sort", List.of(normalized.sortValue()));
-        putSizeIfExplicit(query, normalized.size());
         return buildUrl(query);
     }
 
     public String resetFilterGroup(CatalogQueryParams params, String parameterName) {
         var query = baseQuery(params, false);
         query.remove(parameterName);
-        query.remove("page");
         query.remove("expanded");
-        return buildUrl(query);
-    }
-
-    public String withPage(CatalogQueryParams params, int page) {
-        var query = baseQuery(params, false);
-        if (page <= 1) {
-            query.remove("page");
-        } else {
-            query.put("page", List.of(Integer.toString(page)));
-        }
-        return buildUrl(query);
-    }
-
-    public String withPageSize(CatalogQueryParams params, int size) {
-        var query = baseQuery(params, false);
-        query.remove("page");
-        query.remove("expanded");
-        if (size <= 0 || size == searchProperties.defaultPageSize()) {
-            query.remove("size");
-        } else {
-            query.put("size", List.of(Integer.toString(size)));
-        }
         return buildUrl(query);
     }
 
@@ -148,8 +114,6 @@ public final class CatalogUrlFactory {
         putAllIfPresent(query, "modified", normalized.modified());
         query.put("view", List.of(normalized.viewValue()));
         query.put("sort", List.of(normalized.sortValue()));
-        putPageIfPresent(query, normalized.page());
-        putSizeIfExplicit(query, normalized.size());
         if (includeExpanded) {
             putAllIfPresent(query, "expanded", normalized.expanded());
         }
@@ -165,18 +129,6 @@ public final class CatalogUrlFactory {
     private static void putAllIfPresent(Map<String, List<String>> query, String name, List<String> values) {
         if (!values.isEmpty()) {
             query.put(name, List.copyOf(values));
-        }
-    }
-
-    private static void putPageIfPresent(Map<String, List<String>> query, int page) {
-        if (page > 1) {
-            query.put("page", List.of(Integer.toString(page)));
-        }
-    }
-
-    private void putSizeIfExplicit(Map<String, List<String>> query, int size) {
-        if (size > 0 && size != searchProperties.defaultPageSize()) {
-            query.put("size", List.of(Integer.toString(size)));
         }
     }
 

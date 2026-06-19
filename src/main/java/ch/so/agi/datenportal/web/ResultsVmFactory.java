@@ -4,20 +4,16 @@ import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
-import ch.so.agi.datenportal.config.SearchProperties;
 import ch.so.agi.datenportal.search.SearchResult;
 import ch.so.agi.datenportal.search.SortMode;
 import ch.so.agi.datenportal.web.view.CardResultVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
 import ch.so.agi.datenportal.web.view.IssueRowVm;
-import ch.so.agi.datenportal.web.view.PaginationItemVm;
-import ch.so.agi.datenportal.web.view.PaginationVm;
 import ch.so.agi.datenportal.web.view.ResultControlsVm;
 import ch.so.agi.datenportal.web.view.ResultItemVm;
 import ch.so.agi.datenportal.web.view.ResultsVm;
 import ch.so.agi.datenportal.web.view.SortOptionVm;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashSet;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -27,11 +23,9 @@ public final class ResultsVmFactory {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.uuuu");
 
     private final CatalogUrlFactory urlFactory;
-    private final SearchProperties searchProperties;
 
-    public ResultsVmFactory(CatalogUrlFactory urlFactory, SearchProperties searchProperties) {
+    public ResultsVmFactory(CatalogUrlFactory urlFactory) {
         this.urlFactory = urlFactory;
-        this.searchProperties = searchProperties;
     }
 
     public ResultsVm create(SearchResult searchResult, CatalogQueryParams queryParams) {
@@ -62,67 +56,7 @@ public final class ResultsVmFactory {
                                 mode.parameterValue(),
                                 mode.label(),
                                 params.sortMode() == mode))
-                        .toList(),
-                pagination(searchResult, params));
-    }
-
-    private PaginationVm pagination(SearchResult searchResult, CatalogQueryParams params) {
-        int currentPage = Math.max(1, searchResult.page());
-        int totalPages = Math.max(1, searchResult.totalPages());
-        int currentSize = searchResult.size() > 0 ? searchResult.size() : searchProperties.defaultPageSize();
-
-        return new PaginationVm(
-                searchResult.totalElements() > 0,
-                currentPage,
-                currentSize,
-                totalPages,
-                currentPage > 1,
-                currentPage > 1 ? urlFactory.withPage(params, currentPage - 1) : "",
-                currentPage < totalPages,
-                currentPage < totalPages ? urlFactory.withPage(params, currentPage + 1) : "",
-                paginationItems(currentPage, totalPages, params),
-                sizeOptions(currentSize));
-    }
-
-    private List<PaginationItemVm> paginationItems(int currentPage, int totalPages, CatalogQueryParams params) {
-        var pages = new LinkedHashSet<Integer>();
-        pages.add(1);
-        for (int candidate = currentPage - 1; candidate <= currentPage + 1; candidate++) {
-            if (candidate >= 1 && candidate <= totalPages) {
-                pages.add(candidate);
-            }
-        }
-        pages.add(totalPages);
-
-        var ordered = pages.stream().sorted().toList();
-        var items = new java.util.ArrayList<PaginationItemVm>();
-        int previous = 0;
-        for (int page : ordered) {
-            if (previous > 0 && page - previous > 1) {
-                items.add(new PaginationItemVm("…", "", false, true));
-            }
-            items.add(new PaginationItemVm(
-                    Integer.toString(page),
-                    urlFactory.withPage(params, page),
-                    page == currentPage,
-                    false));
-            previous = page;
-        }
-        return items;
-    }
-
-    private List<Integer> sizeOptions(int currentSize) {
-        var values = new LinkedHashSet<Integer>();
-        values.add(searchProperties.defaultPageSize());
-        values.add(20);
-        values.add(50);
-        if (currentSize > 0 && currentSize <= searchProperties.maxPageSize()) {
-            values.add(currentSize);
-        }
-        return values.stream()
-                .filter(value -> value > 0 && value <= searchProperties.maxPageSize())
-                .sorted()
-                .toList();
+                        .toList());
     }
 
     private ResultItemVm row(CatalogEntry entry, CatalogQueryParams params) {
