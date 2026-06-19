@@ -404,6 +404,8 @@ Es gibt zwei Ansichten:
 - `list`: initial und Standard
 - `cards`: Kartenansicht
 
+In der sichtbaren Toggle-Beschriftung heisst `cards` im MVP `Kachelansicht`.
+
 Der Toggle ist ein Link-/Button-Paar und darf nicht nur clientseitiger State sein.
 
 ```text
@@ -427,6 +429,8 @@ public record ViewToggleVm(
     String cardsHref
 ) {}
 ```
+
+Die Sortierung der Result Controls bleibt ein GET-Formular. Der Wechsel der Sortieroption submittet das Formular sofort; ein separater sichtbarer `Sortieren`-Button ist nicht Teil der UI. Die öffentliche Sortierung bietet im MVP nur `Neueste zuerst` und `Titel A-Z`; eine Sortieroption `Relevanz` wird nicht angeboten.
 
 ---
 

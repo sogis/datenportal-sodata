@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public enum ViewMode {
     LIST("list", "Listenansicht"),
-    CARDS("cards", "Kartenansicht");
+    CARDS("cards", "Kachelansicht");
 
     private final String parameterValue;
     private final String label;

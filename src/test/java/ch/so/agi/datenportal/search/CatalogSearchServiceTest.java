@@ -63,7 +63,7 @@ class CatalogSearchServiceTest {
     void exactIdentifierRanksFirst() {
         SearchResult result = service.search(
                 snapshot(),
-                new SearchQuery("gemeindegrenzen", SearchFilters.empty(), SortMode.RELEVANCE));
+                new SearchQuery("gemeindegrenzen", SearchFilters.empty(), SortMode.MODIFIED_DESC));
 
         assertThat(result.entries())
                 .extracting(CatalogEntry::identifier)
@@ -76,7 +76,7 @@ class CatalogSearchServiceTest {
     void seriesIssuesInfluenceSearchabilityWithoutReturningIssuesAsTopLevelHits() {
         SearchResult result = service.search(
                 snapshot(),
-                new SearchQuery("April 2025", SearchFilters.empty(), SortMode.RELEVANCE));
+                new SearchQuery("April 2025", SearchFilters.empty(), SortMode.MODIFIED_DESC));
 
         assertThat(result.entries())
                 .extracting(CatalogEntry::identifier)
@@ -128,6 +128,15 @@ class CatalogSearchServiceTest {
     }
 
     @Test
+    void textSearchUsesModifiedDescendingWhenNoAlternateSortIsRequested() {
+        SearchResult result = service.search(snapshot(), new SearchQuery("Gemeinden", SearchFilters.empty(), SortMode.MODIFIED_DESC));
+
+        assertThat(result.entries())
+                .extracting(CatalogEntry::identifier)
+                .containsExactly("steuerfuss-gemeinden", "gemeindegrenzen");
+    }
+
+    @Test
     void serviceSidePaginationReturnsRequestedSliceWithoutUiContractChanges() {
         SearchResult result = service.search(
                 snapshot(),
@@ -146,12 +155,12 @@ class CatalogSearchServiceTest {
     void invalidQuerySyntaxDoesNotCrashSearch() {
         assertThatCode(() -> service.search(
                         snapshot(),
-                        new SearchQuery("+:/( wasser", SearchFilters.empty(), SortMode.RELEVANCE)))
+                        new SearchQuery("+:/( wasser", SearchFilters.empty(), SortMode.MODIFIED_DESC)))
                 .doesNotThrowAnyException();
     }
 
     private List<String> search(String query) {
-        return service.search(snapshot(), new SearchQuery(query, SearchFilters.empty(), SortMode.RELEVANCE))
+        return service.search(snapshot(), new SearchQuery(query, SearchFilters.empty(), SortMode.MODIFIED_DESC))
                 .entries().stream()
                 .map(CatalogEntry::identifier)
                 .toList();

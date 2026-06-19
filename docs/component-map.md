@@ -23,7 +23,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Mobile-Sheet | `fragments/mobileFilters.jte`, `components/mobileFilterButton.jte` | `CatalogFilterController`, `FilterPanelVm` | Narrow viewport, Apply/Reset |
 | aktive Filterchips | `components/activeFilterChips.jte` | `FilterChipVm` | einzelner Remove-Href |
 | Ansichttoggle | `components/viewToggle.jte` | `ViewToggleVm` | `aria-current` korrekt |
-| Result Controls | `components/resultControls.jte` | `ResultControlsVm` | Result count, Sortierung, Mobile-Button, im gemeinsamen Resultat-Stack |
+| Result Controls | `components/resultControls.jte` | `ResultControlsVm` | Result count, auto-submit Sortierung, Mobile-Button, im gemeinsamen Resultat-Stack |
 | Resultat-Shell | `components/resultsShell.jte` | `ResultsVm` | stabiler HTMX-Target-Bereich, verdichteter Abstand zu Result Controls |
 
 ## Listenansicht

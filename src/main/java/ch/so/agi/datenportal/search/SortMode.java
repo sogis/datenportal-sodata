@@ -5,8 +5,7 @@ import java.util.Optional;
 
 public enum SortMode {
     MODIFIED_DESC("modified-desc", "Neueste zuerst"),
-    TITLE_ASC("title-asc", "Titel A-Z"),
-    RELEVANCE("relevance", "Relevanz");
+    TITLE_ASC("title-asc", "Titel A-Z");
 
     private final String parameterValue;
     private final String label;

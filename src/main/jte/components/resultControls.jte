@@ -6,10 +6,14 @@
 @param FilterPanelVm filterPanel
 @param boolean outOfBand
 <section id="result-controls" class="dp-result-controls" hx-swap-oob="${outOfBand ? "true" : null}">
-  <p id="results-summary" class="dp-results-summary">${results.controls().totalLabel()}</p>
-  <div class="dp-result-controls__actions">
+  <div class="dp-result-controls__summary">
+    <p id="results-summary" class="dp-results-summary">${results.controls().totalLabel()}</p>
+  </div>
+  <div class="dp-result-controls__center">
     @template.components.mobileFilterButton(filterPanel = filterPanel)
     @template.components.viewToggle(results = results)
+  </div>
+  <div class="dp-result-controls__sort">
     <form
       class="dp-sort-form"
       method="get"
@@ -18,9 +22,10 @@
       hx-target="#dataset-results-shell"
       hx-swap="outerHTML"
       hx-push-url="true"
-      hx-indicator="#dataset-loading">
+      hx-indicator="#dataset-loading"
+      hx-trigger="change from:#catalog-sort">
       <label for="catalog-sort">Sortieren nach</label>
-      <select id="catalog-sort" name="sort">
+      <select id="catalog-sort" name="sort" onchange="this.form.requestSubmit()">
         @for(var option : results.controls().sortOptions())
           @if(option.selected())
             <option value="${option.value()}" selected>${option.label()}</option>
@@ -38,7 +43,6 @@
         includeView = true,
         includeExpanded = false
       )
-      <button class="dp-button dp-button--secondary" type="submit">Sortieren</button>
     </form>
   </div>
 </section>

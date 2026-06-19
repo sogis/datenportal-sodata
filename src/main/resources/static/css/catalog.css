@@ -248,21 +248,37 @@
 }
 
 .dp-result-controls {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   gap: var(--dp-space-4);
-  justify-content: space-between;
   align-items: center;
+}
+
+.dp-result-controls__summary {
+  justify-self: start;
+  min-width: 0;
+}
+
+.dp-result-controls__center {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  min-width: 0;
+}
+
+.dp-result-controls__sort {
+  justify-self: end;
+  min-width: 0;
 }
 
 .dp-results-summary {
   margin: 0;
   color: var(--dp-color-text-muted);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 400;
 }
 
-.dp-result-controls__actions,
+.dp-result-controls__center,
 .dp-view-toggle,
 .dp-sort-form {
   display: flex;
@@ -272,22 +288,58 @@
 }
 
 .dp-view-toggle {
+  align-items: stretch;
+  gap: 0;
   border: 1px solid var(--dp-color-border);
   border-radius: var(--dp-radius-sm);
   background: var(--dp-color-surface);
+  overflow: hidden;
 }
 
 .dp-view-toggle__link {
   display: inline-flex;
   align-items: center;
+  gap: var(--dp-space-3);
   min-height: 2.5rem;
   padding: 0 var(--dp-space-4);
   font-size: 16px;
   font-weight: 700;
+  color: var(--dp-color-text);
+  text-decoration: none;
+  line-height: 1;
 }
 
 .dp-view-toggle__link.is-active {
   color: var(--dp-color-accent);
+}
+
+.dp-view-toggle__link--list {
+  border-left: 1px solid var(--dp-color-border);
+}
+
+.dp-view-toggle__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.dp-view-toggle__icon svg {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+}
+
+.dp-view-toggle__label {
+  display: inline-block;
+  line-height: 1;
+}
+
+.dp-sort-form {
+  justify-content: flex-end;
+  font-size: 16px;
 }
 
 .dp-sort-form select {
@@ -298,10 +350,6 @@
   background: var(--dp-color-surface);
   color: var(--dp-color-text);
   font: inherit;
-}
-
-.dp-sort-form {
-  font-size: 16px;
 }
 
 .dp-mobile-filter-button {
@@ -715,20 +763,27 @@ body.dp-filter-sheet-open {
   }
 
   .dp-result-controls {
+    grid-template-columns: 1fr;
     align-items: stretch;
   }
 
-  .dp-result-controls__actions,
+  .dp-result-controls__summary,
+  .dp-result-controls__center,
+  .dp-result-controls__sort,
   .dp-sort-form {
     width: 100%;
+    justify-self: stretch;
   }
 
   .dp-sort-form label {
     width: 100%;
   }
 
+  .dp-sort-form {
+    justify-content: flex-start;
+  }
+
   .dp-sort-form select,
-  .dp-sort-form .dp-button,
   .dp-mobile-filter-button {
     flex: 1;
   }

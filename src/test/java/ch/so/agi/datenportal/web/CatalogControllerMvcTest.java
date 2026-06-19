@@ -39,6 +39,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("id=\"mobile-filter-button\"")))
                 .andExpect(content().string(containsString("Thema / Datensatz")))
                 .andExpect(content().string(not(containsString("<th scope=\"col\">Typ</th>"))))
+                .andExpect(content().string(containsString("Kachelansicht")))
                 .andExpect(content().string(containsString("Listenansicht")))
                 .andExpect(content().string(containsString("aria-current=\"page\"")))
                 .andExpect(content().string(not(containsString("id=\"pagination\""))))
@@ -78,6 +79,8 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(not(containsString("id=\"filter-trigger-resourceType\""))))
                 .andExpect(content().string(containsString("class=\"bi bi-chevron-down\"")))
                 .andExpect(content().string(containsString("class=\"bi bi-arrow-clockwise\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-grid\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-list-ul\"")))
                 .andExpect(content().string(containsString("fill=\"currentColor\"")))
                 .andExpect(content().string(containsString("id=\"dataset-results-shell\"")))
                 .andExpect(content().string(containsString("id=\"dataset-loading\"")))
@@ -87,7 +90,11 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("id=\"catalog-search-clear\"")))
                 .andExpect(content().string(containsString("aria-label=\"Suche zurücksetzen\"")))
                 .andExpect(content().string(not(containsString("aria-label=\"Suche ausführen\""))))
+                .andExpect(content().string(containsString("dp-view-toggle__link dp-view-toggle__link--list")))
+                .andExpect(content().string(not(containsString("dp-view-toggle__divider"))))
+                .andExpect(content().string(containsString("onchange=\"this.form.requestSubmit()\"")))
                 .andExpect(content().string(not(containsString("dp-filter-trigger__chevron\" aria-hidden=\"true\">⌄"))))
+                .andExpect(content().string(not(containsString(">Sortieren</button>"))))
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
                 .andExpect(content().string(containsString("dp-entry-row dp-entry-row--series")))
                 .andExpect(content().string(containsString("CSV (aktuelle Ausgabe)")))
@@ -249,6 +256,33 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(not(containsString("<html"))))
                 .andExpect(content().string(not(containsString("dp-site-header"))))
                 .andExpect(content().string(not(containsString("Zum Inhalt springen"))));
+    }
+
+    @Test
+    void sortFormKeepsQueryStateAndUsesImmediateSubmitWithoutVisibleButton() throws Exception {
+        mockMvc.perform(get("/datasets")
+                        .param("q", "Bauinventar")
+                        .param("theme", "Geografie")
+                        .param("view", "cards"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("class=\"dp-sort-form\"")))
+                .andExpect(content().string(containsString("hx-get=\"/datasets\"")))
+                .andExpect(content().string(containsString("hx-trigger=\"change from:#catalog-sort\"")))
+                .andExpect(content().string(containsString("name=\"sort\"")))
+                .andExpect(content().string(containsString("onchange=\"this.form.requestSubmit()\"")))
+                .andExpect(content().string(containsString("name=\"q\" value=\"Bauinventar\"")))
+                .andExpect(content().string(containsString("name=\"theme\" value=\"Geografie\"")))
+                .andExpect(content().string(containsString("name=\"view\" value=\"cards\"")))
+                .andExpect(content().string(not(containsString(">Sortieren</button>"))));
+    }
+
+    @Test
+    void sortFormDoesNotRenderRelevanceAndFallsBackToDefaultForLegacySortParameter() throws Exception {
+        mockMvc.perform(get("/datasets").param("sort", "relevance"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString(">Relevanz</option>"))))
+                .andExpect(content().string(containsString("<option value=\"modified-desc\" selected>Neueste zuerst</option>")))
+                .andExpect(content().string(not(containsString("<option value=\"title-asc\" selected>"))));
     }
 
     @Test

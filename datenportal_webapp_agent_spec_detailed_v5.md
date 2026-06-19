@@ -1179,11 +1179,10 @@ public enum ModifiedRange {
 }
 
 public enum SortMode {
-    RELEVANCE,
     MODIFIED_DESC,
     TITLE_ASC;
 
-    public static SortMode defaultForQuery(boolean hasTextQuery);
+    public static SortMode defaultMode();
 }
 
 public record PageRequest(int page, int size) {
@@ -1352,7 +1351,7 @@ office=Amt%20für%20Umwelt
 modified=all|last30|last365
 type=dataset|series
 view=cards|list
-sort=relevance|modified-desc|title-asc
+sort=modified-desc|title-asc
 ```
 
 Die öffentliche Katalog-UI verwendet im MVP keine sichtbare Pagination. `page` und `size` dürfen im Request-Modell für eine spätere Reaktivierung vorhanden sein, werden aktuell aber ignoriert und nicht kanonisch weitergetragen.

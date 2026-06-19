@@ -96,9 +96,6 @@ public final class CatalogSearchService {
         if (query.sortMode() == SortMode.TITLE_ASC) {
             return entries.stream().sorted(TITLE_ASC).toList();
         }
-        if (query.sortMode() == SortMode.RELEVANCE && query.hasTextQuery()) {
-            return entries;
-        }
         return entries.stream().sorted(MODIFIED_DESC).toList();
     }
 

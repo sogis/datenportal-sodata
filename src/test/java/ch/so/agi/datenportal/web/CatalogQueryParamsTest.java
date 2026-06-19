@@ -31,6 +31,18 @@ class CatalogQueryParamsTest {
     }
 
     @Test
+    void normalizedFallsBackToDefaultSortWhenLegacyOrUnknownValueIsProvided() {
+        var legacyParams = new CatalogQueryParams();
+        legacyParams.setSort("relevance");
+
+        var unknownParams = new CatalogQueryParams();
+        unknownParams.setSort("unexpected");
+
+        assertThat(legacyParams.normalized().sortValue()).isEqualTo("modified-desc");
+        assertThat(unknownParams.normalized().sortValue()).isEqualTo("modified-desc");
+    }
+
+    @Test
     void toSearchQueryIgnoresPaginationValuesForCatalogFlow() {
         var params = new CatalogQueryParams();
         params.setPage(3);

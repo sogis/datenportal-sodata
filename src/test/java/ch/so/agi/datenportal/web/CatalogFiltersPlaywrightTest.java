@@ -98,6 +98,7 @@ class CatalogFiltersPlaywrightTest {
             BoundingBox modifiedTrigger = requireBoundingBox(page.locator("#filter-trigger-modified"));
             BoundingBox resetButton = requireBoundingBox(page.locator(".dp-filter-reset-button"));
             BoundingBox resultControls = requireBoundingBox(page.locator("#result-controls"));
+            BoundingBox viewToggle = requireBoundingBox(page.locator(".dp-view-toggle"));
             BoundingBox resultsShell = requireBoundingBox(page.locator("#dataset-results-shell"));
             double gapAboveResults = requireGap(filterToolbar, resultControls);
             double gapBeforeTable = requireGap(resultControls, resultsShell);
@@ -115,6 +116,10 @@ class CatalogFiltersPlaywrightTest {
             assertThat(Math.abs(themeTrigger.width - modifiedTrigger.width)).isLessThan(1.5d);
             assertThat(resetButton.width).isLessThan(themeTrigger.width);
             assertThat(Math.abs(themeTrigger.y - resetButton.y)).isLessThan(1.5d);
+            assertThat(Math.abs(horizontalCenter(resultControls) - horizontalCenter(viewToggle))).isLessThan(2.0d);
+            assertThat(cssValue(page.locator(".dp-view-toggle__link--list"), "border-left-width")).isEqualTo("1px");
+            assertThat(cssValue(page.locator(".dp-view-toggle__link--list"), "border-left-color"))
+                    .isEqualTo("rgb(217, 224, 230)");
             assertThat(gapAboveResults).isGreaterThan(gapBeforeTable);
             assertThat(gapAboveResults).isGreaterThan(24d);
             assertThat(gapBeforeTable).isGreaterThan(8d).isLessThan(24d);
@@ -271,15 +276,56 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator("#mobile-filter-button"))).isEqualTo("16px");
             assertThat(fontSize(page.locator(".dp-view-toggle__link").first())).isEqualTo("16px");
             assertThat(fontSize(page.locator("#results-summary"))).isEqualTo("16px");
+            assertThat(cssValue(page.locator("#results-summary"), "font-weight")).isEqualTo("400");
             assertThat(fontSize(page.locator("label[for='catalog-sort']"))).isEqualTo("16px");
             assertThat(fontSize(page.locator("#catalog-sort"))).isEqualTo("16px");
-            assertThat(fontSize(page.locator(".dp-sort-form .dp-button"))).isEqualTo("16px");
             assertThat(fontSize(page.locator(".dp-entry-table thead th").nth(1))).isEqualTo("18px");
             assertThat(fontSize(page.locator(".dp-entry-title").first())).isEqualTo("18px");
             assertThat(fontSize(page.locator(".dp-entry-description").first())).isEqualTo("16px");
             assertThat(fontSize(page.locator(".dp-entry-publication-date").first())).isEqualTo("18px");
             assertThat(fontSize(page.locator(".dp-entry-downloads .dp-download-link").first())).isEqualTo("18px");
             assertThat(page.locator(".dp-entry-themes").count()).isEqualTo(0);
+        }
+    }
+
+    @Test
+    void sortSelectionAutoSubmitsAndKeepsViewAndFilterState() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?view=cards&theme=Geografie"));
+
+            assertThat(page.locator(".dp-card-grid").isVisible()).isTrue();
+            assertThat(page.locator(".dp-view-toggle__link:has-text('Kachelansicht')").count()).isEqualTo(1);
+            assertThat(page.locator(".dp-sort-form button").count()).isEqualTo(0);
+
+            page.selectOption("#catalog-sort", "title-asc");
+
+            waitForLocationSearchContains(page, "sort=title-asc", "view=cards", "theme=Geografie");
+            assertThat(page.locator(".dp-card-grid").isVisible()).isTrue();
+            assertThat(page.locator("#active-filter-chips a:has-text('Thema: Geografie')").count()).isEqualTo(1);
+        }
+    }
+
+    @Test
+    void viewToggleIconsAlignWithLabelsAndKeepVisibleSpacing() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            Locator cardsIcon = page.locator(".dp-view-toggle__link").first().locator(".dp-view-toggle__icon svg");
+            Locator cardsLabel = page.locator(".dp-view-toggle__link").first().locator(".dp-view-toggle__label");
+            Locator listIcon = page.locator(".dp-view-toggle__link--list .dp-view-toggle__icon svg");
+            Locator listLabel = page.locator(".dp-view-toggle__link--list .dp-view-toggle__label");
+
+            BoundingBox cardsIconBox = requireBoundingBox(cardsIcon);
+            BoundingBox cardsLabelBox = requireBoundingBox(cardsLabel);
+            BoundingBox listIconBox = requireBoundingBox(listIcon);
+            BoundingBox listLabelBox = requireBoundingBox(listLabel);
+
+            assertThat(Math.abs(verticalCenter(cardsIconBox) - verticalCenter(cardsLabelBox))).isLessThan(1.5d);
+            assertThat(Math.abs(verticalCenter(listIconBox) - verticalCenter(listLabelBox))).isLessThan(1.5d);
+            assertThat(cardsLabelBox.x - (cardsIconBox.x + cardsIconBox.width)).isGreaterThan(6.0d);
+            assertThat(listLabelBox.x - (listIconBox.x + listIconBox.width)).isGreaterThan(6.0d);
         }
     }
 
@@ -325,6 +371,10 @@ class CatalogFiltersPlaywrightTest {
 
     private static double verticalCenter(BoundingBox boundingBox) {
         return boundingBox.y + (boundingBox.height / 2.0d);
+    }
+
+    private static double horizontalCenter(BoundingBox boundingBox) {
+        return boundingBox.x + (boundingBox.width / 2.0d);
     }
 
     private static void waitForLocationSearchContains(Page page, String... fragments) {
