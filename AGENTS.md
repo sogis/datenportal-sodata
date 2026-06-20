@@ -15,11 +15,12 @@ Read these documents before implementation work:
 
 1. `datenportal_webapp_agent_spec_detailed_v5.md` — full functional and technical specification.
 2. `docs/ui-implementation-contract.md` — authoritative UI contract.
-3. `docs/component-map.md` — mapping from UI areas to JTE templates, ViewModels and controllers.
-4. `docs/llm-coding-agent-usage.md` — agent workflow and expected usage.
-5. `spec/mockups/current/startseite_liste.png` — authoritative list-view start page reference.
-6. `spec/mockups/current/cards.png` — authoritative card-view reference.
-7. `spec/mockups/current/web-components.png` — authoritative visual reference for header and breadcrumb web components.
+3. `docs/ui-primitives.md` — authoritative primitive rules for filter chips, status badges and action pills.
+4. `docs/component-map.md` — mapping from UI areas to JTE templates, ViewModels and controllers.
+5. `docs/llm-coding-agent-usage.md` — agent workflow and expected usage.
+6. `spec/mockups/current/startseite_liste.png` — authoritative list-view start page reference.
+7. `spec/mockups/current/cards.png` — authoritative card-view reference.
+8. `spec/mockups/current/web-components.png` — authoritative visual reference for header and breadcrumb web components.
 
 Older mockups are secondary inspiration only. They must not override the current UI contract.
 

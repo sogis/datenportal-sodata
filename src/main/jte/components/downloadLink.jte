@@ -4,7 +4,7 @@
 <ul class="dp-download-list">
   @for(var download : downloads)
     <li>
-      <a class="dp-download-link" href="${download.href()}" aria-label="${download.ariaLabel()}">${download.label()}</a>
+      <a class="dp-download-link dp-action-pill" href="${download.href()}" aria-label="${download.ariaLabel()}">${download.label()}</a>
     </li>
   @endfor
 </ul>

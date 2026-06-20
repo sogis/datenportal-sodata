@@ -13,7 +13,7 @@
             <p>
               Ausgabe ${issue.issueLabel()} · Publiziert ${issue.publicationDateLabel()}
               @if(issue.current())
-                <span class="dp-status-badge dp-status-badge--open">Aktuelle Ausgabe</span>
+                <span class="dp-status-badge dp-status-badge--info">Aktuelle Ausgabe</span>
               @endif
             </p>
           </div>

@@ -10,6 +10,8 @@ Dieser Contract ist der primäre UI-Vertrag für den LLM-Coding-Agenten. Er erse
 
 ## 1. Referenzen und Verbindlichkeit
 
+Fuer Chips, Badges und Action Pills gilt zusaetzlich `docs/ui-primitives.md` als primitive source of truth. Die neutrale Flaechenhierarchie folgt dort den Ebenen `surface`, `surface-subtle` und `badge`.
+
 ### 1.1 Verbindliche Screenshots
 
 | Datei | Rolle | Verbindlichkeit |
@@ -24,12 +26,13 @@ Die Screenshots sind keine pixelgenauen Blaupausen. Verbindlich sind Struktur, I
 
 Wenn sich Dokumente widersprechen, gilt diese Reihenfolge:
 
-1. `docs/ui-implementation-contract.md`
-2. `datenportal_webapp_agent_spec_detailed_v4.md`
-3. `docs/spec-ui-addendum.md`
-4. `AGENTS.md` und Skills im Zielrepo
-5. `spec/mockups/current/*.png`
-6. ältere Spezifikationen und frühere Mockups
+1. `docs/ui-primitives.md` fuer Filter Chips, Status Badges und Action Pills
+2. `docs/ui-implementation-contract.md`
+3. `datenportal_webapp_agent_spec_detailed_v4.md`
+4. `docs/spec-ui-addendum.md`
+5. `AGENTS.md` und Skills im Zielrepo
+6. `spec/mockups/current/*.png`
+7. ältere Spezifikationen und frühere Mockups
 
 ### 1.3 Nicht mehr verbindlich
 
@@ -821,16 +824,16 @@ src/main/resources/static/css/
 
 ### 9.4 Typ-Badges
 
-Wenn `Datensatz`- oder `Datenreihe`-Badges gerendert werden, verwenden sie denselben Badge-Stil. Dies gilt weiterhin für Kartenansicht und Detailseiten:
+Wenn `Datensatz`- oder `Datenreihe`-Badges gerendert werden, verwenden sie denselben neutralen Status-Badge-Stil. Die konkrete Primitive-Definition liegt in `docs/ui-primitives.md`. Dies gilt weiterhin für Kartenansicht und Detailseiten:
 
 ```css
 .dp-type-badge {
-  background: var(--dp-color-gray-100);
+  background: var(--dp-color-badge);
   color: var(--dp-color-text);
-  border: 1px solid var(--dp-color-gray-300);
+  border: 0;
   border-radius: .25rem;
-  font-size: .875rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 400;
 }
 ```
 

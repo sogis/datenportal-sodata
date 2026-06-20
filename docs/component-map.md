@@ -18,8 +18,8 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Seite | `pages/catalog.jte` | `CatalogController`, `CatalogPageVm` | `/` rendert Titel und Suche |
 | Resultatfragment | `fragments/catalogResults.jte` | `HtmxRequest` | HTMX liefert Fragment |
 | Suche | `components/searchForm.jte` | `CatalogQueryParams.q` | Auto-Suche ab 3 Zeichen, Clear-Reset, No-JS-GET-Fallback, gemeinsames Desktop-Control-Band |
-| Filterbar | `components/filterBar.jte` | `FilterVmFactory`, `FilterPanelVm` | Desktop-Trigger und Reset sichtbar, bündig zum Suchfeld im Control-Band |
-| Desktop-Popover | `fragments/filterPopover.jte`, `components/filterFieldList.jte` | `CatalogFilterController`, `FilterGroupVm` | nur angeforderte Gruppe, HTMX-Formular |
+| Filterbar | `components/filterBar.jte` | `FilterVmFactory`, `FilterPanelVm` | Desktop-Trigger, lokale Panel-Hosts und Reset sichtbar, bündig zum Suchfeld im Control-Band |
+| Desktop-Popover | `fragments/filterPopover.jte`, `components/filterFieldList.jte` | `CatalogFilterController`, `FilterGroupVm` | nur angeforderte Gruppe, lokal angedocktes HTMX-Panel ohne globales Overlay |
 | Mobile-Sheet | `fragments/mobileFilters.jte`, `components/mobileFilterButton.jte` | `CatalogFilterController`, `FilterPanelVm` | Narrow viewport, Apply/Reset |
 | aktive Filterchips | `components/activeFilterChips.jte` | `FilterChipVm` | einzelner Remove-Href |
 | Ansichttoggle | `components/viewToggle.jte` | `ViewToggleVm` | `aria-current` korrekt |
@@ -42,7 +42,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 |---|---|---|---|
 | Grid | `components/entryCardGrid.jte` | `ResultsVm.cards` | `view=cards` rendert Grid |
 | Card | `components/entryCard.jte` | `EntryCardVm` | Typ-Badge, Open Data, Struktur beschrieben |
-| Chips | `components/chipList.jte` | `EntryCardVm.keywords` | Keywords grau gerendert |
+| Chips | `components/chipList.jte` | `EntryCardVm.keywords` | Keywords als neutrale Status-Badge-Familie gerendert |
 
 ## Detailseiten
 
@@ -63,6 +63,6 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | `design-tokens.css` | Farben, Abstände, Typografie, Lizenzfont-Anbindung |
 | `base.css` | Grundelemente, Accessibility, Fokus |
 | `layout.css` | Page Chrome, Hauptbreiten, Grid |
-| `components.css` | Buttons, Badges, Chips, Cards |
+| `components.css` | Buttons, Filter Chips, Status-Badges, Action Pills, Cards |
 | `catalog.css` | Filter, Toolbar, Tabelle, Cards |
 | `detail.css` | Detailseiten und Metadatenbereiche |

@@ -4,10 +4,10 @@
   <div class="dp-result-card__badges">
     <span class="dp-type-badge">${card.typeLabel()}</span>
     @if(card.openData())
-      <span class="dp-status-badge dp-status-badge--open">Open Data</span>
+      <span class="dp-status-badge dp-status-badge--positive">Open Data</span>
     @endif
     @if(card.structureDescribed())
-      <span class="dp-status-badge">Struktur beschrieben</span>
+      <span class="dp-status-badge dp-status-badge--neutral">Struktur beschrieben</span>
     @endif
   </div>
   <h2 class="dp-result-card__title">
@@ -17,7 +17,7 @@
   @if(!card.keywords().isEmpty())
     <ul class="dp-keyword-list">
       @for(var keyword : card.keywords())
-        <li>${keyword}</li>
+        <li class="dp-status-badge dp-status-badge--neutral">${keyword}</li>
       @endfor
     </ul>
   @endif

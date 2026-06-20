@@ -366,6 +366,64 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
+    void uiPrimitivesUseSharedTypographyAndSemanticColorVariants() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?view=cards&theme=Geografie"));
+
+            Locator searchSurface = page.locator(".dp-search");
+            Locator searchInput = page.locator(".dp-search__input");
+            Locator filterChip = page.locator("#active-filter-chips .dp-filter-chip").first();
+            Locator actionPill = page.locator(".dp-download-link.dp-action-pill").first();
+            Locator typeBadge = page.locator(".dp-result-card .dp-type-badge").first();
+            Locator openDataBadge = page.locator(".dp-result-card .dp-status-badge--positive").first();
+            Locator keywordBadge = page.locator(".dp-result-card .dp-keyword-list li").first();
+
+            String searchBackground = cssValue(searchSurface, "background-color");
+            String neutralBackground = cssValue(filterChip, "background-color");
+            String positiveBackground = cssValue(openDataBadge, "background-color");
+
+            assertThat(searchBackground).isEqualTo("rgb(244, 247, 249)");
+            assertThat(cssValue(searchInput, "background-color")).isEqualTo(searchBackground);
+            assertThat(searchBackground).isNotEqualTo("rgb(255, 255, 255)");
+            assertThat(searchBackground).isNotEqualTo(neutralBackground);
+
+            assertThat(fontSize(filterChip)).isEqualTo("14px");
+            assertThat(cssValue(filterChip, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(filterChip, "border-top-width")).isEqualTo("0px");
+            assertThat(neutralBackground).isEqualTo("rgb(238, 242, 245)");
+            assertThat(cssValue(filterChip, "background-color")).isEqualTo(cssValue(actionPill, "background-color"));
+
+            assertThat(fontSize(actionPill)).isEqualTo("18px");
+            assertThat(cssValue(actionPill, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(actionPill, "border-top-width")).isEqualTo("0px");
+
+            assertThat(fontSize(typeBadge)).isEqualTo("16px");
+            assertThat(cssValue(typeBadge, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(typeBadge, "border-top-width")).isEqualTo("0px");
+
+            assertThat(fontSize(keywordBadge)).isEqualTo("16px");
+            assertThat(cssValue(keywordBadge, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(keywordBadge, "background-color")).isEqualTo(cssValue(typeBadge, "background-color"));
+
+            assertThat(fontSize(openDataBadge)).isEqualTo("16px");
+            assertThat(cssValue(openDataBadge, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(openDataBadge, "border-top-width")).isEqualTo("0px");
+            assertThat(positiveBackground).isNotEqualTo(neutralBackground);
+
+            page.navigate(baseUrl("/series/ch.so.abstimmungsresultate"));
+
+            Locator currentIssueBadge = page.locator(".dp-status-badge--info").first();
+
+            assertThat(fontSize(currentIssueBadge)).isEqualTo("16px");
+            assertThat(cssValue(currentIssueBadge, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(currentIssueBadge, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(neutralBackground);
+            assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(positiveBackground);
+        }
+    }
+
+    @Test
     void sortSelectionAutoSubmitsAndKeepsViewAndFilterState() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();

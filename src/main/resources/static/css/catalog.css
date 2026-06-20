@@ -51,7 +51,7 @@
 .dp-search {
   position: relative;
   width: 100%;
-  background: #f5f5f7;
+  background: var(--dp-color-surface-subtle);
   border-top: 0;
   border-right: 0;
   border-bottom: 1px solid #1d1d1d;
@@ -79,7 +79,7 @@
   width: 100%;
   border: 0;
   padding: 6px 42px 0 34px;
-  background: #f5f5f7;
+  background: var(--dp-color-surface-subtle);
   color: #333333;
   font: inherit;
   font-size: 1.125rem;
@@ -220,33 +220,9 @@
   display: none;
 }
 
-.dp-chip-list,
-.dp-keyword-list,
-.dp-download-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--dp-space-2);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
 .dp-active-filters__label,
 .dp-filter-group__label {
   font-weight: 700;
-}
-
-.dp-filter-chip,
-.dp-keyword-list li {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--dp-space-2);
-  min-height: 2rem;
-  padding: 0 var(--dp-space-3);
-  border-radius: var(--dp-radius-sm);
-  background: var(--dp-color-badge);
-  color: var(--dp-color-text);
-  font-size: 0.95rem;
 }
 
 .dp-filter-reset-link {
@@ -448,25 +424,6 @@
   font-size: 16px;
 }
 
-.dp-type-badge,
-.dp-status-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.75rem;
-  padding: 0 var(--dp-space-3);
-  border: 1px solid var(--dp-color-border);
-  border-radius: var(--dp-radius-sm);
-  background: var(--dp-color-badge);
-  color: var(--dp-color-text);
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.dp-status-badge--open {
-  border-color: #b8d8b8;
-  background: #e7f4e7;
-}
-
 .dp-metadata-link {
   display: inline-flex;
   align-items: center;
@@ -483,22 +440,6 @@
 
 .dp-entry-publication-date {
   font-size: 18px;
-}
-
-.dp-entry-downloads .dp-download-link {
-  font-size: 18px;
-}
-
-.dp-download-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.8rem;
-  padding: 0 var(--dp-space-3);
-  border: 1px solid var(--dp-color-border);
-  border-radius: var(--dp-radius-sm);
-  background: var(--dp-color-surface-muted);
-  font-size: 0.9rem;
-  font-weight: 700;
 }
 
 .dp-issue-group .dp-issue-row {

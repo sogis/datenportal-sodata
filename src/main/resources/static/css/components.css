@@ -46,6 +46,91 @@
   background: var(--dp-color-surface-muted);
 }
 
+.dp-chip-list,
+.dp-keyword-list,
+.dp-download-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dp-space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dp-filter-chip,
+.dp-action-pill,
+.dp-download-link,
+.dp-type-badge,
+.dp-status-badge,
+.dp-keyword-list li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 var(--dp-space-3);
+  border: 0;
+  border-radius: var(--dp-radius-sm);
+  line-height: 1.25;
+}
+
+.dp-filter-chip {
+  gap: var(--dp-space-2);
+  background: var(--dp-color-badge);
+  color: var(--dp-color-text);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.dp-type-badge,
+.dp-status-badge,
+.dp-keyword-list li {
+  background: var(--dp-color-badge);
+  color: var(--dp-color-text);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.dp-status-badge--neutral,
+.dp-type-badge,
+.dp-keyword-list li {
+  background: var(--dp-color-badge);
+  color: var(--dp-color-text);
+}
+
+.dp-status-badge--positive {
+  background: var(--dp-color-badge-positive-bg);
+  color: var(--dp-color-badge-positive-text);
+}
+
+.dp-status-badge--info {
+  background: var(--dp-color-badge-info-bg);
+  color: var(--dp-color-badge-info-text);
+}
+
+.dp-action-pill,
+.dp-download-link {
+  background: var(--dp-color-badge);
+  color: var(--dp-color-text);
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.dp-filter-chip,
+.dp-action-pill,
+.dp-download-link {
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.dp-filter-chip:hover,
+.dp-filter-chip:focus-visible,
+.dp-action-pill:hover,
+.dp-action-pill:focus-visible,
+.dp-download-link:hover,
+.dp-download-link:focus-visible {
+  background: var(--dp-color-badge-hover);
+  color: var(--dp-color-text);
+}
+
 .dp-footer {
   border-top: 1px solid var(--dp-color-border);
   background: var(--dp-color-surface);
