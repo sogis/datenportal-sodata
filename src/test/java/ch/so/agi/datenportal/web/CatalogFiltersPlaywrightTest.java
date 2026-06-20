@@ -52,17 +52,38 @@ class CatalogFiltersPlaywrightTest {
             page.navigate(baseUrl("/datasets"));
 
             Locator resultsShell = page.locator("#dataset-results-shell");
+            Locator themeTrigger = page.locator("#filter-trigger-theme");
+            Locator themePanel = page.locator("#filter-panel-host-theme [data-filter-panel]");
             double initialTop = requireBoundingBox(resultsShell).y;
 
             page.click("#filter-trigger-theme");
-            page.waitForSelector("#filter-popover-host [data-filter-panel]");
+            page.waitForSelector("#filter-panel-host-theme [data-filter-panel]");
+
+            BoundingBox triggerBox = requireBoundingBox(themeTrigger);
+            BoundingBox panelBox = requireBoundingBox(themePanel);
+            double initialGap = panelBox.y - (triggerBox.y + triggerBox.height);
+
+            assertThat(Math.abs(initialGap - 4.0d)).isLessThan(1.5d);
+            assertThat(cssValue(themeTrigger, "border-bottom-left-radius")).isEqualTo("4px");
+            assertThat(cssValue(themeTrigger, "border-bottom-right-radius")).isEqualTo("4px");
+            assertThat(cssValue(themePanel, "border-top-left-radius")).isEqualTo("4px");
+            assertThat(cssValue(themePanel, "border-top-right-radius")).isEqualTo("4px");
 
             double topWithPopover = requireBoundingBox(resultsShell).y;
             assertThat(Math.abs(topWithPopover - initialTop)).isLessThan(1.0d);
 
+            page.evaluate("window.scrollTo(0, 200)");
+            page.waitForTimeout(100);
+
+            BoundingBox scrolledTriggerBox = requireBoundingBox(themeTrigger);
+            BoundingBox scrolledPanelBox = requireBoundingBox(themePanel);
+            double scrolledGap = scrolledPanelBox.y - (scrolledTriggerBox.y + scrolledTriggerBox.height);
+
+            assertThat(Math.abs(scrolledGap - 4.0d)).isLessThan(1.5d);
+
             page.locator("#popover-theme-Bau_und_Wohnungswesen").check();
             page.locator("#popover-theme-Geografie").check();
-            page.click("#filter-popover-host button[type='submit']");
+            page.click("#filter-panel-host-theme button[type='submit']");
 
             waitForLocationSearchContains(page, "theme=Bau_und_Wohnungswesen", "theme=Geografie");
             page.waitForFunction("() => document.querySelectorAll('#active-filter-chips .dp-filter-chip').length === 2");
@@ -83,16 +104,61 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
-    void desktopChromeUsesFullWidthWhileSearchAndFiltersShareControlBand() {
+    void desktopPopoverKeepsActionsInsidePanelAndUsesScrollableContentAtReducedHeight() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 700))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            Locator panel = page.locator("#filter-panel-host-theme [data-filter-panel]");
+            Locator options = panel.locator(".dp-filter-group__options");
+            Locator actions = panel.locator(".dp-filter-popover__actions");
+            Locator applyButton = panel.locator(".dp-button--primary");
+            Locator resetButton = panel.locator(".dp-button--secondary");
+
+            page.click("#filter-trigger-theme");
+            page.waitForSelector("#filter-panel-host-theme [data-filter-panel]");
+
+            BoundingBox panelBox = requireBoundingBox(panel);
+            BoundingBox actionsBox = requireBoundingBox(actions);
+
+            assertThat(actionsBox.y + actionsBox.height).isLessThanOrEqualTo(panelBox.y + panelBox.height + 1.5d);
+            assertThat((Boolean) options.evaluate("element => element.scrollHeight > element.clientHeight")).isTrue();
+            assertThat(fontSize(applyButton)).isEqualTo("16px");
+            assertThat(fontSize(resetButton)).isEqualTo("16px");
+            assertThat(cssValue(applyButton, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(resetButton, "font-weight")).isEqualTo("400");
+        }
+    }
+
+    @Test
+    void rightAlignedDesktopPopoverStaysWithinViewport() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets"));
+
+            page.click("#filter-trigger-modified");
+            page.waitForSelector("#filter-panel-host-modified [data-filter-panel]");
+
+            BoundingBox triggerBox = requireBoundingBox(page.locator("#filter-trigger-modified"));
+            BoundingBox panelBox = requireBoundingBox(page.locator("#filter-panel-host-modified [data-filter-panel]"));
+
+            assertThat(panelBox.x + panelBox.width).isLessThanOrEqualTo(1428d);
+            assertThat(Math.abs((triggerBox.x + triggerBox.width) - (panelBox.x + panelBox.width))).isLessThan(1.5d);
+        }
+    }
+
+    @Test
+    void desktopChromeUsesFullWidthWhileSearchAndFiltersShareControlBand() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?theme=Geografie"));
 
             BoundingBox header = requireBoundingBox(page.locator("so-header"));
             BoundingBox breadcrumb = requireBoundingBox(page.locator("so-breadcrumb"));
             BoundingBox contentContainer = requireBoundingBox(page.locator("main .dp-container").first());
             BoundingBox search = requireBoundingBox(page.locator(".dp-search"));
             BoundingBox filterToolbar = requireBoundingBox(page.locator("#filter-toolbar"));
+            BoundingBox activeFilters = requireBoundingBox(page.locator("#active-filter-chips"));
             BoundingBox themeTrigger = requireBoundingBox(page.locator("#filter-trigger-theme"));
             BoundingBox officeTrigger = requireBoundingBox(page.locator("#filter-trigger-office"));
             BoundingBox modifiedTrigger = requireBoundingBox(page.locator("#filter-trigger-modified"));
@@ -100,7 +166,9 @@ class CatalogFiltersPlaywrightTest {
             BoundingBox resultControls = requireBoundingBox(page.locator("#result-controls"));
             BoundingBox viewToggle = requireBoundingBox(page.locator(".dp-view-toggle"));
             BoundingBox resultsShell = requireBoundingBox(page.locator("#dataset-results-shell"));
-            double gapAboveResults = requireGap(filterToolbar, resultControls);
+            double gapSearchToToolbar = requireGap(search, filterToolbar);
+            double gapToolbarToActiveFilters = requireGap(filterToolbar, activeFilters);
+            double gapAboveResults = requireGap(activeFilters, resultControls);
             double gapBeforeTable = requireGap(resultControls, resultsShell);
 
             assertThat(header.width).isGreaterThan(1430d);
@@ -110,6 +178,9 @@ class CatalogFiltersPlaywrightTest {
             assertThat(search.width).isGreaterThan(980d);
             assertThat(Math.abs(search.width - filterToolbar.width)).isLessThan(1.5d);
             assertThat(Math.abs(search.x - filterToolbar.x)).isLessThan(1.5d);
+            assertThat(Math.abs(search.width - activeFilters.width)).isLessThan(1.5d);
+            assertThat(Math.abs(search.x - activeFilters.x)).isLessThan(1.5d);
+            assertThat(Math.abs(gapSearchToToolbar - gapToolbarToActiveFilters)).isLessThan(1.5d);
             assertThat(resultsShell.width).isGreaterThan(1380d);
             assertThat(Math.abs(resultsShell.width - contentContainer.width)).isLessThan(1.5d);
             assertThat(Math.abs(themeTrigger.width - officeTrigger.width)).isLessThan(1.5d);
@@ -152,20 +223,20 @@ class CatalogFiltersPlaywrightTest {
 
             page.focus("#filter-trigger-theme");
             page.click("#filter-trigger-theme");
-            page.waitForSelector("#filter-popover-host [data-filter-panel]");
+            page.waitForSelector("#filter-panel-host-theme [data-filter-panel]");
             page.locator("#popover-theme-Geografie").check();
             page.keyboard().press("Escape");
 
-            page.waitForFunction("() => document.getElementById('filter-popover-host').hidden");
+            page.waitForFunction("() => document.getElementById('filter-panel-host-theme').hidden");
             assertThat(page.locator("#filter-trigger-theme").getAttribute("aria-expanded")).isEqualTo("false");
             assertThat(isFocused(page, "#filter-trigger-theme")).isTrue();
 
             page.click("#filter-trigger-theme");
-            page.waitForSelector("#filter-popover-host [data-filter-panel]");
+            page.waitForSelector("#filter-panel-host-theme [data-filter-panel]");
             assertThat(page.locator("#popover-theme-Geografie").isChecked()).isFalse();
 
-            page.click("#results-summary");
-            page.waitForFunction("() => document.getElementById('filter-popover-host').hidden");
+            page.click(".dp-page-title");
+            page.waitForFunction("() => document.getElementById('filter-panel-host-theme').hidden");
             assertThat(isFocused(page, "#filter-trigger-theme")).isTrue();
         }
     }
@@ -284,6 +355,12 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator(".dp-entry-description").first())).isEqualTo("16px");
             assertThat(fontSize(page.locator(".dp-entry-publication-date").first())).isEqualTo("18px");
             assertThat(fontSize(page.locator(".dp-entry-downloads .dp-download-link").first())).isEqualTo("18px");
+            page.click("#filter-trigger-theme");
+            page.waitForSelector("#filter-panel-host-theme [data-filter-panel]");
+            assertThat(fontSize(page.locator("#filter-panel-host-theme .dp-button--primary"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator("#filter-panel-host-theme .dp-button--secondary"))).isEqualTo("16px");
+            assertThat(cssValue(page.locator("#filter-panel-host-theme .dp-button--primary"), "font-weight")).isEqualTo("400");
+            assertThat(cssValue(page.locator("#filter-panel-host-theme .dp-button--secondary"), "font-weight")).isEqualTo("400");
             assertThat(page.locator(".dp-entry-themes").count()).isEqualTo(0);
         }
     }

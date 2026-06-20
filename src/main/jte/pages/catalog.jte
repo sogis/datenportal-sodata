@@ -10,8 +10,8 @@
         <div class="dp-control-band">
           @template.components.searchForm(queryParams = page.queryParams())
           @template.components.filterBar(filterPanel = page.filterPanel(), queryParams = page.queryParams(), outOfBand = false)
+          @template.components.activeFilterChips(filterPanel = page.filterPanel(), outOfBand = false)
         </div>
-        @template.components.activeFilterChips(filterPanel = page.filterPanel(), outOfBand = false)
         <div class="dp-results-stack">
           @template.components.resultControls(results = page.results(), queryParams = page.queryParams(), filterPanel = page.filterPanel(), outOfBand = false)
           <div id="dataset-results-shell" class="dp-results-shell">
@@ -19,7 +19,6 @@
           </div>
         </div>
       </div>
-      <div id="filter-popover-host" class="dp-filter-host" hidden></div>
       <div id="mobile-filter-panel-host" class="dp-filter-host" hidden></div>
       <div id="dataset-loading" class="dp-loading-indicator htmx-indicator">Datensätze werden geladen ...</div>
     </div>

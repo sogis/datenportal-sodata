@@ -34,6 +34,9 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("aria-label=\"Breadcrumb\"")))
                 .andExpect(content().string(containsString("id=\"catalog-search-form\"")))
                 .andExpect(content().string(containsString("id=\"filter-toolbar\"")))
+                .andExpect(content().string(containsString("id=\"filter-panel-host-theme\"")))
+                .andExpect(content().string(containsString("id=\"filter-panel-host-office\"")))
+                .andExpect(content().string(containsString("id=\"filter-panel-host-modified\"")))
                 .andExpect(content().string(containsString("id=\"result-controls\"")))
                 .andExpect(content().string(containsString("id=\"dataset-results-shell\"")))
                 .andExpect(content().string(containsString("id=\"mobile-filter-button\"")))
@@ -76,6 +79,9 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("id=\"filter-trigger-theme\"")))
                 .andExpect(content().string(containsString("id=\"filter-trigger-office\"")))
                 .andExpect(content().string(containsString("id=\"filter-trigger-modified\"")))
+                .andExpect(content().string(containsString("aria-controls=\"filter-panel-host-theme\"")))
+                .andExpect(content().string(containsString("hx-target=\"#filter-panel-host-theme\"")))
+                .andExpect(content().string(containsString("dp-filter-dropdown--align-end")))
                 .andExpect(content().string(not(containsString("id=\"filter-trigger-resourceType\""))))
                 .andExpect(content().string(containsString("class=\"bi bi-chevron-down\"")))
                 .andExpect(content().string(containsString("class=\"bi bi-arrow-clockwise\"")))
@@ -95,6 +101,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("onchange=\"this.form.requestSubmit()\"")))
                 .andExpect(content().string(not(containsString("dp-filter-trigger__chevron\" aria-hidden=\"true\">⌄"))))
                 .andExpect(content().string(not(containsString(">Sortieren</button>"))))
+                .andExpect(content().string(not(containsString("id=\"filter-popover-host\""))))
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
                 .andExpect(content().string(containsString("dp-entry-row dp-entry-row--series")))
                 .andExpect(content().string(containsString("CSV (aktuelle Ausgabe)")))
@@ -121,12 +128,14 @@ class CatalogControllerMvcTest {
         int controlBandIndex = html.indexOf("class=\"dp-control-band\"");
         int searchIndex = html.indexOf("id=\"catalog-search-form\"", controlBandIndex);
         int filterToolbarIndex = html.indexOf("id=\"filter-toolbar\"", controlBandIndex);
-        int activeFiltersIndex = html.indexOf("id=\"active-filter-chips\"");
+        int activeFiltersIndex = html.indexOf("id=\"active-filter-chips\"", controlBandIndex);
+        int resultsStackIndex = html.indexOf("class=\"dp-results-stack\"", controlBandIndex);
 
         assertThat(controlBandIndex).isGreaterThanOrEqualTo(0);
         assertThat(searchIndex).isGreaterThan(controlBandIndex);
         assertThat(filterToolbarIndex).isGreaterThan(searchIndex);
         assertThat(activeFiltersIndex).isGreaterThan(filterToolbarIndex);
+        assertThat(resultsStackIndex).isGreaterThan(activeFiltersIndex);
     }
 
     @Test
@@ -292,10 +301,13 @@ class CatalogControllerMvcTest {
                         .param("theme", "Bau_und_Wohnungswesen"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("dp-filter-popover")))
+                .andExpect(content().string(containsString("id=\"filter-panel-theme\"")))
                 .andExpect(content().string(containsString("data-filter-panel")))
+                .andExpect(content().string(containsString("data-filter-reset")))
                 .andExpect(content().string(containsString("name=\"theme\"")))
                 .andExpect(content().string(containsString("value=\"Bau_und_Wohnungswesen\"")))
                 .andExpect(content().string(containsString("checked")))
+                .andExpect(content().string(not(containsString("dp-filter-overlay"))))
                 .andExpect(content().string(not(containsString("<html"))));
     }
 
