@@ -81,9 +81,10 @@ Regeln:
 
 - `font-size: 18px`
 - `font-weight: 400`
-- kein Border
+- feiner neutraler Border `1px solid var(--dp-color-border)`
 - neutrale Flaeche `var(--dp-color-badge)`
 - klarer Hover- und Focus-Zustand
+- Border bleibt auch auf grossen neutralen Flaechen wie Serien-Ausgaben sichtbar
 
 Nicht verwenden fuer:
 
@@ -103,6 +104,7 @@ Neutrale Hierarchie:
 Pflicht:
 
 - Filter Chips und Action Pills verwenden dieselbe neutrale Flaeche: `var(--dp-color-badge)`
+- Action Pills verwenden zusaetzlich einen feinen neutralen Border: `1px solid var(--dp-color-border)`
 - neutrale Status-Badges verwenden dieselbe neutrale Flaeche: `var(--dp-color-badge)`
 - grosse passive neutrale Flaechen verwenden `var(--dp-color-surface-subtle)`
 - `Open Data` verwendet eine positive Badge-Variante

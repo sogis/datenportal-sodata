@@ -109,6 +109,7 @@
 .dp-action-pill,
 .dp-download-link {
   background: var(--dp-color-badge);
+  border: 1px solid var(--dp-color-border);
   color: var(--dp-color-text);
   font-size: 18px;
   font-weight: 400;
@@ -118,7 +119,7 @@
 .dp-filter-chip,
 .dp-action-pill,
 .dp-download-link {
-  transition: background-color 120ms ease, color 120ms ease;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
 .dp-filter-chip:hover,

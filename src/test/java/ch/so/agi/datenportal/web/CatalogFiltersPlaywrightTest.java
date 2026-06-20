@@ -409,7 +409,8 @@ class CatalogFiltersPlaywrightTest {
 
             assertThat(fontSize(actionPill)).isEqualTo("18px");
             assertThat(cssValue(actionPill, "font-weight")).isEqualTo("400");
-            assertThat(cssValue(actionPill, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(actionPill, "border-top-width")).isEqualTo("1px");
+            assertThat(cssValue(actionPill, "border-top-color")).isEqualTo("rgb(217, 224, 230)");
 
             assertThat(fontSize(typeBadge)).isEqualTo("16px");
             assertThat(cssValue(typeBadge, "font-weight")).isEqualTo("400");
@@ -433,6 +434,13 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(currentIssueBadge, "border-top-width")).isEqualTo("0px");
             assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(neutralBackground);
             assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(positiveBackground);
+
+            page.navigate(baseUrl("/datasets?expanded=ch.so.abstimmungsresultate"));
+
+            Locator issueActionPill = page.locator(".dp-issue-row .dp-download-link").first();
+
+            assertThat(cssValue(issueActionPill, "border-top-width")).isEqualTo("1px");
+            assertThat(cssValue(issueActionPill, "border-top-color")).isEqualTo("rgb(217, 224, 230)");
         }
     }
 
@@ -540,7 +548,7 @@ class CatalogFiltersPlaywrightTest {
 
     @Test
     void desktopListHeadersStaySeparatedAndReadableWithinTheirColumns() {
-        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1200, 1200))) {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets"));
 
@@ -551,6 +559,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(publishedHeader.textContent()).isEqualTo("Publiziert");
             assertThat(detailsHeader.textContent()).isEqualTo("Details");
             assertThat(downloadsHeader.textContent()).isEqualTo("Daten herunterladen");
+            assertThat(detailsHeader.innerText()).isEqualTo("Details");
 
             assertThat(hasHorizontalOverflow(publishedHeader)).isFalse();
             assertThat(hasHorizontalOverflow(detailsHeader)).isFalse();
