@@ -57,6 +57,9 @@ class CatalogSearchServiceTest {
         assertThat(search("Gemeinden")).contains("steuerfuss-gemeinden", "gemeindegrenzen");
         assertThat(search("Amt für Finanzen")).containsExactly("steuerfuss-gemeinden");
         assertThat(search("Raum Umwelt")).contains("gemeindegrenzen", "verkehrszaehlstellen");
+        assertThat(search("zaehl")).containsExactly("verkehrszaehlstellen");
+        assertThat(search("steue")).containsExactly("steuerfuss-gemeinden");
+        assertThat(search("grenz april")).containsExactly("gemeindegrenzen");
     }
 
     @Test
@@ -81,6 +84,13 @@ class CatalogSearchServiceTest {
         assertThat(result.entries())
                 .extracting(CatalogEntry::identifier)
                 .containsExactly("gemeindegrenzen");
+    }
+
+    @Test
+    void multiWordQueriesUseAndAcrossTokensAndOrAcrossFields() {
+        assertThat(search("steuerfuss finanzen")).containsExactly("steuerfuss-gemeinden");
+        assertThat(search("grenzen april")).containsExactly("gemeindegrenzen");
+        assertThat(search("grenzen statistik")).isEmpty();
     }
 
     @Test
@@ -157,6 +167,12 @@ class CatalogSearchServiceTest {
                         snapshot(),
                         new SearchQuery("+:/( wasser", SearchFilters.empty(), SortMode.MODIFIED_DESC)))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    void secondaryFieldsRemainSearchableWithoutGuaranteedSubstring() {
+        assertThat(search("verwaltungsdaten")).containsExactly("archiv");
+        assertThat(search("amt finanzen")).containsExactly("steuerfuss-gemeinden");
     }
 
     private List<String> search(String query) {

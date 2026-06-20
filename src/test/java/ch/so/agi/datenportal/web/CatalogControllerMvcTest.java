@@ -174,6 +174,14 @@ class CatalogControllerMvcTest {
     }
 
     @Test
+    void searchQuerySupportsSubstringMatching() throws Exception {
+        mockMvc.perform(get("/datasets").param("q", "invent"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Bauinventar")))
+                .andExpect(content().string(not(containsString("Abstimmungsresultate"))));
+    }
+
+    @Test
     void shortSearchQueryIsRenderedAsEmptyAndDoesNotFilterResults() throws Exception {
         mockMvc.perform(get("/datasets").param("q", "ab"))
                 .andExpect(status().isOk())

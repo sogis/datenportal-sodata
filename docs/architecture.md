@@ -82,6 +82,8 @@ Die Katalogseite auf `/` und `/datasets` rendert Suche, Mehrfachfilter, Listenan
 /series/{seriesIdentifier}/issues/{issueIdentifier}
 ```
 
+Die fachliche Soll-Semantik der Katalogsuche ist in [search.md](search.md) beschrieben.
+
 JTE-Templates erhalten nur vorbereitete ViewModels. Fachlogik bleibt in Domain, Services und Factories.
 
 ## Fehlerseiten

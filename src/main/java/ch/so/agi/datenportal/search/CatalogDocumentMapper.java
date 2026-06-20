@@ -35,17 +35,21 @@ public final class CatalogDocumentMapper {
         addExact(document, CatalogSearchFields.ENTRY_TYPE, typeValue(entry), true);
         addExact(document, CatalogSearchFields.IDENTIFIER_EXACT, entry.identifier(), true);
         addText(document, CatalogSearchFields.IDENTIFIER_TEXT, entry.identifier(), false);
+        addNormalizedWholeValue(document, CatalogSearchFields.IDENTIFIER_SUBSTRING, entry.identifier());
         append(allText, entry.identifier());
 
         addText(document, CatalogSearchFields.TITLE, entry.title(), true);
         addExact(document, CatalogSearchFields.TITLE_EXACT, entry.title(), true);
+        addNormalizedWholeValue(document, CatalogSearchFields.TITLE_SUBSTRING, entry.title());
         append(allText, entry.title());
 
         addText(document, CatalogSearchFields.DESCRIPTION, entry.description(), true);
+        addTokenTerms(document, CatalogSearchFields.DESCRIPTION_TERMS, entry.description());
         append(allText, entry.description());
 
         entry.keywords().forEach(keyword -> {
             addText(document, CatalogSearchFields.KEYWORDS, keyword, false);
+            addNormalizedWholeValue(document, CatalogSearchFields.KEYWORD_SUBSTRING, keyword);
             append(allText, keyword);
         });
 
@@ -55,7 +59,11 @@ public final class CatalogDocumentMapper {
         entry.distributionsForListing().stream()
                 .map(DistributionLink::format)
                 .distinct()
-                .forEach(format -> addRawExact(document, CatalogSearchFields.FORMATS, CatalogSearchFields.formatValue(format), false));
+                .forEach(format -> {
+                    var formatValue = CatalogSearchFields.formatValue(format);
+                    addRawExact(document, CatalogSearchFields.FORMATS, formatValue, false);
+                    addRawExact(document, CatalogSearchFields.FORMAT_TERMS, formatValue, false);
+                });
 
         addDate(document, CatalogSearchFields.PUBLICATION_DATE_EPOCH_DAY, entry.modified());
         addDate(document, CatalogSearchFields.MODIFIED_DATE_EPOCH_DAY, entry.modified());
@@ -86,12 +94,21 @@ public final class CatalogDocumentMapper {
                             .reduce("", (left, right) -> left + " " + right) + " "
                     + officeText(issue.creator());
             addText(document, CatalogSearchFields.ISSUE_TEXT, issueText, false);
+            addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_IDENTIFIER_SUBSTRING, issue.identifier());
+            addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_TITLE_SUBSTRING, issue.title());
+            addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_LABEL_SUBSTRING, issue.issueLabel());
+            addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_LABEL_SUBSTRING, issueYear);
+            addTokenTerms(document, CatalogSearchFields.ISSUE_DESCRIPTION_TERMS, issue.description());
+            issue.keywords().forEach(keyword -> addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_KEYWORD_SUBSTRING, keyword));
+            issue.themes().forEach(theme -> addTheme(document, allText, theme));
+            addOffice(document, allText, issue.creator());
             append(allText, issueText);
         }
     }
 
     private static void addTheme(Document document, StringBuilder allText, Theme theme) {
         addText(document, CatalogSearchFields.THEME_TEXT, theme.identifier() + " " + theme.displayName(), false);
+        addTokenTerms(document, CatalogSearchFields.THEME_TERMS, theme.identifier() + " " + theme.displayName());
         addExact(document, CatalogSearchFields.THEME_EXACT, theme.identifier(), false);
         addExact(document, CatalogSearchFields.THEME_EXACT, theme.displayName(), false);
         append(allText, theme.identifier());
@@ -100,6 +117,7 @@ public final class CatalogDocumentMapper {
 
     private static void addOffice(Document document, StringBuilder allText, Office office) {
         addText(document, CatalogSearchFields.OFFICE_TEXT, officeText(office), false);
+        addTokenTerms(document, CatalogSearchFields.OFFICE_TERMS, officeText(office));
         addExact(document, CatalogSearchFields.OFFICE_EXACT, office.identifier(), false);
         addExact(document, CatalogSearchFields.OFFICE_EXACT, office.displayName(), false);
         office.abbreviation().ifPresent(abbreviation -> addExact(document, CatalogSearchFields.OFFICE_EXACT, abbreviation, false));
@@ -124,6 +142,18 @@ public final class CatalogDocumentMapper {
             return;
         }
         document.add(new TextField(field, CatalogSearchFields.searchableText(value), stored ? Field.Store.YES : Field.Store.NO));
+    }
+
+    private static void addNormalizedWholeValue(Document document, String field, String value) {
+        var normalized = CatalogSearchFields.normalizeExact(value);
+        if (normalized.isBlank()) {
+            return;
+        }
+        addRawExact(document, field, normalized, false);
+    }
+
+    private static void addTokenTerms(Document document, String field, String value) {
+        CatalogSearchFields.tokenizeNormalized(value).forEach(token -> addRawExact(document, field, token, false));
     }
 
     private static void addExact(Document document, String field, String value, boolean stored) {
