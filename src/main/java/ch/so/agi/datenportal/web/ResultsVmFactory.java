@@ -70,7 +70,7 @@ public final class ResultsVmFactory {
                 DATE_FORMATTER.format(entry.modified()),
                 detailHref(entry),
                 entry.distributionsForListing().stream()
-                        .map(link -> download(entry.title(), link, entry instanceof DatasetSeriesEntry))
+                        .map(link -> download(entry.title(), link))
                         .toList(),
                 entry instanceof DatasetSeriesEntry,
                 expanded,
@@ -90,7 +90,7 @@ public final class ResultsVmFactory {
                 DATE_FORMATTER.format(issue.modified()),
                 issueDetailHref(series, issue),
                 issue.distributionsForListing().stream()
-                        .map(link -> download(issue.title(), link, false))
+                        .map(link -> download(issue.title(), link))
                         .toList());
     }
 
@@ -104,14 +104,14 @@ public final class ResultsVmFactory {
                 false,
                 keywords(entry),
                 entry.distributionsForListing().stream()
-                        .map(link -> download(entry.title(), link, entry instanceof DatasetSeriesEntry))
+                        .map(link -> download(entry.title(), link))
                         .toList(),
                 "Aktualisiert: " + DATE_FORMATTER.format(entry.modified()),
                 detailHref(entry));
     }
 
-    private DownloadLinkVm download(String entryTitle, DistributionLink link, boolean currentIssue) {
-        var label = currentIssue ? link.displayLabel() + " (aktuelle Ausgabe)" : link.displayLabel();
+    private DownloadLinkVm download(String entryTitle, DistributionLink link) {
+        var label = link.displayLabel();
         return new DownloadLinkVm(
                 label,
                 link.preferredHref().toString(),

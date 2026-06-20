@@ -21,8 +21,8 @@ Die Kartenansicht ist eine alternative Ansicht der Start-/Katalogseite. Die verb
 - Keine Icons in der ersten Spalte, ausser Plus/Minus bei Datenreihen.
 - `Datensatz` und `Datenreihe` verwenden denselben grauen Badge-Stil.
 - Datenreihen sind aufklappbar.
-- Root-Zeile einer Datenreihe zeigt Downloads der aktuellen Ausgabe als `CSV (aktuelle Ausgabe)`, `XLSX (aktuelle Ausgabe)`, `Parquet (aktuelle Ausgabe)`.
-- Aufgeklappte Ausgabezeilen zeigen die Formate ohne Zusatz `aktuelle Ausgabe`.
+- Root-Zeile einer Datenreihe zeigt Downloads der aktuellen Ausgabe als `CSV`, `XLSX`, `Parquet`.
+- Aufgeklappte Ausgabezeilen zeigen die Formate ebenfalls ohne Zusatz `aktuelle Ausgabe`.
 - Info-Link der Root-Zeile führt auf die Detailseite der aktuellen Ausgabe.
 - Klick auf Info-Link oder Downloadlink darf das Aufklappen nicht auslösen.
 
@@ -48,4 +48,3 @@ Die Kartenansicht ist eine alternative Ansicht der Start-/Katalogseite. Die verb
 - Normale Datensatz-Detailseite zeigt Titel, Beschreibung, Badges, Downloads und strukturierte Metadaten.
 - Detailseite einer Datenreihen-Ausgabe zeigt Serienkontext und `Weitere Ausgaben`.
 - Die Root-Datenreihe aus der Liste verlinkt per Info-Link zur aktuellen Ausgabe.
-

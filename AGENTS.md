@@ -125,7 +125,7 @@ Mandatory UI decisions:
 - `Datensatz` and `Datenreihe` must use the same neutral grey type-badge style.
 - Data series root rows must be expandable using plus/minus and row activation.
 - Clicking the info link or a download must not expand the row.
-- Data series root downloads refer to the current issue and must be labelled accordingly, for example `CSV (aktuelle Ausgabe)`.
+- Data series root downloads refer to the current issue and use the plain format label in the action pill, for example `CSV`.
 - Card view follows `spec/mockups/current/cards.png`.
 - Cards must show `Open Data` in the MVP.
 - Cards must show a structural badge named `Struktur beschrieben` when attribute descriptions or a data model are available.

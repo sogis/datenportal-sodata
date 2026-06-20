@@ -110,8 +110,9 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(not(containsString(">i</a>"))))
                 .andExpect(content().string(not(containsString("<span aria-hidden=\"true\">+</span>"))))
                 .andExpect(content().string(not(containsString("<span aria-hidden=\"true\">-</span>"))))
-                .andExpect(content().string(containsString("CSV (aktuelle Ausgabe)")))
-                .andExpect(content().string(containsString("Parquet (aktuelle Ausgabe)")));
+                .andExpect(content().string(containsString(">CSV</a>")))
+                .andExpect(content().string(containsString(">Parquet</a>")))
+                .andExpect(content().string(not(containsString("(aktuelle Ausgabe)"))));
     }
 
     @Test
@@ -187,6 +188,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("dp-result-card")))
                 .andExpect(content().string(containsString("Open Data")))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate\"")))
+                .andExpect(content().string(not(containsString("(aktuelle Ausgabe)"))))
                 .andExpect(content().string(not(containsString("dp-entry-table-wrapper"))));
     }
 
@@ -263,9 +265,9 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\"")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2026")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2025")))
-                .andExpect(content().string(containsString("CSV (aktuelle Ausgabe) herunterladen: Abstimmungsresultate")))
+                .andExpect(content().string(containsString("CSV herunterladen: Abstimmungsresultate")))
                 .andExpect(content().string(containsString("CSV herunterladen: Abstimmungsresultate 2025")))
-                .andExpect(content().string(not(containsString("CSV (aktuelle Ausgabe) herunterladen: Abstimmungsresultate 2025"))));
+                .andExpect(content().string(not(containsString("(aktuelle Ausgabe)"))));
     }
 
     @Test

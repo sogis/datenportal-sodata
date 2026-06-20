@@ -58,7 +58,8 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/current\"")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2025")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2024")))
-                .andExpect(content().string(containsString("CSV (aktuelle Ausgabe) herunterladen: Abstimmungsresultate 2026")))
+                .andExpect(content().string(containsString("CSV herunterladen: Abstimmungsresultate 2026")))
+                .andExpect(content().string(not(containsString("(aktuelle Ausgabe)"))))
                 .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.csv\"")));
     }
 

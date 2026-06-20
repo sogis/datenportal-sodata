@@ -57,7 +57,7 @@ public final class DetailPageVmFactory {
                 new DownloadSectionVm(
                         "Downloads",
                         "Dateien dieses Datensatzes in den verfügbaren Formaten.",
-                        downloads(dataset.title(), dataset.distributions(), Optional.empty())),
+                        downloads(dataset.title(), dataset.distributions())),
                 metadataSections(dataset, dataset.distributions()));
     }
 
@@ -78,7 +78,7 @@ public final class DetailPageVmFactory {
                 new DownloadSectionVm(
                         "Downloads aktuelle Ausgabe",
                         "Dateien der aktuellen Ausgabe " + currentIssue.issueLabel() + ".",
-                        downloads(currentIssue.title(), currentIssue.distributions(), Optional.of("aktuelle Ausgabe"))),
+                        downloads(currentIssue.title(), currentIssue.distributions())),
                 seriesIssues(series),
                 metadataSections(series, currentIssue.distributions()));
     }
@@ -100,7 +100,7 @@ public final class DetailPageVmFactory {
                 new DownloadSectionVm(
                         "Downloads",
                         "Dateien dieser Ausgabe in den verfügbaren Formaten.",
-                        downloads(issue.title(), issue.distributions(), Optional.empty())),
+                        downloads(issue.title(), issue.distributions())),
                 seriesIssues(series),
                 metadataSections(issue, issue.distributions()));
     }
@@ -118,25 +118,17 @@ public final class DetailPageVmFactory {
                                         ? urlFactory.currentIssueDetail(series.identifier())
                                         : urlFactory.issueDetail(series.identifier(), issue.identifier()),
                                 issue.identifier().equals(currentIdentifier),
-                                downloads(issue.title(), issue.primaryDistributions(), Optional.empty())))
+                                downloads(issue.title(), issue.primaryDistributions())))
                         .toList());
     }
 
-    private List<DownloadLinkVm> downloads(
-            String ownerTitle,
-            List<DistributionLink> distributions,
-            Optional<String> contextLabel) {
+    private List<DownloadLinkVm> downloads(String ownerTitle, List<DistributionLink> distributions) {
         return distributions.stream()
                 .sorted(DISTRIBUTION_ORDER)
-                .map(link -> {
-                    String label = contextLabel
-                            .map(context -> link.displayLabel() + " (" + context + ")")
-                            .orElse(link.displayLabel());
-                    return new DownloadLinkVm(
-                            label,
-                            link.preferredHref().toString(),
-                            label + " herunterladen: " + ownerTitle);
-                })
+                .map(link -> new DownloadLinkVm(
+                        link.displayLabel(),
+                        link.preferredHref().toString(),
+                        link.displayLabel() + " herunterladen: " + ownerTitle))
                 .toList();
     }
 

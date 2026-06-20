@@ -480,16 +480,16 @@ Pflicht:
 Downloadbeschriftung für Datenreihen-Root:
 
 ```text
-CSV (aktuelle Ausgabe)
-XLSX (aktuelle Ausgabe)
-Parquet (aktuelle Ausgabe)
+CSV
+XLSX
+Parquet
 ```
 
 oder, falls responsive besser:
 
 ```text
 CSV
-aktuelle Ausgabe
+Hinweis auf aktuelle Ausgabe separat ausserhalb des Pills
 ```
 
 als zweizeiliger Button. Wichtig ist, dass kein roter Sonderbutton `Aktuelle Ausgabe` verwendet wird.
@@ -570,7 +570,7 @@ public record DownloadButtonVm(
 ) {}
 ```
 
-`contextLabel` ist für `aktuelle Ausgabe` vorgesehen.
+`contextLabel` ist optional und nicht für den MVP-Download-Pill der aktuellen Ausgabe vorgesehen.
 
 ### 6.7 JTE-Komponenten
 
@@ -845,7 +845,7 @@ Keine rote Hervorhebung für `Datenreihe`.
 - Tabellenzeilen mit Row Click dürfen nicht die Tastaturbedienung ersetzen.
 - Plus-/Minus-Button hat `aria-expanded` und `aria-controls`.
 - Filtergruppen haben zugängliche Namen.
-- Downloadlinks müssen Format und Kontext im zugänglichen Namen enthalten, z. B. `CSV aktuelle Ausgabe herunterladen`.
+- Downloadlinks müssen einen eindeutigen zugänglichen Namen mit Format und Zielbezug tragen, z. B. `CSV herunterladen: Abstimmungsresultate`.
 
 ---
 
@@ -972,8 +972,8 @@ Pflichttests:
 - Listenansicht enthält Spalten `Thema / Datensatz`, `Publikationsdatum`, `Metadaten`, `Daten herunterladen`.
 - Listenansicht rendert weder `dp-type-badge` noch `dp-entry-themes`.
 - Datenreihe-Root-Zeile enthält Plus-/Minus-Button mit `aria-expanded`.
-- Datenreihe-Root-Zeile enthält Downloads mit Kontext `aktuelle Ausgabe`.
-- Aufgeklappte Datenreihe rendert Ausgabezeilen ohne Kontext `aktuelle Ausgabe`.
+- Datenreihe-Root-Zeile enthält Downloads der aktuellen Ausgabe ohne Zusatz im Pill-Label.
+- Aufgeklappte Datenreihe rendert Ausgabezeilen ebenfalls ohne Zusatz `aktuelle Ausgabe`.
 - Kartenansicht rendert `dp-type-badge`, `Open Data` und `Struktur beschrieben` dort, wo fachlich zutreffend.
 - Detailseite enthält keine Datenvorschau.
 - Detailseite einer Serienausgabe enthält `Weitere Ausgaben`.
@@ -1009,7 +1009,7 @@ Keine Screenshot-Pixelvergleiche im MVP. Stattdessen HTML-Struktur, Klassen, ARI
 - Filterbar mit aktiven Chips.
 - Listenansicht gemäss `startseite_liste.png`.
 - Datensatz-/Datenreihe-Badges grau.
-- Downloads für aktuelle Ausgabe.
+- Downloads zur aktuellen Ausgabe.
 - MVC-Tests.
 
 ### Phase UI-3: Datenreihen-Expansion

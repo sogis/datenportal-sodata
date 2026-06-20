@@ -2273,10 +2273,10 @@ Datenreihen-Root-Zeile:
 - Zeile ist per Plus und optional per Row-Klick aufklappbar
 - Row-Klick darf nicht auslösen, wenn auf Metadaten-Link oder Download-Link geklickt wird
 - Typ-Badge `Datenreihe`, gleicher grauer Stil wie `Datensatz`
-- Download-Spalte zeigt die Formate der aktuellen Ausgabe, aber mit kurzer Kennzeichnung, z.B.:
-  - `CSV (aktuelle Ausgabe)`
-  - `XLSX (aktuelle Ausgabe)`
-  - `Parquet (aktuelle Ausgabe)`
+- Download-Spalte zeigt die Formate der aktuellen Ausgabe mit dem reinen Formatlabel, z.B.:
+  - `CSV`
+  - `XLSX`
+  - `Parquet`
 - Es gibt keine roten Extra-Badges `Aktuelle Ausgabe` / `Alle Ausgaben` in der Download-Spalte
 - Der `i`-Link der Root-Zeile führt auf die Detailseite der aktuellen Ausgabe oder auf eine Detailseite, die die aktuelle Ausgabe prominent zeigt. Im MVP gilt: Root-`i` zeigt auf aktuelle Ausgabe.
 
@@ -2284,7 +2284,7 @@ Aufgeklappte Ausgaben:
 
 - Jede Ausgabe wird als eigene zusätzliche Tabellenzeile unterhalb der Root-Zeile dargestellt.
 - Ausgabezeilen sehen grundsätzlich wie normale Zeilen aus.
-- Ausgabezeilen zeigen nicht den Klammertext `(aktuelle Ausgabe)`, ausser die Ausgabe selbst ist als aktuell markiert und dies in einer separaten dezenten Statusangabe nötig ist.
+- Ausgabezeilen zeigen keinen Zusatz `aktuelle Ausgabe` im Download-Pill-Label; eine aktuelle Ausgabe darf separat dezent markiert werden.
 - Ausgabezeilen verlinken ihre eigenen Metadaten-/Detailseiten.
 - Ausgabezeilen haben direkte Downloadlinks für ihre konkreten Dateien.
 
@@ -2341,7 +2341,7 @@ public record EntryCardVm(
 ) {}
 ```
 
-Bei Datenreihen zeigen die Formatlinks auch in der Card die aktuelle Ausgabe. Falls Platz knapp ist, darf die Kennzeichnung als `aktuelle Ausgabe` im `aria-label` und in einem dezenten Hilfstext stehen.
+Bei Datenreihen zeigen die Formatlinks auch in der Card die aktuelle Ausgabe, verwenden im Download-Pill aber nur das Formatlabel. Ein zusätzlicher Kontext-Hinweis darf ausserhalb des Pills stehen.
 
 ### 14.8 Detailseiten
 
@@ -2412,7 +2412,7 @@ Mindesttests:
 - aktive Filterchips werden angezeigt
 - `Datensatz` und `Datenreihe` nutzen denselben Badge-Klassenpräfix
 - Listenansicht enthält keine Icons in der Titelspalte
-- Datenreihen-Root-Zeile zeigt Formatlinks mit Kennzeichnung `aktuelle Ausgabe`
+- Datenreihen-Root-Zeile zeigt Formatlinks der aktuellen Ausgabe ohne Zusatz im Pill-Label
 - Expand-Zustand zeigt Ausgabezeilen
 - Kartenansicht zeigt `Open Data` und `Struktur beschrieben`
 - Detailseite enthält keine Datenvorschau
@@ -2888,7 +2888,7 @@ Umfang:
 - Row-Klick als progressive Enhancement
 - HTMX-Fragment für Ausgabezeilen
 - Fallback über `expanded=<seriesId>`
-- Root-Downloads mit Kennzeichnung `(aktuelle Ausgabe)`
+- Root-Downloads der aktuellen Ausgabe ohne Zusatz im Pill-Label
 - Ausgabezeilen mit eigenen Downloadlinks
 
 DoD:
