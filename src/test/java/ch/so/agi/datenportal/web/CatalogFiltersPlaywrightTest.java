@@ -387,6 +387,8 @@ class CatalogFiltersPlaywrightTest {
             Locator searchSurface = page.locator(".dp-search");
             Locator searchInput = page.locator(".dp-search__input");
             Locator filterChip = page.locator("#active-filter-chips .dp-filter-chip").first();
+            Locator cardTitle = page.locator(".dp-result-card .dp-result-card__title").first();
+            Locator cardDescription = page.locator(".dp-result-card .dp-result-card__description").first();
             Locator actionPill = page.locator(".dp-download-link.dp-action-pill").first();
             Locator typeBadge = page.locator(".dp-result-card .dp-type-badge").first();
             Locator openDataBadge = page.locator(".dp-result-card .dp-status-badge--positive").first();
@@ -416,9 +418,15 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(typeBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(typeBadge, "border-top-width")).isEqualTo("0px");
 
-            assertThat(fontSize(keywordBadge)).isEqualTo("16px");
+            assertThat(fontSize(cardTitle)).isEqualTo("18px");
+            assertThat(fontSize(cardDescription)).isEqualTo("18px");
+
+            assertThat(fontSize(keywordBadge)).isEqualTo("14px");
             assertThat(cssValue(keywordBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(keywordBadge, "background-color")).isEqualTo(cssValue(typeBadge, "background-color"));
+            assertThat(cssValue(keywordBadge, "padding-left")).isEqualTo("6px");
+            assertThat(cssValue(keywordBadge, "padding-right")).isEqualTo("6px");
+            assertThat(cssValue(keywordBadge, "min-height")).isEqualTo("25.6px");
 
             assertThat(fontSize(openDataBadge)).isEqualTo("16px");
             assertThat(cssValue(openDataBadge, "font-weight")).isEqualTo("400");
@@ -441,6 +449,59 @@ class CatalogFiltersPlaywrightTest {
 
             assertThat(cssValue(issueActionPill, "border-top-width")).isEqualTo("1px");
             assertThat(cssValue(issueActionPill, "border-top-color")).isEqualTo("rgb(217, 224, 230)");
+        }
+    }
+
+    @Test
+    void cardsKeepBottomClusterAlignedWhileFlexibleSpaceStaysAboveDownloads() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1400))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?view=cards"));
+
+            Locator shortCard = page.locator(".dp-result-card").filter(new Locator.FilterOptions()
+                    .setHas(page.locator(".dp-result-card__title a:has-text('Energieverbrauch Gemeinden')")));
+            Locator tallCard = page.locator(".dp-result-card").filter(new Locator.FilterOptions()
+                    .setHas(page.locator(".dp-result-card__title a:has-text('Gemeindegrenzen Kanton Solothurn')")));
+
+            BoundingBox shortBottom = requireBoundingBox(shortCard.locator(".dp-result-card__bottom"));
+            BoundingBox tallBottom = requireBoundingBox(tallCard.locator(".dp-result-card__bottom"));
+            BoundingBox shortFooter = requireBoundingBox(shortCard.locator(".dp-result-card__footer"));
+            BoundingBox tallFooter = requireBoundingBox(tallCard.locator(".dp-result-card__footer"));
+
+            double shortKeywordGap = requireGap(
+                    requireBoundingBox(shortCard.locator(".dp-keyword-list")),
+                    requireBoundingBox(shortCard.locator(".dp-download-list")));
+            double tallKeywordGap = requireGap(
+                    requireBoundingBox(tallCard.locator(".dp-keyword-list")),
+                    requireBoundingBox(tallCard.locator(".dp-download-list")));
+
+            assertThat(Math.abs(lowerEdge(shortBottom) - lowerEdge(tallBottom))).isLessThan(1.5d);
+            assertThat(Math.abs(lowerEdge(shortFooter) - lowerEdge(tallFooter))).isLessThan(1.5d);
+            assertThat(shortKeywordGap).isGreaterThanOrEqualTo(24.0d);
+            assertThat(tallKeywordGap).isGreaterThanOrEqualTo(24.0d);
+        }
+    }
+
+    @Test
+    void cardTypeBadgeIconsAlignVerticallyWithTheirLabels() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?view=cards"));
+
+            Locator datasetBadge = page.locator(".dp-result-card").filter(new Locator.FilterOptions()
+                    .setHas(page.locator(".dp-result-card__title a:has-text('Schulstandorte')")))
+                    .locator(".dp-result-card__type-badge");
+            Locator seriesBadge = page.locator(".dp-result-card").filter(new Locator.FilterOptions()
+                    .setHas(page.locator(".dp-result-card__title a:has-text('Energieverbrauch Gemeinden')")))
+                    .locator(".dp-result-card__type-badge");
+
+            BoundingBox datasetIcon = requireBoundingBox(datasetBadge.locator("svg"));
+            BoundingBox datasetLabel = requireBoundingBox(datasetBadge.locator("span"));
+            BoundingBox seriesIcon = requireBoundingBox(seriesBadge.locator("svg"));
+            BoundingBox seriesLabel = requireBoundingBox(seriesBadge.locator("span"));
+
+            assertThat(Math.abs(verticalCenter(datasetIcon) - verticalCenter(datasetLabel))).isLessThan(1.5d);
+            assertThat(Math.abs(verticalCenter(seriesIcon) - verticalCenter(seriesLabel))).isLessThan(1.5d);
         }
     }
 
@@ -596,6 +657,10 @@ class CatalogFiltersPlaywrightTest {
 
     private static double horizontalCenter(BoundingBox boundingBox) {
         return boundingBox.x + (boundingBox.width / 2.0d);
+    }
+
+    private static double lowerEdge(BoundingBox boundingBox) {
+        return boundingBox.y + boundingBox.height;
     }
 
     private static void waitForLocationSearchContains(Page page, String... fragments) {

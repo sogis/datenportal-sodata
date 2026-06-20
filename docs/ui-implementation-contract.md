@@ -610,11 +610,14 @@ Die Card-Ansicht zeigt ein Grid. Die Card folgt dem Screenshot `cards.png`.
 Pflicht je Card:
 
 - graues Typ-Badge `Datensatz` oder `Datenreihe`, gleiches graues Badge-Aussehen wie auf anderen Badge-Stellen der App
+- der Typ-Badge in Cards zeigt als Prefix ein Datei-Icon fuer `Datensatz` und ein Collection-Icon fuer `Datenreihe`, vertikal mittig zum Text ausgerichtet
 - Badge `Open Data`, im MVP hardcodiert sichtbar
 - zusätzlicher Badge `Struktur beschrieben`, wenn Attribute beschrieben sind oder ein Datenmodell vorhanden ist
-- Titel und Beschreibung wie im Screenshot
-- graue Keyword-/Themen-Badges
+- Titel `18px` und Beschreibung `18px` wie im Screenshot
+- graue Keyword-/Themen-Badges mit `14px`
 - Formate als kompakte Textlinks oder Buttons
+- Downloads, Trennlinie, Datum und Detailpfeil bilden einen gemeinsamen Bottom-Cluster, der bei gleich hohen Cards bündig am unteren Rand sitzt
+- zwischen Keyword-Badges und dem Bottom-Cluster liegt mindestens `var(--dp-space-5)` Abstand
 - Aktualisierungs-/Publikationsdatum unten links
 - roter Pfeil/Link unten rechts zur Detailseite
 
@@ -825,6 +828,7 @@ src/main/resources/static/css/
 - Im Katalog verwenden Filter-Trigger, Filter-Reset, Mobile-Filter-Button, Resultatsummary, View-Switcher sowie der komplette Sortierblock `16px`.
 - Das Suchfeld bleibt typografisch eigenständig und wird nicht auf `16px` abgesenkt.
 - In der Listenansicht verwenden Tabellenheader `18px`, Titel `18px`, Beschreibungen `16px`, Publikationsdatum `18px` und Downloadbuttons `18px`.
+- In der Kartenansicht verwenden Card-Titel `18px`, Card-Beschreibungen `18px`, Keyword-Badges `14px`, Typ-/Status-Badges `16px` und Downloadbuttons `18px`.
 - Tabellenheader in der Listenansicht duerfen innerhalb ihrer eigenen Spalte umbrechen, aber nicht in Nachbarspalten hineinlaufen.
 
 ### 9.4 Typ-Badges

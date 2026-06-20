@@ -64,6 +64,12 @@ Status-Varianten:
 - positive: `Open Data`
 - info: `Aktuelle Ausgabe`
 
+Lokale Ausnahme fuer Card-Keywords:
+
+- Keyword-/Themen-Labels auf Cards bleiben Teil der neutralen Badge-Familie.
+- Sie verwenden jedoch bewusst `font-size: 14px`, damit sie sich unterhalb von Titel und Beschreibung ruhiger einordnen.
+- Sie verwenden auf Cards ausserdem nur `6px` horizontales Padding und `min-height: 1.6rem`, damit sie kompakter als Typ- und Status-Badges wirken.
+
 ### 1.3 Action Pill
 
 Zweck:
@@ -123,7 +129,7 @@ Nicht erlaubt:
 - `Open Data` = positives Status-Badge
 - `Aktuelle Ausgabe` = Info-Status-Badge
 - `CSV`, `XLSX`, `Parquet` = Action Pills
-- Keyword-/Themen-Labels auf Cards = neutrale Status-Badge-Familie
+- Keyword-/Themen-Labels auf Cards = neutrale Status-Badge-Familie mit lokaler `14px`-Typografie-Ausnahme
 
 ## 4. Benennung im Code
 

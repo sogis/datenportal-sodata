@@ -81,8 +81,7 @@
 }
 
 .dp-type-badge,
-.dp-status-badge,
-.dp-keyword-list li {
+.dp-status-badge {
   background: var(--dp-color-badge);
   color: var(--dp-color-text);
   font-size: 16px;
@@ -90,10 +89,18 @@
 }
 
 .dp-status-badge--neutral,
-.dp-type-badge,
+.dp-type-badge {
+  background: var(--dp-color-badge);
+  color: var(--dp-color-text);
+}
+
 .dp-keyword-list li {
   background: var(--dp-color-badge);
   color: var(--dp-color-text);
+  font-size: 14px;
+  font-weight: 400;
+  min-height: 1.6rem;
+  padding: 0 6px;
 }
 
 .dp-status-badge--positive {
