@@ -9,6 +9,7 @@ public record FilterGroupVm(
         String collapsedLabel,
         int selectedCount,
         FilterGroupType type,
+        boolean alignEnd,
         String triggerHref,
         String resetHref,
         List<FilterOptionVm> options) {

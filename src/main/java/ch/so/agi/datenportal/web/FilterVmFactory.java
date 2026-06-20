@@ -71,6 +71,7 @@ public final class FilterVmFactory {
                 collapsedLabel(emptyLabel, selected, values),
                 selected.size(),
                 type,
+                "modified".equals(id),
                 urlFactory.filterPopover(params, id),
                 urlFactory.resetFilterGroup(params, parameterName),
                 options);

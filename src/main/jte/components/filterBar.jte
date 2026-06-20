@@ -6,27 +6,30 @@
 <div id="filter-toolbar" class="dp-filter-toolbar" aria-label="Filter" hx-swap-oob="${outOfBand ? "true" : null}">
   <div class="dp-filter-toolbar__desktop">
     @for(var group : filterPanel.groups())
-      <button
-        id="filter-trigger-${group.id()}"
-        class="dp-filter-trigger${group.selectedCount() > 0 ? " is-active" : ""}"
-        type="button"
-        aria-expanded="false"
-        aria-controls="filter-popover-host"
-        data-filter-trigger
-        data-filter-id="${group.id()}"
-        hx-get="${group.triggerHref()}"
-        hx-target="#filter-popover-host"
-        hx-swap="innerHTML">
-        <span class="dp-filter-trigger__text">
-          <span class="dp-filter-trigger__label">${group.label()}</span>
-          <span class="dp-filter-trigger__state">${group.collapsedLabel()}</span>
-        </span>
-        <span class="dp-filter-trigger__chevron" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
-          </svg>
-        </span>
-      </button>
+      <div class="dp-filter-dropdown${group.alignEnd() ? " dp-filter-dropdown--align-end" : ""}" data-filter-dropdown data-filter-id="${group.id()}">
+        <button
+          id="filter-trigger-${group.id()}"
+          class="dp-filter-trigger${group.selectedCount() > 0 ? " is-active" : ""}"
+          type="button"
+          aria-expanded="false"
+          aria-controls="filter-panel-host-${group.id()}"
+          data-filter-trigger
+          data-filter-id="${group.id()}"
+          hx-get="${group.triggerHref()}"
+          hx-target="#filter-panel-host-${group.id()}"
+          hx-swap="innerHTML">
+          <span class="dp-filter-trigger__text">
+            <span class="dp-filter-trigger__label">${group.label()}</span>
+            <span class="dp-filter-trigger__state">${group.collapsedLabel()}</span>
+          </span>
+          <span class="dp-filter-trigger__chevron" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+            </svg>
+          </span>
+        </button>
+        <div id="filter-panel-host-${group.id()}" class="dp-filter-dropdown__panel-host" data-filter-panel-host hidden></div>
+      </div>
     @endfor
     <a
       class="dp-filter-reset-button"
