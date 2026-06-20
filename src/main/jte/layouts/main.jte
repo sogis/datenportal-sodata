@@ -20,6 +20,6 @@
   <main id="main-content" class="dp-main" tabindex="-1">
     ${content}
   </main>
-  @template.components.footer()
+  @template.components.footer(footer = chrome.footer())
 </body>
 </html>

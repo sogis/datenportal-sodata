@@ -4,4 +4,5 @@ public record PageChromeVm(
         String pageTitle,
         HeaderVm header,
         BreadcrumbVm breadcrumb,
-        WebAssetsVm assets) {}
+        WebAssetsVm assets,
+        FooterVm footer) {}

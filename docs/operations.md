@@ -32,6 +32,8 @@ Health zeigt:
 - `catalogReload`: Reload-Laufstatus, letzter erfolgreicher Reload oder initialer Load, letzter Fehler falls vorhanden.
 - `catalogSearchIndex`: Verfügbarkeit des aktiven Lucene-Index.
 
+Wenn Gradle-Build-Informationen vorhanden sind, bezieht die Anwendung die Footer-Build-Kennung aus `META-INF/build-info.properties`. Der Commit-Anteil wird beim Build als 12-stelliger Git-Hash geschrieben.
+
 Die Endpunkte enthalten keine Reload-Tokens und keine credential-haltigen Quell-URLs. Produktiv sollte der Zugriff zusätzlich über Infrastruktur eingeschränkt werden.
 
 Der Standard-`diskSpace`-Health-Contributor ist deaktiviert, damit keine lokalen Serverpfade im Health-JSON erscheinen.

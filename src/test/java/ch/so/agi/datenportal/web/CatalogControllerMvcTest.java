@@ -47,7 +47,10 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("aria-current=\"page\"")))
                 .andExpect(content().string(not(containsString("id=\"pagination\""))))
                 .andExpect(content().string(not(containsString("Zeilen pro Seite"))))
-                .andExpect(content().string(containsString("/js/catalog-filters.js")));
+                .andExpect(content().string(containsString("/js/catalog-filters.js")))
+                .andExpect(content().string(containsString("Die Daten werden von den zuständigen Stellen des Kantons Solothurn bereitgestellt.")))
+                .andExpect(content().string(containsString("datenportal-sodata-0.1.0-SNAPSHOT-")))
+                .andExpect(content().string(not(containsString("Datenportal Phase 1"))));
     }
 
     @Test

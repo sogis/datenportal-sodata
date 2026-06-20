@@ -23,6 +23,42 @@ ext {
     playwrightVersion = '1.60.0'
 }
 
+def gitCommit = 'unknown'
+try {
+    def gitDir = file('.git')
+    def headFile = new File(gitDir, 'HEAD')
+    if (headFile.exists()) {
+        def head = headFile.text.trim()
+        if (head.startsWith('ref: ')) {
+            def ref = head.substring(5)
+            def refFile = new File(gitDir, ref)
+            if (refFile.exists()) {
+                def resolvedGitCommit = refFile.text.trim()
+                if (resolvedGitCommit) {
+                    gitCommit = resolvedGitCommit.take(12)
+                }
+            } else {
+                def packedRefsFile = new File(gitDir, 'packed-refs')
+                if (packedRefsFile.exists()) {
+                    def packedRefLine = packedRefsFile.readLines().find { line ->
+                        !line.startsWith('#') && !line.startsWith('^') && line.endsWith(" ${ref}")
+                    }
+                    if (packedRefLine) {
+                        gitCommit = packedRefLine.tokenize(' ')[0].take(12)
+                    }
+                }
+            }
+        } else if (head) {
+            gitCommit = head.take(12)
+        }
+    }
+} catch (Exception ignored) {
+}
+
+def gitCommitProvider = providers.provider {
+    gitCommit
+}
+
 sourceSets {
     main {
         resources {
@@ -85,7 +121,13 @@ jte {
 }
 
 springBoot {
-    buildInfo()
+    buildInfo {
+        properties {
+            additional = [
+                'commit': gitCommitProvider
+            ]
+        }
+    }
 }
 
 tasks.named('check') {

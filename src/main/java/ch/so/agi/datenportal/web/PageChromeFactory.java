@@ -12,14 +12,17 @@ public class PageChromeFactory {
     private final HeaderViewModelFactory headerViewModelFactory;
     private final BreadcrumbFactory breadcrumbFactory;
     private final WebAssetsVmFactory webAssetsVmFactory;
+    private final FooterViewModelFactory footerViewModelFactory;
 
     public PageChromeFactory(
             HeaderViewModelFactory headerViewModelFactory,
             BreadcrumbFactory breadcrumbFactory,
-            WebAssetsVmFactory webAssetsVmFactory) {
+            WebAssetsVmFactory webAssetsVmFactory,
+            FooterViewModelFactory footerViewModelFactory) {
         this.headerViewModelFactory = headerViewModelFactory;
         this.breadcrumbFactory = breadcrumbFactory;
         this.webAssetsVmFactory = webAssetsVmFactory;
+        this.footerViewModelFactory = footerViewModelFactory;
     }
 
     public PageChromeVm catalogPage(String pageTitle) {
@@ -27,7 +30,8 @@ public class PageChromeFactory {
                 pageTitle,
                 headerViewModelFactory.forCatalogPage(),
                 breadcrumbFactory.catalog(),
-                webAssetsVmFactory.create());
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
     }
 
     public PageChromeVm datasetDetailPage(DatasetEntry dataset) {
@@ -35,7 +39,8 @@ public class PageChromeFactory {
                 dataset.title() + " | Datenportal",
                 headerViewModelFactory.forDetailPage(),
                 breadcrumbFactory.datasetDetail(dataset),
-                webAssetsVmFactory.create());
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
     }
 
     public PageChromeVm seriesDetailPage(DatasetSeriesEntry series) {
@@ -43,7 +48,8 @@ public class PageChromeFactory {
                 series.title() + " | Datenportal",
                 headerViewModelFactory.forDetailPage(),
                 breadcrumbFactory.seriesDetail(series),
-                webAssetsVmFactory.create());
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
     }
 
     public PageChromeVm issueDetailPage(DatasetSeriesEntry series, DatasetIssueEntry issue) {
@@ -51,7 +57,8 @@ public class PageChromeFactory {
                 issue.title() + " | Datenportal",
                 headerViewModelFactory.forDetailPage(),
                 breadcrumbFactory.issueDetail(series, issue),
-                webAssetsVmFactory.create());
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
     }
 
     public PageChromeVm notFoundPage() {
@@ -63,6 +70,7 @@ public class PageChromeFactory {
                 pageTitle,
                 headerViewModelFactory.forDetailPage(),
                 breadcrumbFactory.error(breadcrumbLabel),
-                webAssetsVmFactory.create());
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
     }
 }

@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.DefaultResourceLoader;
 
 class DetailPageVmFactoryTest {
@@ -28,7 +30,8 @@ class DetailPageVmFactoryTest {
                     new BreadcrumbFactory(),
                     new WebAssetsVmFactory(
                             new WebComponentsProperties(true, "0.1.10", null, false),
-                            new DefaultResourceLoader())),
+                            new DefaultResourceLoader()),
+                    new FooterViewModelFactory(new StaticListableBeanFactory().getBeanProvider(BuildProperties.class))),
             new CatalogUrlFactory());
 
     @Test

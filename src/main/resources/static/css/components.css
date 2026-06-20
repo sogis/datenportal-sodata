@@ -134,7 +134,7 @@
 
 .dp-footer {
   border-top: 1px solid var(--dp-color-border);
-  background: var(--dp-color-surface);
+  background: #2F4858;
 }
 
 .dp-footer__inner {
@@ -143,6 +143,6 @@
   justify-content: space-between;
   gap: var(--dp-space-3);
   padding: var(--dp-space-5) 0;
-  color: var(--dp-color-text-muted);
+  color: #fff;
   font-size: 0.95rem;
 }
