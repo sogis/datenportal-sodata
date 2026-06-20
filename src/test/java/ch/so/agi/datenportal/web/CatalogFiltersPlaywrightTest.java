@@ -423,6 +423,36 @@ class CatalogFiltersPlaywrightTest {
         }
     }
 
+    @Test
+    void expandAndMetadataIconsRenderBorderlessAtTwentyFourPixels() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            Locator expandButton = page.locator(".dp-expand-button").first();
+            Locator expandIcon = expandButton.locator("svg");
+            Locator metadataLink = page.locator(".dp-metadata-link").first();
+            Locator metadataIcon = metadataLink.locator("svg");
+
+            assertThat(cssValue(expandButton, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(expandButton, "border-right-width")).isEqualTo("0px");
+            assertThat(cssValue(expandButton, "border-bottom-width")).isEqualTo("0px");
+            assertThat(cssValue(expandButton, "border-left-width")).isEqualTo("0px");
+            assertThat(cssValue(metadataLink, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(metadataLink, "border-right-width")).isEqualTo("0px");
+            assertThat(cssValue(metadataLink, "border-bottom-width")).isEqualTo("0px");
+            assertThat(cssValue(metadataLink, "border-left-width")).isEqualTo("0px");
+
+            BoundingBox expandIconBox = requireBoundingBox(expandIcon);
+            BoundingBox metadataIconBox = requireBoundingBox(metadataIcon);
+
+            assertThat(Math.abs(expandIconBox.width - 24.0d)).isLessThan(0.5d);
+            assertThat(Math.abs(expandIconBox.height - 24.0d)).isLessThan(0.5d);
+            assertThat(Math.abs(metadataIconBox.width - 24.0d)).isLessThan(0.5d);
+            assertThat(Math.abs(metadataIconBox.height - 24.0d)).isLessThan(0.5d);
+        }
+    }
+
     private String baseUrl(String path) {
         return "http://127.0.0.1:" + port + path;
     }

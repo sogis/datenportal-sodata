@@ -420,11 +420,20 @@
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  border: 1px solid var(--dp-color-border);
+  border: 0;
   border-radius: var(--dp-radius-sm);
-  background: var(--dp-color-surface);
-  font-size: 1.25rem;
-  font-weight: 700;
+  background: transparent;
+  color: var(--dp-color-text);
+  line-height: 0;
+  text-decoration: none;
+}
+
+.dp-expand-button svg,
+.dp-metadata-link svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
 }
 
 .dp-entry-title {
@@ -464,9 +473,12 @@
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
-  border: 1px solid var(--dp-color-text);
+  border: 0;
   border-radius: 50%;
-  font-weight: 700;
+  background: transparent;
+  color: var(--dp-color-text);
+  line-height: 0;
+  text-decoration: none;
 }
 
 .dp-entry-publication-date {

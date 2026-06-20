@@ -104,6 +104,12 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(not(containsString("id=\"filter-popover-host\""))))
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
                 .andExpect(content().string(containsString("dp-entry-row dp-entry-row--series")))
+                .andExpect(content().string(containsString("class=\"bi bi-plus-lg\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-info-circle\"")))
+                .andExpect(content().string(containsString("width=\"24\" height=\"24\"")))
+                .andExpect(content().string(not(containsString(">i</a>"))))
+                .andExpect(content().string(not(containsString("<span aria-hidden=\"true\">+</span>"))))
+                .andExpect(content().string(not(containsString("<span aria-hidden=\"true\">-</span>"))))
                 .andExpect(content().string(containsString("CSV (aktuelle Ausgabe)")))
                 .andExpect(content().string(containsString("Parquet (aktuelle Ausgabe)")));
     }
@@ -227,11 +233,24 @@ class CatalogControllerMvcTest {
                 .contains("<th scope=\"col\">Publikationsdatum</th>")
                 .contains("<th scope=\"col\">Metadaten</th>")
                 .contains("<th scope=\"col\">Daten herunterladen</th>")
+                .contains("class=\"bi bi-plus-lg\"")
+                .contains("class=\"bi bi-info-circle\"")
+                .contains("width=\"24\" height=\"24\"")
                 .doesNotContain("<th scope=\"col\">Typ</th>")
                 .doesNotContain("dp-type-badge")
                 .doesNotContain("dp-entry-themes")
-                .doesNotContain("dp-entry-icon");
-        assertThat(expandedHtml).doesNotContain("dp-type-badge");
+                .doesNotContain("dp-entry-icon")
+                .doesNotContain(">i</a>")
+                .doesNotContain("<span aria-hidden=\"true\">+</span>")
+                .doesNotContain("<span aria-hidden=\"true\">-</span>");
+        assertThat(expandedHtml)
+                .contains("class=\"bi bi-dash-lg\"")
+                .contains("class=\"bi bi-info-circle\"")
+                .contains("width=\"24\" height=\"24\"")
+                .doesNotContain("dp-type-badge")
+                .doesNotContain(">i</a>")
+                .doesNotContain("<span aria-hidden=\"true\">+</span>")
+                .doesNotContain("<span aria-hidden=\"true\">-</span>");
         assertThat(cardsHtml).contains("dp-type-badge");
     }
 
