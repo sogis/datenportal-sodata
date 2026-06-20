@@ -17,7 +17,7 @@ Die Kartenansicht ist eine alternative Ansicht der Start-/Katalogseite. Die verb
 ## Startseite Listenansicht
 
 - Initiale Ansicht: `view=list`.
-- Spalten: `Thema / Datensatz`, `Typ`, `Publikationsdatum`, `Metadaten`, `Daten herunterladen`.
+- Spalten: `Thema / Datensatz`, `Typ`, `Publiziert`, `Details`, `Daten herunterladen`.
 - Keine Icons in der ersten Spalte, ausser Plus/Minus bei Datenreihen.
 - `Datensatz` und `Datenreihe` verwenden denselben grauen Badge-Stil.
 - Datenreihen sind aufklappbar.

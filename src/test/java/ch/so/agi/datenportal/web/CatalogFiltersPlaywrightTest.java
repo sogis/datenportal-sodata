@@ -524,6 +524,40 @@ class CatalogFiltersPlaywrightTest {
         }
     }
 
+    @Test
+    void desktopListViewKeepsThreeDownloadPillsOnOneLineForSeriesRootAndIssueRows() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?expanded=ch.so.abstimmungsresultate"));
+
+            Locator seriesRootDownloads = page.locator(".dp-entry-row--series .dp-entry-downloads .dp-download-link");
+            Locator issueDownloads = page.locator(".dp-issue-row").first().locator(".dp-entry-downloads .dp-download-link");
+
+            assertSingleDownloadRow(seriesRootDownloads);
+            assertSingleDownloadRow(issueDownloads);
+        }
+    }
+
+    @Test
+    void desktopListHeadersStaySeparatedAndReadableWithinTheirColumns() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            Locator publishedHeader = page.locator(".dp-entry-table thead th").nth(2);
+            Locator detailsHeader = page.locator(".dp-entry-table thead th").nth(3);
+            Locator downloadsHeader = page.locator(".dp-entry-table thead th").nth(4);
+
+            assertThat(publishedHeader.textContent()).isEqualTo("Publiziert");
+            assertThat(detailsHeader.textContent()).isEqualTo("Details");
+            assertThat(downloadsHeader.textContent()).isEqualTo("Daten herunterladen");
+
+            assertThat(hasHorizontalOverflow(publishedHeader)).isFalse();
+            assertThat(hasHorizontalOverflow(detailsHeader)).isFalse();
+            assertThat(hasHorizontalOverflow(downloadsHeader)).isFalse();
+        }
+    }
+
     private String baseUrl(String path) {
         return "http://127.0.0.1:" + port + path;
     }
@@ -569,5 +603,20 @@ class CatalogFiltersPlaywrightTest {
         return Boolean.TRUE.equals(page.evaluate(
                 "value => document.activeElement === document.querySelector(value)",
                 selector));
+    }
+
+    private static boolean hasHorizontalOverflow(Locator locator) {
+        return Boolean.TRUE.equals(locator.evaluate("element => element.scrollWidth > element.clientWidth + 1"));
+    }
+
+    private static void assertSingleDownloadRow(Locator downloadLinks) {
+        assertThat(downloadLinks.count()).isGreaterThanOrEqualTo(3);
+
+        BoundingBox first = requireBoundingBox(downloadLinks.nth(0));
+        BoundingBox second = requireBoundingBox(downloadLinks.nth(1));
+        BoundingBox third = requireBoundingBox(downloadLinks.nth(2));
+
+        assertThat(Math.abs(first.y - second.y)).isLessThan(1.5d);
+        assertThat(Math.abs(first.y - third.y)).isLessThan(1.5d);
     }
 }

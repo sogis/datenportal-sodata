@@ -446,10 +446,12 @@ Referenz: `spec/mockups/current/startseite_liste.png`.
 Pflichtspalten:
 
 ```text
-Thema / Datensatz | Publikationsdatum | Metadaten | Daten herunterladen
+Thema / Datensatz | Publiziert | Details | Daten herunterladen
 ```
 
 Die erste Spalte enthält keine Themen-/Datensatz-Icons mehr. Ausnahme: Datenreihen erhalten ganz links einen Plus-/Minus-Button zum Aufklappen.
+
+In der Desktop-Listenansicht wird die Spalte `Daten herunterladen` mit fester Reserve fuer mindestens drei Standard-Pills `CSV`, `XLSX`, `Parquet` eingeplant. Die Titel-/Beschreibungsspalte nimmt den verbleibenden Platz ein.
 
 ### 6.2 Normale Datensatz-Zeile
 
@@ -476,6 +478,7 @@ Pflicht:
 - Publikationsdatum der aktuellen Ausgabe oder der Serien-Aktualisierung in `18px`
 - Info-Link führt auf die Detailseite der aktuellen Ausgabe
 - Downloads zeigen die aktuellen Ausgaben direkt in derselben Spalte und bleiben in `18px`
+- Die Desktop-Breitenaufteilung reserviert auch fuer diese Root-Zeile genug Platz fuer `CSV`, `XLSX`, `Parquet` in einer Zeile plus kleine Reserve
 
 Downloadbeschriftung für Datenreihen-Root:
 
@@ -507,6 +510,7 @@ Pflicht für Ausgabezeilen:
 - Publikationsdatum der Ausgabe in `18px`
 - Info-Link zur Detailseite genau dieser Ausgabe
 - Downloadbuttons `CSV`, `XLSX`, `Parquet` ohne Klammertext `aktuelle Ausgabe`, in `18px`
+- Dieselbe Desktop-Reservierung der Downloadspalte gilt auch fuer aufgeklappte Ausgabezeilen
 
 ### 6.5 Progressive Enhancement für Row Click
 
@@ -821,6 +825,7 @@ src/main/resources/static/css/
 - Im Katalog verwenden Filter-Trigger, Filter-Reset, Mobile-Filter-Button, Resultatsummary, View-Switcher sowie der komplette Sortierblock `16px`.
 - Das Suchfeld bleibt typografisch eigenständig und wird nicht auf `16px` abgesenkt.
 - In der Listenansicht verwenden Tabellenheader `18px`, Titel `18px`, Beschreibungen `16px`, Publikationsdatum `18px` und Downloadbuttons `18px`.
+- Tabellenheader in der Listenansicht duerfen innerhalb ihrer eigenen Spalte umbrechen, aber nicht in Nachbarspalten hineinlaufen.
 
 ### 9.4 Typ-Badges
 
@@ -969,7 +974,7 @@ Pflichttests:
 - `GET /` enthält Header-Web-Component oder Fallback.
 - `GET /` enthält Breadcrumb-Web-Component oder Fallback.
 - `GET /` rendert standardmässig Listenansicht.
-- Listenansicht enthält Spalten `Thema / Datensatz`, `Publikationsdatum`, `Metadaten`, `Daten herunterladen`.
+- Listenansicht enthält Spalten `Thema / Datensatz`, `Publiziert`, `Details`, `Daten herunterladen`.
 - Listenansicht rendert weder `dp-type-badge` noch `dp-entry-themes`.
 - Datenreihe-Root-Zeile enthält Plus-/Minus-Button mit `aria-expanded`.
 - Datenreihe-Root-Zeile enthält Downloads der aktuellen Ausgabe ohne Zusatz im Pill-Label.
