@@ -357,11 +357,24 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator(".dp-entry-downloads .dp-download-link").first())).isEqualTo("18px");
             page.click("#filter-trigger-theme");
             page.waitForSelector("#filter-panel-host-theme [data-filter-panel]");
+            assertThat(fontSize(page.locator("#filter-panel-host-theme .dp-filter-option").first())).isEqualTo("14px");
             assertThat(fontSize(page.locator("#filter-panel-host-theme .dp-button--primary"))).isEqualTo("16px");
             assertThat(fontSize(page.locator("#filter-panel-host-theme .dp-button--secondary"))).isEqualTo("16px");
             assertThat(cssValue(page.locator("#filter-panel-host-theme .dp-button--primary"), "font-weight")).isEqualTo("400");
             assertThat(cssValue(page.locator("#filter-panel-host-theme .dp-button--secondary"), "font-weight")).isEqualTo("400");
             assertThat(page.locator(".dp-entry-themes").count()).isEqualTo(0);
+        }
+
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(390, 844))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            page.click("#mobile-filter-button");
+            page.waitForSelector("#mobile-filter-panel-host [data-filter-panel]");
+
+            assertThat(fontSize(page.locator("#mobile-filter-panel-host .dp-filter-option").first())).isEqualTo("14px");
+            assertThat(fontSize(page.locator("#mobile-filter-panel-host .dp-button--primary"))).isEqualTo("16px");
+            assertThat(fontSize(page.locator("#mobile-filter-panel-host .dp-button--secondary"))).isEqualTo("16px");
         }
     }
 

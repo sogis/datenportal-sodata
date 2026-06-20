@@ -586,7 +586,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--dp-space-2);
   align-items: center;
-  font-size: 0.95rem;
+  font-size: 14px;
 }
 
 .dp-filter-option__count {
@@ -604,7 +604,9 @@
   border-top: 1px solid var(--dp-color-border);
 }
 
-.dp-filter-popover__actions .dp-button {
+.dp-filter-popover__actions .dp-button,
+.dp-filter-sheet__actions .dp-button,
+.dp-filter-fallback__actions .dp-button {
   font-size: 16px;
   font-weight: 400;
 }

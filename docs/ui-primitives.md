@@ -145,3 +145,9 @@ Bestehende Marker duerfen als Alias bestehen bleiben, wenn Templates oder Tests 
 - Ein Status-Badge ist keine Aktion.
 - Ein Filter Chip ist kein allgemeines graues Label fuer Keywords oder Metadaten.
 - Unterschiede zwischen den drei Familien werden nicht ueber `font-weight: 700` hergestellt.
+
+## 6. Filter-Panel-Typografie
+
+- Filter-Einträge in Desktop-Popovern, mobilem Filter-Sheet und No-JS-Fallback verwenden `14px`.
+- Aktionsbuttons im Filterkontext, insbesondere `Anwenden`, `Zurücksetzen` und `Ergebnisse anzeigen`, verwenden weiterhin `16px`.
+- Diese lokale Primitive ändert die globale `18px`-Body-Typografie nicht.
