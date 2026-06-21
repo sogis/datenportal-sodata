@@ -1,16 +1,20 @@
 package ch.so.agi.datenportal.web;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -92,6 +96,23 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
+    void detailRoutePathVariablesDeclareExplicitNames() throws NoSuchMethodException {
+        assertPathVariableName("datasetDetail", new Class<?>[] {String.class, Model.class}, 0, "identifier");
+        assertPathVariableName("seriesDetail", new Class<?>[] {String.class, Model.class}, 0, "seriesIdentifier");
+        assertPathVariableName("currentIssueDetail", new Class<?>[] {String.class, Model.class}, 0, "seriesIdentifier");
+        assertPathVariableName(
+                "issueDetail",
+                new Class<?>[] {String.class, String.class, Model.class},
+                0,
+                "seriesIdentifier");
+        assertPathVariableName(
+                "issueDetail",
+                new Class<?>[] {String.class, String.class, Model.class},
+                1,
+                "issueIdentifier");
+    }
+
+    @Test
     void unknownIdentifierReturns404() throws Exception {
         mockMvc.perform(get("/datasets/does-not-exist"))
                 .andExpect(status().isNotFound())
@@ -111,5 +132,17 @@ class CatalogDetailControllerMvcTest {
         mockMvc.perform(get("/series/ch.so.gemeindegrenzen/issues/ch.so.abstimmungsresultate_2026"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("Seite nicht gefunden")));
+    }
+
+    private static void assertPathVariableName(
+            String methodName,
+            Class<?>[] parameterTypes,
+            int parameterIndex,
+            String expectedName) throws NoSuchMethodException {
+        Method method = CatalogDetailController.class.getMethod(methodName, parameterTypes);
+        PathVariable annotation = method.getParameters()[parameterIndex].getAnnotation(PathVariable.class);
+
+        assertThat(annotation).isNotNull();
+        assertThat(annotation.value()).isEqualTo(expectedName);
     }
 }

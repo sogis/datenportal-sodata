@@ -23,7 +23,7 @@ public final class CatalogDetailController {
     }
 
     @GetMapping("/datasets/{identifier}")
-    public String datasetDetail(@PathVariable String identifier, Model model) {
+    public String datasetDetail(@PathVariable("identifier") String identifier, Model model) {
         return catalogService.withSnapshot(snapshot -> {
             var entry = snapshot.findAnyEntry(identifier)
                     .orElseThrow(() -> notFound(identifier));
@@ -37,7 +37,7 @@ public final class CatalogDetailController {
     }
 
     @GetMapping("/series/{seriesIdentifier}")
-    public String seriesDetail(@PathVariable String seriesIdentifier, Model model) {
+    public String seriesDetail(@PathVariable("seriesIdentifier") String seriesIdentifier, Model model) {
         return catalogService.withSnapshot(snapshot -> {
             DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
             model.addAttribute("page", detailPageVmFactory.series(series));
@@ -46,7 +46,7 @@ public final class CatalogDetailController {
     }
 
     @GetMapping("/series/{seriesIdentifier}/issues/current")
-    public String currentIssueDetail(@PathVariable String seriesIdentifier, Model model) {
+    public String currentIssueDetail(@PathVariable("seriesIdentifier") String seriesIdentifier, Model model) {
         return catalogService.withSnapshot(snapshot -> {
             DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
             model.addAttribute("page", detailPageVmFactory.issue(series, series.currentIssueOrThrow()));
@@ -56,8 +56,8 @@ public final class CatalogDetailController {
 
     @GetMapping("/series/{seriesIdentifier}/issues/{issueIdentifier}")
     public String issueDetail(
-            @PathVariable String seriesIdentifier,
-            @PathVariable String issueIdentifier,
+            @PathVariable("seriesIdentifier") String seriesIdentifier,
+            @PathVariable("issueIdentifier") String issueIdentifier,
             Model model) {
         return catalogService.withSnapshot(snapshot -> {
             DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
