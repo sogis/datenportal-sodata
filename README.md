@@ -60,6 +60,21 @@ Bei belegtem Port:
 ./gradlew bootRun --args='--server.port=8081'
 ```
 
+## Dokumentationslandkarte
+
+Die Dokumentation ist nach Zweck getrennt, damit Einstieg, Laufzeit, Betrieb und UI-Regeln nicht in einer einzigen Datei vermischt werden.
+
+- `README.md`: Einstieg, Quickstart, MVP-Überblick und grober Datenfluss.
+- `docs/architecture.md`: technischer Laufzeitaufbau, Datenfluss vom XTF bis ins Rendering und atomarer Reload.
+- `docs/configuration.md`: Laufzeit-Properties, Katalogquellen, Reload-Token, Actuator, Cache und Security-Header.
+- `docs/operations.md`: lokaler Betrieb, Reload, Health/Info, Fehlerdiagnose und Smoke-Tests.
+- `docs/search.md`: fachliche Soll-Semantik der Suche und Filter.
+- `docs/ui-implementation-contract.md`: verbindlicher UI-Vertrag für Katalog-, Karten- und Detailseiten.
+- `docs/ui-primitives.md`: Source of truth für Chips, Badges und Action Pills.
+- `docs/component-map.md`: Zuordnung von UI-Bereichen zu JTE-Templates, ViewModels und Tests.
+- `AGENTS.md`: Arbeitsregeln, verpflichtende Referenzen und Repo-Grenzen für Coding-Agents.
+- `datenportal_webapp_agent_spec_detailed_v5.md`: vollständige Soll-Spezifikation mit Architektur, Klassenbild und Phasenmodell.
+
 ## Konfiguration
 
 Standardkonfiguration in `src/main/resources/application.yml`:
@@ -90,6 +105,38 @@ Weitere Details:
 - `docs/operations.md`
 - `docs/web-components.md`
 - `docs/architecture.md`
+
+## Wie Daten ins GUI kommen
+
+Die Anwendung liest das PublishedCatalog-XTF vollständig ein, überführt es in ein internes Read-Model und rendert daraus sowohl die Suchresultate als auch die Detailseiten. Lucene dient dabei der Katalogsuche; Detailseiten lesen ihren Eintrag direkt aus dem aktiven Snapshot.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant XTF as "PublishedCatalog XTF"
+    participant Import as "Import / Parser"
+    participant Snapshot as "CatalogSnapshot"
+    participant Lucene as "Lucene Index"
+    participant Controller as "Web Controller"
+    participant ViewModel as "ViewModel Factory"
+    participant JTE as "JTE Templates"
+    participant Browser as "Browser"
+
+    XTF->>Import: XTF/XML lesen und parsen
+    Import->>Snapshot: Domain-Read-Model aufbauen
+    Snapshot->>Lucene: Top-Level-Einträge indexieren
+
+    Browser->>Controller: Anfrage auf Katalog oder Detailseite
+    Controller->>Snapshot: aktiven Katalogstand lesen
+    alt Katalogsuche
+        Controller->>Lucene: Textsuche ausführen
+        Lucene-->>Controller: Treffer-IDs liefern
+        Controller->>Snapshot: Treffer auf echte Einträge auflösen
+    end
+    Controller->>ViewModel: Seitenmodell aufbauen
+    ViewModel->>JTE: vorbereitete Daten übergeben
+    JTE-->>Browser: HTML rendern
+```
 
 ## Reload
 
