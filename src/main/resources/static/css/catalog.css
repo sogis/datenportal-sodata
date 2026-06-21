@@ -500,7 +500,7 @@
   min-height: 20rem;
   padding: var(--dp-space-5);
   border: 1px solid var(--dp-color-border);
-  border-radius: var(--dp-radius-md);
+  border-radius: var(--dp-radius-sm);
   background: var(--dp-color-surface);
 }
 
