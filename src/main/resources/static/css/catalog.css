@@ -490,7 +490,7 @@
 .dp-card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--dp-space-5);
+  gap: var(--dp-space-8);
 }
 
 .dp-result-card {
