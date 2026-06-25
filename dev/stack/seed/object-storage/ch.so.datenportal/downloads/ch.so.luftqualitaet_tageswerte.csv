@@ -1,0 +1,9 @@
+﻿objekt_id;gemeinde;kategorie;wert;einheit;stand_datum
+LUFTQUALIT_T_001;Solothurn;Kategorie A;4.642;Anzahl;2026-06-02
+LUFTQUALIT_T_002;Olten;Kategorie B;7.783;m2;2026-06-03
+LUFTQUALIT_T_003;Grenchen;Kategorie C;10.925;mg/l;2026-06-04
+LUFTQUALIT_T_004;Zuchwil;Kategorie D;14.066;CHF;2026-06-05
+LUFTQUALIT_T_005;Balsthal;Kategorie A;17.208;Anzahl;2026-06-06
+LUFTQUALIT_T_006;Dornach;Kategorie B;20.349;m2;2026-06-07
+LUFTQUALIT_T_007;Oensingen;Kategorie C;23.491;mg/l;2026-06-08
+LUFTQUALIT_T_008;Trimbach;Kategorie D;26.632;CHF;2026-06-09

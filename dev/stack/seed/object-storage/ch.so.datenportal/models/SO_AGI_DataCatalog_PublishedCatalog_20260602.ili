@@ -1,0 +1,118 @@
+INTERLIS 2.4;
+
+/** Hierarchical publication/transfer model for the Canton Solothurn data catalog.
+ *
+ * Corrected fixture variant 2026-06-24:
+ * - DataResource now contains `attributes` and `model`, like the Datasheet model.
+ * - The model name matches the XTF namespace used by the PublishedCatalog fixtures.
+ */
+MODEL SO_AGI_DataCatalog_PublishedCatalog_20260602 (en)
+  AT "https://geo.so.ch/models/AGI"
+  VERSION "2026-06-02"
+  =
+  IMPORTS SO_AGI_DataCatalog_Base_20260529;
+
+  DOMAIN
+    DistributionFormat = (
+      csv,
+      xlsx,
+      parquet,
+      other
+    );
+
+  STRUCTURE Office =
+    officeUri : MANDATORY INTERLIS.URI;
+    name : MANDATORY TEXT*255;
+    abbreviation : MANDATORY TEXT*32;
+    email : MANDATORY INTERLIS.URI;
+    officeAtWeb : MANDATORY INTERLIS.URI;
+  END Office;
+
+  STRUCTURE ThemeAssignment =
+    localTheme : MANDATORY SO_AGI_DataCatalog_Base_20260529.Theme;
+    themeUri : MANDATORY INTERLIS.URI;
+  END ThemeAssignment;
+
+  STRUCTURE AccessRights =
+    localAccessLevel : MANDATORY (
+      open,
+      public_with_conditions,
+      restricted,
+      internal,
+      confidential
+    );
+    accessRightsUri : MANDATORY INTERLIS.URI;
+  END AccessRights;
+
+  STRUCTURE AccrualPeriodicity =
+    localFrequency : MANDATORY SO_AGI_DataCatalog_Base_20260529.MaintenanceFrequencyCode;
+    frequencyUri : MANDATORY INTERLIS.URI;
+  END AccrualPeriodicity;
+
+  STRUCTURE Distribution =
+    distributionUri : MANDATORY INTERLIS.URI;
+    accessURL : MANDATORY INTERLIS.URI;
+    downloadURL : INTERLIS.URI;
+    format : MANDATORY DistributionFormat;
+  END Distribution;
+
+  STRUCTURE DataResource =
+    resourceUri : MANDATORY INTERLIS.URI;
+    identifier : MANDATORY TEXT*255;
+    title : MANDATORY TEXT*255;
+    description : MANDATORY MTEXT;
+    publisher : MANDATORY Office;
+    creator : BAG {0..*} OF Office;
+    contactPoint : BAG {0..*} OF SO_AGI_DataCatalog_Base_20260529.ContactPoint;
+    themes : BAG {1..*} OF ThemeAssignment;
+    keywords : BAG {0..*} OF TEXT*255;
+    landingPage : BAG {0..*} OF INTERLIS.URI;
+    issued : DATE;
+    modified : MANDATORY DATE;
+    licenseUri : INTERLIS.URI;
+    accessRights : MANDATORY AccessRights;
+    publicationStatus : MANDATORY SO_AGI_DataCatalog_Base_20260529.PublicationStatus;
+    origin : SO_AGI_DataCatalog_Base_20260529.Origin;
+    accrualPeriodicity : AccrualPeriodicity;
+    temporalCoverage : SO_AGI_DataCatalog_Base_20260529.TemporalCoverage;
+
+    /** Structured data dictionary for the concrete tabular/geospatial resource. */
+    attributes : BAG {0..*} OF SO_AGI_DataCatalog_Base_20260529.DatasetAttribute;
+
+    /** Name or URI of the data/schema/model, e.g. INTERLIS model name or a publication schema. */
+    model : TEXT*255;
+  END DataResource;
+
+  STRUCTURE Dataset EXTENDS DataResource =
+    distributions : BAG {1..*} OF Distribution;
+  END Dataset;
+
+  STRUCTURE DatasetIssue EXTENDS Dataset =
+    issueLabel : MANDATORY TEXT*100;
+    isCurrentIssue : BOOLEAN;
+  END DatasetIssue;
+
+  STRUCTURE DatasetSeries EXTENDS DataResource =
+    issues : BAG {1..*} OF DatasetIssue;
+  END DatasetSeries;
+
+  TOPIC Publication =
+    OID AS SO_AGI_DataCatalog_Base_20260529.DCOID;
+
+    CLASS Catalog =
+      catalogUri : MANDATORY INTERLIS.URI;
+      title : MANDATORY TEXT*255;
+      description : MANDATORY MTEXT;
+      publisher : MANDATORY Office;
+      homepage : INTERLIS.URI;
+      modified : DATE;
+      agents : BAG {1..*} OF Office;
+      datasets : BAG {0..*} OF Dataset;
+      datasetSeries : BAG {0..*} OF DatasetSeries;
+      MANDATORY CONSTRAINT INTERLIS.elementCount(datasets) > 0 OR INTERLIS.elementCount(datasetSeries) > 0;
+      UNIQUE catalogUri;
+    END Catalog;
+
+  END Publication;
+
+END SO_AGI_DataCatalog_PublishedCatalog_20260602.

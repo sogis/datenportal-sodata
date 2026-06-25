@@ -1,0 +1,9 @@
+﻿objekt_id;gemeinde;kategorie;wert;einheit;stand_datum
+SCHULSTANDOR_001;Solothurn;Kategorie A;4.642;Anzahl;2026-06-02
+SCHULSTANDOR_002;Olten;Kategorie B;7.783;m2;2026-06-03
+SCHULSTANDOR_003;Grenchen;Kategorie C;10.925;mg/l;2026-06-04
+SCHULSTANDOR_004;Zuchwil;Kategorie D;14.066;CHF;2026-06-05
+SCHULSTANDOR_005;Balsthal;Kategorie A;17.208;Anzahl;2026-06-06
+SCHULSTANDOR_006;Dornach;Kategorie B;20.349;m2;2026-06-07
+SCHULSTANDOR_007;Oensingen;Kategorie C;23.491;mg/l;2026-06-08
+SCHULSTANDOR_008;Trimbach;Kategorie D;26.632;CHF;2026-06-09

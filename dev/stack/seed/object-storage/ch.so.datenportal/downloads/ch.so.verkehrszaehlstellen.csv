@@ -1,0 +1,9 @@
+﻿objekt_id;gemeinde;abschnitt;verkehrsart;wert;einheit;stand_datum
+VERKEHRSZ_HL_001;Solothurn;Dummy 1;Kategorie A;4.642;Anzahl;2026-06-02
+VERKEHRSZ_HL_002;Olten;Dummy 2;Kategorie B;7.783;m2;2026-06-03
+VERKEHRSZ_HL_003;Grenchen;Dummy 3;Kategorie C;10.925;mg/l;2026-06-04
+VERKEHRSZ_HL_004;Zuchwil;Dummy 4;Kategorie D;14.066;CHF;2026-06-05
+VERKEHRSZ_HL_005;Balsthal;Dummy 5;Kategorie A;17.208;Anzahl;2026-06-06
+VERKEHRSZ_HL_006;Dornach;Dummy 6;Kategorie B;20.349;m2;2026-06-07
+VERKEHRSZ_HL_007;Oensingen;Dummy 7;Kategorie C;23.491;mg/l;2026-06-08
+VERKEHRSZ_HL_008;Trimbach;Dummy 8;Kategorie D;26.632;CHF;2026-06-09

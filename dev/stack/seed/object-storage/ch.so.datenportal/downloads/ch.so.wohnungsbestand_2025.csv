@@ -1,0 +1,9 @@
+﻿objekt_id;gemeinde;kategorie;wert;einheit;stand_datum
+WOHNUNGSBEST_001;Solothurn;Kategorie A;4.642;Anzahl;2026-06-02
+WOHNUNGSBEST_002;Olten;Kategorie B;7.783;m2;2026-06-03
+WOHNUNGSBEST_003;Grenchen;Kategorie C;10.925;mg/l;2026-06-04
+WOHNUNGSBEST_004;Zuchwil;Kategorie D;14.066;CHF;2026-06-05
+WOHNUNGSBEST_005;Balsthal;Kategorie A;17.208;Anzahl;2026-06-06
+WOHNUNGSBEST_006;Dornach;Kategorie B;20.349;m2;2026-06-07
+WOHNUNGSBEST_007;Oensingen;Kategorie C;23.491;mg/l;2026-06-08
+WOHNUNGSBEST_008;Trimbach;Kategorie D;26.632;CHF;2026-06-09

@@ -1,0 +1,9 @@
+﻿jahr;gemeinde;konto_code;betrag_chf;kennzahl
+2021;Solothurn;STEUERERTR_G_001;11234.5;Dummy 1
+2022;Olten;STEUERERTR_G_002;12469;Dummy 2
+2023;Grenchen;STEUERERTR_G_003;13703.5;Dummy 3
+2024;Zuchwil;STEUERERTR_G_004;14938;Dummy 4
+2025;Balsthal;STEUERERTR_G_005;16172.5;Dummy 5
+2026;Dornach;STEUERERTR_G_006;17407;Dummy 6
+2020;Oensingen;STEUERERTR_G_007;18641.5;Dummy 7
+2021;Trimbach;STEUERERTR_G_008;19876;Dummy 8

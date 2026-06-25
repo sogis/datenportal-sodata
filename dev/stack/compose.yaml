@@ -1,0 +1,105 @@
+name: datenportal-dev-stack
+
+x-garage-env: &garage-env
+  DATENPORTAL_BUCKET: ${DATENPORTAL_BUCKET:-ch.so.datenportal}
+  AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-garage}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-GK0123456789abcdef0123456789abcdef}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+  AWS_EC2_METADATA_DISABLED: "true"
+
+services:
+  garage:
+    image: dxflrs/garage:v2.3.0
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    restart: unless-stopped
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: ${AWS_ACCESS_KEY_ID:-GK0123456789abcdef0123456789abcdef}
+      GARAGE_DEFAULT_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      GARAGE_DEFAULT_BUCKET: ${DATENPORTAL_BUCKET:-ch.so.datenportal}
+      RUST_LOG: garage=info
+    ports:
+      - "${GARAGE_S3_PORT:-3900}:3900"     # S3 API
+      - "${GARAGE_RPC_PORT:-3901}:3901"     # Garage RPC
+      - "${GARAGE_WEB_PORT:-3902}:3902"     # Garage static website endpoint
+      - "${GARAGE_ADMIN_PORT:-3903}:3903"   # Garage admin/metrics API
+    volumes:
+      - ./services/garage/garage.toml:/etc/garage.toml:ro
+      - ./var/garage/meta:/var/lib/garage/meta
+      - ./var/garage/data:/var/lib/garage/data
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  downloads:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      garage:
+        condition: service_healthy
+    ports:
+      - "${DATENPORTAL_DOWNLOAD_PORT:-8081}:8081"
+    volumes:
+      - ./services/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+
+  seed:
+    image: amazon/aws-cli:latest
+    profiles: ["seed"]
+    depends_on:
+      garage:
+        condition: service_healthy
+    environment:
+      <<: *garage-env
+      AWS_ENDPOINT_URL: http://garage:3900
+    volumes:
+      - ./seed/object-storage:/seed/object-storage:ro
+      - ./services/garage/init:/seed/init:ro
+    entrypoint: ["/bin/sh", "/seed/init/seed.sh"]
+
+  aws:
+    image: amazon/aws-cli:latest
+    profiles: ["tools"]
+    depends_on:
+      garage:
+        condition: service_healthy
+    environment:
+      <<: *garage-env
+      AWS_ENDPOINT_URL: http://garage:3900
+    volumes:
+      - ./seed/object-storage:/seed/object-storage:ro
+    entrypoint: ["aws", "--endpoint-url", "http://garage:3900", "--region", "garage"]
+
+  # Beispiele für spätere Erweiterungen. Aktivieren, sobald benötigt.
+  # postgres:
+  #   image: postgis/postgis:17-3.5
+  #   profiles: ["db"]
+  #   environment:
+  #     POSTGRES_DB: datenportal
+  #     POSTGRES_USER: datenportal
+  #     POSTGRES_PASSWORD: datenportal
+  #   ports:
+  #     - "${POSTGRES_PORT:-5432}:5432"
+  #   volumes:
+  #     - ./services/postgres/initdb:/docker-entrypoint-initdb.d:ro
+  #     - ./var/postgres:/var/lib/postgresql/data
+  #
+  # mailpit:
+  #   image: axllent/mailpit:latest
+  #   profiles: ["mail"]
+  #   ports:
+  #     - "${MAILPIT_SMTP_PORT:-1025}:1025"
+  #     - "${MAILPIT_WEB_PORT:-8025}:8025"
+  #
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:latest
+  #   profiles: ["auth"]
+  #   command: ["start-dev", "--import-realm"]
+  #   environment:
+  #     KC_BOOTSTRAP_ADMIN_USERNAME: admin
+  #     KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+  #   ports:
+  #     - "${KEYCLOAK_PORT:-8088}:8080"
+  #   volumes:
+  #     - ./services/keycloak/import:/opt/keycloak/data/import:ro
+  #     - ./var/keycloak:/opt/keycloak/data

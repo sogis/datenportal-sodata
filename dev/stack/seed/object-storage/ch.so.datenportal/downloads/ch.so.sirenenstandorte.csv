@@ -1,0 +1,9 @@
+﻿lage_id;gemeinde;ereignistyp;prioritaet;anzahl;stand_datum
+SIRENENSTAND_001;Solothurn;Kategorie A;Dummy 1;27;2026-06-02
+SIRENENSTAND_002;Olten;Kategorie B;Dummy 2;44;2026-06-03
+SIRENENSTAND_003;Grenchen;Kategorie C;Dummy 3;61;2026-06-04
+SIRENENSTAND_004;Zuchwil;Kategorie D;Dummy 4;78;2026-06-05
+SIRENENSTAND_005;Balsthal;Kategorie A;Dummy 5;95;2026-06-06
+SIRENENSTAND_006;Dornach;Kategorie B;Dummy 6;112;2026-06-07
+SIRENENSTAND_007;Oensingen;Kategorie C;Dummy 7;129;2026-06-08
+SIRENENSTAND_008;Trimbach;Kategorie D;Dummy 8;146;2026-06-09

@@ -1,3 +1,12 @@
+# Lokale Overrides und Laufzeitdaten des Docker-Dev-Stacks
+/dev/stack/.env
+/dev/stack/var/*
+!/dev/stack/var/.gitkeep
+
+# Optional: lokale Dumps/temporäre Seed-Dateien, falls ihr solche Ordner später nutzt
+/dev/stack/tmp/
+/dev/stack/dumps/
+
 .settings
 bin/
 # ---> macOS

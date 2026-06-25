@@ -1,0 +1,16 @@
+:8081 {
+    @options method OPTIONS
+    respond @options 204
+
+    header {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+        Access-Control-Allow-Headers "*"
+        Access-Control-Expose-Headers "ETag, Content-Length, Content-Type"
+    }
+
+    reverse_proxy garage:3902 {
+        # Garage Website Endpoint erwartet Host = <bucket>.<root_domain>.
+        header_up Host ch.so.datenportal.web.garage.localhost
+    }
+}

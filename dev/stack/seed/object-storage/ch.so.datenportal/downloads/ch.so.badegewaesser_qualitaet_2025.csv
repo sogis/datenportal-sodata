@@ -1,0 +1,9 @@
+﻿jahr;messstelle_code;gemeinde;parameter;messwert;einheit;messwert_status
+2021;BADEGEW_SSER_001;Solothurn;Nitrat;4.642;Anzahl;aktiv
+2022;BADEGEW_SSER_002;Olten;pH;7.783;m2;geprüft
+2023;BADEGEW_SSER_003;Grenchen;DOC;10.925;mg/l;provisorisch
+2024;BADEGEW_SSER_004;Zuchwil;Leitfähigkeit;14.066;CHF;archiviert
+2025;BADEGEW_SSER_005;Balsthal;Nitrat;17.208;Anzahl;aktiv
+2026;BADEGEW_SSER_006;Dornach;pH;20.349;m2;geprüft
+2020;BADEGEW_SSER_007;Oensingen;DOC;23.491;mg/l;provisorisch
+2021;BADEGEW_SSER_008;Trimbach;Leitfähigkeit;26.632;CHF;archiviert

@@ -1,0 +1,9 @@
+﻿anlage_id;gemeinde;energietraeger;leistung_kw;inbetriebnahme_jahr;status
+SOLARANLAGEN_001;Solothurn;Dummy 1;37.35;2021;aktiv
+SOLARANLAGEN_002;Olten;Dummy 2;49.7;2022;geprüft
+SOLARANLAGEN_003;Grenchen;Dummy 3;62.05;2023;provisorisch
+SOLARANLAGEN_004;Zuchwil;Dummy 4;74.4;2024;archiviert
+SOLARANLAGEN_005;Balsthal;Dummy 5;86.75;2025;aktiv
+SOLARANLAGEN_006;Dornach;Dummy 6;99.1;2026;geprüft
+SOLARANLAGEN_007;Oensingen;Dummy 7;111.45;2020;provisorisch
+SOLARANLAGEN_008;Trimbach;Dummy 8;123.8;2021;archiviert
