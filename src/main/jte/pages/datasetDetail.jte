@@ -12,11 +12,9 @@
         modifiedLabel = page.modifiedLabel(),
         issuedLabel = page.issuedLabel()
       )
-      <div class="dp-detail-layout">
-        <div class="dp-detail-main">
-          @for(var section : page.metadataSections())
-            @template.components.metadataSection(section = section)
-          @endfor
+      <div class="dp-detail-summary-layout">
+        <div class="dp-detail-summary-main dp-detail-panel">
+          @template.components.detailTeaserRow()
         </div>
         <aside class="dp-detail-side" aria-label="Downloads">
           @template.components.detailDownloadPanel(downloads = page.downloads())

@@ -51,6 +51,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datensatzdetail | `pages/datasetDetail.jte` | `DatasetDetailPageVm` | keine Datenvorschau |
 | Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | aktuelle und historische Ausgaben |
 | Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Rücklink zur Datenreihe und weitere Ausgaben |
+| Datensatz-Teaserreihe | `components/detailTeaserRow.jte` | statisch im Template | drei Spalten, mobile gestapelt |
 | Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
 | weitere Ausgaben | `components/seriesIssues.jte` | `SeriesIssuesVm` | aktuelle/ältere Ausgaben |

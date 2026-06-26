@@ -199,7 +199,7 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
-    void detailPageUsesWideLayoutWithReadableDescription() {
+    void datasetDetailUsesReadableHeroAndAlignedSummaryLayout() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/ch.so.bauinventar"));
@@ -207,12 +207,51 @@ class CatalogFiltersPlaywrightTest {
             BoundingBox contentContainer = requireBoundingBox(page.locator("main .dp-container").first());
             BoundingBox hero = requireBoundingBox(page.locator(".dp-detail-hero"));
             BoundingBox description = requireBoundingBox(page.locator(".dp-detail-description"));
+            BoundingBox facts = requireBoundingBox(page.locator(".dp-detail-facts"));
+            BoundingBox summaryLayout = requireBoundingBox(page.locator(".dp-detail-summary-layout"));
+            BoundingBox summaryCard = requireBoundingBox(page.locator(".dp-detail-summary-main"));
+            BoundingBox teaserRow = requireBoundingBox(page.locator(".dp-detail-teaser-row"));
+            BoundingBox downloadPanel = requireBoundingBox(page.locator(".dp-detail-downloads"));
+            double gapDescriptionToFacts = requireGap(description, facts);
+            double gapFactsToSummary = requireGap(facts, summaryLayout);
 
             assertThat(contentContainer.width).isGreaterThan(1380d);
             assertThat(hero.width).isGreaterThan(1380d);
             assertThat(Math.abs(hero.width - contentContainer.width)).isLessThan(1.5d);
-            assertThat(description.width).isLessThan(900d);
+            assertThat(description.width).isGreaterThan(700d);
+            assertThat(description.width).isLessThan(1000d);
             assertThat(description.width).isLessThan(hero.width - 300d);
+            assertThat(cssValue(page.locator(".dp-detail-description"), "color")).isEqualTo("rgb(47, 72, 88)");
+            assertThat(cssValue(page.locator(".dp-detail-facts dt").first(), "color")).isEqualTo("rgb(47, 72, 88)");
+            assertThat(cssValue(page.locator(".dp-detail-summary-main"), "background-color")).isEqualTo("rgb(255, 255, 255)");
+            assertThat(cssValue(page.locator(".dp-detail-summary-main"), "border-top-width")).isEqualTo("1px");
+            assertThat(cssValue(page.locator(".dp-detail-summary-main"), "border-top-color")).isEqualTo("rgb(217, 224, 230)");
+            assertThat(cssValue(page.locator(".dp-detail-summary-main"), "border-top-left-radius")).isEqualTo("4px");
+            assertThat(cssValue(page.locator(".dp-detail-teaser-row"), "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-teaser").nth(1), "border-left-width")).isEqualTo("1px");
+            assertThat(fontSize(page.locator(".dp-detail-teaser__content h2").first())).isEqualTo("18px");
+            assertThat(fontSize(page.locator(".dp-detail-teaser__content p").first())).isEqualTo("18px");
+            assertThat(fontSize(page.locator(".dp-detail-teaser__action").first())).isEqualTo("18px");
+            assertThat(gapDescriptionToFacts).isGreaterThanOrEqualTo(16d);
+            assertThat(gapFactsToSummary).isGreaterThanOrEqualTo(32d);
+            assertThat(Math.abs(summaryLayout.width - contentContainer.width)).isLessThan(1.5d);
+            assertThat(Math.abs(summaryCard.y - downloadPanel.y)).isLessThan(1.5d);
+            assertThat(teaserRow.y).isGreaterThan(summaryCard.y);
+            assertThat(downloadPanel.x).isGreaterThan(teaserRow.x + teaserRow.width - 1d);
+        }
+
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(390, 844))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/ch.so.bauinventar"));
+
+            BoundingBox firstTeaser = requireBoundingBox(page.locator(".dp-detail-teaser").nth(0));
+            BoundingBox secondTeaser = requireBoundingBox(page.locator(".dp-detail-teaser").nth(1));
+            BoundingBox teaserRow = requireBoundingBox(page.locator(".dp-detail-teaser-row"));
+            BoundingBox downloadPanel = requireBoundingBox(page.locator(".dp-detail-downloads"));
+
+            assertThat(Math.abs(firstTeaser.x - secondTeaser.x)).isLessThan(1.5d);
+            assertThat(secondTeaser.y).isGreaterThanOrEqualTo(lowerEdge(firstTeaser));
+            assertThat(downloadPanel.y).isGreaterThan(lowerEdge(teaserRow));
         }
     }
 

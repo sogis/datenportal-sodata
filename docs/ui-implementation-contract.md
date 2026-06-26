@@ -697,6 +697,11 @@ Pflichtbereiche:
    - Kontakt
 7. Footer/Statuszeile
 
+Temporäre Umsetzungsnotiz:
+
+- Die aktuelle MVP-Iteration priorisiert auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Drei-Spalten-Teaserreihe (`Struktur & Qualität`, `Erkunden`, `Verwenden`) und dem rechts ausgerichteten Downloadbereich.
+- Die tieferen Metadatenbereiche sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
+
 ### 8.2 Detailseite für Datenreihen und Ausgaben
 
 Wichtig: In der Liste zeigt der Info-Link der Root-Datenreihe auf die Detailseite der aktuellen Ausgabe.

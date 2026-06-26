@@ -390,7 +390,10 @@
 
 .dp-entry-table th,
 .dp-entry-table td {
-  padding: var(--dp-space-3);
+  padding-top: var(--dp-space-5);
+  padding-bottom: var(--dp-space-5);
+  padding-left: var(--dp-space-3);
+  padding-right: var(--dp-space-3);
   border-bottom: 1px solid var(--dp-color-border);
   text-align: left;
   vertical-align: top;
@@ -441,7 +444,7 @@
 
 .dp-entry-description {
   margin: var(--dp-space-1) 0 0;
-  color: var(--dp-color-text-muted);
+  /*color: var(--dp-color-text-muted);*/
   font-size: 16px;
   display: -webkit-box;
   overflow: hidden;
