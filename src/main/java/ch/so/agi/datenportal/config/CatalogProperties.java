@@ -18,7 +18,7 @@ public record CatalogProperties(
         Duration httpReadTimeout,
         DataSize maxSize) {
 
-    private static final String DEFAULT_CLASSPATH_LOCATION = "published_catalog_full_54_entries.xtf";
+    private static final String DEFAULT_CLASSPATH_LOCATION = "published_catalog_full_62_entries.xtf";
     private static final Duration DEFAULT_HTTP_CONNECT_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration DEFAULT_HTTP_READ_TIMEOUT = Duration.ofSeconds(30);
     private static final DataSize DEFAULT_MAX_SIZE = DataSize.ofMegabytes(50);

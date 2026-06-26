@@ -1,15 +1,16 @@
 spring:
   application:
     name: datenportal-sodata
+  web:
+    error:
+      include-message: never
+      include-stacktrace: never
+      include-binding-errors: never
+      whitelabel:
+        enabled: false
 
 server:
   server-header: ""
-  error:
-    include-message: never
-    include-stacktrace: never
-    include-binding-errors: never
-    whitelabel:
-      enabled: false
 
 management:
   endpoints:
@@ -37,7 +38,7 @@ management:
 datenportal:
   catalog:
     source-type: classpath
-    classpath-location: published_catalog_full_54_entries.xtf
+    classpath-location: published_catalog_full_62_entries.xtf
     http-connect-timeout: 5s
     http-read-timeout: 30s
     max-size: 50MB

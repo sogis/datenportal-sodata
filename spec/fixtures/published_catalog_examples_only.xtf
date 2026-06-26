@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <ili:transfer xmlns="http://www.interlis.ch/xtf/2.4/SO_AGI_DataCatalog_PublishedCatalog_20260602" xmlns:base="http://www.interlis.ch/xtf/2.4/SO_AGI_DataCatalog_Base_20260529" xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS">
   <ili:headersection>
     <ili:models>
@@ -6,7 +6,7 @@
       <ili:model>SO_AGI_DataCatalog_Base_20260529</ili:model>
     </ili:models>
     <ili:sender>ChatGPT</ili:sender>
-    <ili:comment>PublishedCatalog-Testdaten aus den vier gelieferten Datasheet-XTF-Beispielen abgeleitet.</ili:comment>
+    <ili:comment>PublishedCatalog-Testdaten erweitert am 2026-06-24: Beispiele mit aktuellem Publikationsdatum, fiktive ältere Einträge, zusätzliche nicht-öffentliche, Bundes- und kommunale Datensätze sowie DataResource.attributes/model.</ili:comment>
   </ili:headersection>
   <ili:datasection>
     <Publication ili:bid="b1">
@@ -24,7 +24,7 @@
           </Office>
         </publisher>
         <homepage>https://data.so.ch/</homepage>
-        <modified>2026-05-26</modified>
+        <modified>2026-06-24</modified>
         <agents>
           <Office>
             <officeUri>https://data.so.ch/agent/afin</officeUri>
@@ -99,8 +99,8 @@
             <keywords>Mikroverunreinigungen</keywords>
             <keywords>NAQUA</keywords>
             <landingPage>https://data.so.ch/dataset/ch.so.wasserqualitaet_grundwasser</landingPage>
-            <issued>2026-05-19</issued>
-            <modified>2025-05-19</modified>
+            <issued>2026-06-24</issued>
+            <modified>2026-06-24</modified>
             <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
             <accessRights>
               <AccessRights>
@@ -122,6 +122,65 @@
                 <base:endDate>2025-12-31</base:endDate>
               </base:TemporalCoverage>
             </temporalCoverage>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>jahr</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Jahr der Messung.</base:description>
+                <base:unit>Jahr</base:unit>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>messstelle_code</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Stabiler Code der Messstelle.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>gemeinde</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Gemeinde der Messstelle.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>parameter</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Untersuchter Parameter oder Stoff.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>messwert</base:name>
+                <base:dataType>DECIMAL</base:dataType>
+                <base:description>Numerischer Messwert.</base:description>
+                <base:unit>parameterabhängig</base:unit>
+                <base:mandatory>false</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>einheit</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Einheit des Messwerts.</base:description>
+                <base:mandatory>false</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>messwert_status</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Status der Messung oder Nachweisgrenze.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <model>SO_AFU_Wasserqualitaet_Monitoring_Publikation_20260624</model>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.wasserqualitaet_grundwasser/distribution/csv</distributionUri>
@@ -193,8 +252,8 @@
             <keywords>Staatsangehörigkeit</keywords>
             <keywords>Jahrgang</keywords>
             <landingPage>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur</landingPage>
-            <issued>2026-05-22</issued>
-            <modified>2025-12-31</modified>
+            <issued>2026-06-24</issued>
+            <modified>2026-06-24</modified>
             <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
             <accessRights>
               <AccessRights>
@@ -216,6 +275,57 @@
                 <base:endDate>2025-12-31</base:endDate>
               </base:TemporalCoverage>
             </temporalCoverage>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>jahr</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Statistikjahr.</base:description>
+                <base:unit>Jahr</base:unit>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>bfs_nr</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>BFS-Gemeindenummer.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>gemeinde</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Gemeindename.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>geschlecht</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Geschlecht oder Total-Kategorie.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>altersgruppe</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Altersgruppe.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>anzahl_personen</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Anzahl Personen.</base:description>
+                <base:unit>Personen</base:unit>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <model>SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624</model>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025</resourceUri>
@@ -262,8 +372,8 @@
                 <keywords>Jahrgang</keywords>
                 <keywords>2025</keywords>
                 <landingPage>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025</landingPage>
-                <issued>2026-05-20</issued>
-                <modified>2025-12-31</modified>
+                <issued>2026-06-24</issued>
+                <modified>2026-06-24</modified>
                 <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
                 <accessRights>
                   <AccessRights>
@@ -284,6 +394,57 @@
                     <base:referenceDate>2025-12-31</base:referenceDate>
                   </base:TemporalCoverage>
                 </temporalCoverage>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>jahr</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Statistikjahr.</base:description>
+                    <base:unit>Jahr</base:unit>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>bfs_nr</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>BFS-Gemeindenummer.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>gemeinde</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Gemeindename.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>geschlecht</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Geschlecht oder Total-Kategorie.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>altersgruppe</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Altersgruppe.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>anzahl_personen</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Anzahl Personen.</base:description>
+                    <base:unit>Personen</base:unit>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <model>SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624</model>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025/distribution/csv</distributionUri>
@@ -305,186 +466,6 @@
                     <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025/distribution/parquet</distributionUri>
                     <accessURL>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025</accessURL>
                     <downloadURL>https://data.so.ch/download/ch.so.bevoelkerung.altersstruktur_2025.parquet</downloadURL>
-                    <format>parquet</format>
-                  </Distribution>
-                </distributions>
-                <issueLabel>2025</issueLabel>
-                <isCurrentIssue>true</isCurrentIssue>
-              </DatasetIssue>
-            </issues>
-          </DatasetSeries>
-        </datasetSeries>
-        <datasetSeries>
-          <DatasetSeries>
-            <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht</resourceUri>
-            <identifier>ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht</identifier>
-            <title>Wohnbevölkerung nach Gemeinde, Geschlecht, Staatsangehörigkeit und Altersgruppen</title>
-            <description>Wohnbevölkerung im Kanton Solothurn nach Gemeinde, Bezirk, Geschlecht, Staatsangehörigkeit und Altersgruppen. Die Daten beschreiben je Gemeinde aggregierte Personenzahlen.</description>
-            <publisher>
-              <Office>
-                <officeUri>https://data.so.ch/agent/agi</officeUri>
-                <name>Amt für Geoinformation</name>
-                <abbreviation>AGI</abbreviation>
-                <email>mailto:agi@bd.so.ch</email>
-                <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
-              </Office>
-            </publisher>
-            <creator>
-              <Office>
-                <officeUri>https://data.so.ch/agent/afin</officeUri>
-                <name>Amt für Finanzen</name>
-                <abbreviation>AFIN</abbreviation>
-                <email>mailto:statistik@fd.so.ch</email>
-                <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
-              </Office>
-            </creator>
-            <contactPoint>
-              <base:ContactPoint>
-                <base:name>Amt für Finanzen</base:name>
-                <base:organizationUnit>Amt für Finanzen</base:organizationUnit>
-                <base:email>mailto:statistik@fd.so.ch</base:email>
-                <base:url>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</base:url>
-              </base:ContactPoint>
-            </contactPoint>
-            <themes>
-              <ThemeAssignment>
-                <localTheme>Bevoelkerung</localTheme>
-                <themeUri>https://publications.europa.eu/resource/authority/data-theme/SOCI</themeUri>
-              </ThemeAssignment>
-            </themes>
-            <themes>
-              <ThemeAssignment>
-                <localTheme>Geografie</localTheme>
-                <themeUri>https://publications.europa.eu/resource/authority/data-theme/REGI</themeUri>
-              </ThemeAssignment>
-            </themes>
-            <keywords>Wohnbevölkerung</keywords>
-            <keywords>Gemeinde</keywords>
-            <keywords>Bezirk</keywords>
-            <keywords>Geschlecht</keywords>
-            <keywords>Staatsangehörigkeit</keywords>
-            <keywords>Altersgruppen</keywords>
-            <keywords>Einwohnerregister</keywords>
-            <landingPage>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht</landingPage>
-            <issued>2026-05-22</issued>
-            <modified>2025-12-31</modified>
-            <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
-            <accessRights>
-              <AccessRights>
-                <localAccessLevel>open</localAccessLevel>
-                <accessRightsUri>https://publications.europa.eu/resource/authority/access-right/PUBLIC</accessRightsUri>
-              </AccessRights>
-            </accessRights>
-            <publicationStatus>published</publicationStatus>
-            <origin>cantonal</origin>
-            <accrualPeriodicity>
-              <AccrualPeriodicity>
-                <localFrequency>annually</localFrequency>
-                <frequencyUri>https://publications.europa.eu/resource/authority/frequency/ANNUAL</frequencyUri>
-              </AccrualPeriodicity>
-            </accrualPeriodicity>
-            <temporalCoverage>
-              <base:TemporalCoverage>
-                <base:startDate>2025-01-01</base:startDate>
-                <base:endDate>2025-12-31</base:endDate>
-              </base:TemporalCoverage>
-            </temporalCoverage>
-            <issues>
-              <DatasetIssue>
-                <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</resourceUri>
-                <identifier>ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</identifier>
-                <title>Wohnbevölkerung nach Gemeinde, Geschlecht, Staatsangehörigkeit und Altersgruppen 2025</title>
-                <description>Ausgabe 2025 der Datenreihe Wohnbevölkerung nach Gemeinde, Geschlecht, Staatsangehörigkeit und Altersgruppen. Die Ausgabe ist vollständig materialisiert und enthält die drei Downloadformate CSV, XLSX und Parquet.</description>
-                <publisher>
-                  <Office>
-                    <officeUri>https://data.so.ch/agent/agi</officeUri>
-                    <name>Amt für Geoinformation</name>
-                    <abbreviation>AGI</abbreviation>
-                    <email>mailto:agi@bd.so.ch</email>
-                    <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
-                  </Office>
-                </publisher>
-                <creator>
-                  <Office>
-                    <officeUri>https://data.so.ch/agent/afin</officeUri>
-                    <name>Amt für Finanzen</name>
-                    <abbreviation>AFIN</abbreviation>
-                    <email>mailto:statistik@fd.so.ch</email>
-                    <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
-                  </Office>
-                </creator>
-                <contactPoint>
-                  <base:ContactPoint>
-                    <base:name>Amt für Finanzen</base:name>
-                    <base:organizationUnit>Amt für Finanzen</base:organizationUnit>
-                    <base:email>mailto:statistik@fd.so.ch</base:email>
-                    <base:url>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</base:url>
-                  </base:ContactPoint>
-                </contactPoint>
-                <themes>
-                  <ThemeAssignment>
-                    <localTheme>Bevoelkerung</localTheme>
-                    <themeUri>https://publications.europa.eu/resource/authority/data-theme/SOCI</themeUri>
-                  </ThemeAssignment>
-                </themes>
-                <themes>
-                  <ThemeAssignment>
-                    <localTheme>Geografie</localTheme>
-                    <themeUri>https://publications.europa.eu/resource/authority/data-theme/REGI</themeUri>
-                  </ThemeAssignment>
-                </themes>
-                <keywords>Wohnbevölkerung</keywords>
-                <keywords>Gemeinde</keywords>
-                <keywords>Bezirk</keywords>
-                <keywords>Geschlecht</keywords>
-                <keywords>Staatsangehörigkeit</keywords>
-                <keywords>Altersgruppen</keywords>
-                <keywords>Einwohnerregister</keywords>
-                <keywords>2025</keywords>
-                <landingPage>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</landingPage>
-                <issued>2026-05-20</issued>
-                <modified>2025-12-31</modified>
-                <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
-                <accessRights>
-                  <AccessRights>
-                    <localAccessLevel>open</localAccessLevel>
-                    <accessRightsUri>https://publications.europa.eu/resource/authority/access-right/PUBLIC</accessRightsUri>
-                  </AccessRights>
-                </accessRights>
-                <publicationStatus>published</publicationStatus>
-                <origin>cantonal</origin>
-                <accrualPeriodicity>
-                  <AccrualPeriodicity>
-                    <localFrequency>annually</localFrequency>
-                    <frequencyUri>https://publications.europa.eu/resource/authority/frequency/ANNUAL</frequencyUri>
-                  </AccrualPeriodicity>
-                </accrualPeriodicity>
-                <temporalCoverage>
-                  <base:TemporalCoverage>
-                    <base:referenceDate>2025-12-31</base:referenceDate>
-                  </base:TemporalCoverage>
-                </temporalCoverage>
-                <distributions>
-                  <Distribution>
-                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/distribution/csv</distributionUri>
-                    <accessURL>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</accessURL>
-                    <downloadURL>https://data.so.ch/download/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025.csv</downloadURL>
-                    <format>csv</format>
-                  </Distribution>
-                </distributions>
-                <distributions>
-                  <Distribution>
-                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/distribution/xlsx</distributionUri>
-                    <accessURL>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</accessURL>
-                    <downloadURL>https://data.so.ch/download/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025.xlsx</downloadURL>
-                    <format>xlsx</format>
-                  </Distribution>
-                </distributions>
-                <distributions>
-                  <Distribution>
-                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/distribution/parquet</distributionUri>
-                    <accessURL>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</accessURL>
-                    <downloadURL>https://data.so.ch/download/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025.parquet</downloadURL>
                     <format>parquet</format>
                   </Distribution>
                 </distributions>
@@ -549,8 +530,8 @@
             <keywords>LV95</keywords>
             <keywords>EPSG:2056</keywords>
             <landingPage>https://data.so.ch/dataset/ch.so.gemeindegrenzen</landingPage>
-            <issued>2026-05-18</issued>
-            <modified>2026-01-01</modified>
+            <issued>2026-06-24</issued>
+            <modified>2026-06-24</modified>
             <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
             <accessRights>
               <AccessRights>
@@ -572,6 +553,55 @@
                 <base:endDate>2026-12-31</base:endDate>
               </base:TemporalCoverage>
             </temporalCoverage>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>t_id</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Technischer Identifikator.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>t_ili_tid</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Technischer INTERLIS-Transferidentifikator.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>gemeindename</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Name der politischen Gemeinde.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>bfs_gemeindenummer</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>BFS-Gemeindenummer.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>bezirksname</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Name des Bezirks.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>geometrie_wkt</base:name>
+                <base:dataType>WKT MULTIPOLYGON</base:dataType>
+                <base:description>Flächengeometrie als WKT in LV95/EPSG:2056.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <model>SO_AGI_Gemeindegrenzen_Publikation_20260624</model>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2025</resourceUri>
@@ -628,8 +658,8 @@
                 <keywords>EPSG:2056</keywords>
                 <keywords>2025</keywords>
                 <landingPage>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2025</landingPage>
-                <issued>2026-05-20</issued>
-                <modified>2025-12-31</modified>
+                <issued>2026-06-24</issued>
+                <modified>2026-06-24</modified>
                 <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
                 <accessRights>
                   <AccessRights>
@@ -651,6 +681,55 @@
                     <base:endDate>2025-12-31</base:endDate>
                   </base:TemporalCoverage>
                 </temporalCoverage>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>t_id</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Technischer Identifikator.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>t_ili_tid</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Technischer INTERLIS-Transferidentifikator.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>gemeindename</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Name der politischen Gemeinde.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>bfs_gemeindenummer</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>BFS-Gemeindenummer.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>bezirksname</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Name des Bezirks.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>geometrie_wkt</base:name>
+                    <base:dataType>WKT MULTIPOLYGON</base:dataType>
+                    <base:description>Flächengeometrie als WKT in LV95/EPSG:2056.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <model>SO_AGI_Gemeindegrenzen_Publikation_20260624</model>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2025/distribution/csv</distributionUri>
@@ -735,8 +814,8 @@
                 <keywords>EPSG:2056</keywords>
                 <keywords>2026</keywords>
                 <landingPage>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2026</landingPage>
-                <issued>2027-05-20</issued>
-                <modified>2026-12-31</modified>
+                <issued>2026-06-24</issued>
+                <modified>2026-06-24</modified>
                 <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
                 <accessRights>
                   <AccessRights>
@@ -758,6 +837,55 @@
                     <base:endDate>2026-12-31</base:endDate>
                   </base:TemporalCoverage>
                 </temporalCoverage>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>t_id</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Technischer Identifikator.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>t_ili_tid</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Technischer INTERLIS-Transferidentifikator.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>gemeindename</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Name der politischen Gemeinde.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>bfs_gemeindenummer</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>BFS-Gemeindenummer.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>bezirksname</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Name des Bezirks.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>geometrie_wkt</base:name>
+                    <base:dataType>WKT MULTIPOLYGON</base:dataType>
+                    <base:description>Flächengeometrie als WKT in LV95/EPSG:2056.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <model>SO_AGI_Gemeindegrenzen_Publikation_20260624</model>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2026/distribution/csv</distributionUri>
@@ -783,6 +911,288 @@
                   </Distribution>
                 </distributions>
                 <issueLabel>2026</issueLabel>
+                <isCurrentIssue>true</isCurrentIssue>
+              </DatasetIssue>
+            </issues>
+          </DatasetSeries>
+        </datasetSeries>
+        <datasetSeries>
+          <DatasetSeries>
+            <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht</resourceUri>
+            <identifier>ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht</identifier>
+            <title>Wohnbevölkerung nach Gemeinde, Geschlecht, Staatsangehörigkeit und Altersgruppen</title>
+            <description>Wohnbevölkerung im Kanton Solothurn nach Gemeinde, Bezirk, Geschlecht, Staatsangehörigkeit und Altersgruppen. Die Daten beschreiben je Gemeinde aggregierte Personenzahlen.</description>
+            <publisher>
+              <Office>
+                <officeUri>https://data.so.ch/agent/agi</officeUri>
+                <name>Amt für Geoinformation</name>
+                <abbreviation>AGI</abbreviation>
+                <email>mailto:agi@bd.so.ch</email>
+                <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
+              </Office>
+            </publisher>
+            <creator>
+              <Office>
+                <officeUri>https://data.so.ch/agent/afin</officeUri>
+                <name>Amt für Finanzen</name>
+                <abbreviation>AFIN</abbreviation>
+                <email>mailto:statistik@fd.so.ch</email>
+                <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
+              </Office>
+            </creator>
+            <contactPoint>
+              <base:ContactPoint>
+                <base:name>Amt für Finanzen</base:name>
+                <base:organizationUnit>Amt für Finanzen</base:organizationUnit>
+                <base:email>mailto:statistik@fd.so.ch</base:email>
+                <base:url>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</base:url>
+              </base:ContactPoint>
+            </contactPoint>
+            <themes>
+              <ThemeAssignment>
+                <localTheme>Bevoelkerung</localTheme>
+                <themeUri>https://publications.europa.eu/resource/authority/data-theme/SOCI</themeUri>
+              </ThemeAssignment>
+            </themes>
+            <themes>
+              <ThemeAssignment>
+                <localTheme>Geografie</localTheme>
+                <themeUri>https://publications.europa.eu/resource/authority/data-theme/REGI</themeUri>
+              </ThemeAssignment>
+            </themes>
+            <keywords>Wohnbevölkerung</keywords>
+            <keywords>Gemeinde</keywords>
+            <keywords>Bezirk</keywords>
+            <keywords>Geschlecht</keywords>
+            <keywords>Staatsangehörigkeit</keywords>
+            <keywords>Altersgruppen</keywords>
+            <keywords>Einwohnerregister</keywords>
+            <landingPage>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht</landingPage>
+            <issued>2026-06-24</issued>
+            <modified>2026-06-24</modified>
+            <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
+            <accessRights>
+              <AccessRights>
+                <localAccessLevel>open</localAccessLevel>
+                <accessRightsUri>https://publications.europa.eu/resource/authority/access-right/PUBLIC</accessRightsUri>
+              </AccessRights>
+            </accessRights>
+            <publicationStatus>published</publicationStatus>
+            <origin>cantonal</origin>
+            <accrualPeriodicity>
+              <AccrualPeriodicity>
+                <localFrequency>annually</localFrequency>
+                <frequencyUri>https://publications.europa.eu/resource/authority/frequency/ANNUAL</frequencyUri>
+              </AccrualPeriodicity>
+            </accrualPeriodicity>
+            <temporalCoverage>
+              <base:TemporalCoverage>
+                <base:startDate>2025-01-01</base:startDate>
+                <base:endDate>2025-12-31</base:endDate>
+              </base:TemporalCoverage>
+            </temporalCoverage>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>jahr</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Statistikjahr.</base:description>
+                <base:unit>Jahr</base:unit>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>bfs_nr</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>BFS-Gemeindenummer.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>gemeinde</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Gemeindename.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>geschlecht</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Geschlecht oder Total-Kategorie.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>altersgruppe</base:name>
+                <base:dataType>TEXT</base:dataType>
+                <base:description>Altersgruppe.</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>anzahl_personen</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Anzahl Personen.</base:description>
+                <base:unit>Personen</base:unit>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <model>SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624</model>
+            <issues>
+              <DatasetIssue>
+                <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</resourceUri>
+                <identifier>ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</identifier>
+                <title>Wohnbevölkerung nach Gemeinde, Geschlecht, Staatsangehörigkeit und Altersgruppen 2025</title>
+                <description>Ausgabe 2025 der Datenreihe Wohnbevölkerung nach Gemeinde, Geschlecht, Staatsangehörigkeit und Altersgruppen. Die Ausgabe ist vollständig materialisiert und enthält die drei Downloadformate CSV, XLSX und Parquet.</description>
+                <publisher>
+                  <Office>
+                    <officeUri>https://data.so.ch/agent/agi</officeUri>
+                    <name>Amt für Geoinformation</name>
+                    <abbreviation>AGI</abbreviation>
+                    <email>mailto:agi@bd.so.ch</email>
+                    <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
+                  </Office>
+                </publisher>
+                <creator>
+                  <Office>
+                    <officeUri>https://data.so.ch/agent/afin</officeUri>
+                    <name>Amt für Finanzen</name>
+                    <abbreviation>AFIN</abbreviation>
+                    <email>mailto:statistik@fd.so.ch</email>
+                    <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
+                  </Office>
+                </creator>
+                <contactPoint>
+                  <base:ContactPoint>
+                    <base:name>Amt für Finanzen</base:name>
+                    <base:organizationUnit>Amt für Finanzen</base:organizationUnit>
+                    <base:email>mailto:statistik@fd.so.ch</base:email>
+                    <base:url>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</base:url>
+                  </base:ContactPoint>
+                </contactPoint>
+                <themes>
+                  <ThemeAssignment>
+                    <localTheme>Bevoelkerung</localTheme>
+                    <themeUri>https://publications.europa.eu/resource/authority/data-theme/SOCI</themeUri>
+                  </ThemeAssignment>
+                </themes>
+                <themes>
+                  <ThemeAssignment>
+                    <localTheme>Geografie</localTheme>
+                    <themeUri>https://publications.europa.eu/resource/authority/data-theme/REGI</themeUri>
+                  </ThemeAssignment>
+                </themes>
+                <keywords>Wohnbevölkerung</keywords>
+                <keywords>Gemeinde</keywords>
+                <keywords>Bezirk</keywords>
+                <keywords>Geschlecht</keywords>
+                <keywords>Staatsangehörigkeit</keywords>
+                <keywords>Altersgruppen</keywords>
+                <keywords>Einwohnerregister</keywords>
+                <keywords>2025</keywords>
+                <landingPage>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</landingPage>
+                <issued>2026-06-24</issued>
+                <modified>2026-06-24</modified>
+                <licenseUri>https://creativecommons.org/licenses/by/4.0/</licenseUri>
+                <accessRights>
+                  <AccessRights>
+                    <localAccessLevel>open</localAccessLevel>
+                    <accessRightsUri>https://publications.europa.eu/resource/authority/access-right/PUBLIC</accessRightsUri>
+                  </AccessRights>
+                </accessRights>
+                <publicationStatus>published</publicationStatus>
+                <origin>cantonal</origin>
+                <accrualPeriodicity>
+                  <AccrualPeriodicity>
+                    <localFrequency>annually</localFrequency>
+                    <frequencyUri>https://publications.europa.eu/resource/authority/frequency/ANNUAL</frequencyUri>
+                  </AccrualPeriodicity>
+                </accrualPeriodicity>
+                <temporalCoverage>
+                  <base:TemporalCoverage>
+                    <base:referenceDate>2025-12-31</base:referenceDate>
+                  </base:TemporalCoverage>
+                </temporalCoverage>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>jahr</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Statistikjahr.</base:description>
+                    <base:unit>Jahr</base:unit>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>bfs_nr</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>BFS-Gemeindenummer.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>gemeinde</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Gemeindename.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>geschlecht</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Geschlecht oder Total-Kategorie.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>altersgruppe</base:name>
+                    <base:dataType>TEXT</base:dataType>
+                    <base:description>Altersgruppe.</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>anzahl_personen</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Anzahl Personen.</base:description>
+                    <base:unit>Personen</base:unit>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <model>SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624</model>
+                <distributions>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/distribution/csv</distributionUri>
+                    <accessURL>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</accessURL>
+                    <downloadURL>https://data.so.ch/download/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025.csv</downloadURL>
+                    <format>csv</format>
+                  </Distribution>
+                </distributions>
+                <distributions>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/distribution/xlsx</distributionUri>
+                    <accessURL>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</accessURL>
+                    <downloadURL>https://data.so.ch/download/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025.xlsx</downloadURL>
+                    <format>xlsx</format>
+                  </Distribution>
+                </distributions>
+                <distributions>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/distribution/parquet</distributionUri>
+                    <accessURL>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</accessURL>
+                    <downloadURL>https://data.so.ch/download/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025.parquet</downloadURL>
+                    <format>parquet</format>
+                  </Distribution>
+                </distributions>
+                <issueLabel>2025</issueLabel>
                 <isCurrentIssue>true</isCurrentIssue>
               </DatasetIssue>
             </issues>

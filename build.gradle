@@ -59,6 +59,7 @@ def gitCommitProvider = providers.provider {
     gitCommit
 }
 
+// Damit sind die Inhalte dieses Verzeichnisses via Classpath greifbar.
 sourceSets {
     main {
         resources {
