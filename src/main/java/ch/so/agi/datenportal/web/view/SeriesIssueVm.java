@@ -8,6 +8,7 @@ public record SeriesIssueVm(
         String publicationDateLabel,
         String detailHref,
         boolean current,
+        AccessStateVm accessState,
         List<DownloadLinkVm> downloads) {
 
     public SeriesIssueVm {

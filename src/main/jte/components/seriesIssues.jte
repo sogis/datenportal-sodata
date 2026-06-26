@@ -17,7 +17,7 @@
               @endif
             </p>
           </div>
-          @template.components.downloadLink(downloads = issue.downloads())
+          @template.components.downloadLink(accessState = issue.accessState(), downloads = issue.downloads())
         </article>
       @endfor
     </div>

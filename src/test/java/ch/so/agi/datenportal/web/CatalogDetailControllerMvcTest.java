@@ -104,6 +104,42 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
+    void nonOpenDatasetDetailShowsAccessBadgeAndLockInsteadOfDownloads() throws Exception {
+        mockMvc.perform(get("/datasets/ch.2581.baumkataster"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Baumkataster")))
+                .andExpect(content().string(containsString("dp-status-badge dp-status-badge--warning")))
+                .andExpect(content().string(containsString("Oeffentlich mit Bedingungen")))
+                .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.2581.baumkataster.csv\""))))
+                .andExpect(content().string(not(containsString(">Open Data</span>"))));
+    }
+
+    @Test
+    void nonOpenSeriesDetailShowsLockInCurrentIssueDownloadsAndIssueList() throws Exception {
+        mockMvc.perform(get("/series/ch.so.baustellen.koordinationsplanung"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Baustellen-Koordinationsplanung")))
+                .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datenreihe</span>")))
+                .andExpect(content().string(containsString("Oeffentlich mit Bedingungen")))
+                .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2026.csv\""))))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2025.csv\""))))
+                .andExpect(content().string(not(containsString(">Open Data</span>"))));
+    }
+
+    @Test
+    void nonOpenIssueDetailShowsAccessBadgeAndLockInsteadOfDownloads() throws Exception {
+        mockMvc.perform(get("/series/ch.so.baustellen.koordinationsplanung/issues/current"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Baustellen-Koordinationsplanung 2026")))
+                .andExpect(content().string(containsString("Oeffentlich mit Bedingungen")))
+                .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2026.csv\""))))
+                .andExpect(content().string(not(containsString(">Open Data</span>"))));
+    }
+
+    @Test
     void detailRoutePathVariablesDeclareExplicitNames() throws NoSuchMethodException {
         assertPathVariableName("datasetDetail", new Class<?>[] {String.class, Model.class}, 0, "identifier");
         assertPathVariableName("seriesDetail", new Class<?>[] {String.class, Model.class}, 0, "seriesIdentifier");

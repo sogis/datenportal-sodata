@@ -1,11 +1,10 @@
+@import ch.so.agi.datenportal.web.view.AccessStateVm
 @param String typeLabel
-@param boolean openData
+@param AccessStateVm accessState
 @param boolean structureDescribed
 <div class="dp-detail-badges" aria-label="Status">
   <span class="dp-type-badge">${typeLabel}</span>
-  @if(openData)
-    <span class="dp-status-badge dp-status-badge--positive">Open Data</span>
-  @endif
+  @template.components.accessBadge(accessState = accessState)
   @if(structureDescribed)
     <span class="dp-status-badge dp-status-badge--neutral">Struktur beschrieben</span>
   @endif

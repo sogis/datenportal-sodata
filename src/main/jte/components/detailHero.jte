@@ -1,14 +1,15 @@
+@import ch.so.agi.datenportal.web.view.AccessStateVm
 @param String title
 @param String description
 @param String typeLabel
-@param boolean openData
+@param AccessStateVm accessState
 @param boolean structureDescribed
 @param String modifiedLabel
 @param String issuedLabel
 <header class="dp-detail-hero">
   @template.components.detailBadges(
     typeLabel = typeLabel,
-    openData = openData,
+    accessState = accessState,
     structureDescribed = structureDescribed
   )
   <h1 class="dp-detail-title">${title}</h1>

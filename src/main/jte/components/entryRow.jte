@@ -41,6 +41,6 @@
     </a>
   </td>
   <td class="dp-entry-downloads">
-    @template.components.downloadLink(downloads = row.downloads())
+    @template.components.downloadLink(accessState = row.accessState(), downloads = row.downloads())
   </td>
 </tr>

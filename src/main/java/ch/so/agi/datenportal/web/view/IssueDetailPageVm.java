@@ -11,7 +11,7 @@ public record IssueDetailPageVm(
         String issueLabel,
         boolean currentIssue,
         String description,
-        boolean openData,
+        AccessStateVm accessState,
         boolean structureDescribed,
         String modifiedLabel,
         String issuedLabel,

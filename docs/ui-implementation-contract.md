@@ -611,7 +611,7 @@ Pflicht je Card:
 
 - graues Typ-Badge `Datensatz` oder `Datenreihe`, gleiches graues Badge-Aussehen wie auf anderen Badge-Stellen der App
 - der Typ-Badge in Cards zeigt als Prefix ein Datei-Icon fuer `Datensatz` und ein Collection-Icon fuer `Datenreihe`, vertikal mittig zum Text ausgerichtet
-- Badge `Open Data`, im MVP hardcodiert sichtbar
+- Badge `Open Data` nur fuer offene Eintraege; nicht offene Eintraege zeigen stattdessen ein gelbes Badge mit dem lesbaren Zugriffstext
 - zusätzlicher Badge `Struktur beschrieben`, wenn Attribute beschrieben sind oder ein Datenmodell vorhanden ist
 - Titel `18px` und Beschreibung `18px` wie im Screenshot
 - graue Keyword-/Themen-Badges mit `14px`
@@ -684,9 +684,9 @@ Pflichtbereiche:
 
 1. Header/Breadcrumb via Web Components
 2. Titel
-3. Badges: `Datensatz`, `Open Data`, optional `Struktur beschrieben`
+3. Badges: `Datensatz`, fuer offene Eintraege `Open Data`, sonst der lesbare Zugriffstext, optional `Struktur beschrieben`
 4. Kurzbeschreibung/Abstract
-5. Downloadbereich mit `CSV`, `XLSX`, `Parquet`, optional `API`
+5. Downloadbereich mit `CSV`, `XLSX`, `Parquet`, optional `API`; nicht offene Eintraege zeigen stattdessen ein Schloss
 6. Metadatenbereiche:
    - Übersicht
    - Verantwortlichkeit
@@ -833,7 +833,7 @@ src/main/resources/static/css/
 - Im Katalog verwenden Filter-Trigger, Filter-Reset, Mobile-Filter-Button, Resultatsummary, View-Switcher sowie der komplette Sortierblock `16px`.
 - Das Suchfeld bleibt typografisch eigenständig und wird nicht auf `16px` abgesenkt.
 - In der Listenansicht verwenden Tabellenheader `18px`, Titel `18px`, Beschreibungen `16px`, Publikationsdatum `18px` und Downloadbuttons `18px`.
-- In der Kartenansicht verwenden Card-Titel `18px`, Card-Beschreibungen `18px`, Keyword-Badges `14px`, Typ-/Status-Badges `16px` und Downloadbuttons `18px`.
+- In der Kartenansicht verwenden Card-Titel `18px`, Card-Beschreibungen `18px`, Keyword-Badges `14px`, Typ-/Status-Badges `16px`, Downloadbuttons `18px` und Schloss-Hinweise `24px`.
 - Tabellenheader in der Listenansicht duerfen innerhalb ihrer eigenen Spalte umbrechen, aber nicht in Nachbarspalten hineinlaufen.
 
 ### 9.4 Typ-Badges
@@ -988,7 +988,7 @@ Pflichttests:
 - Datenreihe-Root-Zeile enthält Plus-/Minus-Button mit `aria-expanded`.
 - Datenreihe-Root-Zeile enthält Downloads der aktuellen Ausgabe ohne Zusatz im Pill-Label.
 - Aufgeklappte Datenreihe rendert Ausgabezeilen ebenfalls ohne Zusatz `aktuelle Ausgabe`.
-- Kartenansicht rendert `dp-type-badge`, `Open Data` und `Struktur beschrieben` dort, wo fachlich zutreffend.
+- Kartenansicht rendert `dp-type-badge`, bei offenen Eintraegen `Open Data`, bei nicht offenen Eintraegen den Zugriffstext und `Struktur beschrieben` dort, wo fachlich zutreffend.
 - Detailseite enthält keine Datenvorschau.
 - Detailseite einer Serienausgabe enthält `Weitere Ausgaben`.
 
@@ -1037,7 +1037,7 @@ Keine Screenshot-Pixelvergleiche im MVP. Stattdessen HTML-Struktur, Klassen, ARI
 ### Phase UI-4: Kartenansicht
 
 - Cards gemäss `cards.png`.
-- `Open Data` hardcodiert sichtbar im MVP.
+- `Open Data` wird nur fuer offene Eintraege angezeigt; nicht offene Eintraege zeigen stattdessen den lesbaren Zugriffstext und ein Schloss statt Downloadlinks.
 - `Struktur beschrieben`-Badge.
 - Ansichttoggle und Zustandserhalt.
 - Tests.

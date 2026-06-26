@@ -10,6 +10,7 @@ import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
+import ch.so.agi.datenportal.web.view.AccessStateVm;
 import ch.so.agi.datenportal.web.view.DatasetDetailPageVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
 import ch.so.agi.datenportal.web.view.DownloadSectionVm;
@@ -50,26 +51,28 @@ public final class DetailPageVmFactory {
                 dataset.title(),
                 dataset.description(),
                 dataset.type().label(),
-                dataset.isOpenData(),
+                accessState(dataset),
                 false,
                 formatDate(dataset.modified()),
                 formatDate(dataset.metadata().issued()).orElse(""),
                 new DownloadSectionVm(
                         "Downloads",
-                        "Dateien dieses Datensatzes in den verfügbaren Formaten.",
+                        downloadLead(accessState(dataset), "diesem Datensatz"),
+                        accessState(dataset),
                         downloads(dataset.title(), dataset.distributions())),
-                metadataSections(dataset, dataset.distributions()));
+                metadataSections(dataset, dataset.distributions(), accessState(dataset)));
     }
 
     public SeriesDetailPageVm series(DatasetSeriesEntry series) {
         DatasetIssueEntry currentIssue = series.currentIssueOrThrow();
+        AccessStateVm currentIssueAccessState = accessState(currentIssue);
         return new SeriesDetailPageVm(
                 pageChromeFactory.seriesDetailPage(series),
                 series.identifier(),
                 series.title(),
                 series.description(),
                 series.type().label(),
-                series.isOpenData(),
+                accessState(series),
                 false,
                 formatDate(series.modified()),
                 formatDate(series.metadata().issued()).orElse(""),
@@ -77,13 +80,15 @@ public final class DetailPageVmFactory {
                 urlFactory.currentIssueDetail(series.identifier()),
                 new DownloadSectionVm(
                         "Downloads aktuelle Ausgabe",
-                        "Dateien der aktuellen Ausgabe " + currentIssue.issueLabel() + ".",
+                        downloadLead(currentIssueAccessState, "der aktuellen Ausgabe " + currentIssue.issueLabel()),
+                        currentIssueAccessState,
                         downloads(currentIssue.title(), currentIssue.distributions())),
                 seriesIssues(series),
-                metadataSections(series, currentIssue.distributions()));
+                metadataSections(series, currentIssue.distributions(), currentIssueAccessState));
     }
 
     public IssueDetailPageVm issue(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        AccessStateVm issueAccessState = accessState(issue);
         return new IssueDetailPageVm(
                 pageChromeFactory.issueDetailPage(series, issue),
                 series.title(),
@@ -93,16 +98,17 @@ public final class DetailPageVmFactory {
                 issue.issueLabel(),
                 issue.identifier().equals(series.currentIssueOrThrow().identifier()),
                 issue.description(),
-                issue.isOpenData(),
+                issueAccessState,
                 false,
                 formatDate(issue.modified()),
                 formatDate(issue.metadata().issued()).orElse(""),
                 new DownloadSectionVm(
                         "Downloads",
-                        "Dateien dieser Ausgabe in den verfügbaren Formaten.",
+                        downloadLead(issueAccessState, "dieser Ausgabe"),
+                        issueAccessState,
                         downloads(issue.title(), issue.distributions())),
                 seriesIssues(series),
-                metadataSections(issue, issue.distributions()));
+                metadataSections(issue, issue.distributions(), issueAccessState));
     }
 
     private SeriesIssuesVm seriesIssues(DatasetSeriesEntry series) {
@@ -118,6 +124,7 @@ public final class DetailPageVmFactory {
                                         ? urlFactory.currentIssueDetail(series.identifier())
                                         : urlFactory.issueDetail(series.identifier(), issue.identifier()),
                                 issue.identifier().equals(currentIdentifier),
+                                accessState(issue),
                                 downloads(issue.title(), issue.primaryDistributions())))
                         .toList());
     }
@@ -132,14 +139,17 @@ public final class DetailPageVmFactory {
                 .toList();
     }
 
-    private List<MetadataSectionVm> metadataSections(CatalogEntry entry, List<DistributionLink> distributions) {
+    private List<MetadataSectionVm> metadataSections(
+            CatalogEntry entry,
+            List<DistributionLink> distributions,
+            AccessStateVm downloadAccessState) {
         List<MetadataSectionVm> sections = new ArrayList<>();
         addSection(sections, "overview", "Übersicht", overviewItems(entry));
         addSection(sections, "topics", "Themen und Schlagworte", topicItems(entry));
         addSection(sections, "responsibility", "Verantwortlichkeit", responsibilityItems(entry));
         addSection(sections, "usage", "Nutzung und Lizenz", usageItems(entry));
         addSection(sections, "time", "Zeit und Raum", timeItems(entry));
-        addSection(sections, "resources", "Ressourcen und Formate", resourceItems(distributions));
+        addSection(sections, "resources", "Ressourcen und Formate", resourceItems(distributions, downloadAccessState));
         return List.copyOf(sections);
     }
 
@@ -200,7 +210,7 @@ public final class DetailPageVmFactory {
         return items;
     }
 
-    private List<MetadataItemVm> resourceItems(List<DistributionLink> distributions) {
+    private List<MetadataItemVm> resourceItems(List<DistributionLink> distributions, AccessStateVm downloadAccessState) {
         List<MetadataItemVm> items = new ArrayList<>();
         join(distributions.stream()
                         .sorted(DISTRIBUTION_ORDER)
@@ -208,13 +218,26 @@ public final class DetailPageVmFactory {
                         .distinct()
                         .toList())
                 .ifPresent(value -> items.add(item("Formate", value)));
-        distributions.stream()
-                .sorted(DISTRIBUTION_ORDER)
-                .forEach(link -> items.add(item(
-                        link.displayLabel(),
-                        link.preferredHref().toString(),
-                        link.preferredHref().toString())));
+        if (downloadAccessState.openData()) {
+            distributions.stream()
+                    .sorted(DISTRIBUTION_ORDER)
+                    .forEach(link -> items.add(item(
+                            link.displayLabel(),
+                            link.preferredHref().toString(),
+                            link.preferredHref().toString())));
+        }
         return items;
+    }
+
+    private static AccessStateVm accessState(CatalogEntry entry) {
+        return new AccessStateVm(entry.isOpenData(), entry.accessLevel().displayLabel());
+    }
+
+    private static String downloadLead(AccessStateVm accessState, String resourceLabel) {
+        if (accessState.openData()) {
+            return "Dateien " + resourceLabel + " in den verfügbaren Formaten.";
+        }
+        return "Für " + resourceLabel + " sind keine Open-Data-Downloads verfügbar.";
     }
 
     private static void addContactItems(List<MetadataItemVm> items, ContactPoint contact) {

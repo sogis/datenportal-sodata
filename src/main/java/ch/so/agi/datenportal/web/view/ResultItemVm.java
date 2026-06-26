@@ -10,6 +10,7 @@ public record ResultItemVm(
         String themeLabel,
         String publicationDateLabel,
         String detailHref,
+        AccessStateVm accessState,
         List<DownloadLinkVm> downloads,
         boolean series,
         boolean expanded,

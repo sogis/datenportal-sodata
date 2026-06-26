@@ -204,6 +204,44 @@ class CatalogControllerMvcTest {
     }
 
     @Test
+    void nonOpenDatasetListViewReplacesDownloadsWithLockIcon() throws Exception {
+        mockMvc.perform(get("/datasets").param("q", "Baumkataster"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Baumkataster")))
+                .andExpect(content().string(containsString("Oeffentlich mit Bedingungen")))
+                .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.2581.baumkataster.csv\""))))
+                .andExpect(content().string(not(containsString(">CSV</a>"))));
+    }
+
+    @Test
+    void nonOpenSeriesRowsAndIssuesReplaceDownloadsWithLockIcon() throws Exception {
+        mockMvc.perform(get("/datasets")
+                        .param("q", "Baustellen")
+                        .param("expanded", "ch.so.baustellen.koordinationsplanung"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Baustellen-Koordinationsplanung")))
+                .andExpect(content().string(containsString("Baustellen-Koordinationsplanung 2026")))
+                .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2026.csv\""))))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2025.csv\""))));
+    }
+
+    @Test
+    void nonOpenCardsShowAccessBadgeAndLockInsteadOfOpenDataDownloads() throws Exception {
+        mockMvc.perform(get("/datasets")
+                        .param("view", "cards")
+                        .param("q", "Baumkataster"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Baumkataster")))
+                .andExpect(content().string(containsString("dp-status-badge dp-status-badge--warning")))
+                .andExpect(content().string(containsString(">Oeffentlich mit Bedingungen</span>")))
+                .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
+                .andExpect(content().string(not(containsString(">Open Data</span>"))))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.2581.baumkataster.csv\""))));
+    }
+
+    @Test
     void activeFilterChipsRemoveSingleValuesAndKeepRelevantParameters() throws Exception {
         mockMvc.perform(get("/datasets")
                         .param("theme", "Bau_und_Wohnungswesen")

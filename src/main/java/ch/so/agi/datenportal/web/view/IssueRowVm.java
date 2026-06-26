@@ -9,6 +9,7 @@ public record IssueRowVm(
         String typeLabel,
         String publicationDateLabel,
         String detailHref,
+        AccessStateVm accessState,
         List<DownloadLinkVm> downloads) {
 
     public IssueRowVm {

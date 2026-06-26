@@ -482,6 +482,10 @@
   justify-content: start;
 }
 
+.dp-entry-downloads .dp-access-lock {
+  align-self: center;
+}
+
 .dp-issue-group .dp-issue-row {
   background: var(--dp-color-surface-muted);
 }

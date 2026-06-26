@@ -108,6 +108,11 @@
   color: var(--dp-color-badge-positive-text);
 }
 
+.dp-status-badge--warning {
+  background: var(--dp-color-badge-warning-bg);
+  color: var(--dp-color-badge-warning-text);
+}
+
 .dp-status-badge--info {
   background: var(--dp-color-badge-info-bg);
   color: var(--dp-color-badge-info-text);
@@ -137,6 +142,23 @@
 .dp-download-link:focus-visible {
   background: var(--dp-color-badge-hover);
   color: var(--dp-color-text);
+}
+
+.dp-access-lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--dp-color-text-muted);
+  line-height: 0;
+}
+
+.dp-access-lock svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
 }
 
 .dp-footer {

@@ -41,7 +41,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | UI-Bereich | JTE | Java | Tests |
 |---|---|---|---|
 | Grid | `components/entryCardGrid.jte` | `ResultsVm.cards` | `view=cards` rendert Grid |
-| Card | `components/entryCard.jte` | `EntryCardVm` | Typ-Badge, Open Data, Struktur beschrieben |
+| Card | `components/entryCard.jte` | `EntryCardVm` | Typ-Badge, Access-Badge, Struktur beschrieben |
 | Chips | `components/chipList.jte` | `EntryCardVm.keywords` | Keywords als neutrale Status-Badge-Familie gerendert |
 
 ## Detailseiten
@@ -52,7 +52,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | aktuelle und historische Ausgaben |
 | Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Rücklink zur Datenreihe und weitere Ausgaben |
 | Datensatz-Teaserreihe | `components/detailTeaserRow.jte` | statisch im Template | drei Spalten, mobile gestapelt |
-| Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet |
+| Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet oder Schloss fuer nicht offene Eintraege |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
 | weitere Ausgaben | `components/seriesIssues.jte` | `SeriesIssuesVm` | aktuelle/ältere Ausgaben |
 | Fehlerseite | `pages/notFound.jte` | `CatalogErrorControllerAdvice` | unbekannte Identifier liefern 404 |

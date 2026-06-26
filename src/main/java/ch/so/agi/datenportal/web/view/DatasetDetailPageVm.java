@@ -8,7 +8,7 @@ public record DatasetDetailPageVm(
         String title,
         String description,
         String typeLabel,
-        boolean openData,
+        AccessStateVm accessState,
         boolean structureDescribed,
         String modifiedLabel,
         String issuedLabel,

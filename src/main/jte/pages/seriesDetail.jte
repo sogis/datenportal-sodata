@@ -7,7 +7,7 @@
         title = page.title(),
         description = page.description(),
         typeLabel = page.typeLabel(),
-        openData = page.openData(),
+        accessState = page.accessState(),
         structureDescribed = page.structureDescribed(),
         modifiedLabel = page.modifiedLabel(),
         issuedLabel = page.issuedLabel()

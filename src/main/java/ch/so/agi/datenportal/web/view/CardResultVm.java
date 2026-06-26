@@ -7,7 +7,7 @@ public record CardResultVm(
         String title,
         String description,
         String typeLabel,
-        boolean openData,
+        AccessStateVm accessState,
         boolean structureDescribed,
         List<String> keywords,
         List<DownloadLinkVm> downloads,

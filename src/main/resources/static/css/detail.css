@@ -247,6 +247,11 @@
   color: var(--dp-color-text-muted);
 }
 
+.dp-detail-downloads .dp-download-list,
+.dp-series-issue .dp-download-list {
+  justify-content: start;
+}
+
 @media (max-width: 900px) {
   .dp-detail-summary-layout,
   .dp-detail-layout,

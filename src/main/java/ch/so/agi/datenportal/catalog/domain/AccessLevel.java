@@ -2,8 +2,8 @@ package ch.so.agi.datenportal.catalog.domain;
 
 public enum AccessLevel {
     OPEN("Open Data"),
-    PUBLIC_WITH_CONDITIONS("Oeffentlich mit Bedingungen"),
-    RESTRICTED("Eingeschraenkt"),
+    PUBLIC_WITH_CONDITIONS("Öffentlich mit Bedingungen"),
+    RESTRICTED("Eingeschränkt"),
     INTERNAL("Intern"),
     CONFIDENTIAL("Vertraulich");
 

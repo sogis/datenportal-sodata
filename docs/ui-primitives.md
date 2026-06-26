@@ -48,6 +48,7 @@ Beispiele:
 - `Datensatz`
 - `Datenreihe`
 - `Open Data`
+- `Oeffentlich mit Bedingungen`
 - `Struktur beschrieben`
 - `Aktuelle Ausgabe`
 
@@ -62,6 +63,7 @@ Status-Varianten:
 
 - neutral: `Datensatz`, `Datenreihe`, `Struktur beschrieben`, Keyword-/Themen-Labels auf Cards
 - positive: `Open Data`
+- warning: nicht offene Zugriffsrechte wie `Oeffentlich mit Bedingungen`, `Eingeschraenkt`, `Intern`, `Vertraulich`
 - info: `Aktuelle Ausgabe`
 
 Lokale Ausnahme fuer Card-Keywords:
@@ -114,6 +116,7 @@ Pflicht:
 - neutrale Status-Badges verwenden dieselbe neutrale Flaeche: `var(--dp-color-badge)`
 - grosse passive neutrale Flaechen verwenden `var(--dp-color-surface-subtle)`
 - `Open Data` verwendet eine positive Badge-Variante
+- nicht offene Zugriffsrechte verwenden eine gelbe Warning-Badge-Variante
 - `Aktuelle Ausgabe` verwendet eine sachliche Info-/Ink-Variante
 
 Nicht erlaubt:
@@ -127,6 +130,7 @@ Nicht erlaubt:
 - `Datensatz` und `Datenreihe` = neutrale Status-Badges
 - `Struktur beschrieben` = neutrales Status-Badge
 - `Open Data` = positives Status-Badge
+- `Oeffentlich mit Bedingungen`, `Eingeschraenkt`, `Intern`, `Vertraulich` = Warning-Status-Badge
 - `Aktuelle Ausgabe` = Info-Status-Badge
 - `CSV`, `XLSX`, `Parquet` = Action Pills
 - Keyword-/Themen-Labels auf Cards = neutrale Status-Badge-Familie mit lokaler `14px`-Typografie-Ausnahme
@@ -139,6 +143,7 @@ Semantische CSS-Familien:
 - `.dp-status-badge`
 - `.dp-status-badge--neutral`
 - `.dp-status-badge--positive`
+- `.dp-status-badge--warning`
 - `.dp-status-badge--info`
 - `.dp-action-pill`
 

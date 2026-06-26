@@ -473,6 +473,20 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(openDataBadge, "border-top-width")).isEqualTo("0px");
             assertThat(positiveBackground).isNotEqualTo(neutralBackground);
 
+            page.navigate(baseUrl("/datasets?view=cards&q=Baumkataster"));
+
+            Locator warningBadge = page.locator(".dp-result-card .dp-status-badge--warning").first();
+            Locator lockedCardDownload = page.locator(".dp-result-card .dp-access-lock").first();
+            Locator lockedCardDownloadIcon = lockedCardDownload.locator("svg");
+
+            assertThat(fontSize(warningBadge)).isEqualTo("16px");
+            assertThat(cssValue(warningBadge, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(warningBadge, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(warningBadge, "background-color")).isEqualTo("rgb(255, 254, 48)");
+            assertThat(page.locator(".dp-result-card .dp-download-link").count()).isZero();
+            assertThat(cssValue(lockedCardDownloadIcon, "width")).isEqualTo("24px");
+            assertThat(cssValue(lockedCardDownloadIcon, "height")).isEqualTo("24px");
+
             page.navigate(baseUrl("/series/ch.so.abstimmungsresultate"));
 
             Locator currentIssueBadge = page.locator(".dp-status-badge--info").first();

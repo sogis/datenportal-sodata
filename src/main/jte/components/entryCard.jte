@@ -14,9 +14,7 @@
       @endif
       <span>${card.typeLabel()}</span>
     </span>
-    @if(card.openData())
-      <span class="dp-status-badge dp-status-badge--positive">Open Data</span>
-    @endif
+    @template.components.accessBadge(accessState = card.accessState())
     @if(card.structureDescribed())
       <span class="dp-status-badge dp-status-badge--neutral">Struktur beschrieben</span>
     @endif
@@ -33,7 +31,7 @@
     </ul>
   @endif
   <div class="dp-result-card__bottom">
-    @template.components.downloadLink(downloads = card.downloads())
+    @template.components.downloadLink(accessState = card.accessState(), downloads = card.downloads())
     <div class="dp-result-card__footer">
       <span>${card.dateLabel()}</span>
       <a class="dp-card-detail-link" href="${card.detailHref()}" aria-label="Details anzeigen: ${card.title()}">&rarr;</a>

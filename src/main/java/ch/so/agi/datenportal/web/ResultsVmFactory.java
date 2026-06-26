@@ -6,6 +6,7 @@ import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.search.SearchResult;
 import ch.so.agi.datenportal.search.SortMode;
+import ch.so.agi.datenportal.web.view.AccessStateVm;
 import ch.so.agi.datenportal.web.view.CardResultVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
 import ch.so.agi.datenportal.web.view.IssueRowVm;
@@ -69,6 +70,7 @@ public final class ResultsVmFactory {
                 themeLabel(entry),
                 DATE_FORMATTER.format(entry.modified()),
                 detailHref(entry),
+                accessState(entry),
                 entry.distributionsForListing().stream()
                         .map(link -> download(entry.title(), link))
                         .toList(),
@@ -89,6 +91,7 @@ public final class ResultsVmFactory {
                 issue.type().label(),
                 DATE_FORMATTER.format(issue.modified()),
                 issueDetailHref(series, issue),
+                accessState(issue),
                 issue.distributionsForListing().stream()
                         .map(link -> download(issue.title(), link))
                         .toList());
@@ -100,7 +103,7 @@ public final class ResultsVmFactory {
                 entry.title(),
                 entry.description(),
                 entry.type().label(),
-                true,
+                accessState(entry),
                 false,
                 keywords(entry),
                 entry.distributionsForListing().stream()
@@ -116,6 +119,10 @@ public final class ResultsVmFactory {
                 label,
                 link.preferredHref().toString(),
                 label + " herunterladen: " + entryTitle);
+    }
+
+    private static AccessStateVm accessState(CatalogEntry entry) {
+        return new AccessStateVm(entry.isOpenData(), entry.accessLevel().displayLabel());
     }
 
     private String detailHref(CatalogEntry entry) {

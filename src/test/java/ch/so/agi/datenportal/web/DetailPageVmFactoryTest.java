@@ -85,6 +85,36 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
+    void nonOpenDatasetCarriesAccessLabelAndSuppressesResourceLinksInMetadata() {
+        DatasetEntry dataset = new DatasetEntry(
+                "dataset",
+                "Datensatz",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                LocalDate.parse("2026-05-19"),
+                AccessLevel.PUBLIC_WITH_CONDITIONS,
+                CatalogEntryMetadata.empty(),
+                List.of(distribution(DistributionFormat.CSV), distribution(DistributionFormat.XLSX)));
+
+        var page = factory.dataset(dataset);
+
+        assertThat(page.accessState().openData()).isFalse();
+        assertThat(page.accessState().label()).isEqualTo("Oeffentlich mit Bedingungen");
+        assertThat(page.downloads().accessState().openData()).isFalse();
+        assertThat(page.downloads().lead()).contains("keine Open-Data-Downloads");
+        assertThat(page.metadataSections())
+                .filteredOn(section -> section.id().equals("resources"))
+                .singleElement()
+                .satisfies(section -> assertThat(section.items())
+                        .extracting(item -> item.label())
+                        .contains("Formate")
+                        .doesNotContain("CSV", "XLSX"));
+    }
+
+    @Test
     void issuePageMarksRelatedCurrentIssue() {
         DatasetIssueEntry oldIssue = issue("series-2025", "2025", false, LocalDate.parse("2025-12-31"));
         DatasetIssueEntry currentIssue = issue("series-2026", "2026", true, LocalDate.parse("2026-12-31"));
@@ -111,7 +141,61 @@ class DetailPageVmFactoryTest {
                 });
     }
 
+    @Test
+    void seriesAndIssuesCarrySeparateAccessStatesForBadgesAndDownloads() {
+        DatasetIssueEntry oldIssue = issue(
+                "series-2025",
+                "2025",
+                false,
+                LocalDate.parse("2025-12-31"),
+                AccessLevel.PUBLIC_WITH_CONDITIONS);
+        DatasetIssueEntry currentIssue = issue(
+                "series-2026",
+                "2026",
+                true,
+                LocalDate.parse("2026-12-31"),
+                AccessLevel.PUBLIC_WITH_CONDITIONS);
+        DatasetSeriesEntry series = new DatasetSeriesEntry(
+                "series",
+                "Datenreihe",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                AccessLevel.OPEN,
+                CatalogEntryMetadata.empty(),
+                List.of(oldIssue, currentIssue));
+
+        var page = factory.series(series);
+
+        assertThat(page.accessState().openData()).isTrue();
+        assertThat(page.currentIssueDownloads().accessState().openData()).isFalse();
+        assertThat(page.currentIssueDownloads().lead()).contains("keine Open-Data-Downloads");
+        assertThat(page.issues().issues())
+                .allSatisfy(issue -> {
+                    assertThat(issue.accessState().openData()).isFalse();
+                    assertThat(issue.accessState().label()).isEqualTo("Oeffentlich mit Bedingungen");
+                });
+        assertThat(page.metadataSections())
+                .filteredOn(section -> section.id().equals("resources"))
+                .singleElement()
+                .satisfies(section -> assertThat(section.items())
+                        .extracting(item -> item.label())
+                        .contains("Formate")
+                        .doesNotContain("CSV", "XLSX", "Parquet"));
+    }
+
     private static DatasetIssueEntry issue(String identifier, String label, boolean current, LocalDate modified) {
+        return issue(identifier, label, current, modified, AccessLevel.OPEN);
+    }
+
+    private static DatasetIssueEntry issue(
+            String identifier,
+            String label,
+            boolean current,
+            LocalDate modified,
+            AccessLevel accessLevel) {
         return new DatasetIssueEntry(
                 identifier,
                 "Ausgabe " + label,
@@ -121,7 +205,7 @@ class DetailPageVmFactoryTest {
                 List.of(theme()),
                 List.of(label),
                 modified,
-                AccessLevel.OPEN,
+                accessLevel,
                 CatalogEntryMetadata.empty(),
                 List.of(distribution(DistributionFormat.CSV)),
                 label,
