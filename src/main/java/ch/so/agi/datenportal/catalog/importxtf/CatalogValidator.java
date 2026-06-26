@@ -2,6 +2,7 @@ package ch.so.agi.datenportal.catalog.importxtf;
 
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
+import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
@@ -27,10 +28,12 @@ public final class CatalogValidator {
         for (DatasetEntry dataset : catalog.datasets()) {
             validateIdentifier(dataset, "dataset", identifiers, errors);
             validateDistributions(dataset.identifier(), dataset.distributions(), errors);
+            validateAttributes(dataset.identifier(), dataset.metadata().attributes(), errors);
         }
 
         for (DatasetSeriesEntry series : catalog.datasetSeries()) {
             validateIdentifier(series, "dataset series", identifiers, errors);
+            validateAttributes(series.identifier(), series.metadata().attributes(), errors);
 
             if (series.issues().isEmpty()) {
                 errors.add("Dataset series '" + series.identifier() + "' must contain at least one issue.");
@@ -48,6 +51,7 @@ public final class CatalogValidator {
             for (DatasetIssueEntry issue : series.issues()) {
                 validateIdentifier(issue, "dataset issue", identifiers, errors);
                 validateDistributions(issue.identifier(), issue.distributions(), errors);
+                validateAttributes(issue.identifier(), issue.metadata().attributes(), errors);
             }
         }
 
@@ -71,6 +75,18 @@ public final class CatalogValidator {
     private static void validateDistributions(String ownerIdentifier, List<DistributionLink> distributions, List<String> errors) {
         if (distributions.isEmpty()) {
             errors.add("Entry '" + ownerIdentifier + "' must contain at least one distribution.");
+        }
+    }
+
+    private static void validateAttributes(String ownerIdentifier, List<DatasetAttribute> attributes, List<String> errors) {
+        for (DatasetAttribute attribute : attributes) {
+            if (attribute.name().isBlank()) {
+                errors.add("Entry '" + ownerIdentifier + "' contains a dataset attribute with blank name.");
+            }
+            if (attribute.dataType().isBlank()) {
+                errors.add("Entry '" + ownerIdentifier + "' contains dataset attribute '" + attribute.name()
+                        + "' with blank dataType.");
+            }
         }
     }
 }

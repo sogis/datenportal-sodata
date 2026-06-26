@@ -2,6 +2,7 @@ package ch.so.agi.datenportal.catalog.domain;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public record CatalogEntryMetadata(
@@ -10,7 +11,9 @@ public record CatalogEntryMetadata(
         Optional<URI> licenseUri,
         Optional<ContactPoint> contactPoint,
         Optional<String> accrualPeriodicity,
-        Optional<TemporalCoverage> temporalCoverage) {
+        Optional<TemporalCoverage> temporalCoverage,
+        List<DatasetAttribute> attributes,
+        Optional<String> model) {
 
     private static final CatalogEntryMetadata EMPTY = new CatalogEntryMetadata(
             Optional.empty(),
@@ -18,6 +21,8 @@ public record CatalogEntryMetadata(
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
+            Optional.empty(),
+            List.of(),
             Optional.empty());
 
     public CatalogEntryMetadata {
@@ -29,9 +34,15 @@ public record CatalogEntryMetadata(
                 .filter(value -> !value.isBlank());
         temporalCoverage = temporalCoverage == null ? Optional.empty() : temporalCoverage
                 .filter(coverage -> !coverage.isEmpty());
+        attributes = attributes == null ? List.of() : List.copyOf(attributes);
+        model = model == null ? Optional.empty() : model.filter(value -> !value.isBlank());
     }
 
     public static CatalogEntryMetadata empty() {
         return EMPTY;
+    }
+
+    public boolean hasStructureInformation() {
+        return !attributes.isEmpty() || model.isPresent();
     }
 }

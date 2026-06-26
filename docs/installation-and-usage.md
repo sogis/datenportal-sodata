@@ -13,7 +13,7 @@ Dieses Dokument ist nur noch eine kompakte Orientierung. Für den aktuellen MVP-
 ./gradlew bootRun
 ```
 
-Die Anwendung lädt standardmässig `published_catalog_full_54_entries.xtf` vom Classpath.
+Die Anwendung lädt standardmässig `published_catalog_full_62_entries.xtf` vom Classpath.
 
 ## Alternative Katalogquellen
 

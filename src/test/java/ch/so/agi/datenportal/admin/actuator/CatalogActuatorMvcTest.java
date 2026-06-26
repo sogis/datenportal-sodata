@@ -25,7 +25,7 @@ class CatalogActuatorMvcTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"))
                 .andExpect(jsonPath("$.components.catalogSnapshot.status").value("UP"))
-                .andExpect(jsonPath("$.components.catalogSnapshot.details.visibleEntries").value(54))
+                .andExpect(jsonPath("$.components.catalogSnapshot.details.visibleEntries").value(62))
                 .andExpect(jsonPath("$.components.catalogSnapshot.details.loadedAt", not(emptyOrNullString())))
                 .andExpect(jsonPath("$.components.catalogReload.status").value("UP"))
                 .andExpect(jsonPath("$.components.catalogReload.details.running").value(false))

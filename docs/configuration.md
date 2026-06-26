@@ -10,7 +10,7 @@ Bevorzugte Konfiguration:
 datenportal:
   catalog:
     source-type: classpath # classpath | http | file
-    classpath-location: published_catalog_full_54_entries.xtf
+    classpath-location: published_catalog_full_62_entries.xtf
     file-location: ./config/catalog.xtf
     http-url: https://example.org/published_catalog.xtf
     http-connect-timeout: 5s
@@ -25,7 +25,7 @@ Die Legacy-Property bleibt vorerst gültig:
 ```yaml
 datenportal:
   catalog:
-    source: classpath:published_catalog_full_54_entries.xtf
+    source: classpath:published_catalog_full_62_entries.xtf
 ```
 
 Wenn `source-type` gesetzt ist, gewinnt die neue Konfiguration gegenüber `source`.

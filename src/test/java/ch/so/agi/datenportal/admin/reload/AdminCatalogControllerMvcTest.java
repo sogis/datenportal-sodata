@@ -43,7 +43,7 @@ class AdminCatalogControllerMvcTest {
                         .header(ReloadTokenVerifier.HEADER_NAME, "test-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.visibleEntries").value(54))
+                .andExpect(jsonPath("$.visibleEntries").value(62))
                 .andExpect(jsonPath("$.contentHash", not(emptyOrNullString())));
     }
 
@@ -53,8 +53,8 @@ class AdminCatalogControllerMvcTest {
                         .header(ReloadTokenVerifier.HEADER_NAME, "test-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.enabled").value(true))
-                .andExpect(jsonPath("$.visibleEntries").value(54))
-                .andExpect(jsonPath("$.sourceDescription").value("classpath:published_catalog_full_54_entries.xtf"))
+                .andExpect(jsonPath("$.visibleEntries").value(62))
+                .andExpect(jsonPath("$.sourceDescription").value("classpath:published_catalog_full_62_entries.xtf"))
                 .andExpect(jsonPath("$.contentHash", not(emptyOrNullString())));
     }
 

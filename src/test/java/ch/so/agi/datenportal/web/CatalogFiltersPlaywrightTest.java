@@ -9,6 +9,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.BoundingBox;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -458,27 +459,25 @@ class CatalogFiltersPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets?view=cards"));
 
-            Locator shortCard = page.locator(".dp-result-card").filter(new Locator.FilterOptions()
-                    .setHas(page.locator(".dp-result-card__title a:has-text('Energieverbrauch Gemeinden')")));
-            Locator tallCard = page.locator(".dp-result-card").filter(new Locator.FilterOptions()
-                    .setHas(page.locator(".dp-result-card__title a:has-text('Gemeindegrenzen Kanton Solothurn')")));
+            List<Integer> rowIndexes = findCardRowWithMixedKeywordHeights(page.locator(".dp-result-card"));
+            assertThat(rowIndexes).hasSizeGreaterThanOrEqualTo(2);
 
-            BoundingBox shortBottom = requireBoundingBox(shortCard.locator(".dp-result-card__bottom"));
-            BoundingBox tallBottom = requireBoundingBox(tallCard.locator(".dp-result-card__bottom"));
-            BoundingBox shortFooter = requireBoundingBox(shortCard.locator(".dp-result-card__footer"));
-            BoundingBox tallFooter = requireBoundingBox(tallCard.locator(".dp-result-card__footer"));
+            Locator cards = page.locator(".dp-result-card");
+            BoundingBox baselineBottom = requireBoundingBox(cards.nth(rowIndexes.getFirst()).locator(".dp-result-card__bottom"));
+            BoundingBox baselineFooter = requireBoundingBox(cards.nth(rowIndexes.getFirst()).locator(".dp-result-card__footer"));
 
-            double shortKeywordGap = requireGap(
-                    requireBoundingBox(shortCard.locator(".dp-keyword-list")),
-                    requireBoundingBox(shortCard.locator(".dp-download-list")));
-            double tallKeywordGap = requireGap(
-                    requireBoundingBox(tallCard.locator(".dp-keyword-list")),
-                    requireBoundingBox(tallCard.locator(".dp-download-list")));
+            for (int cardIndex : rowIndexes) {
+                Locator card = cards.nth(cardIndex);
+                BoundingBox cardBottom = requireBoundingBox(card.locator(".dp-result-card__bottom"));
+                BoundingBox cardFooter = requireBoundingBox(card.locator(".dp-result-card__footer"));
+                double keywordGap = requireGap(
+                        requireBoundingBox(card.locator(".dp-keyword-list")),
+                        requireBoundingBox(card.locator(".dp-download-list")));
 
-            assertThat(Math.abs(lowerEdge(shortBottom) - lowerEdge(tallBottom))).isLessThan(1.5d);
-            assertThat(Math.abs(lowerEdge(shortFooter) - lowerEdge(tallFooter))).isLessThan(1.5d);
-            assertThat(shortKeywordGap).isGreaterThanOrEqualTo(24.0d);
-            assertThat(tallKeywordGap).isGreaterThanOrEqualTo(24.0d);
+                assertThat(Math.abs(lowerEdge(cardBottom) - lowerEdge(baselineBottom))).isLessThan(1.5d);
+                assertThat(Math.abs(lowerEdge(cardFooter) - lowerEdge(baselineFooter))).isLessThan(1.5d);
+                assertThat(keywordGap).isGreaterThanOrEqualTo(24.0d);
+            }
         }
     }
 
@@ -661,6 +660,50 @@ class CatalogFiltersPlaywrightTest {
 
     private static double lowerEdge(BoundingBox boundingBox) {
         return boundingBox.y + boundingBox.height;
+    }
+
+    private static List<Integer> findCardRowWithMixedKeywordHeights(Locator cards) {
+        int cardCount = cards.count();
+        List<RowCardMeasurement> currentRow = new ArrayList<>();
+        List<Integer> fallbackRow = List.of();
+
+        for (int index = 0; index < cardCount; index++) {
+            Locator card = cards.nth(index);
+            BoundingBox cardBox = requireBoundingBox(card);
+            double keywordHeight = requireBoundingBox(card.locator(".dp-keyword-list")).height;
+
+            if (currentRow.isEmpty() || Math.abs(currentRow.getFirst().top() - cardBox.y) < 1.5d) {
+                currentRow.add(new RowCardMeasurement(index, cardBox.y, keywordHeight));
+                continue;
+            }
+
+            if (currentRow.size() >= 2 && hasMixedKeywordHeights(currentRow)) {
+                return currentRow.stream().map(RowCardMeasurement::index).toList();
+            }
+            if (fallbackRow.isEmpty() && currentRow.size() >= 2) {
+                fallbackRow = currentRow.stream().map(RowCardMeasurement::index).toList();
+            }
+
+            currentRow = new ArrayList<>();
+            currentRow.add(new RowCardMeasurement(index, cardBox.y, keywordHeight));
+        }
+
+        if (currentRow.size() >= 2 && hasMixedKeywordHeights(currentRow)) {
+            return currentRow.stream().map(RowCardMeasurement::index).toList();
+        }
+        if (fallbackRow.isEmpty() && currentRow.size() >= 2) {
+            return currentRow.stream().map(RowCardMeasurement::index).toList();
+        }
+        return fallbackRow;
+    }
+
+    private static boolean hasMixedKeywordHeights(List<RowCardMeasurement> row) {
+        double minHeight = row.stream().mapToDouble(RowCardMeasurement::keywordHeight).min().orElse(0.0d);
+        double maxHeight = row.stream().mapToDouble(RowCardMeasurement::keywordHeight).max().orElse(0.0d);
+        return (maxHeight - minHeight) > 10.0d;
+    }
+
+    private record RowCardMeasurement(int index, double top, double keywordHeight) {
     }
 
     private static void waitForLocationSearchContains(Page page, String... fragments) {

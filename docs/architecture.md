@@ -80,7 +80,7 @@ Wichtige Verantwortlichkeiten:
 
 1. Spring bindet `datenportal.catalog.*`.
 2. `CatalogSource` lädt die vollständigen Katalogbytes.
-3. `XtfPublishedCatalogParser` parst namespace-aware und XXE-sicher.
+3. `XtfPublishedCatalogParser` parst namespace-aware und XXE-sicher, inklusive exakter `accessRights` sowie strukturbezogener Metadaten (`attributes`, `model`).
 4. `CatalogValidator` prüft Pflichtregeln.
 5. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index.
 6. `CatalogSnapshotBuilder` erzeugt den immutable `CatalogSnapshot`.
@@ -135,7 +135,7 @@ sequenceDiagram
     Source-->>Loader: CatalogBytes
     Loader->>Builder: build(bytes)
     Builder->>Parser: parse(inputStream, sourceDescription)
-    Parser-->>Builder: Catalog mit Datasets, Series, Issues und Metadaten
+    Parser-->>Builder: Catalog mit Datasets, Series, Issues, exakten Access-Levels und Resource-Metadaten
     Builder->>Validator: validate(catalog)
     Validator-->>Builder: OK oder Fehler
     loop je Top-Level-Eintrag

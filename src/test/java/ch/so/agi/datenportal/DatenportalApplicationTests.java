@@ -16,8 +16,8 @@ class DatenportalApplicationTests {
     @Test
     void contextLoadsAndStartupCatalogIsAvailable() {
         assertThat(catalogService.currentSnapshot().sourceDescription())
-                .isEqualTo("classpath:published_catalog_full_54_entries.xtf");
-        assertThat(catalogService.visibleEntries()).hasSize(54);
+                .isEqualTo("classpath:published_catalog_full_62_entries.xtf");
+        assertThat(catalogService.visibleEntries()).hasSize(62);
         assertThat(catalogService.findVisibleEntry("ch.so.bauinventar")).isPresent();
         assertThat(catalogService.findAnyEntry("ch.so.abstimmungsresultate_2026")).isPresent();
         assertThat(catalogService.currentSnapshot().searchIndex().isEmpty()).isFalse();

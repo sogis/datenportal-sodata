@@ -2,7 +2,10 @@ package ch.so.agi.datenportal.catalog.domain;
 
 public enum AccessLevel {
     OPEN("Open Data"),
-    RESTRICTED("Eingeschränkt");
+    PUBLIC_WITH_CONDITIONS("Oeffentlich mit Bedingungen"),
+    RESTRICTED("Eingeschraenkt"),
+    INTERNAL("Intern"),
+    CONFIDENTIAL("Vertraulich");
 
     private final String displayLabel;
 
@@ -25,7 +28,10 @@ public enum AccessLevel {
 
         return switch (value.trim().toLowerCase()) {
             case "open" -> OPEN;
+            case "public_with_conditions" -> PUBLIC_WITH_CONDITIONS;
             case "restricted" -> RESTRICTED;
+            case "internal" -> INTERNAL;
+            case "confidential" -> CONFIDENTIAL;
             default -> throw new IllegalArgumentException("Unsupported access level: " + value);
         };
     }

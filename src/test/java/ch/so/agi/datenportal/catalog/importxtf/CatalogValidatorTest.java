@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
+import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
@@ -65,7 +67,25 @@ class CatalogValidatorTest {
         assertThat(result.warnings()).anyMatch(message -> message.contains("no explicit current issue"));
     }
 
+    @Test
+    void acceptsExtendedAccessLevelsAndStructuredMetadata() {
+        Catalog catalog = new Catalog(
+                List.of(dataset("public-conditions", AccessLevel.PUBLIC_WITH_CONDITIONS)),
+                List.of(series(
+                        "series",
+                        AccessLevel.INTERNAL,
+                        issue("series-2026", "2026", true, LocalDate.parse("2026-12-31"), AccessLevel.CONFIDENTIAL))));
+
+        CatalogValidationResult result = VALIDATOR.validate(catalog);
+
+        assertThat(result.errors()).isEmpty();
+    }
+
     private static DatasetEntry dataset(String identifier) {
+        return dataset(identifier, AccessLevel.OPEN);
+    }
+
+    private static DatasetEntry dataset(String identifier, AccessLevel accessLevel) {
         return new DatasetEntry(
                 identifier,
                 "Dataset " + identifier,
@@ -75,11 +95,16 @@ class CatalogValidatorTest {
                 List.of(THEME),
                 List.of(identifier),
                 LocalDate.parse("2026-05-01"),
-                AccessLevel.OPEN,
+                accessLevel,
+                metadata(),
                 List.of(new DistributionLink(URI.create("https://example.com/" + identifier + ".csv"), DistributionFormat.CSV)));
     }
 
     private static DatasetSeriesEntry series(String identifier, DatasetIssueEntry... issues) {
+        return series(identifier, AccessLevel.OPEN, issues);
+    }
+
+    private static DatasetSeriesEntry series(String identifier, AccessLevel accessLevel, DatasetIssueEntry... issues) {
         return new DatasetSeriesEntry(
                 identifier,
                 "Series " + identifier,
@@ -88,11 +113,21 @@ class CatalogValidatorTest {
                 OFFICE,
                 List.of(THEME),
                 List.of(identifier),
-                AccessLevel.OPEN,
+                accessLevel,
+                metadata(),
                 List.of(issues));
     }
 
     private static DatasetIssueEntry issue(String identifier, String label, boolean current, LocalDate modified) {
+        return issue(identifier, label, current, modified, AccessLevel.OPEN);
+    }
+
+    private static DatasetIssueEntry issue(
+            String identifier,
+            String label,
+            boolean current,
+            LocalDate modified,
+            AccessLevel accessLevel) {
         return new DatasetIssueEntry(
                 identifier,
                 "Issue " + label,
@@ -102,9 +137,22 @@ class CatalogValidatorTest {
                 List.of(THEME),
                 List.of(label),
                 modified,
-                AccessLevel.OPEN,
+                accessLevel,
+                metadata(),
                 List.of(new DistributionLink(URI.create("https://example.com/" + identifier + ".csv"), DistributionFormat.CSV)),
                 label,
                 current);
+    }
+
+    private static CatalogEntryMetadata metadata() {
+        return new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                List.of(new DatasetAttribute("gemeinde", "TEXT", Optional.of("Gemeinde"), Optional.empty(), true)),
+                Optional.of("SO_AGI_Testmodell_20260624"));
     }
 }

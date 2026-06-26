@@ -4,6 +4,7 @@ import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.ContactPoint;
+import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
@@ -205,6 +206,13 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "origin" -> series.origin = readOptionalText(reader, childPath).orElse(null);
                     case "accrualPeriodicity" -> series.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
                     case "temporalCoverage" -> series.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
+                    case "attributes" -> {
+                        RawDatasetAttribute attribute = parseDatasetAttributeContainer(reader, childPath);
+                        if (attribute != null) {
+                            series.attributes.add(attribute);
+                        }
+                    }
+                    case "model" -> series.model = readOptionalText(reader, childPath).orElse(null);
                     case "issues" -> series.issues.addAll(parseIssuesContainer(reader, childPath));
                     default -> skipElement(reader);
                 }
@@ -249,6 +257,13 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "origin" -> dataset.origin = readOptionalText(reader, childPath).orElse(null);
                     case "accrualPeriodicity" -> dataset.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
                     case "temporalCoverage" -> dataset.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
+                    case "attributes" -> {
+                        RawDatasetAttribute attribute = parseDatasetAttributeContainer(reader, childPath);
+                        if (attribute != null) {
+                            dataset.attributes.add(attribute);
+                        }
+                    }
+                    case "model" -> dataset.model = readOptionalText(reader, childPath).orElse(null);
                     case "distributions" -> {
                         RawDistribution distribution = parseDistributionContainer(reader, childPath);
                         if (distribution != null) {
@@ -322,6 +337,13 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "origin" -> issue.origin = readOptionalText(reader, childPath).orElse(null);
                     case "accrualPeriodicity" -> issue.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
                     case "temporalCoverage" -> issue.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
+                    case "attributes" -> {
+                        RawDatasetAttribute attribute = parseDatasetAttributeContainer(reader, childPath);
+                        if (attribute != null) {
+                            issue.attributes.add(attribute);
+                        }
+                    }
+                    case "model" -> issue.model = readOptionalText(reader, childPath).orElse(null);
                     case "distributions" -> {
                         RawDistribution distribution = parseDistributionContainer(reader, childPath);
                         if (distribution != null) {
@@ -634,6 +656,53 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         throw new XMLStreamException("distributions element is not closed");
     }
 
+    private RawDatasetAttribute parseDatasetAttributeContainer(XMLStreamReader reader, XtfElementPath path)
+            throws XMLStreamException {
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                if ("DatasetAttribute".equals(reader.getLocalName())) {
+                    return parseDatasetAttribute(reader, path.push("DatasetAttribute"));
+                }
+                skipElement(reader);
+                continue;
+            }
+
+            if (event == XMLStreamConstants.END_ELEMENT && "attributes".equals(reader.getLocalName())) {
+                return null;
+            }
+        }
+
+        throw new XMLStreamException("attributes element is not closed");
+    }
+
+    private RawDatasetAttribute parseDatasetAttribute(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+        RawDatasetAttribute attribute = new RawDatasetAttribute(path);
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                String localName = reader.getLocalName();
+                XtfElementPath childPath = path.push(localName);
+                switch (localName) {
+                    case "name" -> attribute.name = readRequiredText(reader, childPath);
+                    case "dataType" -> attribute.dataType = readRequiredText(reader, childPath);
+                    case "description" -> attribute.description = readOptionalText(reader, childPath).orElse(null);
+                    case "unit" -> attribute.unit = readOptionalText(reader, childPath).orElse(null);
+                    case "mandatory" -> attribute.mandatory = parseRequiredBoolean(reader, childPath);
+                    default -> skipElement(reader);
+                }
+                continue;
+            }
+
+            if (event == XMLStreamConstants.END_ELEMENT && "DatasetAttribute".equals(reader.getLocalName())) {
+                return attribute;
+            }
+        }
+
+        throw new XMLStreamException("DatasetAttribute element is not closed");
+    }
+
     private RawDistribution parseDistribution(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
         RawDistribution distribution = new RawDistribution(path);
 
@@ -768,6 +837,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         String origin;
         String accrualPeriodicity;
         RawTemporalCoverage temporalCoverage;
+        final List<RawDatasetAttribute> attributes = new ArrayList<>();
+        String model;
 
         RawEntry(XtfElementPath path) {
             this.path = path;
@@ -822,7 +893,9 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     Optional.ofNullable(licenseUri),
                     Optional.ofNullable(contactPoint).map(RawContactPoint::toDomain),
                     Optional.ofNullable(accrualPeriodicity),
-                    Optional.ofNullable(temporalCoverage).map(RawTemporalCoverage::toDomain));
+                    Optional.ofNullable(temporalCoverage).map(RawTemporalCoverage::toDomain),
+                    attributes.stream().map(RawDatasetAttribute::toDomain).toList(),
+                    Optional.ofNullable(model));
         }
 
         private static void require(Object value, XtfElementPath path) {
@@ -970,6 +1043,37 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
 
         TemporalCoverage toDomain() {
             return new TemporalCoverage(startDate, endDate, referenceDate);
+        }
+    }
+
+    private static final class RawDatasetAttribute {
+        final XtfElementPath path;
+        String name;
+        String dataType;
+        String description;
+        String unit;
+        Boolean mandatory;
+
+        RawDatasetAttribute(XtfElementPath path) {
+            this.path = path;
+        }
+
+        DatasetAttribute toDomain() {
+            if (name == null || name.isBlank()) {
+                throw validationError(path.push("name"), "Required field is missing.");
+            }
+            if (dataType == null || dataType.isBlank()) {
+                throw validationError(path.push("dataType"), "Required field is missing.");
+            }
+            if (mandatory == null) {
+                throw validationError(path.push("mandatory"), "Required field is missing.");
+            }
+            return new DatasetAttribute(
+                    name,
+                    dataType,
+                    Optional.ofNullable(description),
+                    Optional.ofNullable(unit),
+                    mandatory);
         }
     }
 
