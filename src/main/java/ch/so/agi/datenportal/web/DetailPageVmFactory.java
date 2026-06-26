@@ -57,7 +57,7 @@ public final class DetailPageVmFactory {
                 formatDate(dataset.metadata().issued()).orElse(""),
                 new DownloadSectionVm(
                         "Downloads",
-                        downloadLead(accessState(dataset), "diesem Datensatz"),
+                        downloadLead(accessState(dataset), "diesem Datensatz", "diesen Datensatz"),
                         accessState(dataset),
                         downloads(dataset.title(), dataset.distributions())),
                 metadataSections(dataset, dataset.distributions(), accessState(dataset)));
@@ -80,7 +80,7 @@ public final class DetailPageVmFactory {
                 urlFactory.currentIssueDetail(series.identifier()),
                 new DownloadSectionVm(
                         "Downloads aktuelle Ausgabe",
-                        downloadLead(currentIssueAccessState, "der aktuellen Ausgabe " + currentIssue.issueLabel()),
+                        downloadLead(currentIssueAccessState, "der aktuellen Ausgabe " + currentIssue.issueLabel(), "die aktuelle Ausgabe " + currentIssue.issueLabel()),
                         currentIssueAccessState,
                         downloads(currentIssue.title(), currentIssue.distributions())),
                 seriesIssues(series),
@@ -104,7 +104,7 @@ public final class DetailPageVmFactory {
                 formatDate(issue.metadata().issued()).orElse(""),
                 new DownloadSectionVm(
                         "Downloads",
-                        downloadLead(issueAccessState, "dieser Ausgabe"),
+                        downloadLead(issueAccessState, "dieser Ausgabe", "diese Ausgabe"),
                         issueAccessState,
                         downloads(issue.title(), issue.distributions())),
                 seriesIssues(series),
@@ -233,11 +233,11 @@ public final class DetailPageVmFactory {
         return new AccessStateVm(entry.isOpenData(), entry.accessLevel().displayLabel());
     }
 
-    private static String downloadLead(AccessStateVm accessState, String resourceLabel) {
+    private static String downloadLead(AccessStateVm accessState, String dativeLabel, String accusativeLabel) {
         if (accessState.openData()) {
-            return "Dateien " + resourceLabel + " in den verfügbaren Formaten.";
+            return "Dateien zu " + dativeLabel + " in den verfügbaren Formaten.";
         }
-        return "Für " + resourceLabel + " sind keine Open-Data-Downloads verfügbar.";
+        return "Für " + accusativeLabel + " sind keine Open-Data-Downloads verfügbar.";
     }
 
     private static void addContactItems(List<MetadataItemVm> items, ContactPoint contact) {
