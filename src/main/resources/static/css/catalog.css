@@ -538,7 +538,7 @@
   margin: 0;
   font-size: 18px;
   line-height: 1.45;
-  color: var(--dp-color-text-muted);
+  /*color: var(--dp-color-text-muted);*/
 }
 
 .dp-result-card__bottom {
