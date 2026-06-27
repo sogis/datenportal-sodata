@@ -212,6 +212,7 @@ class CatalogFiltersPlaywrightTest {
             BoundingBox featureStrip = requireBoundingBox(page.locator(".dp-detail-feature-downloads"));
             BoundingBox downloads = requireBoundingBox(page.locator(".dp-detail-feature-downloads__downloads"));
             BoundingBox actionPanel = requireBoundingBox(page.locator(".dp-detail-actions"));
+            BoundingBox overviewCard = requireBoundingBox(page.locator("#metadata-overview"));
             Locator availableFeatureIcon = page.locator(".dp-detail-feature--available .dp-detail-feature__icon svg").first();
             Locator actionLink = page.locator(".dp-detail-action-link").first();
             double gapDescriptionToSummary = requireGap(description, summaryLayout);
@@ -247,6 +248,11 @@ class CatalogFiltersPlaywrightTest {
             assertThat(Math.abs(featureStrip.x - summaryCard.x)).isLessThan(1.5d);
             assertThat(downloads.x).isGreaterThan(featureStrip.x);
             assertThat(actionPanel.x).isGreaterThan(featureStrip.x + featureStrip.width - 1d);
+            assertThat(overviewCard.y).isGreaterThan(lowerEdge(featureStrip));
+            assertThat(requireGap(featureStrip, overviewCard)).isGreaterThanOrEqualTo(24d);
+            assertThat(fontSize(page.locator("#metadata-title-overview"))).isEqualTo("24px");
+            assertThat(fontSize(page.locator("#metadata-overview .dp-metadata-list dt").first())).isEqualTo("18px");
+            assertThat(fontSize(page.locator("#metadata-overview .dp-metadata-list dd").first())).isEqualTo("18px");
         }
 
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(390, 844))) {

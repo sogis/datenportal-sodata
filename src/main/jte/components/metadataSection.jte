@@ -8,7 +8,7 @@
         <dt>${item.label()}</dt>
         <dd>
           @if(item.href().isPresent())
-            <a href="${item.href().get()}">${item.value()}</a>
+            <a href="${item.href().get()}" target="_blank">${item.value()}</a>
           @else
             ${item.value()}
           @endif

@@ -684,9 +684,9 @@ Pflichtbereiche:
 
 1. Header/Breadcrumb via Web Components
 2. Titel
-3. Badges: `Datensatz`, fuer offene Eintraege `Open Data`, sonst der lesbare Zugriffstext, optional `Struktur beschrieben`
+3. Der Hero der normalen Datensatz-Detailseite rendert aktuell keine Badge-Zeile.
 4. Kurzbeschreibung/Abstract
-5. Downloadbereich mit `CSV`, `XLSX`, `Parquet`, optional `API`; nicht offene Eintraege zeigen stattdessen ein Schloss
+5. Datenmerkmale-/Download-Zeile mit `Open Data`, `Attribute beschrieben`, `Daten validiert` sowie `CSV`, `XLSX`, `Parquet`; nicht offene Eintraege zeigen stattdessen ein Schloss
 6. Metadatenbereiche:
    - Übersicht
    - Verantwortlichkeit
@@ -699,8 +699,8 @@ Pflichtbereiche:
 
 Temporäre Umsetzungsnotiz:
 
-- Die aktuelle MVP-Iteration priorisiert auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile und einer rechten vertikalen Aktionsspalte (`Struktur & Qualität`, `Erkunden`, `Verwenden`) ohne Platzhalterlinks.
-- Die tieferen Metadatenbereiche sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
+- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, der Übersichtskarte und einer rechten vertikalen Aktionsspalte (`Struktur & Qualität`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
+- Die tieferen Metadatenbereiche unterhalb der Übersicht sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
 
 ### 8.2 Detailseite für Datenreihen und Ausgaben
 
@@ -735,56 +735,82 @@ Alternativ darf der Agent eine slugbasierte Variante verwenden, wenn die Identif
 ### 8.4 Detail-ViewModels
 
 ```java
-public sealed interface DetailPageVm permits DatasetDetailPageVm, SeriesIssueDetailPageVm {
-    PageChromeVm chrome();
-    String title();
-    String description();
-    List<StatusBadgeVm> badges();
-    List<DownloadButtonVm> downloads();
-    List<MetadataSectionVm> metadataSections();
-}
-
 public record DatasetDetailPageVm(
     PageChromeVm chrome,
+    String identifier,
     String title,
     String description,
-    List<StatusBadgeVm> badges,
-    List<DownloadButtonVm> downloads,
+    String typeLabel,
+    AccessStateVm accessState,
+    boolean structureDescribed,
+    String modifiedLabel,
+    String issuedLabel,
+    List<DetailFeatureVm> features,
+    DownloadSectionVm downloads,
+    MetadataSectionVm overview,
     List<MetadataSectionVm> metadataSections
-) implements DetailPageVm {}
+) {}
 
-public record SeriesIssueDetailPageVm(
+public record SeriesDetailPageVm(
+    PageChromeVm chrome,
+    String identifier,
+    String title,
+    String description,
+    String typeLabel,
+    AccessStateVm accessState,
+    boolean structureDescribed,
+    String modifiedLabel,
+    String issuedLabel,
+    String currentIssueLabel,
+    String currentIssueHref,
+    DownloadSectionVm currentIssueDownloads,
+    SeriesIssuesVm issues,
+    List<MetadataSectionVm> metadataSections
+) {}
+
+public record IssueDetailPageVm(
     PageChromeVm chrome,
     String seriesTitle,
-    String issueTitle,
+    String seriesHref,
+    String identifier,
     String title,
-    String description,
+    String issueLabel,
     boolean currentIssue,
-    List<StatusBadgeVm> badges,
-    List<DownloadButtonVm> downloads,
-    List<MetadataSectionVm> metadataSections,
-    List<OtherIssueVm> otherIssues,
-    Optional<String> currentIssueHref
-) implements DetailPageVm {}
+    String description,
+    AccessStateVm accessState,
+    boolean structureDescribed,
+    String modifiedLabel,
+    String issuedLabel,
+    DownloadSectionVm downloads,
+    SeriesIssuesVm relatedIssues,
+    List<MetadataSectionVm> metadataSections
+) {}
 
 public record MetadataSectionVm(
     String id,
     String title,
-    List<MetadataRowVm> rows
+    List<MetadataItemVm> items
 ) {}
 
-public record MetadataRowVm(
+public record MetadataItemVm(
     String label,
     String value,
     Optional<String> href
 ) {}
 
-public record OtherIssueVm(
-    String label,
+public record SeriesIssuesVm(
+    String title,
+    List<SeriesIssueVm> issues
+) {}
+
+public record SeriesIssueVm(
+    String issueLabel,
+    String title,
     String publicationDateLabel,
     String detailHref,
-    List<DownloadButtonVm> downloads,
-    boolean current
+    boolean current,
+    AccessStateVm accessState,
+    List<DownloadLinkVm> downloads
 ) {}
 ```
 

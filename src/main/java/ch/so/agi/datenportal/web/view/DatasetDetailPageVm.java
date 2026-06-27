@@ -14,6 +14,7 @@ public record DatasetDetailPageVm(
         String issuedLabel,
         List<DetailFeatureVm> features,
         DownloadSectionVm downloads,
+        MetadataSectionVm overview,
         List<MetadataSectionVm> metadataSections) {
 
     public DatasetDetailPageVm {

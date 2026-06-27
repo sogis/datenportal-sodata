@@ -16,6 +16,7 @@
       <div class="dp-detail-summary-layout">
         <div class="dp-detail-summary-main">
           @template.components.detailFeatureDownloadStrip(features = page.features(), downloads = page.downloads())
+          @template.components.metadataSection(section = page.overview())
         </div>
         <aside class="dp-detail-side" aria-label="Aktionen">
           @template.components.detailActionPanel()

@@ -11,11 +11,15 @@ public record CatalogEntryMetadata(
         Optional<URI> licenseUri,
         Optional<ContactPoint> contactPoint,
         Optional<String> accrualPeriodicity,
+        Optional<String> publicationStatus,
+        Optional<String> origin,
         Optional<TemporalCoverage> temporalCoverage,
         List<DatasetAttribute> attributes,
         Optional<String> model) {
 
     private static final CatalogEntryMetadata EMPTY = new CatalogEntryMetadata(
+            Optional.empty(),
+            Optional.empty(),
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
@@ -31,6 +35,10 @@ public record CatalogEntryMetadata(
         licenseUri = licenseUri == null ? Optional.empty() : licenseUri;
         contactPoint = contactPoint == null ? Optional.empty() : contactPoint;
         accrualPeriodicity = accrualPeriodicity == null ? Optional.empty() : accrualPeriodicity
+                .filter(value -> !value.isBlank());
+        publicationStatus = publicationStatus == null ? Optional.empty() : publicationStatus
+                .filter(value -> !value.isBlank());
+        origin = origin == null ? Optional.empty() : origin
                 .filter(value -> !value.isBlank());
         temporalCoverage = temporalCoverage == null ? Optional.empty() : temporalCoverage
                 .filter(coverage -> !coverage.isEmpty());

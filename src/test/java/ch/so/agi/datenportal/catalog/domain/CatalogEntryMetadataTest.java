@@ -26,9 +26,13 @@ class CatalogEntryMetadataTest {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 List.of(new DatasetAttribute("gemeinde", "TEXT", Optional.empty(), Optional.empty(), true)),
                 Optional.empty());
         var withModel = new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),

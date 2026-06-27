@@ -48,6 +48,9 @@ class XtfPublishedCatalogParserTest {
         assertThat(dataset.metadata().issued()).contains(LocalDate.parse("2026-06-24"));
         assertThat(dataset.metadata().licenseUri()).contains(URI.create("https://creativecommons.org/licenses/by/4.0/"));
         assertThat(dataset.metadata().landingPage()).contains(URI.create("https://data.so.ch/dataset/ch.so.wasserqualitaet_grundwasser"));
+        assertThat(dataset.metadata().publicationStatus()).contains("published");
+        assertThat(dataset.metadata().origin()).contains("cantonal");
+        assertThat(dataset.metadata().accrualPeriodicity()).contains("annually");
         assertThat(dataset.metadata().contactPoint()).get()
                 .satisfies(contact -> {
                     assertThat(contact.name()).isEqualTo("Amt für Umwelt");

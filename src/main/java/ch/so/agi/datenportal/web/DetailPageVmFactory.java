@@ -62,6 +62,7 @@ public final class DetailPageVmFactory {
                         downloadLead(accessState(dataset), "diesem Datensatz", "diesen Datensatz"),
                         accessState(dataset),
                         downloads(dataset.title(), dataset.distributions())),
+                new MetadataSectionVm("overview", "Übersicht", overviewItems(dataset)),
                 metadataSections(dataset, dataset.distributions(), accessState(dataset)));
     }
 
@@ -178,8 +179,19 @@ public final class DetailPageVmFactory {
         items.add(item("Identifier", entry.identifier()));
         items.add(item("Typ", entry.type().label()));
         items.add(item("Zugriff", entry.accessLevel().displayLabel()));
+        entry.metadata().origin()
+                .map(DetailPageVmFactory::originLabel)
+                .ifPresent(value -> items.add(item("Herkunft", value)));
+        entry.metadata().publicationStatus()
+                .map(DetailPageVmFactory::publicationStatusLabel)
+                .ifPresent(value -> items.add(item("Publikationsstatus", value)));
         formatDate(entry.metadata().issued()).ifPresent(value -> items.add(item("Publiziert", value)));
         items.add(item("Aktualisiert", formatDate(entry.modified())));
+        entry.metadata().accrualPeriodicity()
+                .map(DetailPageVmFactory::frequencyLabel)
+                .ifPresent(value -> items.add(item("Aktualisierungsintervall", value)));
+        entry.metadata().licenseUri()
+                .ifPresent(uri -> items.add(item("Lizenz", uri.toString(), uri.toString())));
         return items;
     }
 
@@ -298,7 +310,33 @@ public final class DetailPageVmFactory {
             case "quarterly" -> "quartalsweise";
             case "weekly" -> "wöchentlich";
             case "daily" -> "täglich";
-            case "continual", "continuous" -> "laufend";
+            case "continual", "continuous" -> "kontinuierlich";
+            case "biweekly" -> "zweiwöchentlich";
+            case "biannually" -> "halbjährlich";
+            case "asneeded", "as_needed" -> "bei Bedarf";
+            case "irregular" -> "unregelmässig";
+            case "notplanned", "not_planned" -> "nicht geplant";
+            case "unknown" -> "unbekannt";
+            default -> value;
+        };
+    }
+
+    private static String originLabel(String value) {
+        return switch (value.trim().toLowerCase()) {
+            case "federal" -> "Bund";
+            case "cantonal" -> "Kanton";
+            case "municipal" -> "Gemeinde";
+            case "other" -> "Weitere";
+            default -> value;
+        };
+    }
+
+    private static String publicationStatusLabel(String value) {
+        return switch (value.trim().toLowerCase()) {
+            case "draft" -> "Entwurf";
+            case "in_review", "inreview" -> "in Prüfung";
+            case "published" -> "veröffentlicht";
+            case "archived" -> "archiviert";
             default -> value;
         };
     }

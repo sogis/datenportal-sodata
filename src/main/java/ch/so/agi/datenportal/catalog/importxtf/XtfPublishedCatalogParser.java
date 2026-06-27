@@ -893,6 +893,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     Optional.ofNullable(licenseUri),
                     Optional.ofNullable(contactPoint).map(RawContactPoint::toDomain),
                     Optional.ofNullable(accrualPeriodicity),
+                    Optional.ofNullable(publicationStatus),
+                    Optional.ofNullable(origin),
                     Optional.ofNullable(temporalCoverage).map(RawTemporalCoverage::toDomain),
                     attributes.stream().map(RawDatasetAttribute::toDomain).toList(),
                     Optional.ofNullable(model));

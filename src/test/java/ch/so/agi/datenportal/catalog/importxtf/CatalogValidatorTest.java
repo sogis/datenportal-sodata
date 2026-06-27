@@ -152,6 +152,8 @@ class CatalogValidatorTest {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 List.of(new DatasetAttribute("gemeinde", "TEXT", Optional.of("Gemeinde"), Optional.empty(), true)),
                 Optional.of("SO_AGI_Testmodell_20260624"));
     }

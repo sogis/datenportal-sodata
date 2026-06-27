@@ -87,6 +87,40 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
+    void datasetOverviewContainsTranslatedCoreMetadataAndLicense() {
+        DatasetEntry dataset = new DatasetEntry(
+                "dataset",
+                "Datensatz",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                LocalDate.parse("2026-05-19"),
+                AccessLevel.OPEN,
+                metadataForOverview(),
+                List.of(distribution(DistributionFormat.CSV)));
+
+        var page = factory.dataset(dataset);
+
+        assertThat(page.overview().title()).isEqualTo("Übersicht");
+        assertThat(page.overview().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(
+                        tuple("Identifier", "dataset"),
+                        tuple("Typ", "Datensatz"),
+                        tuple("Zugriff", "Open Data"),
+                        tuple("Herkunft", "Kanton"),
+                        tuple("Publikationsstatus", "veröffentlicht"),
+                        tuple("Publiziert", "01.05.2026"),
+                        tuple("Aktualisiert", "19.05.2026"),
+                        tuple("Aktualisierungsintervall", "bei Bedarf"),
+                        tuple("Lizenz", "https://creativecommons.org/licenses/by/4.0/"));
+        assertThat(page.overview().items().getLast().href())
+                .contains("https://creativecommons.org/licenses/by/4.0/");
+    }
+
+    @Test
     void datasetFeaturesReflectAccessAttributesAndModel() {
         DatasetEntry dataset = new DatasetEntry(
                 "dataset",
@@ -280,6 +314,8 @@ class DetailPageVmFactoryTest {
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 attributes
                         ? List.of(new DatasetAttribute(
                                 "identifier",
@@ -289,6 +325,20 @@ class DetailPageVmFactoryTest {
                                 true))
                         : List.of(),
                 model ? Optional.of("SO_AGI_TestModel") : Optional.empty());
+    }
+
+    private static CatalogEntryMetadata metadataForOverview() {
+        return new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.of(LocalDate.parse("2026-05-01")),
+                Optional.of(URI.create("https://creativecommons.org/licenses/by/4.0/")),
+                Optional.empty(),
+                Optional.of("asNeeded"),
+                Optional.of("published"),
+                Optional.of("cantonal"),
+                Optional.empty(),
+                List.of(),
+                Optional.empty());
     }
 
     private static Office office() {
