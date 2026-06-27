@@ -70,7 +70,7 @@ class XtfPublishedCatalogParserTest {
                     assertThat(attribute.unit()).contains("Jahr");
                     assertThat(attribute.mandatory()).isTrue();
                 });
-        assertThat(dataset.metadata().model()).contains("SO_AFU_Wasserqualitaet_Monitoring_Publikation_20260624");
+        assertThat(dataset.metadata().model()).isEmpty();
         assertThat(dataset.metadata().hasStructureInformation()).isTrue();
         assertThat(dataset.primaryDistributions())
                 .extracting(distribution -> distribution.format())
@@ -81,6 +81,21 @@ class XtfPublishedCatalogParserTest {
                         "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.csv",
                         "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.xlsx",
                         "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.parquet");
+    }
+
+    @Test
+    void mapsSeriesRootWithoutStructureMetadataWhileKeepingIssueStructureMetadata() throws Exception {
+        DatasetSeriesEntry series = parseFixture().datasetSeries().stream()
+                .filter(entry -> entry.identifier().equals("ch.so.bevoelkerung.altersstruktur"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(series.metadata().attributes()).isEmpty();
+        assertThat(series.metadata().model()).isEmpty();
+        assertThat(series.metadata().hasStructureInformation()).isFalse();
+        assertThat(series.currentIssueOrThrow().metadata().attributes()).isNotEmpty();
+        assertThat(series.currentIssueOrThrow().metadata().model())
+                .contains("SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624");
     }
 
     @Test

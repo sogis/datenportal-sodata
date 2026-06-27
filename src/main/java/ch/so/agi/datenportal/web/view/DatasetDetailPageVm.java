@@ -12,10 +12,12 @@ public record DatasetDetailPageVm(
         boolean structureDescribed,
         String modifiedLabel,
         String issuedLabel,
+        List<DetailFeatureVm> features,
         DownloadSectionVm downloads,
         List<MetadataSectionVm> metadataSections) {
 
     public DatasetDetailPageVm {
+        features = List.copyOf(features);
         metadataSections = List.copyOf(metadataSections);
     }
 }

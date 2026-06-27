@@ -14,6 +14,9 @@
   --dp-color-badge-warning-text: #4f4a00;
   --dp-color-badge-info-bg: #e7eef6;
   --dp-color-badge-info-text: #2a4358;
+  --dp-color-status-ok-circle: #e7f4e7;
+  --dp-color-status-negative-circle: #d9480f;
+
   --dp-color-focus: #0b5fff;
   --dp-shadow-card: 0 8px 24px rgba(32, 54, 74, 0.06);
   /*--dp-radius-sm: 0.375rem;*/

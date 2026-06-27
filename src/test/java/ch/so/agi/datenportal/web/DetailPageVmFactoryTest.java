@@ -1,10 +1,11 @@
 package ch.so.agi.datenportal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
-import ch.so.agi.datenportal.config.WebComponentsProperties;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
+import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
@@ -12,6 +13,7 @@ import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.Theme;
+import ch.so.agi.datenportal.config.WebComponentsProperties;
 import ch.so.agi.datenportal.support.JsonAttributeEncoder;
 import java.net.URI;
 import java.time.LocalDate;
@@ -85,6 +87,56 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
+    void datasetFeaturesReflectAccessAttributesAndModel() {
+        DatasetEntry dataset = new DatasetEntry(
+                "dataset",
+                "Datensatz",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                LocalDate.parse("2026-05-19"),
+                AccessLevel.OPEN,
+                metadataWithStructure(true, true),
+                List.of(distribution(DistributionFormat.CSV)));
+
+        var page = factory.dataset(dataset);
+
+        assertThat(page.features())
+                .extracting("label", "available")
+                .containsExactly(
+                        tuple("Open Data", true),
+                        tuple("Attribute beschrieben", true),
+                        tuple("Daten validiert", true));
+    }
+
+    @Test
+    void datasetFeaturesExposeUnavailableStates() {
+        DatasetEntry dataset = new DatasetEntry(
+                "dataset",
+                "Datensatz",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                LocalDate.parse("2026-05-19"),
+                AccessLevel.PUBLIC_WITH_CONDITIONS,
+                metadataWithStructure(false, false),
+                List.of(distribution(DistributionFormat.CSV)));
+
+        var page = factory.dataset(dataset);
+
+        assertThat(page.features())
+                .extracting("label", "available")
+                .containsExactly(
+                        tuple("Open Data", false),
+                        tuple("Attribute beschrieben", false),
+                        tuple("Daten validiert", false));
+    }
+
+    @Test
     void nonOpenDatasetCarriesAccessLabelAndSuppressesResourceLinksInMetadata() {
         DatasetEntry dataset = new DatasetEntry(
                 "dataset",
@@ -102,7 +154,7 @@ class DetailPageVmFactoryTest {
         var page = factory.dataset(dataset);
 
         assertThat(page.accessState().openData()).isFalse();
-        assertThat(page.accessState().label()).isEqualTo("Oeffentlich mit Bedingungen");
+        assertThat(page.accessState().label()).isEqualTo("Öffentlich mit Bedingungen");
         assertThat(page.downloads().accessState().openData()).isFalse();
         assertThat(page.downloads().lead()).contains("keine Open-Data-Downloads");
         assertThat(page.metadataSections())
@@ -175,7 +227,7 @@ class DetailPageVmFactoryTest {
         assertThat(page.issues().issues())
                 .allSatisfy(issue -> {
                     assertThat(issue.accessState().openData()).isFalse();
-                    assertThat(issue.accessState().label()).isEqualTo("Oeffentlich mit Bedingungen");
+                    assertThat(issue.accessState().label()).isEqualTo("Öffentlich mit Bedingungen");
                 });
         assertThat(page.metadataSections())
                 .filteredOn(section -> section.id().equals("resources"))
@@ -218,6 +270,25 @@ class DetailPageVmFactoryTest {
                 URI.create("https://data.so.ch/access/" + suffix),
                 URI.create("https://data.so.ch/download." + suffix),
                 format);
+    }
+
+    private static CatalogEntryMetadata metadataWithStructure(boolean attributes, boolean model) {
+        return new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                attributes
+                        ? List.of(new DatasetAttribute(
+                                "identifier",
+                                "TEXT",
+                                Optional.of("Fachlicher Identifikator"),
+                                Optional.empty(),
+                                true))
+                        : List.of(),
+                model ? Optional.of("SO_AGI_TestModel") : Optional.empty());
     }
 
     private static Office office() {

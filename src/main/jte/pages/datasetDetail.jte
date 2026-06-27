@@ -10,14 +10,15 @@
         accessState = page.accessState(),
         structureDescribed = page.structureDescribed(),
         modifiedLabel = page.modifiedLabel(),
-        issuedLabel = page.issuedLabel()
+        issuedLabel = page.issuedLabel(),
+        showFacts = false
       )
       <div class="dp-detail-summary-layout">
-        <div class="dp-detail-summary-main dp-detail-panel">
-          @template.components.detailTeaserRow()
+        <div class="dp-detail-summary-main">
+          @template.components.detailFeatureDownloadStrip(features = page.features(), downloads = page.downloads())
         </div>
-        <aside class="dp-detail-side" aria-label="Downloads">
-          @template.components.detailDownloadPanel(downloads = page.downloads())
+        <aside class="dp-detail-side" aria-label="Aktionen">
+          @template.components.detailActionPanel()
         </aside>
       </div>
     </div>

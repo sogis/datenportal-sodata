@@ -32,23 +32,32 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets\">Daten und Statistiken</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("Bauinventar")))
                 .andExpect(content().string(containsString("Inventar schützenswerter und erhaltenswerter Bauten.")))
-                .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datensatz</span>")))
                 .andExpect(content().string(containsString("Open Data")))
                 .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.bauinventar.csv\"")))
                 .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.bauinventar.xlsx\"")))
                 .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.bauinventar.parquet\"")))
+                .andExpect(content().string(containsString("Datenmerkmale")))
+                .andExpect(content().string(containsString("Attribute beschrieben")))
+                .andExpect(content().string(containsString("Daten validiert")))
+                .andExpect(content().string(containsString("class=\"bi bi-check-circle\"")))
                 .andExpect(content().string(containsString("Struktur &amp; Qualität")))
                 .andExpect(content().string(containsString("Erkunden")))
                 .andExpect(content().string(containsString("Verwenden")))
                 .andExpect(content().string(containsString("Details ansehen")))
                 .andExpect(content().string(containsString("Datenvorschau anzeigen")))
                 .andExpect(content().string(containsString("Downloads anzeigen")))
+                .andExpect(content().string(containsString("href=\"#\"")))
+                .andExpect(content().string(containsString("&rarr;")))
                 .andExpect(content().string(containsString("class=\"bi bi-shield-check\"")))
                 .andExpect(content().string(containsString("class=\"bi bi-search\"")))
                 .andExpect(content().string(containsString("class=\"bi bi-code-slash\"")))
-                .andExpect(content().string(containsString("href=\"#\">Details ansehen</a>")))
                 .andExpect(content().string(containsString("Daten und Statistiken")))
                 .andExpect(content().string(containsString("aria-current=\"page\"")))
+                .andExpect(content().string(not(containsString("dp-detail-badges"))))
+                .andExpect(content().string(not(containsString("<dl class=\"dp-detail-facts\""))))
+                .andExpect(content().string(not(containsString("Publiziert"))))
+                .andExpect(content().string(not(containsString("Aktualisiert"))))
+                .andExpect(content().string(not(containsString(">Struktur beschrieben</span>"))))
                 .andExpect(content().string(not(containsString("Übersicht"))))
                 .andExpect(content().string(not(containsString("Verantwortlichkeit"))))
                 .andExpect(content().string(not(containsString("Themen und Schlagworte"))))
@@ -59,12 +68,22 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
+    void datasetDetailShowsAttributeFeatureWithoutValidationWhenModelIsMissing() throws Exception {
+        mockMvc.perform(get("/datasets/ch.so.wasserqualitaet_grundwasser"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Wasserqualität Grundwasser")))
+                .andExpect(content().string(containsString("Attribute beschrieben")))
+                .andExpect(content().string(containsString("Daten validiert")))
+                .andExpect(content().string(containsString("class=\"bi bi-check-circle\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-x-circle\"")));
+    }
+
+    @Test
     void seriesDetailRendersCurrentIssueHistoricalIssuesAndCurrentIssueDownloads() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
                 .andExpect(content().string(containsString("Kantonale und eidgenössische Abstimmungsresultate nach Gemeinde.")))
-                .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datenreihe</span>")))
                 .andExpect(content().string(containsString("Aktuelle Ausgabe")))
                 .andExpect(content().string(containsString("Ausgabe 2026")))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/current\"")))
@@ -108,11 +127,10 @@ class CatalogDetailControllerMvcTest {
         mockMvc.perform(get("/datasets/ch.2581.baumkataster"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Baumkataster")))
-                .andExpect(content().string(containsString("dp-status-badge dp-status-badge--warning")))
-                .andExpect(content().string(containsString("Oeffentlich mit Bedingungen")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-x-circle\"")))
                 .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.2581.baumkataster.csv\""))))
-                .andExpect(content().string(not(containsString(">Open Data</span>"))));
+                .andExpect(content().string(not(containsString("dp-status-badge dp-status-badge--positive"))));
     }
 
     @Test
@@ -120,8 +138,7 @@ class CatalogDetailControllerMvcTest {
         mockMvc.perform(get("/series/ch.so.baustellen.koordinationsplanung"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Baustellen-Koordinationsplanung")))
-                .andExpect(content().string(containsString("<span class=\"dp-type-badge\">Datenreihe</span>")))
-                .andExpect(content().string(containsString("Oeffentlich mit Bedingungen")))
+                .andExpect(content().string(containsString("Öffentlich mit Bedingungen")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
                 .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2026.csv\""))))
                 .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2025.csv\""))))
@@ -133,7 +150,7 @@ class CatalogDetailControllerMvcTest {
         mockMvc.perform(get("/series/ch.so.baustellen.koordinationsplanung/issues/current"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Baustellen-Koordinationsplanung 2026")))
-                .andExpect(content().string(containsString("Oeffentlich mit Bedingungen")))
+                .andExpect(content().string(containsString("Öffentlich mit Bedingungen")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
                 .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2026.csv\""))))
                 .andExpect(content().string(not(containsString(">Open Data</span>"))));

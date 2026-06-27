@@ -297,7 +297,6 @@
                 <base:mandatory>true</base:mandatory>
               </base:DatasetAttribute>
             </attributes>
-            <model>SO_AFU_Wasserqualitaet_Monitoring_Publikation_20260624</model>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.wasserqualitaet_grundwasser/distribution/csv</distributionUri>
@@ -4241,57 +4240,6 @@
                 <base:endDate>2025-12-31</base:endDate>
               </base:TemporalCoverage>
             </temporalCoverage>
-            <attributes>
-              <base:DatasetAttribute>
-                <base:name>jahr</base:name>
-                <base:dataType>INTEGER</base:dataType>
-                <base:description>Statistikjahr.</base:description>
-                <base:unit>Jahr</base:unit>
-                <base:mandatory>true</base:mandatory>
-              </base:DatasetAttribute>
-            </attributes>
-            <attributes>
-              <base:DatasetAttribute>
-                <base:name>bfs_nr</base:name>
-                <base:dataType>INTEGER</base:dataType>
-                <base:description>BFS-Gemeindenummer.</base:description>
-                <base:mandatory>true</base:mandatory>
-              </base:DatasetAttribute>
-            </attributes>
-            <attributes>
-              <base:DatasetAttribute>
-                <base:name>gemeinde</base:name>
-                <base:dataType>TEXT</base:dataType>
-                <base:description>Gemeindename.</base:description>
-                <base:mandatory>true</base:mandatory>
-              </base:DatasetAttribute>
-            </attributes>
-            <attributes>
-              <base:DatasetAttribute>
-                <base:name>geschlecht</base:name>
-                <base:dataType>TEXT</base:dataType>
-                <base:description>Geschlecht oder Total-Kategorie.</base:description>
-                <base:mandatory>true</base:mandatory>
-              </base:DatasetAttribute>
-            </attributes>
-            <attributes>
-              <base:DatasetAttribute>
-                <base:name>altersgruppe</base:name>
-                <base:dataType>TEXT</base:dataType>
-                <base:description>Altersgruppe.</base:description>
-                <base:mandatory>true</base:mandatory>
-              </base:DatasetAttribute>
-            </attributes>
-            <attributes>
-              <base:DatasetAttribute>
-                <base:name>anzahl_personen</base:name>
-                <base:dataType>INTEGER</base:dataType>
-                <base:description>Anzahl Personen.</base:description>
-                <base:unit>Personen</base:unit>
-                <base:mandatory>true</base:mandatory>
-              </base:DatasetAttribute>
-            </attributes>
-            <model>SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624</model>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025</resourceUri>

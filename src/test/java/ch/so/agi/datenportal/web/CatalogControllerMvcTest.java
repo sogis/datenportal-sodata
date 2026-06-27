@@ -208,7 +208,7 @@ class CatalogControllerMvcTest {
         mockMvc.perform(get("/datasets").param("q", "Baumkataster"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Baumkataster")))
-                .andExpect(content().string(containsString("Oeffentlich mit Bedingungen")))
+                .andExpect(content().string(containsString("Öffentlich mit Bedingungen")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
                 .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.2581.baumkataster.csv\""))))
                 .andExpect(content().string(not(containsString(">CSV</a>"))));
@@ -235,7 +235,7 @@ class CatalogControllerMvcTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Baumkataster")))
                 .andExpect(content().string(containsString("dp-status-badge dp-status-badge--warning")))
-                .andExpect(content().string(containsString(">Oeffentlich mit Bedingungen</span>")))
+                .andExpect(content().string(containsString(">Öffentlich mit Bedingungen</span>")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
                 .andExpect(content().string(not(containsString(">Open Data</span>"))))
                 .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.2581.baumkataster.csv\""))));

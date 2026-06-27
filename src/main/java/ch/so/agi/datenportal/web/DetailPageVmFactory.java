@@ -12,6 +12,7 @@ import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.web.view.AccessStateVm;
 import ch.so.agi.datenportal.web.view.DatasetDetailPageVm;
+import ch.so.agi.datenportal.web.view.DetailFeatureVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
 import ch.so.agi.datenportal.web.view.DownloadSectionVm;
 import ch.so.agi.datenportal.web.view.IssueDetailPageVm;
@@ -52,15 +53,24 @@ public final class DetailPageVmFactory {
                 dataset.description(),
                 dataset.type().label(),
                 accessState(dataset),
-                false,
+                dataset.metadata().hasStructureInformation(),
                 formatDate(dataset.modified()),
                 formatDate(dataset.metadata().issued()).orElse(""),
+                datasetFeatures(dataset),
                 new DownloadSectionVm(
                         "Downloads",
                         downloadLead(accessState(dataset), "diesem Datensatz", "diesen Datensatz"),
                         accessState(dataset),
                         downloads(dataset.title(), dataset.distributions())),
                 metadataSections(dataset, dataset.distributions(), accessState(dataset)));
+    }
+
+    private List<DetailFeatureVm> datasetFeatures(DatasetEntry dataset) {
+        CatalogEntryMetadata metadata = dataset.metadata();
+        return List.of(
+                new DetailFeatureVm("Open Data", dataset.isOpenData()),
+                new DetailFeatureVm("Attribute beschrieben", !metadata.attributes().isEmpty()),
+                new DetailFeatureVm("Daten validiert", metadata.model().isPresent()));
     }
 
     public SeriesDetailPageVm series(DatasetSeriesEntry series) {

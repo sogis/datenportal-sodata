@@ -60,4 +60,5 @@ echo "  Public download proxy on host: http://localhost:${DATENPORTAL_DOWNLOAD_P
 echo "  Example index: http://localhost:${DATENPORTAL_DOWNLOAD_PORT:-8081}/index.html"
 echo
 echo "A few uploaded objects:"
-aws_call s3 ls "s3://${BUCKET}/" --recursive | head -20 || true
+LISTING=$(aws_call s3 ls "s3://${BUCKET}/" --recursive 2>/dev/null || true)
+echo "$LISTING" | head -20

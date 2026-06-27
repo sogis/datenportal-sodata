@@ -14,7 +14,8 @@
         accessState = page.accessState(),
         structureDescribed = page.structureDescribed(),
         modifiedLabel = page.modifiedLabel(),
-        issuedLabel = page.issuedLabel()
+        issuedLabel = page.issuedLabel(),
+        showFacts = true
       )
       @if(page.currentIssue())
         <p class="dp-current-issue-note">Diese Ausgabe ist aktuell.</p>

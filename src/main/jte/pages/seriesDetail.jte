@@ -10,7 +10,8 @@
         accessState = page.accessState(),
         structureDescribed = page.structureDescribed(),
         modifiedLabel = page.modifiedLabel(),
-        issuedLabel = page.issuedLabel()
+        issuedLabel = page.issuedLabel(),
+        showFacts = true
       )
       <section class="dp-detail-panel dp-current-issue" aria-labelledby="current-issue-title">
         <p class="dp-detail-kicker">Aktuelle Ausgabe</p>

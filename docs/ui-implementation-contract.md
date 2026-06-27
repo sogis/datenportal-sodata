@@ -699,7 +699,7 @@ Pflichtbereiche:
 
 Temporäre Umsetzungsnotiz:
 
-- Die aktuelle MVP-Iteration priorisiert auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Drei-Spalten-Teaserreihe (`Struktur & Qualität`, `Erkunden`, `Verwenden`) und dem rechts ausgerichteten Downloadbereich.
+- Die aktuelle MVP-Iteration priorisiert auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile und einer rechten vertikalen Aktionsspalte (`Struktur & Qualität`, `Erkunden`, `Verwenden`) ohne Platzhalterlinks.
 - Die tieferen Metadatenbereiche sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
 
 ### 8.2 Detailseite für Datenreihen und Ausgaben
