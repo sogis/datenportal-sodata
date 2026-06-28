@@ -213,6 +213,8 @@ class CatalogFiltersPlaywrightTest {
             BoundingBox downloads = requireBoundingBox(page.locator(".dp-detail-feature-downloads__downloads"));
             BoundingBox actionPanel = requireBoundingBox(page.locator(".dp-detail-actions"));
             BoundingBox overviewCard = requireBoundingBox(page.locator("#metadata-overview"));
+            BoundingBox temporalCoverageCard = requireBoundingBox(page.locator("#metadata-temporal-coverage"));
+            BoundingBox topicsCard = requireBoundingBox(page.locator("#metadata-topics"));
             Locator availableFeatureIcon = page.locator(".dp-detail-feature--available .dp-detail-feature__icon svg").first();
             Locator actionLink = page.locator(".dp-detail-action-link").first();
             double gapDescriptionToSummary = requireGap(description, summaryLayout);
@@ -250,9 +252,19 @@ class CatalogFiltersPlaywrightTest {
             assertThat(actionPanel.x).isGreaterThan(featureStrip.x + featureStrip.width - 1d);
             assertThat(overviewCard.y).isGreaterThan(lowerEdge(featureStrip));
             assertThat(requireGap(featureStrip, overviewCard)).isGreaterThanOrEqualTo(24d);
-            assertThat(fontSize(page.locator("#metadata-title-overview"))).isEqualTo("24px");
-            assertThat(fontSize(page.locator("#metadata-overview .dp-metadata-list dt").first())).isEqualTo("18px");
+            assertThat(temporalCoverageCard.y).isGreaterThan(lowerEdge(overviewCard));
+            assertThat(topicsCard.y).isGreaterThan(lowerEdge(temporalCoverageCard));
+            assertThat(requireGap(overviewCard, temporalCoverageCard)).isGreaterThanOrEqualTo(24d);
+            assertThat(requireGap(temporalCoverageCard, topicsCard)).isGreaterThanOrEqualTo(24d);
+            assertThat(fontSize(page.locator("#metadata-title-overview"))).isEqualTo("18px");
+            assertThat(fontSize(page.locator("#metadata-title-temporal-coverage"))).isEqualTo("18px");
+            assertThat(fontSize(page.locator("#metadata-title-topics"))).isEqualTo("18px");
+            assertThat(fontSize(page.locator("#metadata-overview .dp-metadata-list dt").first())).isEqualTo("14.4px");
             assertThat(fontSize(page.locator("#metadata-overview .dp-metadata-list dd").first())).isEqualTo("18px");
+            assertThat(fontSize(page.locator("#metadata-temporal-coverage .dp-metadata-list dt").first())).isEqualTo("14.4px");
+            assertThat(fontSize(page.locator("#metadata-temporal-coverage .dp-metadata-list dd").first())).isEqualTo("18px");
+            assertThat(fontSize(page.locator("#metadata-topics .dp-metadata-list dt").first())).isEqualTo("14.4px");
+            assertThat(fontSize(page.locator("#metadata-topics .dp-metadata-list dd").first())).isEqualTo("18px");
         }
 
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(390, 844))) {
