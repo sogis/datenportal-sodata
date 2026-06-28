@@ -235,7 +235,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator(".dp-detail-feature").first())).isEqualTo("18px");
             assertThat(cssValue(availableFeatureIcon, "width")).isEqualTo("24px");
             assertThat(cssValue(availableFeatureIcon, "height")).isEqualTo("24px");
-            assertThat(cssValue(availableFeatureIcon, "color")).isEqualTo("rgb(231, 244, 231)");
+            assertThat(cssValue(availableFeatureIcon, "color")).isEqualTo("rgb(34, 197, 94)");
             assertThat(fontSize(page.locator(".dp-detail-action-item__content h3").first())).isEqualTo("16px");
             assertThat(fontSize(page.locator(".dp-detail-action-item__content p").first())).isEqualTo("16px");
             assertThat(fontSize(actionLink)).isEqualTo("16px");
