@@ -697,6 +697,7 @@ Pflichtbereiche:
 Temporäre Umsetzungsnotiz:
 
 - Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, den ersten drei Metadatenkarten (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und einer rechten vertikalen Aktionsspalte (`Struktur & Qualität`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
+- Zusätzlich zeigt die normale Datensatz-Detailseite die Card `Zuständigkeiten und Kontakt` direkt nach `Themen und Schlagworte`. Sie verwendet dieselben Metadaten-Card-Styles und enthält `Datenproduzent`, `Kontakt` und `Herausgeber`.
 - Die tieferen Metadatenbereiche unterhalb dieser drei Cards sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
 
 ### 8.2 Detailseite für Datenreihen und Ausgaben

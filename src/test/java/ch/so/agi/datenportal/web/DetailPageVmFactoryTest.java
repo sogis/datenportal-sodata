@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
+import ch.so.agi.datenportal.catalog.domain.ContactPoint;
 import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
@@ -203,6 +204,74 @@ class DetailPageVmFactoryTest {
                 .containsExactly(
                         tuple("Thema", "Bevölkerung, Mobilität und Verkehr"),
                         tuple("Schlagworte", "ÖV, Pendler"));
+    }
+
+    @Test
+    void datasetResponsibilitiesContactContainsProducerContactAndPublisherLines() {
+        Office creator = new Office(
+                "arp",
+                "Amt für Raumplanung",
+                Optional.of("ARP"),
+                Optional.of(URI.create("mailto:arp@bd.so.ch")),
+                Optional.of(URI.create("https://so.ch/arp/")));
+        Office publisher = new Office(
+                "agi",
+                "Amt für Geoinformation",
+                Optional.of("AGI"),
+                Optional.of(URI.create("mailto:agi@bd.so.ch")),
+                Optional.of(URI.create("https://so.ch/agi/")));
+        CatalogEntryMetadata metadata = new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(new ContactPoint(
+                        "Amt für Raumplanung",
+                        Optional.of("Nutzungsplanung"),
+                        Optional.of(URI.create("mailto:planung@bd.so.ch")),
+                        Optional.empty(),
+                        Optional.empty())),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                List.of(),
+                Optional.empty());
+        DatasetEntry dataset = new DatasetEntry(
+                "dataset",
+                "Datensatz",
+                "Beschreibung",
+                publisher,
+                creator,
+                List.of(theme()),
+                List.of(),
+                LocalDate.parse("2026-05-19"),
+                AccessLevel.OPEN,
+                metadata,
+                List.of(distribution(DistributionFormat.CSV)));
+
+        var section = factory.dataset(dataset).responsibilitiesContact();
+
+        assertThat(section.title()).isEqualTo("Zuständigkeiten und Kontakt");
+        assertThat(section.items())
+                .extracting(item -> item.label())
+                .containsExactly("Datenproduzent", "Kontakt", "Herausgeber");
+        assertThat(section.items().get(0).lines())
+                .extracting(line -> line.value(), line -> line.href())
+                .containsExactly(
+                        tuple("Amt für Raumplanung", Optional.empty()),
+                        tuple("https://so.ch/arp/", Optional.of("https://so.ch/arp/")));
+        assertThat(section.items().get(1).lines())
+                .extracting(line -> line.value(), line -> line.href())
+                .containsExactly(
+                        tuple("Amt für Raumplanung", Optional.empty()),
+                        tuple("Nutzungsplanung", Optional.empty()),
+                        tuple("planung@bd.so.ch", Optional.of("mailto:planung@bd.so.ch")));
+        assertThat(section.items().get(2).lines())
+                .extracting(line -> line.value(), line -> line.href())
+                .containsExactly(
+                        tuple("Amt für Geoinformation", Optional.empty()),
+                        tuple("https://so.ch/agi/", Optional.of("https://so.ch/agi/")),
+                        tuple("agi@bd.so.ch", Optional.of("mailto:agi@bd.so.ch")));
     }
 
     @Test

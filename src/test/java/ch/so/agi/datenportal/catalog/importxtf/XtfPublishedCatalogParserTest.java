@@ -39,7 +39,13 @@ class XtfPublishedCatalogParserTest {
 
         assertThat(dataset.title()).isEqualTo("Wasserqualität Grundwasser");
         assertThat(dataset.creator().identifier()).isEqualTo("afu");
+        assertThat(dataset.creator().email()).contains(URI.create("mailto:afu@bd.so.ch"));
+        assertThat(dataset.creator().officeAtWeb())
+                .contains(URI.create("https://afu.so.ch"));
         assertThat(dataset.publisher().identifier()).isEqualTo("agi");
+        assertThat(dataset.publisher().email()).contains(URI.create("mailto:agi@bd.so.ch"));
+        assertThat(dataset.publisher().officeAtWeb())
+                .contains(URI.create("https://agi.so.ch"));
         assertThat(dataset.accessLevel()).isEqualTo(AccessLevel.OPEN);
         assertThat(dataset.themes())
                 .extracting(theme -> theme.identifier())
@@ -56,7 +62,8 @@ class XtfPublishedCatalogParserTest {
         assertThat(dataset.metadata().accrualPeriodicity()).contains("annually");
         assertThat(dataset.metadata().contactPoint()).get()
                 .satisfies(contact -> {
-                    assertThat(contact.name()).isEqualTo("Amt für Umwelt");
+                    assertThat(contact.name()).isEqualTo("Anna Keller");
+                    assertThat(contact.organizationUnit()).contains("Fachstelle für Wasserqualität Grundwasser");
                     assertThat(contact.email()).contains(URI.create("mailto:afu@bd.so.ch"));
                 });
         assertThat(dataset.metadata().attributes())

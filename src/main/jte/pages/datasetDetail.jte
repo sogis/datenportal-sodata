@@ -23,6 +23,7 @@
           @if(!page.topics().items().isEmpty())
             @template.components.metadataSection(section = page.topics())
           @endif
+          @template.components.contactMetadataSection(section = page.responsibilitiesContact())
         </div>
         <aside class="dp-detail-side" aria-label="Aktionen">
           @template.components.detailActionPanel()

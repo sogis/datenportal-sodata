@@ -11,6 +11,9 @@ import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.web.view.AccessStateVm;
+import ch.so.agi.datenportal.web.view.ContactMetadataItemVm;
+import ch.so.agi.datenportal.web.view.ContactMetadataLineVm;
+import ch.so.agi.datenportal.web.view.ContactMetadataSectionVm;
 import ch.so.agi.datenportal.web.view.DatasetDetailPageVm;
 import ch.so.agi.datenportal.web.view.DetailFeatureVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
@@ -65,6 +68,7 @@ public final class DetailPageVmFactory {
                 new MetadataSectionVm("overview", "Übersicht", overviewItems(dataset)),
                 new MetadataSectionVm("temporal-coverage", "Zeitliche Abdeckung", temporalCoverageItems(dataset)),
                 new MetadataSectionVm("topics", "Themen und Schlagworte", datasetTopicItems(dataset)),
+                responsibilitiesContactSection(dataset),
                 metadataSections(dataset, dataset.distributions(), accessState(dataset)));
     }
 
@@ -268,6 +272,43 @@ public final class DetailPageVmFactory {
         return items;
     }
 
+    private ContactMetadataSectionVm responsibilitiesContactSection(DatasetEntry dataset) {
+        return new ContactMetadataSectionVm(
+                "responsibilities-contact",
+                "Zuständigkeiten und Kontakt",
+                List.of(
+                        new ContactMetadataItemVm("Datenproduzent", producerLines(dataset.creator())),
+                        new ContactMetadataItemVm("Kontakt", contactLines(dataset.metadata().contactPoint())),
+                        new ContactMetadataItemVm("Herausgeber", publisherLines(dataset.publisher()))));
+    }
+
+    private List<ContactMetadataLineVm> producerLines(Office office) {
+        List<ContactMetadataLineVm> lines = new ArrayList<>();
+        lines.add(contactLine(office.displayName()));
+        office.officeAtWeb().ifPresent(uri -> lines.add(contactLine(uri.toString(), uri.toString())));
+        return List.copyOf(lines);
+    }
+
+    private List<ContactMetadataLineVm> publisherLines(Office office) {
+        List<ContactMetadataLineVm> lines = new ArrayList<>();
+        lines.add(contactLine(office.displayName()));
+        office.officeAtWeb().ifPresent(uri -> lines.add(contactLine(uri.toString(), uri.toString())));
+        office.email().ifPresent(uri -> lines.add(contactLine(mailDisplay(uri), uri.toString())));
+        return List.copyOf(lines);
+    }
+
+    private List<ContactMetadataLineVm> contactLines(Optional<ContactPoint> contactPoint) {
+        List<ContactMetadataLineVm> lines = new ArrayList<>();
+        contactPoint.ifPresent(contact -> {
+            lines.add(contactLine(contact.name()));
+            contact.organizationUnit()
+                    .filter(value -> !value.equals(contact.name()))
+                    .ifPresent(value -> lines.add(contactLine(value)));
+            contact.email().ifPresent(uri -> lines.add(contactLine(mailDisplay(uri), uri.toString())));
+        });
+        return List.copyOf(lines);
+    }
+
     private static AccessStateVm accessState(CatalogEntry entry) {
         return new AccessStateVm(entry.isOpenData(), entry.accessLevel().displayLabel());
     }
@@ -310,6 +351,14 @@ public final class DetailPageVmFactory {
 
     private static MetadataItemVm item(String label, String value, String href) {
         return new MetadataItemVm(label, value, Optional.ofNullable(href).filter(link -> !link.isBlank()));
+    }
+
+    private static ContactMetadataLineVm contactLine(String value) {
+        return contactLine(value, null);
+    }
+
+    private static ContactMetadataLineVm contactLine(String value, String href) {
+        return new ContactMetadataLineVm(value, Optional.ofNullable(href).filter(link -> !link.isBlank()));
     }
 
     private static Optional<String> formatDate(Optional<LocalDate> date) {

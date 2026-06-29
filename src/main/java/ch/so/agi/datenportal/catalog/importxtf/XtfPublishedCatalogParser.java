@@ -1027,15 +1027,25 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         }
 
         ContactPoint toDomain() {
-            if (name == null || name.isBlank()) {
+            String displayName = firstPresent(name, organizationUnit, email.map(URI::toString).orElse(null), url.map(URI::toString).orElse(null));
+            if (displayName == null) {
                 throw validationError(path.push("name"), "Required field is missing.");
             }
             return new ContactPoint(
-                    name,
+                    displayName,
                     Optional.ofNullable(organizationUnit),
                     email,
                     Optional.ofNullable(phone),
                     url);
+        }
+
+        private static String firstPresent(String... values) {
+            for (String value : values) {
+                if (value != null && !value.isBlank()) {
+                    return value;
+                }
+            }
+            return null;
         }
     }
 
@@ -1104,7 +1114,9 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
             return new Office(
                     officeIdentifier,
                     name,
-                    Optional.ofNullable(abbreviation).filter(value -> !value.isBlank()));
+                    Optional.ofNullable(abbreviation).filter(value -> !value.isBlank()),
+                    email,
+                    officeAtWeb);
         }
 
         private static String lastPathSegment(URI uri, XtfElementPath path) {
