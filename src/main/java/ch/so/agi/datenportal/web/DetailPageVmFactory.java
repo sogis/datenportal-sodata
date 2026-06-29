@@ -69,6 +69,7 @@ public final class DetailPageVmFactory {
                 new MetadataSectionVm("temporal-coverage", "Zeitliche Abdeckung", temporalCoverageItems(dataset)),
                 new MetadataSectionVm("topics", "Themen und Schlagworte", datasetTopicItems(dataset)),
                 responsibilitiesContactSection(dataset),
+                new MetadataSectionVm("other-information", "Übrige Informationen", otherInformationItems(dataset)),
                 metadataSections(dataset, dataset.distributions(), accessState(dataset)));
     }
 
@@ -269,6 +270,19 @@ public final class DetailPageVmFactory {
                             link.preferredHref().toString(),
                             link.preferredHref().toString())));
         }
+        return items;
+    }
+
+    private List<MetadataItemVm> otherInformationItems(CatalogEntry entry) {
+        List<MetadataItemVm> items = new ArrayList<>();
+        entry.metadata().surveyMethod()
+                .ifPresent(value -> items.add(item("Erhebungs- / Messmethode", value)));
+        entry.metadata().dataAvailableFrom()
+                .ifPresent(value -> items.add(item("Verfügbare Daten ab", value)));
+        entry.metadata().furtherUses()
+                .ifPresent(value -> items.add(item("Weitere Verwendungen", value)));
+        entry.metadata().auxiliaryData()
+                .ifPresent(value -> items.add(item("Hilfsdaten", value)));
         return items;
     }
 

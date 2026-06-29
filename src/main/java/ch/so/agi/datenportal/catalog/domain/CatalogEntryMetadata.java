@@ -15,7 +15,11 @@ public record CatalogEntryMetadata(
         Optional<String> origin,
         Optional<TemporalCoverage> temporalCoverage,
         List<DatasetAttribute> attributes,
-        Optional<String> model) {
+        Optional<String> model,
+        Optional<String> surveyMethod,
+        Optional<String> dataAvailableFrom,
+        Optional<String> furtherUses,
+        Optional<String> auxiliaryData) {
 
     private static final CatalogEntryMetadata EMPTY = new CatalogEntryMetadata(
             Optional.empty(),
@@ -27,7 +31,39 @@ public record CatalogEntryMetadata(
             Optional.empty(),
             Optional.empty(),
             List.of(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
             Optional.empty());
+
+    public CatalogEntryMetadata(
+            Optional<URI> landingPage,
+            Optional<LocalDate> issued,
+            Optional<URI> licenseUri,
+            Optional<ContactPoint> contactPoint,
+            Optional<String> accrualPeriodicity,
+            Optional<String> publicationStatus,
+            Optional<String> origin,
+            Optional<TemporalCoverage> temporalCoverage,
+            List<DatasetAttribute> attributes,
+            Optional<String> model) {
+        this(
+                landingPage,
+                issued,
+                licenseUri,
+                contactPoint,
+                accrualPeriodicity,
+                publicationStatus,
+                origin,
+                temporalCoverage,
+                attributes,
+                model,
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty());
+    }
 
     public CatalogEntryMetadata {
         landingPage = landingPage == null ? Optional.empty() : landingPage;
@@ -44,6 +80,10 @@ public record CatalogEntryMetadata(
                 .filter(coverage -> !coverage.isEmpty());
         attributes = attributes == null ? List.of() : List.copyOf(attributes);
         model = model == null ? Optional.empty() : model.filter(value -> !value.isBlank());
+        surveyMethod = cleanOptional(surveyMethod);
+        dataAvailableFrom = cleanOptional(dataAvailableFrom);
+        furtherUses = cleanOptional(furtherUses);
+        auxiliaryData = cleanOptional(auxiliaryData);
     }
 
     public static CatalogEntryMetadata empty() {
@@ -52,5 +92,9 @@ public record CatalogEntryMetadata(
 
     public boolean hasStructureInformation() {
         return !attributes.isEmpty() || model.isPresent();
+    }
+
+    private static Optional<String> cleanOptional(Optional<String> value) {
+        return value == null ? Optional.empty() : value.filter(text -> !text.isBlank());
     }
 }

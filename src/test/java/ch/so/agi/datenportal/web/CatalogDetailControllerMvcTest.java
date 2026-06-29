@@ -107,7 +107,19 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("Attribute beschrieben")))
                 .andExpect(content().string(containsString("Daten validiert")))
                 .andExpect(content().string(containsString("class=\"bi bi-check-circle\"")))
-                .andExpect(content().string(containsString("class=\"bi bi-x-circle\"")));
+                .andExpect(content().string(containsString("class=\"bi bi-x-circle\"")))
+                .andExpect(content().string(containsString("Übrige Informationen")))
+                .andExpect(content().string(containsString("Erhebungs- / Messmethode")))
+                .andExpect(content().string(containsString(
+                        "Die Daten zu Wasserqualität Grundwasser entstehen durch fachliche Erfassung")))
+                .andExpect(content().string(containsString("Verfügbare Daten ab")))
+                .andExpect(content().string(containsString("Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.")))
+                .andExpect(content().string(containsString("Weitere Verwendungen")))
+                .andExpect(content().string(containsString(
+                        "Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.")))
+                .andExpect(content().string(containsString("Hilfsdaten")))
+                .andExpect(content().string(containsString(
+                        "Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.")));
     }
 
     @Test

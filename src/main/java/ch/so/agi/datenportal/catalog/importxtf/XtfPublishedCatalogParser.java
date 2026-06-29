@@ -214,6 +214,10 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                         }
                     }
                     case "model" -> series.model = readOptionalText(reader, childPath).orElse(null);
+                    case "surveyMethod" -> series.surveyMethod = readOptionalText(reader, childPath).orElse(null);
+                    case "dataAvailableFrom" -> series.dataAvailableFrom = readOptionalText(reader, childPath).orElse(null);
+                    case "furtherUses" -> series.furtherUses = readOptionalText(reader, childPath).orElse(null);
+                    case "auxiliaryData" -> series.auxiliaryData = readOptionalText(reader, childPath).orElse(null);
                     case "issues" -> series.issues.addAll(parseIssuesContainer(reader, childPath));
                     default -> skipElement(reader);
                 }
@@ -265,6 +269,10 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                         }
                     }
                     case "model" -> dataset.model = readOptionalText(reader, childPath).orElse(null);
+                    case "surveyMethod" -> dataset.surveyMethod = readOptionalText(reader, childPath).orElse(null);
+                    case "dataAvailableFrom" -> dataset.dataAvailableFrom = readOptionalText(reader, childPath).orElse(null);
+                    case "furtherUses" -> dataset.furtherUses = readOptionalText(reader, childPath).orElse(null);
+                    case "auxiliaryData" -> dataset.auxiliaryData = readOptionalText(reader, childPath).orElse(null);
                     case "distributions" -> {
                         RawDistribution distribution = parseDistributionContainer(reader, childPath);
                         if (distribution != null) {
@@ -345,6 +353,10 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                         }
                     }
                     case "model" -> issue.model = readOptionalText(reader, childPath).orElse(null);
+                    case "surveyMethod" -> issue.surveyMethod = readOptionalText(reader, childPath).orElse(null);
+                    case "dataAvailableFrom" -> issue.dataAvailableFrom = readOptionalText(reader, childPath).orElse(null);
+                    case "furtherUses" -> issue.furtherUses = readOptionalText(reader, childPath).orElse(null);
+                    case "auxiliaryData" -> issue.auxiliaryData = readOptionalText(reader, childPath).orElse(null);
                     case "distributions" -> {
                         RawDistribution distribution = parseDistributionContainer(reader, childPath);
                         if (distribution != null) {
@@ -840,6 +852,10 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         RawTemporalCoverage temporalCoverage;
         final List<RawDatasetAttribute> attributes = new ArrayList<>();
         String model;
+        String surveyMethod;
+        String dataAvailableFrom;
+        String furtherUses;
+        String auxiliaryData;
 
         RawEntry(XtfElementPath path) {
             this.path = path;
@@ -898,7 +914,11 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     Optional.ofNullable(origin),
                     Optional.ofNullable(temporalCoverage).map(RawTemporalCoverage::toDomain),
                     attributes.stream().map(RawDatasetAttribute::toDomain).toList(),
-                    Optional.ofNullable(model));
+                    Optional.ofNullable(model),
+                    Optional.ofNullable(surveyMethod),
+                    Optional.ofNullable(dataAvailableFrom),
+                    Optional.ofNullable(furtherUses),
+                    Optional.ofNullable(auxiliaryData));
         }
 
         private static void require(Object value, XtfElementPath path) {

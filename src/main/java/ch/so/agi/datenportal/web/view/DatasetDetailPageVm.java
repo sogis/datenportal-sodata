@@ -18,6 +18,7 @@ public record DatasetDetailPageVm(
         MetadataSectionVm temporalCoverage,
         MetadataSectionVm topics,
         ContactMetadataSectionVm responsibilitiesContact,
+        MetadataSectionVm otherInformation,
         List<MetadataSectionVm> metadataSections) {
 
     public DatasetDetailPageVm {

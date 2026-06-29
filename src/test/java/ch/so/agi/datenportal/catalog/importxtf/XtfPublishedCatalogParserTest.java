@@ -66,6 +66,14 @@ class XtfPublishedCatalogParserTest {
                     assertThat(contact.organizationUnit()).contains("Fachstelle für Wasserqualität Grundwasser");
                     assertThat(contact.email()).contains(URI.create("mailto:afu@bd.so.ch"));
                 });
+        assertThat(dataset.metadata().surveyMethod())
+                .contains("Die Daten zu Wasserqualität Grundwasser entstehen durch fachliche Erfassung, anschliessende Qualitätskontrolle und periodische Harmonisierung.");
+        assertThat(dataset.metadata().dataAvailableFrom())
+                .contains("Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.");
+        assertThat(dataset.metadata().furtherUses())
+                .contains("Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.");
+        assertThat(dataset.metadata().auxiliaryData())
+                .contains("Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.");
         assertThat(dataset.metadata().attributes())
                 .extracting(attribute -> attribute.name())
                 .containsExactly(

@@ -275,6 +275,36 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
+    void datasetOtherInformationContainsConfiguredValuesInOrder() {
+        CatalogEntryMetadata metadata = new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                List.of(),
+                Optional.empty(),
+                Optional.of("Fachliche Erhebung und Qualitätskontrolle"),
+                Optional.of("ab 2011"),
+                Optional.of("Übersichten und Kennzahlen"),
+                Optional.of("Referenztabellen und Prüflisten"));
+
+        var section = factory.dataset(datasetWithMetadata(metadata)).otherInformation();
+
+        assertThat(section.title()).isEqualTo("Übrige Informationen");
+        assertThat(section.items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(
+                        tuple("Erhebungs- / Messmethode", "Fachliche Erhebung und Qualitätskontrolle"),
+                        tuple("Verfügbare Daten ab", "ab 2011"),
+                        tuple("Weitere Verwendungen", "Übersichten und Kennzahlen"),
+                        tuple("Hilfsdaten", "Referenztabellen und Prüflisten"));
+    }
+
+    @Test
     void datasetFeaturesReflectAccessAttributesAndModel() {
         DatasetEntry dataset = new DatasetEntry(
                 "dataset",
