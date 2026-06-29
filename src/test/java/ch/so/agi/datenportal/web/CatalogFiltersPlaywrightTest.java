@@ -235,7 +235,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator(".dp-detail-feature").first())).isEqualTo("18px");
             assertThat(cssValue(availableFeatureIcon, "width")).isEqualTo("24px");
             assertThat(cssValue(availableFeatureIcon, "height")).isEqualTo("24px");
-            assertThat(cssValue(availableFeatureIcon, "color")).isEqualTo("rgb(34, 197, 94)");
+            assertThat(cssValue(availableFeatureIcon, "color")).isEqualTo("rgb(231, 246, 236)");
             assertThat(fontSize(page.locator(".dp-detail-action-item__content h3").first())).isEqualTo("16px");
             assertThat(fontSize(page.locator(".dp-detail-action-item__content p").first())).isEqualTo("16px");
             assertThat(fontSize(actionLink)).isEqualTo("16px");
@@ -521,6 +521,7 @@ class CatalogFiltersPlaywrightTest {
             page.navigate(baseUrl("/series/ch.so.abstimmungsresultate"));
 
             Locator currentIssueBadge = page.locator(".dp-status-badge--info").first();
+            Locator seriesIssuesIntro = page.locator(".dp-series-issues-intro").first();
             Locator seriesIssueTitleLink = page.locator(".dp-series-issue h2 a").first();
             Locator seriesIssueMeta = page.locator(".dp-series-issue__meta").first();
             Locator seriesIssueDetailLink = page.locator(".dp-series-issue__detail-link").first();
@@ -529,6 +530,10 @@ class CatalogFiltersPlaywrightTest {
             assertThat(page.locator(".dp-detail-downloads").count()).isZero();
             assertThat(page.locator(".dp-detail-facts").count()).isZero();
             assertThat(page.locator("#metadata-overview").count()).isZero();
+            assertThat(page.locator("#series-issues-title").count()).isZero();
+            assertThat(seriesIssuesIntro.textContent()).isEqualTo("Zu dieser Serie sind folgende Ausgaben verfügbar:");
+            assertThat(cssValue(seriesIssuesIntro, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(seriesIssuesIntro, "color")).isEqualTo("rgb(47, 72, 88)");
             assertThat(fontSize(currentIssueBadge)).isEqualTo("16px");
             assertThat(cssValue(currentIssueBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(currentIssueBadge, "border-top-width")).isEqualTo("0px");

@@ -22,7 +22,7 @@
       @endif
       <div class="dp-detail-layout">
         <div class="dp-detail-main">
-          @template.components.seriesIssues(issues = page.relatedIssues())
+          @template.components.seriesIssues(issues = page.relatedIssues(), showTitle = true)
           @for(var section : page.metadataSections())
             @template.components.metadataSection(section = section)
           @endfor

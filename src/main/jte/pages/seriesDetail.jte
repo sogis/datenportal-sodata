@@ -1,7 +1,7 @@
 @import ch.so.agi.datenportal.web.view.SeriesDetailPageVm
 @param SeriesDetailPageVm page
 @template.layouts.main(chrome = page.chrome(), content = @`
-  <section class="dp-detail-page">
+  <section class="dp-detail-page dp-series-detail-page">
     <div class="dp-container">
       @template.components.detailHero(
         title = page.title(),
@@ -13,8 +13,9 @@
         issuedLabel = page.issuedLabel(),
         showFacts = false
       )
+      <p class="dp-series-issues-intro">Zu dieser Serie sind folgende Ausgaben verfügbar:</p>
       <div class="dp-detail-summary-main">
-        @template.components.seriesIssues(issues = page.issues())
+        @template.components.seriesIssues(issues = page.issues(), showTitle = false)
       </div>
     </div>
   </section>

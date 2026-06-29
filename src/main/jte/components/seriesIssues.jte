@@ -1,8 +1,11 @@
 @import ch.so.agi.datenportal.web.view.SeriesIssuesVm
 @param SeriesIssuesVm issues
+@param boolean showTitle
 @if(!issues.issues().isEmpty())
-  <section class="dp-detail-panel dp-series-issues" aria-labelledby="series-issues-title">
-    <h2 id="series-issues-title">${issues.title()}</h2>
+  <section class="dp-detail-panel dp-series-issues" aria-labelledby="${showTitle ? "series-issues-title" : null}" aria-label="${showTitle ? null : issues.title()}">
+    @if(showTitle)
+      <h2 id="series-issues-title">${issues.title()}</h2>
+    @endif
     <div class="dp-series-issues__list">
       @for(var issue : issues.issues())
         <article class="dp-series-issue">

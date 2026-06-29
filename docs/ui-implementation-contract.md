@@ -709,7 +709,8 @@ Die Serienübersicht unter `/series/{seriesIdentifier}` ist bewusst schlank:
 
 - Titel der Datenreihe
 - Beschreibung der Datenreihe
-- Abschnitt `Ausgaben`
+- Intro-Absatz `Zu dieser Serie sind folgende Ausgaben verfügbar:`
+- Ausgaben-Card ohne sichtbaren Titel innerhalb der Card
 - aktuelle Ausgabe immer zuoberst
 - weitere Ausgaben alphanumerisch absteigend, z. B. `foo 2025` vor `foo 2024`
 

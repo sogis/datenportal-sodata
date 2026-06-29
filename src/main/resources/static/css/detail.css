@@ -28,6 +28,17 @@
   font-size: 1.1rem;
 }
 
+.dp-series-detail-page .dp-detail-hero {
+  margin-bottom: var(--dp-space-4);
+}
+
+.dp-series-issues-intro {
+  margin: 0 0 var(--dp-space-4);
+  color: var(--dp-color-text);
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
 .dp-detail-facts {
   display: flex;
   flex-wrap: wrap;
