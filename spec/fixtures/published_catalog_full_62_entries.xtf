@@ -301,7 +301,6 @@
             <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
             <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
             <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.wasserqualitaet_grundwasser/distribution/csv</distributionUri>
@@ -600,7 +599,6 @@
             <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
             <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
             <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.2581.baumkataster/distribution/csv</distributionUri>
@@ -898,7 +896,6 @@
             <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
             <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
             <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.polizei.einsatzlagen.laufend/distribution/csv</distributionUri>
@@ -1197,7 +1194,6 @@
             <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
             <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
             <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.gewaessernetz/distribution/csv</distributionUri>
@@ -1504,7 +1500,6 @@
             <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
             <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
             <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.laermbelastung_strassenverkehr/distribution/csv</distributionUri>
@@ -1801,7 +1796,6 @@
             <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
             <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
             <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.notfalltreffpunkte/distribution/csv</distributionUri>
@@ -2107,7 +2101,6 @@
             <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
             <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
             <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.schulstandorte/distribution/csv</distributionUri>
@@ -2404,7 +2397,6 @@
             <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
             <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
             <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.sirenenstandorte/distribution/csv</distributionUri>
@@ -2706,7 +2698,6 @@
             <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
             <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
             <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.sozialdienste.faelle.detail/distribution/csv</distributionUri>
@@ -3003,7 +2994,6 @@
             <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
             <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
             <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.unternehmensregister/distribution/csv</distributionUri>
@@ -3315,7 +3305,6 @@
             <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
             <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
             <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.verkehrszaehlstellen/distribution/csv</distributionUri>
@@ -3606,7 +3595,6 @@
             <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
             <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
             <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.waldflaechen_bestandeskarte/distribution/csv</distributionUri>
@@ -3897,7 +3885,6 @@
             <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
             <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
             <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.oeffentliche_abfallstellen/distribution/csv</distributionUri>
@@ -4209,7 +4196,6 @@
             <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
             <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
             <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-            <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.oev_haltestellen/distribution/csv</distributionUri>
@@ -4711,7 +4697,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2025/distribution/csv</distributionUri>
@@ -5153,7 +5138,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/distribution/csv</distributionUri>
@@ -5566,7 +5550,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.abstimmungsresultate_2024/distribution/csv</distributionUri>
@@ -5861,7 +5844,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.abstimmungsresultate_2026/distribution/csv</distributionUri>
@@ -6268,7 +6250,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.arbeitslosenquote_2024/distribution/csv</distributionUri>
@@ -6558,7 +6539,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.arbeitslosenquote_2026/distribution/csv</distributionUri>
@@ -7011,7 +6991,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.badegewaesser_qualitaet_2024/distribution/csv</distributionUri>
@@ -7331,7 +7310,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.badegewaesser_qualitaet_2026/distribution/csv</distributionUri>
@@ -7738,7 +7716,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baubewilligungen_gemeinden_2024/distribution/csv</distributionUri>
@@ -8029,7 +8006,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baubewilligungen_gemeinden_2026/distribution/csv</distributionUri>
@@ -8481,7 +8457,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baustellen.koordinationsplanung_2025/distribution/csv</distributionUri>
@@ -8915,7 +8890,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.beschaeftigte_branche_2023/distribution/csv</distributionUri>
@@ -9218,7 +9192,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.beschaeftigte_branche_2025/distribution/csv</distributionUri>
@@ -9625,7 +9598,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.bibliotheken_kennzahlen_2024/distribution/csv</distributionUri>
@@ -10034,7 +10006,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.energieverbrauch_gemeinden_2023/distribution/csv</distributionUri>
@@ -10327,7 +10298,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.energieverbrauch_gemeinden_2025/distribution/csv</distributionUri>
@@ -10747,7 +10717,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gebaeudesanierungen_foerderprogramm_2023/distribution/csv</distributionUri>
@@ -11050,7 +11019,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gebaeudesanierungen_foerderprogramm_2025/distribution/csv</distributionUri>
@@ -11436,7 +11404,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindefinanzen_kennzahlen_2024/distribution/csv</distributionUri>
@@ -11848,7 +11815,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.grundstueckspreise_gemeinden_2023/distribution/csv</distributionUri>
@@ -12151,7 +12117,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.grundstueckspreise_gemeinden_2025/distribution/csv</distributionUri>
@@ -12558,7 +12523,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.hundebestand_gemeinden_2024/distribution/csv</distributionUri>
@@ -12979,7 +12943,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.admin.swisstopo.hoehenmodell.kacheln_2024/distribution/csv</distributionUri>
@@ -13284,7 +13247,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.admin.swisstopo.hoehenmodell.kacheln_2026/distribution/csv</distributionUri>
@@ -13712,7 +13674,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.staatsarchiv.digitalisate.intern_2026/distribution/csv</distributionUri>
@@ -14125,7 +14086,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.kantonsratswahlen_2021/distribution/csv</distributionUri>
@@ -14534,7 +14494,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.klassengroessen_volksschule_2023/distribution/csv</distributionUri>
@@ -14825,7 +14784,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.klassengroessen_volksschule_2025/distribution/csv</distributionUri>
@@ -15250,7 +15208,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.landwirtschaft_nutzflaechen_2024/distribution/csv</distributionUri>
@@ -15663,7 +15620,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.leerwohnungsziffer_2023/distribution/csv</distributionUri>
@@ -15954,7 +15910,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.leerwohnungsziffer_2025/distribution/csv</distributionUri>
@@ -16373,7 +16328,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.lehrbetriebsstatistik_2023/distribution/csv</distributionUri>
@@ -16676,7 +16630,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.lehrbetriebsstatistik_2025/distribution/csv</distributionUri>
@@ -17101,7 +17054,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.mietpreisindex_2024/distribution/csv</distributionUri>
@@ -17403,7 +17355,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.mietpreisindex_2026/distribution/csv</distributionUri>
@@ -17829,7 +17780,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.neugruendungen_unternehmen_2024/distribution/csv</distributionUri>
@@ -18131,7 +18081,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.neugruendungen_unternehmen_2026/distribution/csv</distributionUri>
@@ -18583,7 +18532,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pendlerstroeme_2024/distribution/csv</distributionUri>
@@ -19022,7 +18970,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pflegeheime_bettenangebot_2023/distribution/csv</distributionUri>
@@ -19328,7 +19275,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pflegeheime_bettenangebot_2025/distribution/csv</distributionUri>
@@ -19743,7 +19689,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.recyclingmengen_gemeinden_2023/distribution/csv</distributionUri>
@@ -20034,7 +19979,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.recyclingmengen_gemeinden_2025/distribution/csv</distributionUri>
@@ -20447,7 +20391,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.sozialhilfequoten_gemeinden_2024/distribution/csv</distributionUri>
@@ -20842,7 +20785,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerertraege_natuerliche_personen_2023/distribution/csv</distributionUri>
@@ -21119,7 +21061,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerertraege_natuerliche_personen_2025/distribution/csv</distributionUri>
@@ -21523,7 +21464,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerfuss_gemeinden_2024/distribution/csv</distributionUri>
@@ -21812,7 +21752,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerfuss_gemeinden_2026/distribution/csv</distributionUri>
@@ -22225,7 +22164,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.stimm_wahlbeteiligung_gemeinden_2024/distribution/csv</distributionUri>
@@ -22519,7 +22457,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.stimm_wahlbeteiligung_gemeinden_2026/distribution/csv</distributionUri>
@@ -22969,7 +22906,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.strassenverkehrsunfaelle_2024/distribution/csv</distributionUri>
@@ -23287,7 +23223,6 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Beschreibung simuliert redaktionelle Zusatzinformationen für die Datenportal-Oberfläche.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.strassenverkehrsunfaelle_2026/distribution/csv</distributionUri>
@@ -23694,7 +23629,6 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Die Angaben dienen der Entwicklung und sind nicht als rechtsverbindliche Auskunft zu verstehen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.tourismus_logiernaechte_2024/distribution/csv</distributionUri>
@@ -24132,7 +24066,6 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Zeitliche Vergleiche sollten nur mit gleichartig aufbereiteten Ständen vorgenommen werden.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.2601.verkehrsberuhigung.zonen_2024/distribution/csv</distributionUri>
@@ -24452,7 +24385,6 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Einzelne Werte können je nach Nachführungsstand von produktiven Fachauswertungen abweichen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.2601.verkehrsberuhigung.zonen_2026/distribution/csv</distributionUri>
@@ -24859,7 +24791,6 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
-                <remarks>Fiktiver Testhinweis: Bei kleinen Teilmengen können Rundungen oder Unterdrückungen die Interpretation beeinflussen.</remarks>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.wohnungsbestand_2024/distribution/csv</distributionUri>
