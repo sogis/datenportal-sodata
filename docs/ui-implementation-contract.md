@@ -705,6 +705,16 @@ Temporäre Umsetzungsnotiz:
 
 Wichtig: In der Liste zeigt der Info-Link der Root-Datenreihe auf die Detailseite der aktuellen Ausgabe.
 
+Die Serienübersicht unter `/series/{seriesIdentifier}` ist bewusst schlank:
+
+- Titel der Datenreihe
+- Beschreibung der Datenreihe
+- Abschnitt `Ausgaben`
+- aktuelle Ausgabe immer zuoberst
+- weitere Ausgaben alphanumerisch absteigend, z. B. `foo 2025` vor `foo 2024`
+
+Die Serienübersicht zeigt keinen separaten Downloadbereich, keine Current-Issue-Hinweiskarte und keine Metadatenkarten.
+
 Die Detailseite der aktuellen Ausgabe muss den Serienkontext zeigen:
 
 - Titel der Datenreihe
@@ -721,6 +731,9 @@ Für eine ältere Ausgabe ist die Struktur gleich, aber mit Badge/Label `Ausgabe
 ```text
 GET /datasets/{identifier}
   Detailseite eines normalen Datensatzes.
+
+GET /series/{seriesIdentifier}
+  Vereinfachte Übersicht einer Datenreihe mit Ausgabenliste.
 
 GET /series/{seriesIdentifier}/issues/current
   Detailseite der aktuellen Ausgabe einer Datenreihe.
@@ -762,11 +775,7 @@ public record SeriesDetailPageVm(
     boolean structureDescribed,
     String modifiedLabel,
     String issuedLabel,
-    String currentIssueLabel,
-    String currentIssueHref,
-    DownloadSectionVm currentIssueDownloads,
-    SeriesIssuesVm issues,
-    List<MetadataSectionVm> metadataSections
+    SeriesIssuesVm issues
 ) {}
 
 public record IssueDetailPageVm(

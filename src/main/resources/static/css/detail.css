@@ -367,19 +367,51 @@
   border-bottom: 0;
 }
 
-.dp-series-issue h3 {
+.dp-series-issue h2 {
   margin: 0 0 var(--dp-space-1);
   font-size: 1rem;
   letter-spacing: 0;
 }
 
-.dp-series-issue h3 a {
+.dp-series-issue h2 a {
   color: var(--dp-color-text);
+}
+
+.dp-series-issue h2 a:hover,
+.dp-series-issue h2 a:focus {
+  color: var(--dp-color-accent);
 }
 
 .dp-series-issue p {
   margin: 0;
-  color: var(--dp-color-text-muted);
+}
+
+.dp-series-issue__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dp-space-2) var(--dp-space-3);
+  align-items: center;
+}
+
+.dp-series-issue__detail {
+  margin-top: var(--dp-space-2);
+}
+
+.dp-series-issue__detail-link {
+  display: inline-flex;
+  gap: var(--dp-space-2);
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--dp-color-accent);
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.dp-series-issue__detail-link:hover,
+.dp-series-issue__detail-link:focus {
+  color: var(--dp-color-accent);
 }
 
 .dp-detail-downloads .dp-download-list,

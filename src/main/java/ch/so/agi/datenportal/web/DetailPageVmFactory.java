@@ -82,8 +82,6 @@ public final class DetailPageVmFactory {
     }
 
     public SeriesDetailPageVm series(DatasetSeriesEntry series) {
-        DatasetIssueEntry currentIssue = series.currentIssueOrThrow();
-        AccessStateVm currentIssueAccessState = accessState(currentIssue);
         return new SeriesDetailPageVm(
                 pageChromeFactory.seriesDetailPage(series),
                 series.identifier(),
@@ -94,15 +92,7 @@ public final class DetailPageVmFactory {
                 false,
                 formatDate(series.modified()),
                 formatDate(series.metadata().issued()).orElse(""),
-                currentIssue.issueLabel(),
-                urlFactory.currentIssueDetail(series.identifier()),
-                new DownloadSectionVm(
-                        "Downloads aktuelle Ausgabe",
-                        downloadLead(currentIssueAccessState, "der aktuellen Ausgabe " + currentIssue.issueLabel(), "die aktuelle Ausgabe " + currentIssue.issueLabel()),
-                        currentIssueAccessState,
-                        downloads(currentIssue.title(), currentIssue.distributions())),
-                seriesIssues(series),
-                metadataSections(series, currentIssue.distributions(), currentIssueAccessState));
+                seriesIssues(series));
     }
 
     public IssueDetailPageVm issue(DatasetSeriesEntry series, DatasetIssueEntry issue) {
@@ -133,7 +123,8 @@ public final class DetailPageVmFactory {
         String currentIdentifier = series.currentIssueOrThrow().identifier();
         return new SeriesIssuesVm(
                 "Ausgaben",
-                series.issuesNewestFirst().stream()
+                series.issues().stream()
+                        .sorted(seriesIssueOrder(currentIdentifier))
                         .map(issue -> new SeriesIssueVm(
                                 issue.issueLabel(),
                                 issue.title(),
@@ -145,6 +136,17 @@ public final class DetailPageVmFactory {
                                 accessState(issue),
                                 downloads(issue.title(), issue.primaryDistributions())))
                         .toList());
+    }
+
+    private static Comparator<DatasetIssueEntry> seriesIssueOrder(String currentIdentifier) {
+        Comparator<DatasetIssueEntry> historicalOrder = Comparator
+                .comparing(DatasetIssueEntry::title, String.CASE_INSENSITIVE_ORDER)
+                .reversed()
+                .thenComparing(DatasetIssueEntry::issueLabel, String.CASE_INSENSITIVE_ORDER.reversed())
+                .thenComparing(DatasetIssueEntry::identifier);
+        return Comparator
+                .comparing((DatasetIssueEntry issue) -> !issue.identifier().equals(currentIdentifier))
+                .thenComparing(historicalOrder);
     }
 
     private List<DownloadLinkVm> downloads(String ownerTitle, List<DistributionLink> distributions) {

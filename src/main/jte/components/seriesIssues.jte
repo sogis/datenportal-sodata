@@ -7,14 +7,17 @@
       @for(var issue : issues.issues())
         <article class="dp-series-issue">
           <div>
-            <h3>
+            <h2>
               <a href="${issue.detailHref()}">${issue.title()}</a>
-            </h3>
-            <p>
-              Ausgabe ${issue.issueLabel()} · Publiziert ${issue.publicationDateLabel()}
+            </h2>
+            <p class="dp-series-issue__meta">
+              <span>Ausgabe ${issue.issueLabel()} · Publiziert ${issue.publicationDateLabel()}</span>
               @if(issue.current())
                 <span class="dp-status-badge dp-status-badge--info">Aktuelle Ausgabe</span>
               @endif
+            </p>
+            <p class="dp-series-issue__detail">
+              <a class="dp-series-issue__detail-link" href="${issue.detailHref()}">Detailseite anzeigen <span aria-hidden="true">→</span></a>
             </p>
           </div>
           @template.components.downloadLink(accessState = issue.accessState(), downloads = issue.downloads())

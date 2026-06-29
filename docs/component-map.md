@@ -49,7 +49,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | UI-Bereich | JTE | Java | Tests |
 |---|---|---|---|
 | Datensatzdetail | `pages/datasetDetail.jte` | `DatasetDetailPageVm` | keine Datenvorschau |
-| Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | aktuelle und historische Ausgaben |
+| Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | vereinfachte Serienübersicht mit Ausgabenliste |
 | Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Rücklink zur Datenreihe und weitere Ausgaben |
 | Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `DownloadSectionVm` | Datenmerkmale plus Downloads, mobile gestapelt |
 | Datensatz-Übersicht | `components/metadataSection.jte` | `DatasetDetailPageVm.overview` | erste Metadatenkarte unterhalb Datenmerkmale/Downloads |

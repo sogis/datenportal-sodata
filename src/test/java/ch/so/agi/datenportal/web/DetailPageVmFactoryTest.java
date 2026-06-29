@@ -412,6 +412,32 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
+    void seriesIssuesPlaceCurrentIssueFirstAndSortHistoricalIssuesDescendingByTitle() {
+        DatasetIssueEntry historical2023 = issue("series-2023", "foo 2023", false, LocalDate.parse("2026-01-01"));
+        DatasetIssueEntry historical2025 = issue("series-2025", "foo 2025", false, LocalDate.parse("2024-01-01"));
+        DatasetIssueEntry current2024 = issue("series-2024", "foo 2024", true, LocalDate.parse("2025-01-01"));
+        DatasetSeriesEntry series = new DatasetSeriesEntry(
+                "series",
+                "Datenreihe",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                AccessLevel.OPEN,
+                CatalogEntryMetadata.empty(),
+                List.of(historical2023, historical2025, current2024));
+
+        var page = factory.series(series);
+
+        assertThat(page.issues().issues())
+                .extracting(issue -> issue.issueLabel())
+                .containsExactly("foo 2024", "foo 2025", "foo 2023");
+        assertThat(page.issues().issues().getFirst().current()).isTrue();
+        assertThat(page.issues().issues().getFirst().detailHref()).isEqualTo("/series/series/issues/current");
+    }
+
+    @Test
     void seriesAndIssuesCarrySeparateAccessStatesForBadgesAndDownloads() {
         DatasetIssueEntry oldIssue = issue(
                 "series-2025",
@@ -440,20 +466,11 @@ class DetailPageVmFactoryTest {
         var page = factory.series(series);
 
         assertThat(page.accessState().openData()).isTrue();
-        assertThat(page.currentIssueDownloads().accessState().openData()).isFalse();
-        assertThat(page.currentIssueDownloads().lead()).contains("keine Open-Data-Downloads");
         assertThat(page.issues().issues())
                 .allSatisfy(issue -> {
                     assertThat(issue.accessState().openData()).isFalse();
                     assertThat(issue.accessState().label()).isEqualTo("Öffentlich mit Bedingungen");
                 });
-        assertThat(page.metadataSections())
-                .filteredOn(section -> section.id().equals("resources"))
-                .singleElement()
-                .satisfies(section -> assertThat(section.items())
-                        .extracting(item -> item.label())
-                        .contains("Formate")
-                        .doesNotContain("CSV", "XLSX", "Parquet"));
     }
 
     private static DatasetIssueEntry issue(String identifier, String label, boolean current, LocalDate modified) {

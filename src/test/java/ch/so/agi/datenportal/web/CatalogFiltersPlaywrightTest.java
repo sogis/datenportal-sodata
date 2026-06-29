@@ -521,12 +521,25 @@ class CatalogFiltersPlaywrightTest {
             page.navigate(baseUrl("/series/ch.so.abstimmungsresultate"));
 
             Locator currentIssueBadge = page.locator(".dp-status-badge--info").first();
+            Locator seriesIssueTitleLink = page.locator(".dp-series-issue h2 a").first();
+            Locator seriesIssueMeta = page.locator(".dp-series-issue__meta").first();
+            Locator seriesIssueDetailLink = page.locator(".dp-series-issue__detail-link").first();
 
+            assertThat(page.locator(".dp-current-issue").count()).isZero();
+            assertThat(page.locator(".dp-detail-downloads").count()).isZero();
+            assertThat(page.locator(".dp-detail-facts").count()).isZero();
+            assertThat(page.locator("#metadata-overview").count()).isZero();
             assertThat(fontSize(currentIssueBadge)).isEqualTo("16px");
             assertThat(cssValue(currentIssueBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(currentIssueBadge, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(currentIssueBadge, "background-color")).isEqualTo("rgb(231, 238, 246)");
             assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(neutralBackground);
             assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(positiveBackground);
+            assertThat(cssValue(seriesIssueMeta, "color")).isEqualTo("rgb(47, 72, 88)");
+            assertThat(fontSize(seriesIssueDetailLink)).isEqualTo("18px");
+            assertThat(seriesIssueDetailLink.getAttribute("href")).isEqualTo("/series/ch.so.abstimmungsresultate/issues/current");
+            seriesIssueTitleLink.hover();
+            assertThat(cssValue(seriesIssueTitleLink, "color")).isEqualTo("rgb(210, 10, 17)");
 
             page.navigate(baseUrl("/datasets?expanded=ch.so.abstimmungsresultate"));
 

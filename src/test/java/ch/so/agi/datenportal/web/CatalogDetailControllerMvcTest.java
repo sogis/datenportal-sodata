@@ -123,19 +123,35 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
-    void seriesDetailRendersCurrentIssueHistoricalIssuesAndCurrentIssueDownloads() throws Exception {
+    void seriesDetailRendersSimplifiedIssueListWithoutCurrentIssuePanelDownloadsOrMetadata() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
                 .andExpect(content().string(containsString("Kantonale und eidgenössische Abstimmungsresultate nach Gemeinde.")))
+                .andExpect(content().string(containsString("dp-series-issues")))
                 .andExpect(content().string(containsString("Aktuelle Ausgabe")))
+                .andExpect(content().string(containsString("class=\"dp-status-badge dp-status-badge--info\"")))
                 .andExpect(content().string(containsString("Ausgabe 2026")))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/current\"")))
+                .andExpect(content().string(containsString("<h2>")))
+                .andExpect(content().string(containsString("<a href=\"/series/ch.so.abstimmungsresultate/issues/current\">Abstimmungsresultate 2026</a>")))
+                .andExpect(content().string(not(containsString("<h3>\n              <a href=\"/series/ch.so.abstimmungsresultate/issues/current\">Abstimmungsresultate 2026</a>"))))
+                .andExpect(content().string(containsString("<a class=\"dp-series-issue__detail-link\" href=\"/series/ch.so.abstimmungsresultate/issues/current\">Detailseite anzeigen <span aria-hidden=\"true\">→</span></a>")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2025")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2024")))
                 .andExpect(content().string(containsString("CSV herunterladen: Abstimmungsresultate 2026")))
                 .andExpect(content().string(not(containsString("(aktuelle Ausgabe)"))))
-                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.csv\"")));
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.csv\"")))
+                .andExpect(content().string(not(containsString("dp-current-issue"))))
+                .andExpect(content().string(not(containsString("class=\"dp-detail-panel dp-detail-downloads\""))))
+                .andExpect(content().string(not(containsString("<aside class=\"dp-detail-side\" aria-label=\"Downloads\">"))))
+                .andExpect(content().string(not(containsString("<dl class=\"dp-detail-facts\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-overview\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-topics\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-responsibility\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-usage\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-time\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-resources\""))));
     }
 
     @Test
@@ -178,7 +194,7 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
-    void nonOpenSeriesDetailShowsLockInCurrentIssueDownloadsAndIssueList() throws Exception {
+    void nonOpenSeriesDetailShowsLockInIssueList() throws Exception {
         mockMvc.perform(get("/series/ch.so.baustellen.koordinationsplanung"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Baustellen-Koordinationsplanung")))
