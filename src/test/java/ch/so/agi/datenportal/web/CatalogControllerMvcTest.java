@@ -312,6 +312,7 @@ class CatalogControllerMvcTest {
                 .doesNotContain("<span aria-hidden=\"true\">-</span>");
         assertThat(cardsHtml)
                 .contains("dp-type-badge")
+                .contains("dp-result-card__type-badge dp-status-badge--info")
                 .contains("class=\"bi bi-file-earmark\"")
                 .contains("class=\"bi bi-collection\"");
     }

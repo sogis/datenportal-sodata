@@ -486,7 +486,7 @@ class CatalogFiltersPlaywrightTest {
             Locator cardTitle = page.locator(".dp-result-card .dp-result-card__title").first();
             Locator cardDescription = page.locator(".dp-result-card .dp-result-card__description").first();
             Locator actionPill = page.locator(".dp-download-link.dp-action-pill").first();
-            Locator typeBadge = page.locator(".dp-result-card .dp-type-badge").first();
+            Locator typeBadge = page.locator(".dp-result-card__type-badge:has-text('Datensatz')").first();
             Locator openDataBadge = page.locator(".dp-result-card .dp-status-badge--positive").first();
             Locator keywordBadge = page.locator(".dp-result-card .dp-keyword-list li").first();
 
@@ -513,13 +513,16 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(typeBadge)).isEqualTo("16px");
             assertThat(cssValue(typeBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(typeBadge, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(typeBadge, "background-color")).isEqualTo("rgb(228, 240, 251)");
+            assertThat(cssValue(typeBadge, "color")).isEqualTo("rgb(37, 79, 115)");
+            assertThat(cssValue(typeBadge, "background-color")).isNotEqualTo(neutralBackground);
 
             assertThat(fontSize(cardTitle)).isEqualTo("18px");
             assertThat(fontSize(cardDescription)).isEqualTo("18px");
 
             assertThat(fontSize(keywordBadge)).isEqualTo("14px");
             assertThat(cssValue(keywordBadge, "font-weight")).isEqualTo("400");
-            assertThat(cssValue(keywordBadge, "background-color")).isEqualTo(cssValue(typeBadge, "background-color"));
+            assertThat(cssValue(keywordBadge, "background-color")).isEqualTo(neutralBackground);
             assertThat(cssValue(keywordBadge, "padding-left")).isEqualTo("6px");
             assertThat(cssValue(keywordBadge, "padding-right")).isEqualTo("6px");
             assertThat(cssValue(keywordBadge, "min-height")).isEqualTo("25.6px");
@@ -528,6 +531,17 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(openDataBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(openDataBadge, "border-top-width")).isEqualTo("0px");
             assertThat(positiveBackground).isNotEqualTo(neutralBackground);
+
+            page.navigate(baseUrl("/datasets?view=cards"));
+
+            Locator seriesTypeBadge = page.locator(".dp-result-card__type-badge:has-text('Datenreihe')").first();
+
+            assertThat(fontSize(seriesTypeBadge)).isEqualTo("16px");
+            assertThat(cssValue(seriesTypeBadge, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(seriesTypeBadge, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(seriesTypeBadge, "background-color")).isEqualTo("rgb(228, 240, 251)");
+            assertThat(cssValue(seriesTypeBadge, "color")).isEqualTo("rgb(37, 79, 115)");
+            assertThat(cssValue(seriesTypeBadge, "background-color")).isNotEqualTo(neutralBackground);
 
             page.navigate(baseUrl("/datasets?view=cards&q=Baumkataster"));
 
@@ -562,7 +576,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(currentIssueBadge)).isEqualTo("16px");
             assertThat(cssValue(currentIssueBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(currentIssueBadge, "border-top-width")).isEqualTo("0px");
-            assertThat(cssValue(currentIssueBadge, "background-color")).isEqualTo("rgb(231, 238, 246)");
+            assertThat(cssValue(currentIssueBadge, "background-color")).isEqualTo("rgb(228, 240, 251)");
             assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(neutralBackground);
             assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(positiveBackground);
             assertThat(cssValue(seriesIssueMeta, "color")).isEqualTo("rgb(47, 72, 88)");
