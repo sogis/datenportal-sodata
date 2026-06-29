@@ -15,6 +15,8 @@ public record DatasetDetailPageVm(
         List<DetailFeatureVm> features,
         DownloadSectionVm downloads,
         MetadataSectionVm overview,
+        MetadataSectionVm temporalCoverage,
+        MetadataSectionVm topics,
         List<MetadataSectionVm> metadataSections) {
 
     public DatasetDetailPageVm {

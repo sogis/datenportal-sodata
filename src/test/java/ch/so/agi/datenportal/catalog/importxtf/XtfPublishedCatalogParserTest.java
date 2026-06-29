@@ -44,6 +44,9 @@ class XtfPublishedCatalogParserTest {
         assertThat(dataset.themes())
                 .extracting(theme -> theme.identifier())
                 .containsExactly("Raum_und_Umwelt");
+        assertThat(dataset.themes())
+                .extracting(theme -> theme.displayName())
+                .containsExactly("Raum und Umwelt");
         assertThat(dataset.keywords()).contains("Wasserqualität", "Grundwasser", "NAQUA");
         assertThat(dataset.metadata().issued()).contains(LocalDate.parse("2026-06-24"));
         assertThat(dataset.metadata().licenseUri()).contains(URI.create("https://creativecommons.org/licenses/by/4.0/"));

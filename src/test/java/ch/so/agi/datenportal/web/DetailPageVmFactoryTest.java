@@ -12,6 +12,7 @@ import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
+import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.config.WebComponentsProperties;
 import ch.so.agi.datenportal.support.JsonAttributeEncoder;
@@ -118,6 +119,90 @@ class DetailPageVmFactoryTest {
                         tuple("Lizenz", "https://creativecommons.org/licenses/by/4.0/"));
         assertThat(page.overview().items().getLast().href())
                 .contains("https://creativecommons.org/licenses/by/4.0/");
+    }
+
+    @Test
+    void datasetTemporalCoverageContainsReferenceDate() {
+        var page = factory.dataset(datasetWithMetadata(metadataWithTemporalCoverage(new TemporalCoverage(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(LocalDate.parse("2026-05-19"))))));
+
+        assertThat(page.temporalCoverage().title()).isEqualTo("Zeitliche Abdeckung");
+        assertThat(page.temporalCoverage().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(tuple("Stichtag", "19.05.2026"));
+    }
+
+    @Test
+    void datasetTemporalCoverageContainsClosedPeriod() {
+        var page = factory.dataset(datasetWithMetadata(metadataWithTemporalCoverage(new TemporalCoverage(
+                Optional.of(LocalDate.parse("2018-01-01")),
+                Optional.of(LocalDate.parse("2025-12-31")),
+                Optional.empty()))));
+
+        assertThat(page.temporalCoverage().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(tuple("Zeitraum", "01.01.2018 bis 31.12.2025"));
+    }
+
+    @Test
+    void datasetTemporalCoverageContainsOpenPeriodStart() {
+        var page = factory.dataset(datasetWithMetadata(metadataWithTemporalCoverage(new TemporalCoverage(
+                Optional.of(LocalDate.parse("2018-01-01")),
+                Optional.empty(),
+                Optional.empty()))));
+
+        assertThat(page.temporalCoverage().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(tuple("Zeitraum", "ab 01.01.2018"));
+    }
+
+    @Test
+    void datasetTemporalCoverageContainsOpenPeriodEnd() {
+        var page = factory.dataset(datasetWithMetadata(metadataWithTemporalCoverage(new TemporalCoverage(
+                Optional.empty(),
+                Optional.of(LocalDate.parse("2025-12-31")),
+                Optional.empty()))));
+
+        assertThat(page.temporalCoverage().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(tuple("Zeitraum", "bis 31.12.2025"));
+    }
+
+    @Test
+    void datasetTemporalCoverageIsEmptyWhenNoTemporalCoverageExists() {
+        var page = factory.dataset(datasetWithMetadata(CatalogEntryMetadata.empty()));
+
+        assertThat(page.temporalCoverage().title()).isEqualTo("Zeitliche Abdeckung");
+        assertThat(page.temporalCoverage().items()).isEmpty();
+    }
+
+    @Test
+    void datasetTopicsContainTranslatedThemesAndCommaSeparatedKeywords() {
+        DatasetEntry dataset = new DatasetEntry(
+                "dataset",
+                "Datensatz",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(
+                        new Theme("Bevoelkerung", "Bevölkerung"),
+                        new Theme("Mobilitaet_und_Verkehr", "Mobilität und Verkehr")),
+                List.of("ÖV", "Pendler", "ÖV"),
+                LocalDate.parse("2026-05-19"),
+                AccessLevel.OPEN,
+                CatalogEntryMetadata.empty(),
+                List.of(distribution(DistributionFormat.CSV)));
+
+        var page = factory.dataset(dataset);
+
+        assertThat(page.topics().title()).isEqualTo("Themen und Schlagworte");
+        assertThat(page.topics().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(
+                        tuple("Thema", "Bevölkerung, Mobilität und Verkehr"),
+                        tuple("Schlagworte", "ÖV, Pendler"));
     }
 
     @Test
@@ -337,6 +422,35 @@ class DetailPageVmFactoryTest {
                 Optional.of("published"),
                 Optional.of("cantonal"),
                 Optional.empty(),
+                List.of(),
+                Optional.empty());
+    }
+
+    private static DatasetEntry datasetWithMetadata(CatalogEntryMetadata metadata) {
+        return new DatasetEntry(
+                "dataset",
+                "Datensatz",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                LocalDate.parse("2026-05-19"),
+                AccessLevel.OPEN,
+                metadata,
+                List.of(distribution(DistributionFormat.CSV)));
+    }
+
+    private static CatalogEntryMetadata metadataWithTemporalCoverage(TemporalCoverage temporalCoverage) {
+        return new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(temporalCoverage),
                 List.of(),
                 Optional.empty());
     }

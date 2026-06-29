@@ -251,7 +251,7 @@ class CatalogControllerMvcTest {
                         .param("sort", "title-asc"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Aktive Filter")))
-                .andExpect(content().string(containsString("Thema: Bau und Wohnungswesen")))
+                .andExpect(content().string(containsString("Thema: Bau- und Wohnungswesen")))
                 .andExpect(content().string(containsString("Fachstelle / Amt: Amt für Raumplanung")))
                 .andExpect(content().string(containsString("theme=Kultur_Medien_Informationsgesellschaft_Sport")))
                 .andExpect(content().string(containsString("office=arp")))

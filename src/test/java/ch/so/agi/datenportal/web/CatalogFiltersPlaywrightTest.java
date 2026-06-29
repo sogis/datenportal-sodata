@@ -89,15 +89,15 @@ class CatalogFiltersPlaywrightTest {
             waitForLocationSearchContains(page, "theme=Bau_und_Wohnungswesen", "theme=Geografie");
             page.waitForFunction("() => document.querySelectorAll('#active-filter-chips .dp-filter-chip').length === 2");
 
-            assertThat(page.locator("#active-filter-chips a:has-text('Bau und Wohnungswesen')").count()).isEqualTo(1);
+            assertThat(page.locator("#active-filter-chips a:has-text('Bau- und Wohnungswesen')").count()).isEqualTo(1);
             assertThat(page.locator("#active-filter-chips a:has-text('Geografie')").count()).isEqualTo(1);
 
             page.reload();
             page.waitForLoadState();
-            assertThat(page.locator("#active-filter-chips a:has-text('Bau und Wohnungswesen')").count()).isEqualTo(1);
+            assertThat(page.locator("#active-filter-chips a:has-text('Bau- und Wohnungswesen')").count()).isEqualTo(1);
             assertThat(page.locator("#active-filter-chips a:has-text('Geografie')").count()).isEqualTo(1);
 
-            page.click("#active-filter-chips a:has-text('Bau und Wohnungswesen')");
+            page.click("#active-filter-chips a:has-text('Bau- und Wohnungswesen')");
             waitForLocationSearchContains(page, "theme=Geografie");
             waitForLocationSearchExcludes(page, "theme=Bau_und_Wohnungswesen");
             page.waitForFunction("() => document.querySelectorAll('#active-filter-chips .dp-filter-chip').length === 1");

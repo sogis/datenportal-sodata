@@ -63,6 +63,8 @@ public final class DetailPageVmFactory {
                         accessState(dataset),
                         downloads(dataset.title(), dataset.distributions())),
                 new MetadataSectionVm("overview", "Übersicht", overviewItems(dataset)),
+                new MetadataSectionVm("temporal-coverage", "Zeitliche Abdeckung", temporalCoverageItems(dataset)),
+                new MetadataSectionVm("topics", "Themen und Schlagworte", datasetTopicItems(dataset)),
                 metadataSections(dataset, dataset.distributions(), accessState(dataset)));
     }
 
@@ -203,6 +205,14 @@ public final class DetailPageVmFactory {
         return items;
     }
 
+    private List<MetadataItemVm> datasetTopicItems(CatalogEntry entry) {
+        List<MetadataItemVm> items = new ArrayList<>();
+        join(entry.themes().stream().map(Theme::displayName).toList())
+                .ifPresent(value -> items.add(item("Thema", value)));
+        join(entry.keywords()).ifPresent(value -> items.add(item("Schlagworte", value)));
+        return items;
+    }
+
     private List<MetadataItemVm> responsibilityItems(CatalogEntry entry) {
         List<MetadataItemVm> items = new ArrayList<>();
         items.add(item("Fachstelle / Amt", officeLabel(entry.creator())));
@@ -230,6 +240,13 @@ public final class DetailPageVmFactory {
                 .filter(value -> !value.isBlank())
                 .ifPresent(value -> items.add(item("Zeitlicher Bezug", value)));
         return items;
+    }
+
+    private List<MetadataItemVm> temporalCoverageItems(CatalogEntry entry) {
+        return entry.metadata().temporalCoverage()
+                .flatMap(DetailPageVmFactory::temporalCoverageItem)
+                .map(List::of)
+                .orElseGet(List::of);
     }
 
     private List<MetadataItemVm> resourceItems(List<DistributionLink> distributions, AccessStateVm downloadAccessState) {
@@ -355,6 +372,24 @@ public final class DetailPageVmFactory {
             return "bis " + formatDate(coverage.endDate().get());
         }
         return "";
+    }
+
+    private static Optional<MetadataItemVm> temporalCoverageItem(TemporalCoverage coverage) {
+        if (coverage.referenceDate().isPresent()) {
+            return Optional.of(item("Stichtag", formatDate(coverage.referenceDate().get())));
+        }
+        if (coverage.startDate().isPresent() && coverage.endDate().isPresent()) {
+            return Optional.of(item(
+                    "Zeitraum",
+                    formatDate(coverage.startDate().get()) + " bis " + formatDate(coverage.endDate().get())));
+        }
+        if (coverage.startDate().isPresent()) {
+            return Optional.of(item("Zeitraum", "ab " + formatDate(coverage.startDate().get())));
+        }
+        if (coverage.endDate().isPresent()) {
+            return Optional.of(item("Zeitraum", "bis " + formatDate(coverage.endDate().get())));
+        }
+        return Optional.empty();
     }
 
     private static String mailDisplay(URI uri) {

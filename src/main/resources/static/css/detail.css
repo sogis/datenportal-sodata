@@ -150,7 +150,7 @@
 }
 
 .dp-detail-feature--available .dp-detail-feature__icon {
-  color: var(--dp-color-status-ok-circle);
+  color: var(--dp-color-badge-positive-bg);
 }
 
 .dp-detail-feature--unavailable .dp-detail-feature__icon {

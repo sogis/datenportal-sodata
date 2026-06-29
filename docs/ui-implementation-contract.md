@@ -689,18 +689,15 @@ Pflichtbereiche:
 5. Datenmerkmale-/Download-Zeile mit `Open Data`, `Attribute beschrieben`, `Daten validiert` sowie `CSV`, `XLSX`, `Parquet`; nicht offene Eintraege zeigen stattdessen ein Schloss
 6. Metadatenbereiche:
    - Übersicht
-   - Verantwortlichkeit
-   - Zeit und Raum
-   - Nutzung und Lizenz
-   - Ressourcen und Formate
-   - Struktur / Datenmodell
-   - Kontakt
+   - Zeitliche Abdeckung
+   - Themen und Schlagworte
+   - spätere Bereiche: Verantwortlichkeit, Nutzung und Lizenz, Ressourcen und Formate, Struktur / Datenmodell, Kontakt
 7. Footer/Statuszeile
 
 Temporäre Umsetzungsnotiz:
 
-- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, der Übersichtskarte und einer rechten vertikalen Aktionsspalte (`Struktur & Qualität`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
-- Die tieferen Metadatenbereiche unterhalb der Übersicht sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
+- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, den ersten drei Metadatenkarten (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und einer rechten vertikalen Aktionsspalte (`Struktur & Qualität`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
+- Die tieferen Metadatenbereiche unterhalb dieser drei Cards sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
 
 ### 8.2 Detailseite für Datenreihen und Ausgaben
 
@@ -748,6 +745,8 @@ public record DatasetDetailPageVm(
     List<DetailFeatureVm> features,
     DownloadSectionVm downloads,
     MetadataSectionVm overview,
+    MetadataSectionVm temporalCoverage,
+    MetadataSectionVm topics,
     List<MetadataSectionVm> metadataSections
 ) {}
 
