@@ -59,7 +59,7 @@ public final class DetailPageVmFactory {
                 dataset.metadata().hasStructureInformation(),
                 formatDate(dataset.modified()),
                 formatDate(dataset.metadata().issued()).orElse(""),
-                datasetFeatures(dataset),
+                detailFeatures(dataset),
                 new DownloadSectionVm(
                         "Downloads",
                         downloadLead(accessState(dataset), "diesem Datensatz", "diesen Datensatz"),
@@ -73,10 +73,10 @@ public final class DetailPageVmFactory {
                 metadataSections(dataset, dataset.distributions(), accessState(dataset)));
     }
 
-    private List<DetailFeatureVm> datasetFeatures(DatasetEntry dataset) {
-        CatalogEntryMetadata metadata = dataset.metadata();
+    private List<DetailFeatureVm> detailFeatures(CatalogEntry entry) {
+        CatalogEntryMetadata metadata = entry.metadata();
         return List.of(
-                new DetailFeatureVm("Open Data", dataset.isOpenData()),
+                new DetailFeatureVm("Open Data", entry.isOpenData()),
                 new DetailFeatureVm("Attribute beschrieben", !metadata.attributes().isEmpty()),
                 new DetailFeatureVm("Daten validiert", metadata.model().isPresent()));
     }
@@ -103,20 +103,22 @@ public final class DetailPageVmFactory {
                 urlFactory.seriesDetail(series.identifier()),
                 issue.identifier(),
                 issue.title(),
-                issue.issueLabel(),
-                issue.identifier().equals(series.currentIssueOrThrow().identifier()),
                 issue.description(),
                 issueAccessState,
-                false,
+                issue.metadata().hasStructureInformation(),
                 formatDate(issue.modified()),
                 formatDate(issue.metadata().issued()).orElse(""),
+                detailFeatures(issue),
                 new DownloadSectionVm(
                         "Downloads",
                         downloadLead(issueAccessState, "dieser Ausgabe", "diese Ausgabe"),
                         issueAccessState,
                         downloads(issue.title(), issue.distributions())),
-                seriesIssues(series),
-                metadataSections(issue, issue.distributions(), issueAccessState));
+                new MetadataSectionVm("overview", "Übersicht", overviewItems(issue)),
+                new MetadataSectionVm("temporal-coverage", "Zeitliche Abdeckung", temporalCoverageItems(issue)),
+                new MetadataSectionVm("topics", "Themen und Schlagworte", datasetTopicItems(issue)),
+                responsibilitiesContactSection(issue),
+                new MetadataSectionVm("other-information", "Übrige Informationen", otherInformationItems(issue)));
     }
 
     private SeriesIssuesVm seriesIssues(DatasetSeriesEntry series) {
@@ -288,14 +290,14 @@ public final class DetailPageVmFactory {
         return items;
     }
 
-    private ContactMetadataSectionVm responsibilitiesContactSection(DatasetEntry dataset) {
+    private ContactMetadataSectionVm responsibilitiesContactSection(CatalogEntry entry) {
         return new ContactMetadataSectionVm(
                 "responsibilities-contact",
                 "Zuständigkeiten und Kontakt",
                 List.of(
-                        new ContactMetadataItemVm("Datenproduzent", producerLines(dataset.creator())),
-                        new ContactMetadataItemVm("Kontakt", contactLines(dataset.metadata().contactPoint())),
-                        new ContactMetadataItemVm("Herausgeber", publisherLines(dataset.publisher()))));
+                        new ContactMetadataItemVm("Datenproduzent", producerLines(entry.creator())),
+                        new ContactMetadataItemVm("Kontakt", contactLines(entry.metadata().contactPoint())),
+                        new ContactMetadataItemVm("Herausgeber", publisherLines(entry.publisher()))));
     }
 
     private List<ContactMetadataLineVm> producerLines(Office office) {

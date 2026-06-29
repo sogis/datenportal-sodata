@@ -385,9 +385,43 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
-    void issuePageMarksRelatedCurrentIssue() {
+    void issuePageBuildsDatasetStyleCardsFromConcreteIssueMetadata() {
         DatasetIssueEntry oldIssue = issue("series-2025", "2025", false, LocalDate.parse("2025-12-31"));
-        DatasetIssueEntry currentIssue = issue("series-2026", "2026", true, LocalDate.parse("2026-12-31"));
+        CatalogEntryMetadata issueMetadata = new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.of(LocalDate.parse("2026-01-15")),
+                Optional.of(URI.create("https://creativecommons.org/licenses/by/4.0/")),
+                Optional.of(new ContactPoint(
+                        "Ausgabe Kontakt",
+                        Optional.of("Zeitreihen-Team"),
+                        Optional.of(URI.create("mailto:zeitreihe@example.test")),
+                        Optional.empty(),
+                        Optional.empty())),
+                Optional.of("annually"),
+                Optional.of("published"),
+                Optional.of("cantonal"),
+                Optional.of(new TemporalCoverage(
+                        Optional.of(LocalDate.parse("2026-01-01")),
+                        Optional.of(LocalDate.parse("2026-12-31")),
+                        Optional.empty())),
+                List.of(new DatasetAttribute(
+                        "bfs_nr",
+                        "INTEGER",
+                        Optional.of("Gemeindenummer"),
+                        Optional.empty(),
+                        true)),
+                Optional.of("SO_AGI_IssueModel"),
+                Optional.of("Ausgabenspezifische Erhebung"),
+                Optional.of("ab 2026"),
+                Optional.of("Jahresvergleich"),
+                Optional.of("Gemeindeliste"));
+        DatasetIssueEntry currentIssue = issue(
+                "series-2026",
+                "2026",
+                true,
+                LocalDate.parse("2026-12-31"),
+                AccessLevel.OPEN,
+                issueMetadata);
         DatasetSeriesEntry series = new DatasetSeriesEntry(
                 "series",
                 "Datenreihe",
@@ -402,13 +436,40 @@ class DetailPageVmFactoryTest {
 
         var page = factory.issue(series, currentIssue);
 
-        assertThat(page.relatedIssues().issues())
-                .filteredOn(issue -> issue.current())
-                .singleElement()
-                .satisfies(issue -> {
-                    assertThat(issue.issueLabel()).isEqualTo("2026");
-                    assertThat(issue.detailHref()).isEqualTo("/series/series/issues/current");
-                });
+        assertThat(page.features())
+                .extracting("label", "available")
+                .containsExactly(
+                        tuple("Open Data", true),
+                        tuple("Attribute beschrieben", true),
+                        tuple("Daten validiert", true));
+        assertThat(page.overview().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .contains(
+                        tuple("Identifier", "series-2026"),
+                        tuple("Typ", "Ausgabe"),
+                        tuple("Publiziert", "15.01.2026"),
+                        tuple("Aktualisiert", "31.12.2026"));
+        assertThat(page.temporalCoverage().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(tuple("Zeitraum", "01.01.2026 bis 31.12.2026"));
+        assertThat(page.topics().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(
+                        tuple("Thema", "Geografie"),
+                        tuple("Schlagworte", "2026"));
+        assertThat(page.responsibilitiesContact().items().get(1).lines())
+                .extracting(line -> line.value(), line -> line.href())
+                .containsExactly(
+                        tuple("Ausgabe Kontakt", Optional.empty()),
+                        tuple("Zeitreihen-Team", Optional.empty()),
+                        tuple("zeitreihe@example.test", Optional.of("mailto:zeitreihe@example.test")));
+        assertThat(page.otherInformation().items())
+                .extracting(item -> item.label(), item -> item.value())
+                .containsExactly(
+                        tuple("Erhebungs- / Messmethode", "Ausgabenspezifische Erhebung"),
+                        tuple("Verfügbare Daten ab", "ab 2026"),
+                        tuple("Weitere Verwendungen", "Jahresvergleich"),
+                        tuple("Hilfsdaten", "Gemeindeliste"));
     }
 
     @Test
@@ -483,6 +544,16 @@ class DetailPageVmFactoryTest {
             boolean current,
             LocalDate modified,
             AccessLevel accessLevel) {
+        return issue(identifier, label, current, modified, accessLevel, CatalogEntryMetadata.empty());
+    }
+
+    private static DatasetIssueEntry issue(
+            String identifier,
+            String label,
+            boolean current,
+            LocalDate modified,
+            AccessLevel accessLevel,
+            CatalogEntryMetadata metadata) {
         return new DatasetIssueEntry(
                 identifier,
                 "Ausgabe " + label,
@@ -493,7 +564,7 @@ class DetailPageVmFactoryTest {
                 List.of(label),
                 modified,
                 accessLevel,
-                CatalogEntryMetadata.empty(),
+                metadata,
                 List.of(distribution(DistributionFormat.CSV)),
                 label,
                 current);

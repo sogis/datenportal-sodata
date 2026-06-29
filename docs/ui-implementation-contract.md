@@ -698,6 +698,7 @@ Pflichtbereiche:
 Temporäre Umsetzungsnotiz:
 
 - Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, den ersten drei Metadatenkarten (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und einer rechten vertikalen Aktionsspalte (`Struktur & Qualität`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
+- Die Datenmerkmale `Open Data`, `Attribute beschrieben` und `Daten validiert` verwenden Feature-Status-Icons: verfuegbare Merkmale nutzen `var(--dp-color-status-ok-circle)`, nicht verfuegbare Merkmale nutzen `var(--dp-color-status-negative-circle)`. Diese Icons sind keine Status-Badges; Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` duerfen nicht als Icon-Farbe verwendet werden.
 - Zusätzlich zeigt die normale Datensatz-Detailseite die Card `Zuständigkeiten und Kontakt` direkt nach `Themen und Schlagworte`. Sie verwendet dieselben Metadaten-Card-Styles und enthält `Datenproduzent`, `Kontakt` und `Herausgeber`.
 - Direkt danach zeigt die normale Datensatz-Detailseite die Card `Übrige Informationen` für `Erhebungs- / Messmethode`, `Verfügbare Daten ab`, `Weitere Verwendungen` und `Hilfsdaten`, sofern mindestens eines dieser Felder vorhanden ist. Sie verwendet dieselben Metadaten-Card-Styles.
 - Die tieferen Metadatenbereiche unterhalb dieser Cards sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
@@ -717,16 +718,18 @@ Die Serienübersicht unter `/series/{seriesIdentifier}` ist bewusst schlank:
 
 Die Serienübersicht zeigt keinen separaten Downloadbereich, keine Current-Issue-Hinweiskarte und keine Metadatenkarten.
 
-Die Detailseite der aktuellen Ausgabe muss den Serienkontext zeigen:
+Die Detailseite einer Ausgabe zeigt den Serienkontext nur im oberen Kicker und übernimmt danach die Card-Struktur der normalen Datensatz-Detailseite:
 
-- Titel der Datenreihe
-- Hinweis auf aktuelle Ausgabe, z. B. `Aktuelle Ausgabe 2026`
-- Beschreibung der Datenreihe und/oder Ausgabe
-- Downloadbereich der aktuellen Ausgabe
-- Abschnitt `Weitere Ausgaben`
-- Links auf ältere Ausgaben, z. B. 2025, 2024, 2023
+- Kicker `Datenreihe: <Titel>` mit Link zur Serienübersicht
+- Titel der Ausgabe
+- Beschreibung der Ausgabe
+- Datenmerkmale-/Download-Zeile der konkreten Ausgabe
+- Metadaten-Cards analog zur normalen Datensatz-Detailseite
+- rechte Aktionsspalte analog zur normalen Datensatz-Detailseite
 
-Für eine ältere Ausgabe ist die Struktur gleich, aber mit Badge/Label `Ausgabe 2025` und Link zurück zur aktuellen Ausgabe.
+Auch auf Ausgaben-Detailseiten gilt fuer die Datenmerkmale: verfuegbare Feature-Icons verwenden `var(--dp-color-status-ok-circle)`, nicht verfuegbare Feature-Icons verwenden `var(--dp-color-status-negative-circle)`. Badge-Background-Tokens bleiben Status-Badges vorbehalten und duerfen nicht fuer diese Circle-Icon-Farben eingesetzt werden.
+
+Die Ausgaben-Detailseite zeigt keinen separaten Hinweis `Diese Ausgabe ist aktuell`, keine eingebettete Liste `Weitere Ausgaben` und keine generische Metadatenliste unterhalb der Ausgabenliste.
 
 ### 8.3 Vorgeschlagene URLs
 
@@ -786,16 +789,18 @@ public record IssueDetailPageVm(
     String seriesHref,
     String identifier,
     String title,
-    String issueLabel,
-    boolean currentIssue,
     String description,
     AccessStateVm accessState,
     boolean structureDescribed,
     String modifiedLabel,
     String issuedLabel,
+    List<DetailFeatureVm> features,
     DownloadSectionVm downloads,
-    SeriesIssuesVm relatedIssues,
-    List<MetadataSectionVm> metadataSections
+    MetadataSectionVm overview,
+    MetadataSectionVm temporalCoverage,
+    MetadataSectionVm topics,
+    ContactMetadataSectionVm responsibilitiesContact,
+    MetadataSectionVm otherInformation
 ) {}
 
 public record MetadataSectionVm(
@@ -1028,7 +1033,7 @@ Pflichttests:
 - Aufgeklappte Datenreihe rendert Ausgabezeilen ebenfalls ohne Zusatz `aktuelle Ausgabe`.
 - Kartenansicht rendert `dp-type-badge`, bei offenen Eintraegen `Open Data`, bei nicht offenen Eintraegen den Zugriffstext und `Struktur beschrieben` dort, wo fachlich zutreffend.
 - Detailseite enthält keine Datenvorschau.
-- Detailseite einer Serienausgabe enthält `Weitere Ausgaben`.
+- Detailseite einer Serienausgabe zeigt Serien-Kicker, Dataset-Detail-Cards und Aktionsspalte.
 
 ### 11.2 Accessibility Smoke Checks
 

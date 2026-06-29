@@ -8,18 +8,20 @@ public record IssueDetailPageVm(
         String seriesHref,
         String identifier,
         String title,
-        String issueLabel,
-        boolean currentIssue,
         String description,
         AccessStateVm accessState,
         boolean structureDescribed,
         String modifiedLabel,
         String issuedLabel,
+        List<DetailFeatureVm> features,
         DownloadSectionVm downloads,
-        SeriesIssuesVm relatedIssues,
-        List<MetadataSectionVm> metadataSections) {
+        MetadataSectionVm overview,
+        MetadataSectionVm temporalCoverage,
+        MetadataSectionVm topics,
+        ContactMetadataSectionVm responsibilitiesContact,
+        MetadataSectionVm otherInformation) {
 
     public IssueDetailPageVm {
-        metadataSections = List.copyOf(metadataSections);
+        features = List.copyOf(features);
     }
 }

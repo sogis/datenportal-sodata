@@ -159,7 +159,7 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
-    void currentIssueDetailRendersConcreteIssueAndLinksToSeriesAndOtherIssues() throws Exception {
+    void currentIssueDetailRendersConcreteIssueWithDatasetDetailCards() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/current"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<so-header")))
@@ -168,14 +168,44 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate\">Abstimmungsresultate</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Abstimmungsresultate 2026</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2026")))
+                .andExpect(content().string(containsString("Ausgabe 2026 der Datenreihe Abstimmungsresultate.")))
                 .andExpect(content().string(containsString("Datenreihe:")))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate\"")))
-                .andExpect(content().string(containsString("Diese Ausgabe ist aktuell.")))
-                .andExpect(content().string(containsString("<section class=\"dp-detail-panel dp-series-issues\" aria-labelledby=\"series-issues-title\">")))
-                .andExpect(content().string(containsString("<h2 id=\"series-issues-title\">Ausgaben</h2>")))
-                .andExpect(content().string(containsString("Abstimmungsresultate 2025")))
-                .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\"")))
-                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.csv\"")));
+                .andExpect(content().string(containsString("Datenmerkmale")))
+                .andExpect(content().string(containsString("Open Data")))
+                .andExpect(content().string(containsString("Attribute beschrieben")))
+                .andExpect(content().string(containsString("Daten validiert")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.csv\"")))
+                .andExpect(content().string(containsString("Übersicht")))
+                .andExpect(content().string(containsString("Identifier")))
+                .andExpect(content().string(containsString("ch.so.abstimmungsresultate_2026")))
+                .andExpect(content().string(containsString("Typ")))
+                .andExpect(content().string(containsString("Ausgabe")))
+                .andExpect(content().string(containsString("Zeitliche Abdeckung")))
+                .andExpect(content().string(containsString("Stichtag")))
+                .andExpect(content().string(containsString("31.12.2026")))
+                .andExpect(content().string(containsString("Themen und Schlagworte")))
+                .andExpect(content().string(containsString("Abstimmungen, Resultate, Gemeinden, 2026")))
+                .andExpect(content().string(containsString("Zuständigkeiten und Kontakt")))
+                .andExpect(content().string(containsString("Staatskanzlei")))
+                .andExpect(content().string(containsString("Thomas Müller")))
+                .andExpect(content().string(containsString("Übrige Informationen")))
+                .andExpect(content().string(containsString("Erhebungs- / Messmethode")))
+                .andExpect(content().string(containsString("Struktur &amp; Qualität")))
+                .andExpect(content().string(containsString("Erkunden")))
+                .andExpect(content().string(containsString("Verwenden")))
+                .andExpect(content().string(containsString("<aside class=\"dp-detail-side\" aria-label=\"Aktionen\">")))
+                .andExpect(content().string(not(containsString("Diese Ausgabe ist aktuell."))))
+                .andExpect(content().string(not(containsString("dp-series-issues"))))
+                .andExpect(content().string(not(containsString("series-issues-title"))))
+                .andExpect(content().string(not(containsString("<dl class=\"dp-detail-facts\""))))
+                .andExpect(content().string(not(containsString("Abstimmungsresultate 2025"))))
+                .andExpect(content().string(not(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\""))))
+                .andExpect(content().string(not(containsString("<aside class=\"dp-detail-side\" aria-label=\"Downloads\">"))))
+                .andExpect(content().string(not(containsString("id=\"metadata-responsibility\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-usage\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-time\""))))
+                .andExpect(content().string(not(containsString("id=\"metadata-resources\""))));
     }
 
     @Test
@@ -185,7 +215,14 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("Abstimmungsresultate 2025")))
                 .andExpect(content().string(containsString("Ausgabe 2025")))
                 .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2025.csv\"")))
-                .andExpect(content().string(not(containsString("Diese Ausgabe ist aktuell."))));
+                .andExpect(content().string(containsString("Datenmerkmale")))
+                .andExpect(content().string(containsString("Übersicht")))
+                .andExpect(content().string(containsString("Zuständigkeiten und Kontakt")))
+                .andExpect(content().string(containsString("<aside class=\"dp-detail-side\" aria-label=\"Aktionen\">")))
+                .andExpect(content().string(not(containsString("Diese Ausgabe ist aktuell."))))
+                .andExpect(content().string(not(containsString("dp-series-issues"))))
+                .andExpect(content().string(not(containsString("series-issues-title"))))
+                .andExpect(content().string(not(containsString("<dl class=\"dp-detail-facts\""))));
     }
 
     @Test
@@ -218,8 +255,10 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("Baustellen-Koordinationsplanung 2026")))
                 .andExpect(content().string(containsString("Öffentlich mit Bedingungen")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
+                .andExpect(content().string(containsString("Open Data")))
+                .andExpect(content().string(containsString("class=\"bi bi-x-circle\"")))
                 .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2026.csv\""))))
-                .andExpect(content().string(not(containsString(">Open Data</span>"))));
+                .andExpect(content().string(not(containsString("dp-status-badge dp-status-badge--positive"))));
     }
 
     @Test

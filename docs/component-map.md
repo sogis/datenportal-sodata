@@ -50,7 +50,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 |---|---|---|---|
 | Datensatzdetail | `pages/datasetDetail.jte` | `DatasetDetailPageVm` | keine Datenvorschau |
 | Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | vereinfachte Serienübersicht mit Ausgabenliste |
-| Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Rücklink zur Datenreihe und weitere Ausgaben |
+| Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Serien-Kicker, Dataset-Detail-Cards und Aktionsspalte |
 | Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `DownloadSectionVm` | Datenmerkmale plus Downloads, mobile gestapelt |
 | Datensatz-Übersicht | `components/metadataSection.jte` | `DatasetDetailPageVm.overview` | erste Metadatenkarte unterhalb Datenmerkmale/Downloads |
 | Datensatz-Zeitliche Abdeckung | `components/metadataSection.jte` | `DatasetDetailPageVm.temporalCoverage` | Stichtag oder Zeitraum |
@@ -60,7 +60,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datensatz-Aktionsspalte | `components/detailActionPanel.jte` | statisch im Template | vertikale Aktionshinweise mit sekundären Textlinks |
 | Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet oder Schloss fuer nicht offene Eintraege |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
-| weitere Ausgaben | `components/seriesIssues.jte` | `SeriesIssuesVm` | aktuelle/ältere Ausgaben |
+| Serien-Ausgabenliste | `components/seriesIssues.jte` | `SeriesIssuesVm` | aktuelle/ältere Ausgaben auf der Serienübersicht |
 | Fehlerseite | `pages/notFound.jte` | `CatalogErrorControllerAdvice` | unbekannte Identifier liefern 404 |
 
 ## CSS

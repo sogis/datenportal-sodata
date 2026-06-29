@@ -260,7 +260,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator(".dp-detail-feature").first())).isEqualTo("18px");
             assertThat(cssValue(availableFeatureIcon, "width")).isEqualTo("24px");
             assertThat(cssValue(availableFeatureIcon, "height")).isEqualTo("24px");
-            assertThat(cssValue(availableFeatureIcon, "color")).isEqualTo("rgb(231, 246, 236)");
+            assertThat(cssValue(availableFeatureIcon, "color")).isEqualTo("rgb(34, 197, 94)");
             assertThat(fontSize(page.locator(".dp-detail-action-item__content h3").first())).isEqualTo("16px");
             assertThat(fontSize(page.locator(".dp-detail-action-item__content p").first())).isEqualTo("16px");
             assertThat(fontSize(actionLink)).isEqualTo("16px");
@@ -514,7 +514,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(typeBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(typeBadge, "border-top-width")).isEqualTo("0px");
             assertThat(cssValue(typeBadge, "background-color")).isEqualTo("rgb(228, 240, 251)");
-            assertThat(cssValue(typeBadge, "color")).isEqualTo("rgb(37, 79, 115)");
+            assertThat(cssValue(typeBadge, "color")).isEqualTo("rgb(42, 67, 88)");
             assertThat(cssValue(typeBadge, "background-color")).isNotEqualTo(neutralBackground);
 
             assertThat(fontSize(cardTitle)).isEqualTo("18px");
@@ -540,7 +540,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(seriesTypeBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(seriesTypeBadge, "border-top-width")).isEqualTo("0px");
             assertThat(cssValue(seriesTypeBadge, "background-color")).isEqualTo("rgb(228, 240, 251)");
-            assertThat(cssValue(seriesTypeBadge, "color")).isEqualTo("rgb(37, 79, 115)");
+            assertThat(cssValue(seriesTypeBadge, "color")).isEqualTo("rgb(42, 67, 88)");
             assertThat(cssValue(seriesTypeBadge, "background-color")).isNotEqualTo(neutralBackground);
 
             page.navigate(baseUrl("/datasets?view=cards&q=Baumkataster"));

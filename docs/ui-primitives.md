@@ -9,6 +9,7 @@ Wenn sich andere UI-Dokumente an dieser Stelle widersprechen, gilt dieses Dokume
 - aktive Filter-Chips
 - Status-Badges
 - Action Pills fuer kompakte Aktionen wie Downloads
+- Feature-Status-Icons in der Datenmerkmale-Zeile
 
 ## 1. Primitive-Familien
 
@@ -99,6 +100,31 @@ Nicht verwenden fuer:
 - Filterzustand
 - reine Statusinformation
 
+### 1.4 Feature-Status-Icon
+
+Zweck:
+
+- zeigt in der Datenmerkmale-Zeile, ob ein Merkmal verfuegbar ist
+- ist kein Badge und keine klickbare Aktion
+
+Beispiele:
+
+- Check-Circle fuer `Open Data`, wenn der Eintrag offen ist
+- Check-Circle fuer `Attribute beschrieben`, wenn Attribute vorhanden sind
+- X-Circle fuer `Daten validiert`, wenn kein Datenmodell vorhanden ist
+
+Regeln:
+
+- verfuegbare Features verwenden als Icon-Farbe `var(--dp-color-status-ok-circle)`
+- nicht verfuegbare Features verwenden als Icon-Farbe `var(--dp-color-status-negative-circle)`
+- die Status-Circle-Tokens werden nur fuer Icon-Farben verwendet, nicht als Badge-Hintergrund
+
+Nicht verwenden:
+
+- `var(--dp-color-badge-positive-bg)` fuer Feature-Icon-Farben
+- andere Badge-Background-Tokens fuer Feature-Icon-Farben
+- Status-Badge-Klassen fuer die Datenmerkmale-Icons
+
 ## 2. Farbregeln
 
 Die drei Familien unterscheiden sich primaer ueber Semantik und Typografie, nicht ueber zufaellige Grauabstufungen.
@@ -118,11 +144,13 @@ Pflicht:
 - `Open Data` verwendet eine positive Badge-Variante
 - nicht offene Zugriffsrechte verwenden eine gelbe Warning-Badge-Variante
 - `Aktuelle Ausgabe` verwendet eine sachliche Info-/Ink-Variante
+- Feature-Status-Icons verwenden `var(--dp-color-status-ok-circle)` und `var(--dp-color-status-negative-circle)` als Icon-Farben
 
 Nicht erlaubt:
 
 - unterschiedliche neutrale Grautoene fuer Filter Chip und Action Pill ohne explizite fachliche Begruendung
 - Download-Links als rote Sonderbuttons
+- Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` als Farbe fuer Feature-Status-Icons
 
 ## 3. Mapping im Datenportal
 
@@ -134,6 +162,7 @@ Nicht erlaubt:
 - `Aktuelle Ausgabe` = Info-Status-Badge
 - `CSV`, `XLSX`, `Parquet` = Action Pills
 - Keyword-/Themen-Labels auf Cards = neutrale Status-Badge-Familie mit lokaler `14px`-Typografie-Ausnahme
+- Datenmerkmale `Open Data`, `Attribute beschrieben`, `Daten validiert` = Feature-Status-Icons mit Status-Circle-Farben
 
 ## 4. Benennung im Code
 
@@ -146,6 +175,8 @@ Semantische CSS-Familien:
 - `.dp-status-badge--warning`
 - `.dp-status-badge--info`
 - `.dp-action-pill`
+- `.dp-detail-feature--available .dp-detail-feature__icon`
+- `.dp-detail-feature--unavailable .dp-detail-feature__icon`
 
 Bestehende Marker duerfen als Alias bestehen bleiben, wenn Templates oder Tests darauf bauen:
 
@@ -158,6 +189,7 @@ Bestehende Marker duerfen als Alias bestehen bleiben, wenn Templates oder Tests 
 - Ein Status-Badge ist keine Aktion.
 - Ein Filter Chip ist kein allgemeines graues Label fuer Keywords oder Metadaten.
 - Unterschiede zwischen den drei Familien werden nicht ueber `font-weight: 700` hergestellt.
+- Ein Feature-Status-Icon ist kein Status-Badge; es darf keine Badge-Background-Farbe als Icon-Farbe verwenden.
 
 ## 6. Filter-Panel-Typografie
 

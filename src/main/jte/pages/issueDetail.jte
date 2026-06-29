@@ -15,20 +15,25 @@
         structureDescribed = page.structureDescribed(),
         modifiedLabel = page.modifiedLabel(),
         issuedLabel = page.issuedLabel(),
-        showFacts = true
+        showFacts = false
       )
-      @if(page.currentIssue())
-        <p class="dp-current-issue-note">Diese Ausgabe ist aktuell.</p>
-      @endif
-      <div class="dp-detail-layout">
-        <div class="dp-detail-main">
-          @template.components.seriesIssues(issues = page.relatedIssues(), showTitle = true)
-          @for(var section : page.metadataSections())
-            @template.components.metadataSection(section = section)
-          @endfor
+      <div class="dp-detail-summary-layout">
+        <div class="dp-detail-summary-main">
+          @template.components.detailFeatureDownloadStrip(features = page.features(), downloads = page.downloads())
+          @template.components.metadataSection(section = page.overview())
+          @if(!page.temporalCoverage().items().isEmpty())
+            @template.components.metadataSection(section = page.temporalCoverage())
+          @endif
+          @if(!page.topics().items().isEmpty())
+            @template.components.metadataSection(section = page.topics())
+          @endif
+          @template.components.contactMetadataSection(section = page.responsibilitiesContact())
+          @if(!page.otherInformation().items().isEmpty())
+            @template.components.metadataSection(section = page.otherInformation())
+          @endif
         </div>
-        <aside class="dp-detail-side" aria-label="Downloads">
-          @template.components.detailDownloadPanel(downloads = page.downloads())
+        <aside class="dp-detail-side" aria-label="Aktionen">
+          @template.components.detailActionPanel()
         </aside>
       </div>
     </div>
