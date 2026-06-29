@@ -51,6 +51,36 @@ class BreadcrumbFactoryTest {
         assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
     }
 
+    @Test
+    void datasetStructureQualityBreadcrumbLinksBackToDataset() {
+        var breadcrumb = factory.datasetStructureQuality(dataset("dataset-1", "Bauinventar"));
+
+        assertThat(breadcrumb.items()).extracting("label")
+                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken", "Bauinventar", "Struktur & Qualität");
+        assertThat(breadcrumb.items().get(3).href()).contains("/datasets/dataset-1");
+        assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
+    }
+
+    @Test
+    void issueStructureQualityBreadcrumbLinksBackToCurrentIssue() {
+        DatasetIssueEntry issue = issue("series-2026", "Ausgabe 2026");
+        DatasetSeriesEntry series = series("series", "Datenreihe", issue);
+
+        var breadcrumb = factory.issueStructureQuality(series, issue);
+
+        assertThat(breadcrumb.items()).extracting("label")
+                .containsExactly(
+                        "so.ch",
+                        "Datenportal",
+                        "Daten und Statistiken",
+                        "Datenreihe",
+                        "Ausgabe 2026",
+                        "Struktur & Qualität");
+        assertThat(breadcrumb.items().get(3).href()).contains("/series/series");
+        assertThat(breadcrumb.items().get(4).href()).contains("/series/series/issues/current");
+        assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
+    }
+
     private static DatasetEntry dataset(String identifier, String title) {
         return new DatasetEntry(
                 identifier,

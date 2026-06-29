@@ -265,7 +265,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator(".dp-detail-action-item__content p").first())).isEqualTo("16px");
             assertThat(fontSize(actionLink)).isEqualTo("16px");
             assertThat(actionLink.textContent()).contains("→");
-            assertThat(actionLink.getAttribute("href")).isEqualTo("#");
+            assertThat(actionLink.getAttribute("href")).isEqualTo("/datasets/ch.so.bauinventar/structure-quality");
             assertThat(cssValue(actionLink, "color")).isEqualTo("rgb(210, 10, 17)");
             assertThat(cssValue(actionLink, "background-color")).isEqualTo("rgba(0, 0, 0, 0)");
             assertThat(cssValue(actionLink, "border-top-width")).isEqualTo("0px");
@@ -308,6 +308,23 @@ class CatalogFiltersPlaywrightTest {
             assertThat(actionPanel.y).isGreaterThan(lowerEdge(featureStrip));
             assertThat(Math.abs(firstAction.x - secondAction.x)).isLessThan(1.5d);
             assertThat(secondAction.y).isGreaterThanOrEqualTo(lowerEdge(firstAction));
+        }
+    }
+
+    @Test
+    void issueDetailRelatedIssueTitlesUseAccentLinkColor() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/series/ch.so.abstimmungsresultate/issues/current"));
+
+            Locator relatedIssueTitle = page.locator(".dp-related-issue__title").first();
+
+            assertThat(relatedIssueTitle.textContent()).isEqualTo("Abstimmungsresultate 2025");
+            assertThat(relatedIssueTitle.getAttribute("href"))
+                    .isEqualTo("/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025");
+            assertThat(cssValue(relatedIssueTitle, "color")).isEqualTo("rgb(210, 10, 17)");
+            relatedIssueTitle.hover();
+            assertThat(cssValue(relatedIssueTitle, "color")).isEqualTo("rgb(210, 10, 17)");
         }
     }
 

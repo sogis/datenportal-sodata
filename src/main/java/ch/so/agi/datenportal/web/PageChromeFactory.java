@@ -43,6 +43,15 @@ public class PageChromeFactory {
                 footerViewModelFactory.create());
     }
 
+    public PageChromeVm datasetStructureQualityPage(DatasetEntry dataset) {
+        return new PageChromeVm(
+                "Struktur & Qualität | " + dataset.title() + " | Datenportal",
+                headerViewModelFactory.forDetailPage(),
+                breadcrumbFactory.datasetStructureQuality(dataset),
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
+    }
+
     public PageChromeVm seriesDetailPage(DatasetSeriesEntry series) {
         return new PageChromeVm(
                 series.title() + " | Datenportal",
@@ -57,6 +66,15 @@ public class PageChromeFactory {
                 issue.title() + " | Datenportal",
                 headerViewModelFactory.forDetailPage(),
                 breadcrumbFactory.issueDetail(series, issue),
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
+    }
+
+    public PageChromeVm issueStructureQualityPage(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        return new PageChromeVm(
+                "Struktur & Qualität | " + issue.title() + " | Datenportal",
+                headerViewModelFactory.forDetailPage(),
+                breadcrumbFactory.issueStructureQuality(series, issue),
                 webAssetsVmFactory.create(),
                 footerViewModelFactory.create());
     }

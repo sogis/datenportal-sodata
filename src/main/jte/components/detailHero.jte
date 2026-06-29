@@ -7,8 +7,14 @@
 @param String modifiedLabel
 @param String issuedLabel
 @param boolean showFacts
+@param String titleBadgeLabel
 <header class="dp-detail-hero">
-  <h1 class="dp-detail-title">${title}</h1>
+  <h1 class="dp-detail-title">
+    <span>${title}</span>
+    @if(!titleBadgeLabel.isBlank())
+      <span class="dp-status-badge dp-status-badge--info">${titleBadgeLabel}</span>
+    @endif
+  </h1>
   <p class="dp-detail-description">${description}</p>
   @if(showFacts)
     <dl class="dp-detail-facts" aria-label="Eckdaten">

@@ -36,6 +36,20 @@ public final class CatalogDetailController {
         });
     }
 
+    @GetMapping("/datasets/{identifier}/structure-quality")
+    public String datasetStructureQuality(@PathVariable("identifier") String identifier, Model model) {
+        return catalogService.withSnapshot(snapshot -> {
+            var entry = snapshot.findAnyEntry(identifier)
+                    .orElseThrow(() -> notFound(identifier));
+            if (!(entry instanceof DatasetEntry dataset)) {
+                throw notFound(identifier);
+            }
+
+            model.addAttribute("page", detailPageVmFactory.datasetStructureQuality(dataset));
+            return "pages/structureQuality";
+        });
+    }
+
     @GetMapping("/series/{seriesIdentifier}")
     public String seriesDetail(@PathVariable("seriesIdentifier") String seriesIdentifier, Model model) {
         return catalogService.withSnapshot(snapshot -> {
@@ -51,6 +65,15 @@ public final class CatalogDetailController {
             DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
             model.addAttribute("page", detailPageVmFactory.issue(series, series.currentIssueOrThrow()));
             return "pages/issueDetail";
+        });
+    }
+
+    @GetMapping("/series/{seriesIdentifier}/issues/current/structure-quality")
+    public String currentIssueStructureQuality(@PathVariable("seriesIdentifier") String seriesIdentifier, Model model) {
+        return catalogService.withSnapshot(snapshot -> {
+            DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
+            model.addAttribute("page", detailPageVmFactory.issueStructureQuality(series, series.currentIssueOrThrow()));
+            return "pages/structureQuality";
         });
     }
 
@@ -71,6 +94,20 @@ public final class CatalogDetailController {
         });
     }
 
+    @GetMapping("/series/{seriesIdentifier}/issues/{issueIdentifier}/structure-quality")
+    public String issueStructureQuality(
+            @PathVariable("seriesIdentifier") String seriesIdentifier,
+            @PathVariable("issueIdentifier") String issueIdentifier,
+            Model model) {
+        return catalogService.withSnapshot(snapshot -> {
+            DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
+            DatasetIssueEntry issue = findIssue(series, issueIdentifier);
+
+            model.addAttribute("page", detailPageVmFactory.issueStructureQuality(series, issue));
+            return "pages/structureQuality";
+        });
+    }
+
     private static DatasetSeriesEntry findSeries(ch.so.agi.datenportal.catalog.domain.CatalogSnapshot snapshot, String seriesIdentifier) {
         var entry = snapshot.findAnyEntry(seriesIdentifier)
                 .orElseThrow(() -> notFound(seriesIdentifier));
@@ -78,6 +115,13 @@ public final class CatalogDetailController {
             throw notFound(seriesIdentifier);
         }
         return series;
+    }
+
+    private static DatasetIssueEntry findIssue(DatasetSeriesEntry series, String issueIdentifier) {
+        return series.issues().stream()
+                .filter(candidate -> candidate.identifier().equals(issueIdentifier))
+                .findFirst()
+                .orElseThrow(() -> notFound(issueIdentifier));
     }
 
     private static CatalogNotFoundException notFound(String identifier) {

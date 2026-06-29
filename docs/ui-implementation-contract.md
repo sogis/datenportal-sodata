@@ -721,15 +721,16 @@ Die Serienübersicht zeigt keinen separaten Downloadbereich, keine Current-Issue
 Die Detailseite einer Ausgabe zeigt den Serienkontext nur im oberen Kicker und übernimmt danach die Card-Struktur der normalen Datensatz-Detailseite:
 
 - Kicker `Datenreihe: <Titel>` mit Link zur Serienübersicht
-- Titel der Ausgabe
+- Titel der Ausgabe, bei der aktuellen Ausgabe mit Info-Badge `Aktuelle Ausgabe` als Titel-Suffix
 - Beschreibung der Ausgabe
 - Datenmerkmale-/Download-Zeile der konkreten Ausgabe
 - Metadaten-Cards analog zur normalen Datensatz-Detailseite
+- Card `Weitere Ausgaben` als schlanke Linkliste ohne Downloads; die verlinkten Ausgabentitel sind rote Textlinks analog zu Metadatenlinks wie `Lizenz`
 - rechte Aktionsspalte analog zur normalen Datensatz-Detailseite
 
 Auch auf Ausgaben-Detailseiten gilt fuer die Datenmerkmale: verfuegbare Feature-Icons verwenden `var(--dp-color-status-ok-circle)`, nicht verfuegbare Feature-Icons verwenden `var(--dp-color-status-negative-circle)`. Badge-Background-Tokens bleiben Status-Badges vorbehalten und duerfen nicht fuer diese Circle-Icon-Farben eingesetzt werden.
 
-Die Ausgaben-Detailseite zeigt keinen separaten Hinweis `Diese Ausgabe ist aktuell`, keine eingebettete Liste `Weitere Ausgaben` und keine generische Metadatenliste unterhalb der Ausgabenliste.
+Die Ausgaben-Detailseite zeigt keinen separaten Hinweis `Diese Ausgabe ist aktuell`, keine Download-Duplikate in `Weitere Ausgaben` und keine generische Metadatenliste unterhalb der Ausgabenliste. Falls es keine andere Ausgabe derselben Reihe gibt, zeigt die Card den Hinweis `Zu dieser Datenreihe sind keine weiteren Ausgaben verfügbar.`
 
 ### 8.3 Vorgeschlagene URLs
 
@@ -792,6 +793,8 @@ public record IssueDetailPageVm(
     String description,
     AccessStateVm accessState,
     boolean structureDescribed,
+    String structureQualityHref,
+    boolean currentIssue,
     String modifiedLabel,
     String issuedLabel,
     List<DetailFeatureVm> features,
@@ -800,7 +803,20 @@ public record IssueDetailPageVm(
     MetadataSectionVm temporalCoverage,
     MetadataSectionVm topics,
     ContactMetadataSectionVm responsibilitiesContact,
-    MetadataSectionVm otherInformation
+    MetadataSectionVm otherInformation,
+    RelatedIssuesVm relatedIssues
+) {}
+
+public record RelatedIssuesVm(
+    List<RelatedIssueVm> issues
+) {}
+
+public record RelatedIssueVm(
+    String issueLabel,
+    String title,
+    String publicationDateLabel,
+    String detailHref,
+    boolean current
 ) {}
 
 public record MetadataSectionVm(
@@ -1033,7 +1049,7 @@ Pflichttests:
 - Aufgeklappte Datenreihe rendert Ausgabezeilen ebenfalls ohne Zusatz `aktuelle Ausgabe`.
 - Kartenansicht rendert `dp-type-badge`, bei offenen Eintraegen `Open Data`, bei nicht offenen Eintraegen den Zugriffstext und `Struktur beschrieben` dort, wo fachlich zutreffend.
 - Detailseite enthält keine Datenvorschau.
-- Detailseite einer Serienausgabe zeigt Serien-Kicker, Dataset-Detail-Cards und Aktionsspalte.
+- Detailseite einer Serienausgabe zeigt Serien-Kicker, aktuelles-Ausgabe-Badge im Titel, Dataset-Detail-Cards, `Weitere Ausgaben` und Aktionsspalte.
 
 ### 11.2 Accessibility Smoke Checks
 

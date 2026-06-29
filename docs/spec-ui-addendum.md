@@ -46,5 +46,5 @@ Die Kartenansicht ist eine alternative Ansicht der Start-/Katalogseite. Die verb
 
 - Keine Datenvorschau im MVP.
 - Normale Datensatz-Detailseite zeigt Titel, Beschreibung, Badges, Downloads und strukturierte Metadaten.
-- Detailseite einer Datenreihen-Ausgabe zeigt den Serienkontext im Kicker und danach die Dataset-Detail-Cards.
+- Detailseite einer Datenreihen-Ausgabe zeigt den Serienkontext im Kicker, bei der aktuellen Ausgabe ein Info-Badge im Titel, danach die Dataset-Detail-Cards und eine schlanke Card `Weitere Ausgaben`.
 - Die Root-Datenreihe aus der Liste verlinkt per Info-Link zur aktuellen Ausgabe.

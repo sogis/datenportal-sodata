@@ -11,7 +11,8 @@
         structureDescribed = page.structureDescribed(),
         modifiedLabel = page.modifiedLabel(),
         issuedLabel = page.issuedLabel(),
-        showFacts = false
+        showFacts = false,
+        titleBadgeLabel = ""
       )
       <div class="dp-detail-summary-layout">
         <div class="dp-detail-summary-main">
@@ -29,7 +30,10 @@
           @endif
         </div>
         <aside class="dp-detail-side" aria-label="Aktionen">
-          @template.components.detailActionPanel()
+          @template.components.detailActionPanel(
+            structureQualityHref = page.structureQualityHref(),
+            structureQualityLabel = "Struktur & Qualität"
+          )
         </aside>
       </div>
     </div>

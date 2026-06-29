@@ -93,6 +93,10 @@ public final class CatalogUrlFactory {
         return "/datasets/" + pathSegment(identifier);
     }
 
+    public String datasetStructureQuality(String identifier) {
+        return datasetDetail(identifier) + "/structure-quality";
+    }
+
     public String seriesDetail(String seriesIdentifier) {
         return "/series/" + pathSegment(seriesIdentifier);
     }
@@ -101,8 +105,16 @@ public final class CatalogUrlFactory {
         return seriesDetail(seriesIdentifier) + "/issues/current";
     }
 
+    public String currentIssueStructureQuality(String seriesIdentifier) {
+        return currentIssueDetail(seriesIdentifier) + "/structure-quality";
+    }
+
     public String issueDetail(String seriesIdentifier, String issueIdentifier) {
         return seriesDetail(seriesIdentifier) + "/issues/" + pathSegment(issueIdentifier);
+    }
+
+    public String issueStructureQuality(String seriesIdentifier, String issueIdentifier) {
+        return issueDetail(seriesIdentifier, issueIdentifier) + "/structure-quality";
     }
 
     private LinkedHashMap<String, List<String>> baseQuery(CatalogQueryParams params, boolean includeExpanded) {

@@ -15,7 +15,8 @@
         structureDescribed = page.structureDescribed(),
         modifiedLabel = page.modifiedLabel(),
         issuedLabel = page.issuedLabel(),
-        showFacts = false
+        showFacts = false,
+        titleBadgeLabel = page.currentIssue() ? "Aktuelle Ausgabe" : ""
       )
       <div class="dp-detail-summary-layout">
         <div class="dp-detail-summary-main">
@@ -31,9 +32,13 @@
           @if(!page.otherInformation().items().isEmpty())
             @template.components.metadataSection(section = page.otherInformation())
           @endif
+          @template.components.relatedIssuesCard(relatedIssues = page.relatedIssues())
         </div>
         <aside class="dp-detail-side" aria-label="Aktionen">
-          @template.components.detailActionPanel()
+          @template.components.detailActionPanel(
+            structureQualityHref = page.structureQualityHref(),
+            structureQualityLabel = "Struktur & Qualität"
+          )
         </aside>
       </div>
     </div>

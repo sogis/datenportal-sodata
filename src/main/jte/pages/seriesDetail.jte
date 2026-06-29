@@ -11,7 +11,8 @@
         structureDescribed = page.structureDescribed(),
         modifiedLabel = page.modifiedLabel(),
         issuedLabel = page.issuedLabel(),
-        showFacts = false
+        showFacts = false,
+        titleBadgeLabel = ""
       )
       <p class="dp-series-issues-intro">Zu dieser Serie sind folgende Ausgaben verfügbar:</p>
       <div class="dp-detail-summary-main">

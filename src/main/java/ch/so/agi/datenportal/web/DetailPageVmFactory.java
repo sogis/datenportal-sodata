@@ -3,6 +3,7 @@ package ch.so.agi.datenportal.web;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.ContactPoint;
+import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
@@ -11,9 +12,11 @@ import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.web.view.AccessStateVm;
+import ch.so.agi.datenportal.web.view.AttributeRowVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataItemVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataLineVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataSectionVm;
+import ch.so.agi.datenportal.web.view.DataModelVm;
 import ch.so.agi.datenportal.web.view.DatasetDetailPageVm;
 import ch.so.agi.datenportal.web.view.DetailFeatureVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
@@ -21,9 +24,12 @@ import ch.so.agi.datenportal.web.view.DownloadSectionVm;
 import ch.so.agi.datenportal.web.view.IssueDetailPageVm;
 import ch.so.agi.datenportal.web.view.MetadataItemVm;
 import ch.so.agi.datenportal.web.view.MetadataSectionVm;
+import ch.so.agi.datenportal.web.view.RelatedIssueVm;
+import ch.so.agi.datenportal.web.view.RelatedIssuesVm;
 import ch.so.agi.datenportal.web.view.SeriesDetailPageVm;
 import ch.so.agi.datenportal.web.view.SeriesIssueVm;
 import ch.so.agi.datenportal.web.view.SeriesIssuesVm;
+import ch.so.agi.datenportal.web.view.StructureQualityPageVm;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -57,6 +63,7 @@ public final class DetailPageVmFactory {
                 dataset.type().label(),
                 accessState(dataset),
                 dataset.metadata().hasStructureInformation(),
+                urlFactory.datasetStructureQuality(dataset.identifier()),
                 formatDate(dataset.modified()),
                 formatDate(dataset.metadata().issued()).orElse(""),
                 detailFeatures(dataset),
@@ -96,6 +103,8 @@ public final class DetailPageVmFactory {
     }
 
     public IssueDetailPageVm issue(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        String currentIdentifier = series.currentIssueOrThrow().identifier();
+        boolean currentIssue = issue.identifier().equals(currentIdentifier);
         AccessStateVm issueAccessState = accessState(issue);
         return new IssueDetailPageVm(
                 pageChromeFactory.issueDetailPage(series, issue),
@@ -106,6 +115,10 @@ public final class DetailPageVmFactory {
                 issue.description(),
                 issueAccessState,
                 issue.metadata().hasStructureInformation(),
+                currentIssue
+                        ? urlFactory.currentIssueStructureQuality(series.identifier())
+                        : urlFactory.issueStructureQuality(series.identifier(), issue.identifier()),
+                currentIssue,
                 formatDate(issue.modified()),
                 formatDate(issue.metadata().issued()).orElse(""),
                 detailFeatures(issue),
@@ -118,7 +131,24 @@ public final class DetailPageVmFactory {
                 new MetadataSectionVm("temporal-coverage", "Zeitliche Abdeckung", temporalCoverageItems(issue)),
                 new MetadataSectionVm("topics", "Themen und Schlagworte", datasetTopicItems(issue)),
                 responsibilitiesContactSection(issue),
-                new MetadataSectionVm("other-information", "Übrige Informationen", otherInformationItems(issue)));
+                new MetadataSectionVm("other-information", "Übrige Informationen", otherInformationItems(issue)),
+                relatedIssues(series, issue.identifier(), currentIdentifier));
+    }
+
+    public StructureQualityPageVm datasetStructureQuality(DatasetEntry dataset) {
+        return new StructureQualityPageVm(
+                pageChromeFactory.datasetStructureQualityPage(dataset),
+                "Struktur & Qualität",
+                attributeRows(dataset.metadata().attributes()),
+                dataModel(dataset.metadata()));
+    }
+
+    public StructureQualityPageVm issueStructureQuality(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        return new StructureQualityPageVm(
+                pageChromeFactory.issueStructureQualityPage(series, issue),
+                "Struktur & Qualität",
+                attributeRows(issue.metadata().attributes()),
+                dataModel(issue.metadata()));
     }
 
     private SeriesIssuesVm seriesIssues(DatasetSeriesEntry series) {
@@ -138,6 +168,41 @@ public final class DetailPageVmFactory {
                                 accessState(issue),
                                 downloads(issue.title(), issue.primaryDistributions())))
                         .toList());
+    }
+
+    private RelatedIssuesVm relatedIssues(DatasetSeriesEntry series, String displayedIdentifier, String currentIdentifier) {
+        return new RelatedIssuesVm(series.issues().stream()
+                .filter(issue -> !issue.identifier().equals(displayedIdentifier))
+                .sorted(seriesIssueOrder(currentIdentifier))
+                .map(issue -> new RelatedIssueVm(
+                        issue.issueLabel(),
+                        issue.title(),
+                        publicationDateLabel(issue),
+                        issue.identifier().equals(currentIdentifier)
+                                ? urlFactory.currentIssueDetail(series.identifier())
+                                : urlFactory.issueDetail(series.identifier(), issue.identifier()),
+                        issue.identifier().equals(currentIdentifier)))
+                .toList());
+    }
+
+    private static String publicationDateLabel(CatalogEntry entry) {
+        return formatDate(entry.metadata().issued()).orElse(formatDate(entry.modified()));
+    }
+
+    private static List<AttributeRowVm> attributeRows(List<DatasetAttribute> attributes) {
+        return attributes.stream()
+                .map(attribute -> new AttributeRowVm(
+                        attribute.name(),
+                        attribute.dataType(),
+                        attribute.mandatory() ? "Ja" : "Nein",
+                        attribute.unit().orElse("–"),
+                        attribute.description().orElse("–")))
+                .toList();
+    }
+
+    private static Optional<DataModelVm> dataModel(CatalogEntryMetadata metadata) {
+        return metadata.model()
+                .map(model -> new DataModelVm(model, "#", "ilivalidator.log", "#"));
     }
 
     private static Comparator<DatasetIssueEntry> seriesIssueOrder(String currentIdentifier) {

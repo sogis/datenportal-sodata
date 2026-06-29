@@ -1,3 +1,5 @@
+@param String structureQualityHref
+@param String structureQualityLabel
 <section class="dp-detail-panel dp-detail-actions" aria-labelledby="detail-actions-title">
   <h2 id="detail-actions-title">Aktionen</h2>
   <div class="dp-detail-action-list">
@@ -9,9 +11,9 @@
         </svg>
       </div>
       <div class="dp-detail-action-item__content">
-        <h3>Struktur &amp; Qualität</h3>
+        <h3>${structureQualityLabel}</h3>
         <p>Attribute, Schema und Qualitätsinformationen anzeigen.</p>
-        <a class="dp-detail-action-link" href="#" aria-label="Details ansehen: Struktur und Qualität">
+        <a class="dp-detail-action-link" href="${structureQualityHref}" aria-label="Details ansehen: Struktur und Qualität">
           Details ansehen <span aria-hidden="true">&rarr;</span>
         </a>
       </div>

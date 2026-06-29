@@ -330,6 +330,67 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
+    void datasetDetailLinksStructureQualityPage() {
+        var page = factory.dataset(datasetWithMetadata(CatalogEntryMetadata.empty()));
+
+        assertThat(page.structureQualityHref()).isEqualTo("/datasets/dataset/structure-quality");
+    }
+
+    @Test
+    void datasetStructureQualityMapsAttributesAndDataModel() {
+        CatalogEntryMetadata metadata = new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                List.of(
+                        new DatasetAttribute(
+                                "identifier",
+                                "TEXT",
+                                Optional.of("Fachlicher Identifikator"),
+                                Optional.empty(),
+                                true),
+                        new DatasetAttribute(
+                                "flaeche_m2",
+                                "DECIMAL",
+                                Optional.empty(),
+                                Optional.of("m2"),
+                                false)),
+                Optional.of("SO_AGI_TestModel"));
+
+        var page = factory.datasetStructureQuality(datasetWithMetadata(metadata));
+
+        assertThat(page.title()).isEqualTo("Struktur & Qualität");
+        assertThat(page.attributes())
+                .extracting(
+                        attribute -> attribute.name(),
+                        attribute -> attribute.dataType(),
+                        attribute -> attribute.mandatoryLabel(),
+                        attribute -> attribute.unit(),
+                        attribute -> attribute.description())
+                .containsExactly(
+                        tuple("identifier", "TEXT", "Ja", "–", "Fachlicher Identifikator"),
+                        tuple("flaeche_m2", "DECIMAL", "Nein", "m2", "–"));
+        assertThat(page.dataModel()).isPresent();
+        assertThat(page.dataModel().get().modelName()).isEqualTo("SO_AGI_TestModel");
+        assertThat(page.dataModel().get().modelHref()).isEqualTo("#");
+        assertThat(page.dataModel().get().validationReportName()).isEqualTo("ilivalidator.log");
+        assertThat(page.dataModel().get().validationReportHref()).isEqualTo("#");
+    }
+
+    @Test
+    void structureQualityOmitsDataModelWhenModelIsMissing() {
+        var page = factory.datasetStructureQuality(datasetWithMetadata(CatalogEntryMetadata.empty()));
+
+        assertThat(page.attributes()).isEmpty();
+        assertThat(page.dataModel()).isEmpty();
+    }
+
+    @Test
     void datasetFeaturesExposeUnavailableStates() {
         DatasetEntry dataset = new DatasetEntry(
                 "dataset",
@@ -386,7 +447,13 @@ class DetailPageVmFactoryTest {
 
     @Test
     void issuePageBuildsDatasetStyleCardsFromConcreteIssueMetadata() {
-        DatasetIssueEntry oldIssue = issue("series-2025", "2025", false, LocalDate.parse("2025-12-31"));
+        DatasetIssueEntry oldIssue = issue(
+                "series-2025",
+                "2025",
+                false,
+                LocalDate.parse("2025-12-31"),
+                AccessLevel.OPEN,
+                metadataWithIssued(LocalDate.parse("2025-02-03")));
         CatalogEntryMetadata issueMetadata = new CatalogEntryMetadata(
                 Optional.empty(),
                 Optional.of(LocalDate.parse("2026-01-15")),
@@ -436,6 +503,7 @@ class DetailPageVmFactoryTest {
 
         var page = factory.issue(series, currentIssue);
 
+        assertThat(page.currentIssue()).isTrue();
         assertThat(page.features())
                 .extracting("label", "available")
                 .containsExactly(
@@ -470,6 +538,115 @@ class DetailPageVmFactoryTest {
                         tuple("Verfügbare Daten ab", "ab 2026"),
                         tuple("Weitere Verwendungen", "Jahresvergleich"),
                         tuple("Hilfsdaten", "Gemeindeliste"));
+        assertThat(page.structureQualityHref()).isEqualTo("/series/series/issues/current/structure-quality");
+        assertThat(page.relatedIssues().issues())
+                .extracting(
+                        issue -> issue.issueLabel(),
+                        issue -> issue.title(),
+                        issue -> issue.publicationDateLabel(),
+                        issue -> issue.detailHref(),
+                        issue -> issue.current())
+                .containsExactly(tuple("2025", "Ausgabe 2025", "03.02.2025", "/series/series/issues/series-2025", false));
+    }
+
+    @Test
+    void historicalIssueDetailLinksConcreteStructureQualityPage() {
+        DatasetIssueEntry historicalIssue = issue("series-2025", "foo 2025", false, LocalDate.parse("2025-12-31"));
+        DatasetIssueEntry currentIssue = issue("series-2026", "2026", true, LocalDate.parse("2026-12-31"));
+        DatasetIssueEntry olderIssue = issue("series-2024", "foo 2024", false, LocalDate.parse("2024-12-31"));
+        DatasetSeriesEntry series = new DatasetSeriesEntry(
+                "series",
+                "Datenreihe",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                AccessLevel.OPEN,
+                CatalogEntryMetadata.empty(),
+                List.of(historicalIssue, currentIssue, olderIssue));
+
+        var page = factory.issue(series, historicalIssue);
+
+        assertThat(page.currentIssue()).isFalse();
+        assertThat(page.structureQualityHref()).isEqualTo("/series/series/issues/series-2025/structure-quality");
+        assertThat(page.relatedIssues().issues())
+                .extracting(issue -> issue.issueLabel(), issue -> issue.detailHref(), issue -> issue.current())
+                .containsExactly(
+                        tuple("2026", "/series/series/issues/current", true),
+                        tuple("foo 2024", "/series/series/issues/series-2024", false));
+    }
+
+    @Test
+    void singleIssueSeriesCarriesEmptyRelatedIssues() {
+        DatasetIssueEntry currentIssue = issue("series-2026", "2026", true, LocalDate.parse("2026-12-31"));
+        DatasetSeriesEntry series = new DatasetSeriesEntry(
+                "series",
+                "Datenreihe",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                AccessLevel.OPEN,
+                CatalogEntryMetadata.empty(),
+                List.of(currentIssue));
+
+        var page = factory.issue(series, currentIssue);
+
+        assertThat(page.currentIssue()).isTrue();
+        assertThat(page.relatedIssues().issues()).isEmpty();
+    }
+
+    @Test
+    void issueStructureQualityUsesConcreteIssueMetadata() {
+        CatalogEntryMetadata metadata = new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                List.of(new DatasetAttribute(
+                        "bfs_nr",
+                        "INTEGER",
+                        Optional.of("BFS-Gemeindenummer"),
+                        Optional.empty(),
+                        true)),
+                Optional.of("SO_AGI_IssueModel"));
+        DatasetIssueEntry issue = issue(
+                "series-2026",
+                "2026",
+                true,
+                LocalDate.parse("2026-12-31"),
+                AccessLevel.OPEN,
+                metadata);
+        DatasetSeriesEntry series = new DatasetSeriesEntry(
+                "series",
+                "Datenreihe",
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of(),
+                AccessLevel.OPEN,
+                CatalogEntryMetadata.empty(),
+                List.of(issue));
+
+        var page = factory.issueStructureQuality(series, issue);
+
+        assertThat(page.attributes())
+                .extracting(
+                        attribute -> attribute.name(),
+                        attribute -> attribute.dataType(),
+                        attribute -> attribute.mandatoryLabel(),
+                        attribute -> attribute.unit(),
+                        attribute -> attribute.description())
+                .containsExactly(tuple("bfs_nr", "INTEGER", "Ja", "–", "BFS-Gemeindenummer"));
+        assertThat(page.dataModel()).isPresent();
+        assertThat(page.dataModel().get().modelName()).isEqualTo("SO_AGI_IssueModel");
     }
 
     @Test
@@ -608,6 +785,20 @@ class DetailPageVmFactoryTest {
                 Optional.of("asNeeded"),
                 Optional.of("published"),
                 Optional.of("cantonal"),
+                Optional.empty(),
+                List.of(),
+                Optional.empty());
+    }
+
+    private static CatalogEntryMetadata metadataWithIssued(LocalDate issued) {
+        return new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.of(issued),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 List.of(),
                 Optional.empty());

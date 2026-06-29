@@ -11,6 +11,8 @@ public record IssueDetailPageVm(
         String description,
         AccessStateVm accessState,
         boolean structureDescribed,
+        String structureQualityHref,
+        boolean currentIssue,
         String modifiedLabel,
         String issuedLabel,
         List<DetailFeatureVm> features,
@@ -19,7 +21,8 @@ public record IssueDetailPageVm(
         MetadataSectionVm temporalCoverage,
         MetadataSectionVm topics,
         ContactMetadataSectionVm responsibilitiesContact,
-        MetadataSectionVm otherInformation) {
+        MetadataSectionVm otherInformation,
+        RelatedIssuesVm relatedIssues) {
 
     public IssueDetailPageVm {
         features = List.copyOf(features);
