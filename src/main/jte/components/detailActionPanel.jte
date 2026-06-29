@@ -38,7 +38,7 @@
       </div>
       <div class="dp-detail-action-item__content">
         <h3>Verwenden</h3>
-        <p>Downloads, API und Formate nutzen.</p>
+        <p>Downloads und Formate nutzen.</p>
         <a class="dp-detail-action-link" href="#" aria-label="Downloads anzeigen: Daten verwenden">
           Downloads anzeigen <span aria-hidden="true">&rarr;</span>
         </a>
