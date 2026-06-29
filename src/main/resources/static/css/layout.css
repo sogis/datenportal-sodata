@@ -1,5 +1,8 @@
 .dp-page {
   min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
 }
 
 .dp-container {
@@ -8,6 +11,7 @@
 }
 
 .dp-main {
+  flex: 1 0 auto;
   padding: var(--dp-space-6) 0 var(--dp-space-8);
 }
 

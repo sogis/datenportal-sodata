@@ -82,6 +82,7 @@ Chrome-Regel:
 - Header und Breadcrumb sind immer full width.
 - Web-Component-Header und -Breadcrumb dürfen keine zusätzliche `max-width`-Begrenzung durch JTE-Wrapper erhalten.
 - Semantische Fallbacks für Header und Breadcrumb dürfen Innenabstände haben, aber ebenfalls keine `max-width`-Begrenzung.
+- Der Footer steht bei kurzem Inhalt am unteren Viewport-Rand und bleibt bei langem Inhalt im normalen Dokumentfluss; er darf Inhalte nicht als `fixed` Overlay überdecken.
 
 ### 2.2 Header
 

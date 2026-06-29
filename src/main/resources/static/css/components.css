@@ -162,6 +162,7 @@
 }
 
 .dp-footer {
+  flex-shrink: 0;
   border-top: 1px solid var(--dp-color-border);
   background: #2F4858;
 }

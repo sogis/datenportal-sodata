@@ -199,6 +199,31 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
+    void footerSticksToViewportBottomOnlyWhenContentIsShort() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 900))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/does-not-exist"));
+
+            Locator shortPageFooter = page.locator(".dp-footer");
+            BoundingBox shortPageFooterBox = requireBoundingBox(shortPageFooter);
+            double shortPageViewportHeight = viewportHeight(page);
+
+            assertThat(cssValue(shortPageFooter, "position")).isEqualTo("static");
+            assertThat(Math.abs(lowerEdge(shortPageFooterBox) - shortPageViewportHeight)).isLessThan(1.5d);
+
+            page.navigate(baseUrl("/datasets?expanded=ch.so.abstimmungsresultate"));
+
+            Locator longPageFooter = page.locator(".dp-footer");
+            BoundingBox longPageFooterBox = requireBoundingBox(longPageFooter);
+            double longPageViewportHeight = viewportHeight(page);
+
+            assertThat(cssValue(longPageFooter, "position")).isEqualTo("static");
+            assertThat(documentHeight(page)).isGreaterThan(longPageViewportHeight + 50d);
+            assertThat(longPageFooterBox.y).isGreaterThan(longPageViewportHeight);
+        }
+    }
+
+    @Test
     void datasetDetailUsesReadableHeroAndAlignedSummaryLayout() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();
@@ -762,6 +787,14 @@ class CatalogFiltersPlaywrightTest {
 
     private static double lowerEdge(BoundingBox boundingBox) {
         return boundingBox.y + boundingBox.height;
+    }
+
+    private static double viewportHeight(Page page) {
+        return ((Number) page.evaluate("() => window.innerHeight")).doubleValue();
+    }
+
+    private static double documentHeight(Page page) {
+        return ((Number) page.evaluate("() => document.documentElement.scrollHeight")).doubleValue();
     }
 
     private static List<Integer> findCardRowWithMixedKeywordHeights(Locator cards) {
