@@ -34,7 +34,8 @@
         <aside class="dp-detail-side" aria-label="Daten nutzen">
           @template.components.detailActionPanel(
             structureQualityOriginHref = page.structureQualityOriginHref(),
-            structureQualityOriginLabel = "Struktur, Qualität und Herkunft"
+            structureQualityOriginLabel = "Struktur, Qualität und Herkunft",
+            usageHref = page.usageHref()
           )
         </aside>
       </div>

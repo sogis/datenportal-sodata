@@ -52,6 +52,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | vereinfachte Serienübersicht mit Ausgabenliste |
 | Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Serien-Kicker, aktuelles-Ausgabe-Badge, Dataset-Detail-Cards und Seitenpanel `Daten nutzen` |
 | Struktur, Qualität und Herkunft | `pages/structureQualityOrigin.jte`, `components/structureKpis.jte`, `components/attributeTable.jte`, `components/qualityCard.jte`, `components/metadataSection.jte` | `StructureQualityOriginPageVm`, `KpiVm`, `AttributeRowVm`, `QualityVm`, `MetadataSectionVm` | Datensatz- und Ausgabe-Routen, neutrale KPI-Reihe, Attribute als Tabelle, Qualitäts-Card sowie `Herkunft & Verwendung` optional |
+| Daten verwenden | `pages/usage.jte`, `components/usageDirectAccess.jte`, `components/usageCodeExamples.jte`, `components/usageStarterRecipes.jte` | `UsagePageVm`, `DirectAccessRowVm`, `CodeExampleVm`, `StarterRecipeVm` | Datensatz- und Ausgabe-Routen, Direktzugriff ohne Inhalt-Spalte, Format-Badges, Copy-Feedback, Codebeispiel-Tabs, Starter-Rezepte mit Icons, keine rechte Spalte |
 | Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `DownloadSectionVm` | Datenmerkmale plus Downloads, mobile gestapelt |
 | Datensatz-Übersicht | `components/metadataSection.jte` | `DatasetDetailPageVm.overview` | erste Metadatenkarte unterhalb Datenmerkmale/Downloads |
 | Datensatz-Zeitliche Abdeckung | `components/metadataSection.jte` | `DatasetDetailPageVm.temporalCoverage` | Stichtag oder Zeitraum |
@@ -74,3 +75,10 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | `components.css` | Buttons, Filter Chips, Status-Badges, Action Pills, Cards |
 | `catalog.css` | Filter, Toolbar, Tabelle, Cards |
 | `detail.css` | Detailseiten und Metadatenbereiche |
+
+## Vendor Fonts
+
+| Asset | Zweck |
+|---|---|
+| `vendor/jetbrains-mono/2.304/fonts.css` | lokal vendorte JetBrains-Mono-Webfont-Definition fuer Codebeispiele |
+| `vendor/jetbrains-mono/2.304/JetBrainsMono-Regular.woff2` | JetBrains Mono Regular, nur fuer Codetext |

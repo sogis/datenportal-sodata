@@ -7,17 +7,20 @@ import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
+import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.web.view.AccessStateVm;
 import ch.so.agi.datenportal.web.view.AttributeRowVm;
+import ch.so.agi.datenportal.web.view.CodeExampleVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataItemVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataLineVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataSectionVm;
 import ch.so.agi.datenportal.web.view.DatasetDetailPageVm;
 import ch.so.agi.datenportal.web.view.DetailFeatureVm;
+import ch.so.agi.datenportal.web.view.DirectAccessRowVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
 import ch.so.agi.datenportal.web.view.DownloadSectionVm;
 import ch.so.agi.datenportal.web.view.IssueDetailPageVm;
@@ -30,7 +33,9 @@ import ch.so.agi.datenportal.web.view.RelatedIssuesVm;
 import ch.so.agi.datenportal.web.view.SeriesDetailPageVm;
 import ch.so.agi.datenportal.web.view.SeriesIssueVm;
 import ch.so.agi.datenportal.web.view.SeriesIssuesVm;
+import ch.so.agi.datenportal.web.view.StarterRecipeVm;
 import ch.so.agi.datenportal.web.view.StructureQualityOriginPageVm;
+import ch.so.agi.datenportal.web.view.UsagePageVm;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -65,6 +70,7 @@ public final class DetailPageVmFactory {
                 accessState(dataset),
                 dataset.metadata().hasStructureInformation(),
                 urlFactory.datasetStructureQualityOrigin(dataset.identifier()),
+                urlFactory.datasetUsage(dataset.identifier()),
                 formatDate(dataset.modified()),
                 formatDate(dataset.metadata().issued()).orElse(""),
                 detailFeatures(dataset),
@@ -118,6 +124,9 @@ public final class DetailPageVmFactory {
                 currentIssue
                         ? urlFactory.currentIssueStructureQualityOrigin(series.identifier())
                         : urlFactory.issueStructureQualityOrigin(series.identifier(), issue.identifier()),
+                currentIssue
+                        ? urlFactory.currentIssueUsage(series.identifier())
+                        : urlFactory.issueUsage(series.identifier(), issue.identifier()),
                 currentIssue,
                 formatDate(issue.modified()),
                 formatDate(issue.metadata().issued()).orElse(""),
@@ -154,6 +163,29 @@ public final class DetailPageVmFactory {
                 "Für dieses Datenthema sind keine Attribute beschrieben.",
                 quality(issue.metadata()),
                 section("origin-usage", "Herkunft & Verwendung", originUsageItems(issue)));
+    }
+
+    public UsagePageVm datasetUsage(DatasetEntry dataset) {
+        return usage(pageChromeFactory.datasetUsagePage(dataset), dataset, dataset.distributions());
+    }
+
+    public UsagePageVm issueUsage(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        return usage(pageChromeFactory.issueUsagePage(series, issue), issue, issue.distributions());
+    }
+
+    private UsagePageVm usage(
+            ch.so.agi.datenportal.web.view.PageChromeVm chrome,
+            CatalogEntry entry,
+            List<DistributionLink> distributions) {
+        List<DistributionLink> visibleDistributions = entry.isOpenData()
+                ? distributions.stream().sorted(DISTRIBUTION_ORDER).toList()
+                : List.of();
+        return new UsagePageVm(
+                chrome,
+                "Daten verwenden",
+                directAccessRows(entry.title(), visibleDistributions),
+                codeExamples(entry.identifier(), visibleDistributions),
+                starterRecipes());
     }
 
     private SeriesIssuesVm seriesIssues(DatasetSeriesEntry series) {
@@ -254,6 +286,111 @@ public final class DetailPageVmFactory {
                         link.preferredHref().toString(),
                         link.displayLabel() + " herunterladen: " + ownerTitle))
                 .toList();
+    }
+
+    private static List<DirectAccessRowVm> directAccessRows(String ownerTitle, List<DistributionLink> distributions) {
+        return distributions.stream()
+                .map(link -> new DirectAccessRowVm(
+                        link.displayLabel(),
+                        directAccessDescription(link.format()),
+                        link.preferredHref().toString(),
+                        link.displayLabel() + " herunterladen: " + ownerTitle))
+                .toList();
+    }
+
+    private static String directAccessDescription(DistributionFormat format) {
+        return switch (format) {
+            case CSV -> "Trennzeichen: Semikolon (;) · Texttrenner: Kein Texttrenner · Encoding: UTF-8";
+            case XLSX -> "Excel-Arbeitsmappe";
+            case PARQUET -> "Analytisches Spaltenformat";
+            case OTHER -> "Weitere Ressource";
+        };
+    }
+
+    private static List<CodeExampleVm> codeExamples(String identifier, List<DistributionLink> distributions) {
+        Optional<String> csvUrl = preferredHref(distributions, DistributionFormat.CSV);
+        Optional<String> parquetUrl = preferredHref(distributions, DistributionFormat.PARQUET);
+        String downloadUrl = csvUrl.or(() -> parquetUrl).orElse("");
+        if (downloadUrl.isBlank()) {
+            return List.of();
+        }
+        String duckDbUrl = parquetUrl.or(() -> csvUrl).orElse(downloadUrl);
+
+        return List.of(
+                new CodeExampleVm(
+                        "curl",
+                        "cURL",
+                        """
+                        curl -L -o "%s.csv" \\
+                          "%s"
+                        """.formatted(identifier, downloadUrl).stripTrailing(),
+                        true),
+                new CodeExampleVm(
+                        "python",
+                        "Python",
+                        """
+                        import pandas as pd
+
+                        url = "%s"
+                        df = pd.read_csv(url)
+                        print(df.head())
+                        """.formatted(csvUrl.orElse(downloadUrl)).stripTrailing(),
+                        false),
+                new CodeExampleVm(
+                        "duckdb",
+                        "DuckDB",
+                        duckDbCode(duckDbUrl, parquetUrl.isPresent()),
+                        false));
+    }
+
+    private static Optional<String> preferredHref(List<DistributionLink> distributions, DistributionFormat format) {
+        return distributions.stream()
+                .filter(link -> link.format() == format)
+                .map(link -> link.preferredHref().toString())
+                .findFirst();
+    }
+
+    private static String duckDbCode(String url, boolean parquet) {
+        if (parquet) {
+            return """
+                    SELECT *
+                    FROM read_parquet('%s')
+                    LIMIT 10;
+                    """.formatted(url).stripTrailing();
+        }
+        return """
+                SELECT *
+                FROM read_csv_auto('%s')
+                LIMIT 10;
+                """.formatted(url).stripTrailing();
+    }
+
+    private static List<StarterRecipeVm> starterRecipes() {
+        return List.of(
+                new StarterRecipeVm(
+                        "file-earmark-excel",
+                        "In Excel öffnen",
+                        "Datensatz in Microsoft Excel öffnen und weiterverarbeiten.",
+                        "#",
+                        "Anleitung anzeigen"),
+                new StarterRecipeVm(
+                        "database",
+                        "Mit DuckDB analysieren",
+                        "Schnell lokale Analysen mit DuckDB durchführen.",
+                        "#",
+                        "Anleitung anzeigen"),
+                new StarterRecipeVm(
+                        "r-circle",
+                        "In R auswerten",
+                        "Daten in R einlesen und analysieren (readr oder data.table).",
+                        "#",
+                        "Anleitung anzeigen"),
+                new StarterRecipeVm(
+                        "filetype-py",
+                        "In Python weiterverarbeiten",
+                        "Daten mit pandas laden und weiterverarbeiten.",
+                        "#",
+                        "Anleitung anzeigen"));
     }
 
     private List<MetadataSectionVm> metadataSections(

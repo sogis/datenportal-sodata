@@ -11,6 +11,7 @@ public record DatasetDetailPageVm(
         AccessStateVm accessState,
         boolean structureDescribed,
         String structureQualityOriginHref,
+        String usageHref,
         String modifiedLabel,
         String issuedLabel,
         List<DetailFeatureVm> features,

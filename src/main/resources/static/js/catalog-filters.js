@@ -11,6 +11,8 @@
   const searchClearButton = () => doc.getElementById("catalog-search-clear");
   const triggerSelector = "[data-filter-trigger], [data-mobile-filter-trigger]";
   const SEARCH_DELAY_MS = 300;
+  const COPY_FEEDBACK_MS = 2200;
+  const copyTimers = new WeakMap();
 
   const state = {
     activeKind: null,
@@ -344,5 +346,57 @@
     if (target.id === "dataset-results-shell") {
       closeAll(false);
     }
+  });
+
+  doc.addEventListener("click", async (event) => {
+    const copyButton = event.target instanceof Element ? event.target.closest("[data-copy-value]") : null;
+    if (copyButton instanceof HTMLElement) {
+      event.preventDefault();
+      const value = copyButton.dataset.copyValue ?? "";
+      if (!value) {
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(value);
+        if (copyTimers.has(copyButton)) {
+          window.clearTimeout(copyTimers.get(copyButton));
+        }
+        copyButton.dataset.copyState = "copied";
+        copyButton.setAttribute("aria-label", copyButton.dataset.copySuccessLabel || "Kopiert");
+        const timer = window.setTimeout(() => {
+          delete copyButton.dataset.copyState;
+          copyButton.setAttribute("aria-label", copyButton.dataset.copyLabel || "Kopieren");
+          copyTimers.delete(copyButton);
+        }, COPY_FEEDBACK_MS);
+        copyTimers.set(copyButton, timer);
+      } catch {
+        copyButton.dataset.copyState = "failed";
+      }
+      return;
+    }
+
+    const tab = event.target instanceof Element ? event.target.closest("[data-usage-tab]") : null;
+    if (!(tab instanceof HTMLElement)) {
+      return;
+    }
+
+    event.preventDefault();
+    const tabId = tab.dataset.usageTab;
+    const section = tab.closest(".dp-usage-code");
+    if (!tabId || !section) {
+      return;
+    }
+
+    section.querySelectorAll("[data-usage-tab]").forEach((candidate) => {
+      const selected = candidate === tab;
+      candidate.classList.toggle("dp-usage-tab--active", selected);
+      candidate.setAttribute("aria-selected", String(selected));
+    });
+
+    section.querySelectorAll("[data-usage-panel]").forEach((panel) => {
+      if (panel instanceof HTMLElement) {
+        panel.hidden = panel.dataset.usagePanel !== tabId;
+      }
+    });
   });
 })();

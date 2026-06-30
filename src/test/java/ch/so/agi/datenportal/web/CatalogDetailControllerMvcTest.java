@@ -88,6 +88,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("Downloads, Formate und Codebeispiele anzeigen.")))
                 .andExpect(content().string(containsString("Downloads anzeigen")))
                 .andExpect(content().string(containsString("href=\"/datasets/ch.so.bauinventar/structure-quality-origin\"")))
+                .andExpect(content().string(containsString("href=\"/datasets/ch.so.bauinventar/usage\"")))
                 .andExpect(content().string(containsString("href=\"#\"")))
                 .andExpect(content().string(containsString("&rarr;")))
                 .andExpect(content().string(containsString("class=\"bi bi-shield-check\"")))
@@ -188,6 +189,67 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
+    void datasetUsageRendersDirectAccessCodeExamplesAndStarterRecipesWithoutAside() throws Exception {
+        mockMvc.perform(get("/datasets/ch.so.verwaltungseinheiten/usage"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("<so-header")))
+                .andExpect(content().string(containsString("<so-breadcrumb>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets/ch.so.verwaltungseinheiten\">Verwaltungseinheiten</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Daten verwenden</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<h1 class=\"dp-detail-title\">Daten verwenden</h1>")))
+                .andExpect(content().string(containsString("Direktzugriff")))
+                .andExpect(content().string(containsString("Codebeispiele")))
+                .andExpect(content().string(containsString("Starter-Rezepte")))
+                .andExpect(content().string(containsString("class=\"dp-detail-summary-layout dp-usage-layout\"")))
+                .andExpect(content().string(containsString("<th scope=\"col\">Format</th>")))
+                .andExpect(content().string(containsString("<th scope=\"col\">Beschreibung</th>")))
+                .andExpect(content().string(containsString("<th scope=\"col\">Aktion</th>")))
+                .andExpect(content().string(not(containsString("<th scope=\"col\">Inhalt</th>"))))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.verwaltungseinheiten.csv\"")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.verwaltungseinheiten.xlsx\"")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.verwaltungseinheiten.parquet\"")))
+                .andExpect(content().string(containsString("class=\"dp-usage-format-badge\">CSV</span>")))
+                .andExpect(content().string(containsString("class=\"dp-usage-format-badge\">XLSX</span>")))
+                .andExpect(content().string(containsString("class=\"dp-usage-format-badge\">Parquet</span>")))
+                .andExpect(content().string(containsString("Trennzeichen: Semikolon (;) · Texttrenner: Kein Texttrenner · Encoding: UTF-8")))
+                .andExpect(content().string(containsString("data-copy-value=\"https://data.so.ch/download/ch.so.verwaltungseinheiten.csv\"")))
+                .andExpect(content().string(containsString("data-copy-success-label=\"URL kopiert: CSV\"")))
+                .andExpect(content().string(containsString("URL kopieren")))
+                .andExpect(content().string(containsString("URL kopiert")))
+                .andExpect(content().string(containsString("class=\"bi bi-download\"")))
+                .andExpect(content().string(containsString("bi bi-clipboard")))
+                .andExpect(content().string(containsString("class=\"bi bi-check-lg")))
+                .andExpect(content().string(containsString("role=\"tablist\"")))
+                .andExpect(content().string(containsString("data-usage-tab=\"curl\"")))
+                .andExpect(content().string(containsString("data-usage-tab=\"python\"")))
+                .andExpect(content().string(containsString("data-usage-tab=\"duckdb\"")))
+                .andExpect(content().string(containsString("data-copy-success-label=\"cURL-Code kopiert\"")))
+                .andExpect(content().string(containsString("curl -L -o")))
+                .andExpect(content().string(containsString("ch.so.verwaltungseinheiten.csv")))
+                .andExpect(content().string(containsString("pd.read_csv")))
+                .andExpect(content().string(containsString("read_parquet")))
+                .andExpect(content().string(containsString("Mit DuckDB analysieren")))
+                .andExpect(content().string(containsString("In R auswerten")))
+                .andExpect(content().string(containsString("Daten in R einlesen und analysieren (readr oder data.table).")))
+                .andExpect(content().string(containsString("In Python weiterverarbeiten")))
+                .andExpect(content().string(containsString("Daten mit pandas laden und weiterverarbeiten.")))
+                .andExpect(content().string(containsString("class=\"bi bi-file-earmark-excel\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-database\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-r-circle\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-filetype-py\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-box-arrow-up-right\"")))
+                .andExpect(content().string(containsString("class=\"dp-usage-recipe__title\"")))
+                .andExpect(content().string(containsString("href=\"#\"")))
+                .andExpect(content().string(not(containsString("In QGIS laden"))))
+                .andExpect(content().string(not(containsString("In PostGIS importieren"))))
+                .andExpect(content().string(not(containsString("<aside"))))
+                .andExpect(content().string(not(containsString("dp-usage-layout__reserve"))))
+                .andExpect(content().string(not(containsString("Hinweise zur Verwendung"))))
+                .andExpect(content().string(not(containsString("<h2>1."))))
+                .andExpect(content().string(not(containsString(">Verwaltungseinheiten</h2>"))));
+    }
+
+    @Test
     void datasetDetailShowsAttributeFeatureWithoutValidationWhenModelIsMissing() throws Exception {
         mockMvc.perform(get("/datasets/ch.so.wasserqualitaet_grundwasser"))
                 .andExpect(status().isOk())
@@ -282,6 +344,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("Erkunden")))
                 .andExpect(content().string(containsString("Verwenden")))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/current/structure-quality-origin\"")))
+                .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/current/usage\"")))
                 .andExpect(content().string(containsString("<aside class=\"dp-detail-side\" aria-label=\"Daten nutzen\">")))
                 .andExpect(content().string(not(containsString("Diese Ausgabe ist aktuell."))))
                 .andExpect(content().string(not(containsString("dp-series-issues"))))
@@ -311,6 +374,24 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
+    void currentIssueUsageRendersConcreteIssueDownloadsWithoutAside() throws Exception {
+        mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/current/usage"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate\">Abstimmungsresultate</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/current\">Abstimmungsresultate 2026</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Daten verwenden</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<h1 class=\"dp-detail-title\">Daten verwenden</h1>")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.csv\"")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.xlsx\"")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.parquet\"")))
+                .andExpect(content().string(containsString("curl -L -o")))
+                .andExpect(content().string(containsString("pd.read_csv")))
+                .andExpect(content().string(containsString("read_parquet")))
+                .andExpect(content().string(not(containsString("<aside"))))
+                .andExpect(content().string(not(containsString("Hinweise zur Verwendung"))));
+    }
+
+    @Test
     void historicalIssueDetailRendersSelectedIssue() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025"))
                 .andExpect(status().isOk())
@@ -326,6 +407,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<span class=\"dp-status-badge dp-status-badge--info\">Aktuelle Ausgabe</span>")))
                 .andExpect(content().string(containsString("<aside class=\"dp-detail-side\" aria-label=\"Daten nutzen\">")))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025/structure-quality-origin\"")))
+                .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025/usage\"")))
                 .andExpect(content().string(not(containsString("Diese Ausgabe ist aktuell."))))
                 .andExpect(content().string(not(containsString("dp-series-issues"))))
                 .andExpect(content().string(not(containsString("series-issues-title"))))
@@ -341,6 +423,16 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<th scope=\"row\">stimmbeteiligung_prozent</th>")))
                 .andExpect(content().string(containsString("Stimmbeteiligung in Prozent.")))
                 .andExpect(content().string(containsString("SO_SK_Politik_Abstimmungen_Publikation_20260624")));
+    }
+
+    @Test
+    void historicalIssueUsageRendersSelectedIssueDownloads() throws Exception {
+        mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025/usage"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\">Abstimmungsresultate 2025</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2025.csv\"")))
+                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.abstimmungsresultate_2026.csv\""))))
+                .andExpect(content().string(not(containsString("<aside"))));
     }
 
     @Test
@@ -383,10 +475,16 @@ class CatalogDetailControllerMvcTest {
     void detailRoutePathVariablesDeclareExplicitNames() throws NoSuchMethodException {
         assertPathVariableName("datasetDetail", new Class<?>[] {String.class, Model.class}, 0, "identifier");
         assertPathVariableName("datasetStructureQualityOrigin", new Class<?>[] {String.class, Model.class}, 0, "identifier");
+        assertPathVariableName("datasetUsage", new Class<?>[] {String.class, Model.class}, 0, "identifier");
         assertPathVariableName("seriesDetail", new Class<?>[] {String.class, Model.class}, 0, "seriesIdentifier");
         assertPathVariableName("currentIssueDetail", new Class<?>[] {String.class, Model.class}, 0, "seriesIdentifier");
         assertPathVariableName(
                 "currentIssueStructureQualityOrigin",
+                new Class<?>[] {String.class, Model.class},
+                0,
+                "seriesIdentifier");
+        assertPathVariableName(
+                "currentIssueUsage",
                 new Class<?>[] {String.class, Model.class},
                 0,
                 "seriesIdentifier");
@@ -407,6 +505,16 @@ class CatalogDetailControllerMvcTest {
                 "seriesIdentifier");
         assertPathVariableName(
                 "issueStructureQualityOrigin",
+                new Class<?>[] {String.class, String.class, Model.class},
+                1,
+                "issueIdentifier");
+        assertPathVariableName(
+                "issueUsage",
+                new Class<?>[] {String.class, String.class, Model.class},
+                0,
+                "seriesIdentifier");
+        assertPathVariableName(
+                "issueUsage",
                 new Class<?>[] {String.class, String.class, Model.class},
                 1,
                 "issueIdentifier");

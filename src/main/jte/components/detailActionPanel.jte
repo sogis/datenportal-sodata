@@ -1,5 +1,6 @@
 @param String structureQualityOriginHref
 @param String structureQualityOriginLabel
+@param String usageHref
 <section class="dp-detail-panel dp-detail-actions" aria-labelledby="detail-actions-title">
   <h2 id="detail-actions-title">Daten nutzen</h2>
   <div class="dp-detail-action-list">
@@ -41,7 +42,7 @@
       <div class="dp-detail-action-item__content">
         <h3>Verwenden</h3>
         <p>Downloads, Formate und Codebeispiele anzeigen.</p>
-        <a class="dp-detail-action-link" href="#" aria-label="Downloads anzeigen: Daten verwenden">
+        <a class="dp-detail-action-link" href="${usageHref}" aria-label="Downloads anzeigen: Daten verwenden">
           Downloads anzeigen <span aria-hidden="true">&rarr;</span>
         </a>
       </div>

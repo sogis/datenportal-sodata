@@ -50,6 +50,20 @@ public final class CatalogDetailController {
         });
     }
 
+    @GetMapping("/datasets/{identifier}/usage")
+    public String datasetUsage(@PathVariable("identifier") String identifier, Model model) {
+        return catalogService.withSnapshot(snapshot -> {
+            var entry = snapshot.findAnyEntry(identifier)
+                    .orElseThrow(() -> notFound(identifier));
+            if (!(entry instanceof DatasetEntry dataset)) {
+                throw notFound(identifier);
+            }
+
+            model.addAttribute("page", detailPageVmFactory.datasetUsage(dataset));
+            return "pages/usage";
+        });
+    }
+
     @GetMapping("/series/{seriesIdentifier}")
     public String seriesDetail(@PathVariable("seriesIdentifier") String seriesIdentifier, Model model) {
         return catalogService.withSnapshot(snapshot -> {
@@ -74,6 +88,15 @@ public final class CatalogDetailController {
             DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
             model.addAttribute("page", detailPageVmFactory.issueStructureQualityOrigin(series, series.currentIssueOrThrow()));
             return "pages/structureQualityOrigin";
+        });
+    }
+
+    @GetMapping("/series/{seriesIdentifier}/issues/current/usage")
+    public String currentIssueUsage(@PathVariable("seriesIdentifier") String seriesIdentifier, Model model) {
+        return catalogService.withSnapshot(snapshot -> {
+            DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
+            model.addAttribute("page", detailPageVmFactory.issueUsage(series, series.currentIssueOrThrow()));
+            return "pages/usage";
         });
     }
 
@@ -105,6 +128,20 @@ public final class CatalogDetailController {
 
             model.addAttribute("page", detailPageVmFactory.issueStructureQualityOrigin(series, issue));
             return "pages/structureQualityOrigin";
+        });
+    }
+
+    @GetMapping("/series/{seriesIdentifier}/issues/{issueIdentifier}/usage")
+    public String issueUsage(
+            @PathVariable("seriesIdentifier") String seriesIdentifier,
+            @PathVariable("issueIdentifier") String issueIdentifier,
+            Model model) {
+        return catalogService.withSnapshot(snapshot -> {
+            DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
+            DatasetIssueEntry issue = findIssue(series, issueIdentifier);
+
+            model.addAttribute("page", detailPageVmFactory.issueUsage(series, issue));
+            return "pages/usage";
         });
     }
 

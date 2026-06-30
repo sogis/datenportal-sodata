@@ -14,6 +14,9 @@ public class StaticAssetCachingConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/vendor/so-web-components/**")
                 .addResourceLocations("classpath:/static/vendor/so-web-components/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)).cachePublic());
+        registry.addResourceHandler("/vendor/jetbrains-mono/**")
+                .addResourceLocations("classpath:/static/vendor/jetbrains-mono/")
+                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)).cachePublic());
         registry.addResourceHandler("/js/**")
                 .addResourceLocations("classpath:/static/js/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic());

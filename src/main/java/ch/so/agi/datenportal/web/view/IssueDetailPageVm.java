@@ -12,6 +12,7 @@ public record IssueDetailPageVm(
         AccessStateVm accessState,
         boolean structureDescribed,
         String structureQualityOriginHref,
+        String usageHref,
         boolean currentIssue,
         String modifiedLabel,
         String issuedLabel,

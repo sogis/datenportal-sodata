@@ -35,6 +35,13 @@ public class BreadcrumbFactory {
         return new BreadcrumbVm(items);
     }
 
+    public BreadcrumbVm datasetUsage(DatasetEntry dataset) {
+        var items = catalogItems();
+        items.add(new BreadcrumbItemVm(dataset.title(), Optional.of("/datasets/" + encode(dataset.identifier())), false));
+        items.add(new BreadcrumbItemVm("Daten verwenden", Optional.empty(), true));
+        return new BreadcrumbVm(items);
+    }
+
     public BreadcrumbVm seriesDetail(DatasetSeriesEntry series) {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(series.title(), Optional.empty(), true));
@@ -51,11 +58,17 @@ public class BreadcrumbFactory {
     public BreadcrumbVm issueStructureQualityOrigin(DatasetSeriesEntry series, DatasetIssueEntry issue) {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(series.title(), Optional.of("/series/" + encode(series.identifier())), false));
-        String issueHref = issue.identifier().equals(series.currentIssueOrThrow().identifier())
-                ? "/series/" + encode(series.identifier()) + "/issues/current"
-                : "/series/" + encode(series.identifier()) + "/issues/" + encode(issue.identifier());
+        String issueHref = issueHref(series, issue);
         items.add(new BreadcrumbItemVm(issue.title(), Optional.of(issueHref), false));
         items.add(new BreadcrumbItemVm("Struktur, Qualität und Herkunft", Optional.empty(), true));
+        return new BreadcrumbVm(items);
+    }
+
+    public BreadcrumbVm issueUsage(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        var items = catalogItems();
+        items.add(new BreadcrumbItemVm(series.title(), Optional.of("/series/" + encode(series.identifier())), false));
+        items.add(new BreadcrumbItemVm(issue.title(), Optional.of(issueHref(series, issue)), false));
+        items.add(new BreadcrumbItemVm("Daten verwenden", Optional.empty(), true));
         return new BreadcrumbVm(items);
     }
 
@@ -78,5 +91,11 @@ public class BreadcrumbFactory {
 
     private static String encode(String value) {
         return java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20");
+    }
+
+    private static String issueHref(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        return issue.identifier().equals(series.currentIssueOrThrow().identifier())
+                ? "/series/" + encode(series.identifier()) + "/issues/current"
+                : "/series/" + encode(series.identifier()) + "/issues/" + encode(issue.identifier());
     }
 }

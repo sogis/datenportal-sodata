@@ -64,6 +64,18 @@ Die vendorte `styles/fonts.css` stammt aus `so-web-components@0.1.10` und refere
 
 Die Anwendung verwendet keine separate `/assets/fonts`-Sonderlösung mehr. Falls die Font-Assets künftig erneut angepasst werden müssen, bleiben sie versionsgebunden unter `src/main/resources/static/vendor/so-web-components/<version>/styles/`, und `fonts.css` verwendet nur relative Web-Pfade, nie absolute lokale Pfade.
 
+Codebeispiele auf der Unterseite `Daten verwenden` verwenden zusätzlich JetBrains Mono. Dieser Font ist frei lizenziert und separat vendort:
+
+```text
+src/main/resources/static/vendor/jetbrains-mono/2.304/
+  fonts.css
+  JetBrainsMono-Regular.woff2
+  OFL.txt
+  README.md
+```
+
+`fonts.css` referenziert die WOFF2-Datei relativ. Die App importiert diese Datei über `app.css` und nutzt den Font nur über `--dp-font-mono` für Codetext.
+
 ## Content Security Policy
 
 Die globale CSP erlaubt Skripte und Assets von `self`. `style-src` erlaubt zusätzlich Inline-Styles, weil die aktuellen Web Components Shadow-DOM-Styles erzeugen. Externe CDN-Assets sollten produktiv nicht verwendet werden.

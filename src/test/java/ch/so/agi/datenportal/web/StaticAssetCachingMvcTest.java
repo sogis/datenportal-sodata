@@ -75,6 +75,25 @@ class StaticAssetCachingMvcTest {
     }
 
     @Test
+    void vendoredJetBrainsMonoFontsCssServesRelativeWoff2ReferenceWithoutEmbeddedBase64() throws Exception {
+        mockMvc.perform(get("/vendor/jetbrains-mono/2.304/fonts.css"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))))
+                .andExpect(content().string(allOf(
+                        containsString("./JetBrainsMono-Regular.woff2"),
+                        not(containsString("http")),
+                        not(containsString("data:")),
+                        not(containsString("base64")))));
+    }
+
+    @Test
+    void vendoredJetBrainsMonoWoff2AssetIsServedWithLongCacheHeader() throws Exception {
+        mockMvc.perform(get("/vendor/jetbrains-mono/2.304/JetBrainsMono-Regular.woff2"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))));
+    }
+
+    @Test
     void normalPagesIncludeSecurityHeaders() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())

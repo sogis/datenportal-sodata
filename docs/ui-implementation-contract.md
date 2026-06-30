@@ -712,6 +712,20 @@ Die Subseite `Struktur, Qualität und Herkunft` ist serverseitig gerendert und w
 - Optionale Card `Herkunft & Verwendung` mit `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab`.
 - Cards unterhalb der Attributtabelle nutzen dieselbe Breite wie die Cards auf Detailseiten; die Attributtabelle bleibt full-width.
 
+Die Subseite `Daten verwenden` ist serverseitig gerendert und wird ueber das Seitenpanel `Daten nutzen` aufgerufen. Sie zeigt:
+
+- Titel `Daten verwenden` ohne Untertitel, ohne Kapitelnummern.
+- Keine rechte Spalte und kein sichtbares Seitenpanel; die sichtbaren Inhalte bleiben aber auf der Hauptspaltenbreite der Detailseiten.
+- Abschnitt `Direktzugriff` als Tabelle in derselben Breite und Schriftgroesse wie die Attributtabelle, aber ohne horizontale Scrollbar. Der Tabellenkopf verwendet `font-weight: 700`; Tabelleninhalte bleiben normalgewichtig.
+- Die Tabelle zeigt die Spalten `Format`, `Beschreibung` und `Aktion`; eine separate Spalte `Inhalt` wird nicht gerendert.
+- Formatwerte verwenden ein graues, gebordertes Badge-Styling auf Basis der neutralen Design-Tokens.
+- CSV-Details verwenden `Trennzeichen: Semikolon (;) · Texttrenner: Kein Texttrenner · Encoding: UTF-8`.
+- Aktionen `Herunterladen` und `URL kopieren` verwenden eingebettete Bootstrap-SVG-Icons, transparente Flaeche und `1px solid var(--dp-color-border)`. `URL kopieren` kopiert die vorhandene URL in die Zwischenablage und zeigt kurz `URL kopiert` mit gruenem Check-Icon.
+- Abschnitt `Codebeispiele` mit Tabs `cURL`, `Python`, `DuckDB` im Tab-Styling des Datenblatt-Editors. Codetext verwendet den lokal vendorten Font `JetBrains Mono`; Bash-Beispiele sind so umbrochen, dass keine horizontale Scrollbar noetig ist.
+- Codebeispiel-Copy verwendet dasselbe Clipboard-zu-Check-Feedback.
+- Abschnitt `Starter-Rezepte` mit `18px` Typografie, Standard-Textfarbe, roten Links auf `#`, Bootstrap-Produkt-/Werkzeug-Icons vor dem Namen und einem Absprung-Icon im Link. Der Rezeptname verwendet `font-weight: 700`; die Titelsaeule bricht nicht um. MVP-Rezepte: Excel, DuckDB, R und Python.
+- Keine Card `Hinweise zur Verwendung`.
+
 ### 8.2 Detailseite für Datenreihen und Ausgaben
 
 Wichtig: In der Liste zeigt der Info-Link der Root-Datenreihe auf die Detailseite der aktuellen Ausgabe.
