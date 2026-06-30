@@ -275,7 +275,7 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
-    void datasetOtherInformationContainsConfiguredValuesInOrder() {
+    void structureQualityOriginGroupsOriginAndUsageValuesInOneCard() {
         CatalogEntryMetadata metadata = new CatalogEntryMetadata(
                 Optional.empty(),
                 Optional.empty(),
@@ -292,16 +292,24 @@ class DetailPageVmFactoryTest {
                 Optional.of("Übersichten und Kennzahlen"),
                 Optional.of("Referenztabellen und Prüflisten"));
 
-        var section = factory.dataset(datasetWithMetadata(metadata)).otherInformation();
+        var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(metadata));
 
-        assertThat(section.title()).isEqualTo("Übrige Informationen");
-        assertThat(section.items())
+        assertThat(page.originUsage()).isPresent();
+        assertThat(page.originUsage().get().title()).isEqualTo("Herkunft & Verwendung");
+        assertThat(page.originUsage().get().items())
                 .extracting(item -> item.label(), item -> item.value())
                 .containsExactly(
                         tuple("Erhebungs- / Messmethode", "Fachliche Erhebung und Qualitätskontrolle"),
-                        tuple("Verfügbare Daten ab", "ab 2011"),
+                        tuple("Hilfsdaten", "Referenztabellen und Prüflisten"),
                         tuple("Weitere Verwendungen", "Übersichten und Kennzahlen"),
-                        tuple("Hilfsdaten", "Referenztabellen und Prüflisten"));
+                        tuple("Verfügbare Daten ab", "ab 2011"));
+    }
+
+    @Test
+    void structureQualityOriginOmitsEmptyOriginUsageCard() {
+        var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(CatalogEntryMetadata.empty()));
+
+        assertThat(page.originUsage()).isEmpty();
     }
 
     @Test
@@ -333,11 +341,11 @@ class DetailPageVmFactoryTest {
     void datasetDetailLinksStructureQualityPage() {
         var page = factory.dataset(datasetWithMetadata(CatalogEntryMetadata.empty()));
 
-        assertThat(page.structureQualityHref()).isEqualTo("/datasets/dataset/structure-quality");
+        assertThat(page.structureQualityOriginHref()).isEqualTo("/datasets/dataset/structure-quality-origin");
     }
 
     @Test
-    void datasetStructureQualityMapsAttributesAndDataModel() {
+    void datasetStructureQualityOriginMapsAttributesAndQualityWithModel() {
         CatalogEntryMetadata metadata = new CatalogEntryMetadata(
                 Optional.empty(),
                 Optional.empty(),
@@ -362,9 +370,10 @@ class DetailPageVmFactoryTest {
                                 false)),
                 Optional.of("SO_AGI_TestModel"));
 
-        var page = factory.datasetStructureQuality(datasetWithMetadata(metadata));
+        var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(metadata));
 
-        assertThat(page.title()).isEqualTo("Struktur & Qualität");
+        assertThat(page.title()).isEqualTo("Struktur, Qualität und Herkunft");
+        assertThat(page.emptyAttributesText()).isEqualTo("Für dieses Datenthema sind keine Attribute beschrieben.");
         assertThat(page.attributes())
                 .extracting(
                         attribute -> attribute.name(),
@@ -375,19 +384,21 @@ class DetailPageVmFactoryTest {
                 .containsExactly(
                         tuple("identifier", "TEXT", "Ja", "–", "Fachlicher Identifikator"),
                         tuple("flaeche_m2", "DECIMAL", "Nein", "m2", "–"));
-        assertThat(page.dataModel()).isPresent();
-        assertThat(page.dataModel().get().modelName()).isEqualTo("SO_AGI_TestModel");
-        assertThat(page.dataModel().get().modelHref()).isEqualTo("#");
-        assertThat(page.dataModel().get().validationReportName()).isEqualTo("ilivalidator.log");
-        assertThat(page.dataModel().get().validationReportHref()).isEqualTo("#");
+        assertThat(page.quality().modelName()).contains("SO_AGI_TestModel");
+        assertThat(page.quality().modelHref()).isEqualTo("#");
+        assertThat(page.quality().validationReportName()).isEqualTo("ilivalidator.log");
+        assertThat(page.quality().validationReportHref()).isEqualTo("#");
+        assertThat(page.quality().missingModelMessage()).isEmpty();
     }
 
     @Test
-    void structureQualityOmitsDataModelWhenModelIsMissing() {
-        var page = factory.datasetStructureQuality(datasetWithMetadata(CatalogEntryMetadata.empty()));
+    void structureQualityOriginShowsQualityMessageWhenModelIsMissing() {
+        var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(CatalogEntryMetadata.empty()));
 
         assertThat(page.attributes()).isEmpty();
-        assertThat(page.dataModel()).isEmpty();
+        assertThat(page.quality().modelName()).isEmpty();
+        assertThat(page.quality().missingModelMessage())
+                .contains("Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.");
     }
 
     @Test
@@ -531,14 +542,7 @@ class DetailPageVmFactoryTest {
                         tuple("Ausgabe Kontakt", Optional.empty()),
                         tuple("Zeitreihen-Team", Optional.empty()),
                         tuple("zeitreihe@example.test", Optional.of("mailto:zeitreihe@example.test")));
-        assertThat(page.otherInformation().items())
-                .extracting(item -> item.label(), item -> item.value())
-                .containsExactly(
-                        tuple("Erhebungs- / Messmethode", "Ausgabenspezifische Erhebung"),
-                        tuple("Verfügbare Daten ab", "ab 2026"),
-                        tuple("Weitere Verwendungen", "Jahresvergleich"),
-                        tuple("Hilfsdaten", "Gemeindeliste"));
-        assertThat(page.structureQualityHref()).isEqualTo("/series/series/issues/current/structure-quality");
+        assertThat(page.structureQualityOriginHref()).isEqualTo("/series/series/issues/current/structure-quality-origin");
         assertThat(page.relatedIssues().issues())
                 .extracting(
                         issue -> issue.issueLabel(),
@@ -569,7 +573,7 @@ class DetailPageVmFactoryTest {
         var page = factory.issue(series, historicalIssue);
 
         assertThat(page.currentIssue()).isFalse();
-        assertThat(page.structureQualityHref()).isEqualTo("/series/series/issues/series-2025/structure-quality");
+        assertThat(page.structureQualityOriginHref()).isEqualTo("/series/series/issues/series-2025/structure-quality-origin");
         assertThat(page.relatedIssues().issues())
                 .extracting(issue -> issue.issueLabel(), issue -> issue.detailHref(), issue -> issue.current())
                 .containsExactly(
@@ -599,7 +603,7 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
-    void issueStructureQualityUsesConcreteIssueMetadata() {
+    void issueStructureQualityOriginUsesConcreteIssueMetadata() {
         CatalogEntryMetadata metadata = new CatalogEntryMetadata(
                 Optional.empty(),
                 Optional.empty(),
@@ -635,7 +639,7 @@ class DetailPageVmFactoryTest {
                 CatalogEntryMetadata.empty(),
                 List.of(issue));
 
-        var page = factory.issueStructureQuality(series, issue);
+        var page = factory.issueStructureQualityOrigin(series, issue);
 
         assertThat(page.attributes())
                 .extracting(
@@ -645,8 +649,7 @@ class DetailPageVmFactoryTest {
                         attribute -> attribute.unit(),
                         attribute -> attribute.description())
                 .containsExactly(tuple("bfs_nr", "INTEGER", "Ja", "–", "BFS-Gemeindenummer"));
-        assertThat(page.dataModel()).isPresent();
-        assertThat(page.dataModel().get().modelName()).isEqualTo("SO_AGI_IssueModel");
+        assertThat(page.quality().modelName()).contains("SO_AGI_IssueModel");
     }
 
     @Test

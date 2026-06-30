@@ -265,7 +265,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator(".dp-detail-action-item__content p").first())).isEqualTo("16px");
             assertThat(fontSize(actionLink)).isEqualTo("16px");
             assertThat(actionLink.textContent()).contains("→");
-            assertThat(actionLink.getAttribute("href")).isEqualTo("/datasets/ch.so.bauinventar/structure-quality");
+            assertThat(actionLink.getAttribute("href")).isEqualTo("/datasets/ch.so.bauinventar/structure-quality-origin");
             assertThat(cssValue(actionLink, "color")).isEqualTo("rgb(210, 10, 17)");
             assertThat(cssValue(actionLink, "background-color")).isEqualTo("rgba(0, 0, 0, 0)");
             assertThat(cssValue(actionLink, "border-top-width")).isEqualTo("0px");

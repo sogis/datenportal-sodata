@@ -10,7 +10,7 @@ public record DatasetDetailPageVm(
         String typeLabel,
         AccessStateVm accessState,
         boolean structureDescribed,
-        String structureQualityHref,
+        String structureQualityOriginHref,
         String modifiedLabel,
         String issuedLabel,
         List<DetailFeatureVm> features,
@@ -19,7 +19,6 @@ public record DatasetDetailPageVm(
         MetadataSectionVm temporalCoverage,
         MetadataSectionVm topics,
         ContactMetadataSectionVm responsibilitiesContact,
-        MetadataSectionVm otherInformation,
         List<MetadataSectionVm> metadataSections) {
 
     public DatasetDetailPageVm {

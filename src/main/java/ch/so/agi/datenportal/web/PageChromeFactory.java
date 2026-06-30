@@ -43,11 +43,11 @@ public class PageChromeFactory {
                 footerViewModelFactory.create());
     }
 
-    public PageChromeVm datasetStructureQualityPage(DatasetEntry dataset) {
+    public PageChromeVm datasetStructureQualityOriginPage(DatasetEntry dataset) {
         return new PageChromeVm(
-                "Struktur & Qualität | " + dataset.title() + " | Datenportal",
+                "Struktur, Qualität und Herkunft | " + dataset.title() + " | Datenportal",
                 headerViewModelFactory.forDetailPage(),
-                breadcrumbFactory.datasetStructureQuality(dataset),
+                breadcrumbFactory.datasetStructureQualityOrigin(dataset),
                 webAssetsVmFactory.create(),
                 footerViewModelFactory.create());
     }
@@ -70,11 +70,11 @@ public class PageChromeFactory {
                 footerViewModelFactory.create());
     }
 
-    public PageChromeVm issueStructureQualityPage(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+    public PageChromeVm issueStructureQualityOriginPage(DatasetSeriesEntry series, DatasetIssueEntry issue) {
         return new PageChromeVm(
-                "Struktur & Qualität | " + issue.title() + " | Datenportal",
+                "Struktur, Qualität und Herkunft | " + issue.title() + " | Datenportal",
                 headerViewModelFactory.forDetailPage(),
-                breadcrumbFactory.issueStructureQuality(series, issue),
+                breadcrumbFactory.issueStructureQualityOrigin(series, issue),
                 webAssetsVmFactory.create(),
                 footerViewModelFactory.create());
     }

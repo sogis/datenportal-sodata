@@ -28,10 +28,10 @@ public class BreadcrumbFactory {
         return new BreadcrumbVm(items);
     }
 
-    public BreadcrumbVm datasetStructureQuality(DatasetEntry dataset) {
+    public BreadcrumbVm datasetStructureQualityOrigin(DatasetEntry dataset) {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(dataset.title(), Optional.of("/datasets/" + encode(dataset.identifier())), false));
-        items.add(new BreadcrumbItemVm("Struktur & Qualität", Optional.empty(), true));
+        items.add(new BreadcrumbItemVm("Struktur, Qualität und Herkunft", Optional.empty(), true));
         return new BreadcrumbVm(items);
     }
 
@@ -48,14 +48,14 @@ public class BreadcrumbFactory {
         return new BreadcrumbVm(items);
     }
 
-    public BreadcrumbVm issueStructureQuality(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+    public BreadcrumbVm issueStructureQualityOrigin(DatasetSeriesEntry series, DatasetIssueEntry issue) {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(series.title(), Optional.of("/series/" + encode(series.identifier())), false));
         String issueHref = issue.identifier().equals(series.currentIssueOrThrow().identifier())
                 ? "/series/" + encode(series.identifier()) + "/issues/current"
                 : "/series/" + encode(series.identifier()) + "/issues/" + encode(issue.identifier());
         items.add(new BreadcrumbItemVm(issue.title(), Optional.of(issueHref), false));
-        items.add(new BreadcrumbItemVm("Struktur & Qualität", Optional.empty(), true));
+        items.add(new BreadcrumbItemVm("Struktur, Qualität und Herkunft", Optional.empty(), true));
         return new BreadcrumbVm(items);
     }
 

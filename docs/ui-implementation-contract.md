@@ -697,11 +697,19 @@ Pflichtbereiche:
 
 Temporäre Umsetzungsnotiz:
 
-- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, den ersten drei Metadatenkarten (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und einer rechten vertikalen Aktionsspalte (`Struktur & Qualität`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
+- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, den ersten drei Metadatenkarten (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und einer rechten vertikalen Aktionsspalte (`Struktur, Qualität und Herkunft`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
 - Die Datenmerkmale `Open Data`, `Attribute beschrieben` und `Daten validiert` verwenden Feature-Status-Icons: verfuegbare Merkmale nutzen `var(--dp-color-status-ok-circle)`, nicht verfuegbare Merkmale nutzen `var(--dp-color-status-negative-circle)`. Diese Icons sind keine Status-Badges; Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` duerfen nicht als Icon-Farbe verwendet werden.
 - Zusätzlich zeigt die normale Datensatz-Detailseite die Card `Zuständigkeiten und Kontakt` direkt nach `Themen und Schlagworte`. Sie verwendet dieselben Metadaten-Card-Styles und enthält `Datenproduzent`, `Kontakt` und `Herausgeber`.
-- Direkt danach zeigt die normale Datensatz-Detailseite die Card `Übrige Informationen` für `Erhebungs- / Messmethode`, `Verfügbare Daten ab`, `Weitere Verwendungen` und `Hilfsdaten`, sofern mindestens eines dieser Felder vorhanden ist. Sie verwendet dieselben Metadaten-Card-Styles.
+- Die frühere Card `Übrige Informationen` wird auf Datensatz- und Ausgabe-Detailseiten nicht mehr gerendert. `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab` gehören zur Subseite `Struktur, Qualität und Herkunft`.
 - Die tieferen Metadatenbereiche unterhalb dieser Cards sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
+
+Die Subseite `Struktur, Qualität und Herkunft` ist serverseitig gerendert und wird ueber die Aktionsspalte aufgerufen. Sie zeigt:
+
+- Titel `Struktur, Qualität und Herkunft` in derselben H1-Groesse und Farbe wie Detailseiten.
+- Attribute als plain table ohne Card. Wenn keine Attribute beschrieben sind, erscheint `Für dieses Datenthema sind keine Attribute beschrieben.`
+- Card `Qualität` mit Datenmodell-Link und Validierungsreport `ilivalidator.log`, falls ein Datenmodell vorhanden ist. Ohne Datenmodell erscheint `Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.`
+- Optionale Card `Herkunft & Verwendung` mit `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab`.
+- Cards unterhalb der Attributtabelle nutzen dieselbe Breite wie die Cards auf Detailseiten; die Attributtabelle bleibt full-width.
 
 ### 8.2 Detailseite für Datenreihen und Ausgaben
 
@@ -746,6 +754,15 @@ GET /series/{seriesIdentifier}/issues/current
 
 GET /series/{seriesIdentifier}/issues/{issueIdentifier}
   Detailseite einer spezifischen Ausgabe.
+
+GET /datasets/{identifier}/structure-quality-origin
+  Struktur, Qualität und Herkunft eines normalen Datensatzes.
+
+GET /series/{seriesIdentifier}/issues/current/structure-quality-origin
+  Struktur, Qualität und Herkunft der aktuellen Ausgabe einer Datenreihe.
+
+GET /series/{seriesIdentifier}/issues/{issueIdentifier}/structure-quality-origin
+  Struktur, Qualität und Herkunft einer spezifischen Ausgabe.
 ```
 
 Alternativ darf der Agent eine slugbasierte Variante verwenden, wenn die Identifiers stabil und URL-sicher normalisiert werden. Wichtig ist die fachliche Trennung von Datensatz und Datenreihen-Ausgabe.
@@ -761,6 +778,7 @@ public record DatasetDetailPageVm(
     String typeLabel,
     AccessStateVm accessState,
     boolean structureDescribed,
+    String structureQualityOriginHref,
     String modifiedLabel,
     String issuedLabel,
     List<DetailFeatureVm> features,
@@ -768,6 +786,7 @@ public record DatasetDetailPageVm(
     MetadataSectionVm overview,
     MetadataSectionVm temporalCoverage,
     MetadataSectionVm topics,
+    ContactMetadataSectionVm responsibilitiesContact,
     List<MetadataSectionVm> metadataSections
 ) {}
 
@@ -793,7 +812,7 @@ public record IssueDetailPageVm(
     String description,
     AccessStateVm accessState,
     boolean structureDescribed,
-    String structureQualityHref,
+    String structureQualityOriginHref,
     boolean currentIssue,
     String modifiedLabel,
     String issuedLabel,
@@ -803,8 +822,16 @@ public record IssueDetailPageVm(
     MetadataSectionVm temporalCoverage,
     MetadataSectionVm topics,
     ContactMetadataSectionVm responsibilitiesContact,
-    MetadataSectionVm otherInformation,
     RelatedIssuesVm relatedIssues
+) {}
+
+public record StructureQualityOriginPageVm(
+    PageChromeVm chrome,
+    String title,
+    List<AttributeRowVm> attributes,
+    String emptyAttributesText,
+    QualityVm quality,
+    Optional<MetadataSectionVm> originUsage
 ) {}
 
 public record RelatedIssuesVm(

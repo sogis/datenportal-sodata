@@ -52,21 +52,26 @@ class BreadcrumbFactoryTest {
     }
 
     @Test
-    void datasetStructureQualityBreadcrumbLinksBackToDataset() {
-        var breadcrumb = factory.datasetStructureQuality(dataset("dataset-1", "Bauinventar"));
+    void datasetStructureQualityOriginBreadcrumbLinksBackToDataset() {
+        var breadcrumb = factory.datasetStructureQualityOrigin(dataset("dataset-1", "Bauinventar"));
 
         assertThat(breadcrumb.items()).extracting("label")
-                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken", "Bauinventar", "Struktur & Qualität");
+                .containsExactly(
+                        "so.ch",
+                        "Datenportal",
+                        "Daten und Statistiken",
+                        "Bauinventar",
+                        "Struktur, Qualität und Herkunft");
         assertThat(breadcrumb.items().get(3).href()).contains("/datasets/dataset-1");
         assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
     }
 
     @Test
-    void issueStructureQualityBreadcrumbLinksBackToCurrentIssue() {
+    void issueStructureQualityOriginBreadcrumbLinksBackToCurrentIssue() {
         DatasetIssueEntry issue = issue("series-2026", "Ausgabe 2026");
         DatasetSeriesEntry series = series("series", "Datenreihe", issue);
 
-        var breadcrumb = factory.issueStructureQuality(series, issue);
+        var breadcrumb = factory.issueStructureQualityOrigin(series, issue);
 
         assertThat(breadcrumb.items()).extracting("label")
                 .containsExactly(
@@ -75,7 +80,7 @@ class BreadcrumbFactoryTest {
                         "Daten und Statistiken",
                         "Datenreihe",
                         "Ausgabe 2026",
-                        "Struktur & Qualität");
+                        "Struktur, Qualität und Herkunft");
         assertThat(breadcrumb.items().get(3).href()).contains("/series/series");
         assertThat(breadcrumb.items().get(4).href()).contains("/series/series/issues/current");
         assertThat(breadcrumb.items().getLast().currentPage()).isTrue();

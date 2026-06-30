@@ -36,8 +36,8 @@ public final class CatalogDetailController {
         });
     }
 
-    @GetMapping("/datasets/{identifier}/structure-quality")
-    public String datasetStructureQuality(@PathVariable("identifier") String identifier, Model model) {
+    @GetMapping("/datasets/{identifier}/structure-quality-origin")
+    public String datasetStructureQualityOrigin(@PathVariable("identifier") String identifier, Model model) {
         return catalogService.withSnapshot(snapshot -> {
             var entry = snapshot.findAnyEntry(identifier)
                     .orElseThrow(() -> notFound(identifier));
@@ -45,8 +45,8 @@ public final class CatalogDetailController {
                 throw notFound(identifier);
             }
 
-            model.addAttribute("page", detailPageVmFactory.datasetStructureQuality(dataset));
-            return "pages/structureQuality";
+            model.addAttribute("page", detailPageVmFactory.datasetStructureQualityOrigin(dataset));
+            return "pages/structureQualityOrigin";
         });
     }
 
@@ -68,12 +68,12 @@ public final class CatalogDetailController {
         });
     }
 
-    @GetMapping("/series/{seriesIdentifier}/issues/current/structure-quality")
-    public String currentIssueStructureQuality(@PathVariable("seriesIdentifier") String seriesIdentifier, Model model) {
+    @GetMapping("/series/{seriesIdentifier}/issues/current/structure-quality-origin")
+    public String currentIssueStructureQualityOrigin(@PathVariable("seriesIdentifier") String seriesIdentifier, Model model) {
         return catalogService.withSnapshot(snapshot -> {
             DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
-            model.addAttribute("page", detailPageVmFactory.issueStructureQuality(series, series.currentIssueOrThrow()));
-            return "pages/structureQuality";
+            model.addAttribute("page", detailPageVmFactory.issueStructureQualityOrigin(series, series.currentIssueOrThrow()));
+            return "pages/structureQualityOrigin";
         });
     }
 
@@ -94,8 +94,8 @@ public final class CatalogDetailController {
         });
     }
 
-    @GetMapping("/series/{seriesIdentifier}/issues/{issueIdentifier}/structure-quality")
-    public String issueStructureQuality(
+    @GetMapping("/series/{seriesIdentifier}/issues/{issueIdentifier}/structure-quality-origin")
+    public String issueStructureQualityOrigin(
             @PathVariable("seriesIdentifier") String seriesIdentifier,
             @PathVariable("issueIdentifier") String issueIdentifier,
             Model model) {
@@ -103,8 +103,8 @@ public final class CatalogDetailController {
             DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
             DatasetIssueEntry issue = findIssue(series, issueIdentifier);
 
-            model.addAttribute("page", detailPageVmFactory.issueStructureQuality(series, issue));
-            return "pages/structureQuality";
+            model.addAttribute("page", detailPageVmFactory.issueStructureQualityOrigin(series, issue));
+            return "pages/structureQualityOrigin";
         });
     }
 

@@ -76,12 +76,12 @@ class CatalogUrlFactoryTest {
     }
 
     @Test
-    void structureQualityUrlsUseEncodedDetailRoutes() {
-        assertThat(urlFactory.datasetStructureQuality("ch.so.bau inventar"))
-                .isEqualTo("/datasets/ch.so.bau%20inventar/structure-quality");
-        assertThat(urlFactory.currentIssueStructureQuality("ch.so.abstimmungs resultate"))
-                .isEqualTo("/series/ch.so.abstimmungs%20resultate/issues/current/structure-quality");
-        assertThat(urlFactory.issueStructureQuality("series", "issue 2025"))
-                .isEqualTo("/series/series/issues/issue%202025/structure-quality");
+    void structureQualityOriginUrlsUseEncodedDetailRoutes() {
+        assertThat(urlFactory.datasetStructureQualityOrigin("ch.so.bau inventar"))
+                .isEqualTo("/datasets/ch.so.bau%20inventar/structure-quality-origin");
+        assertThat(urlFactory.currentIssueStructureQualityOrigin("ch.so.abstimmungs resultate"))
+                .isEqualTo("/series/ch.so.abstimmungs%20resultate/issues/current/structure-quality-origin");
+        assertThat(urlFactory.issueStructureQualityOrigin("series", "issue 2025"))
+                .isEqualTo("/series/series/issues/issue%202025/structure-quality-origin");
     }
 }

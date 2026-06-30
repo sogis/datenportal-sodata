@@ -16,7 +16,6 @@ import ch.so.agi.datenportal.web.view.AttributeRowVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataItemVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataLineVm;
 import ch.so.agi.datenportal.web.view.ContactMetadataSectionVm;
-import ch.so.agi.datenportal.web.view.DataModelVm;
 import ch.so.agi.datenportal.web.view.DatasetDetailPageVm;
 import ch.so.agi.datenportal.web.view.DetailFeatureVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
@@ -24,12 +23,13 @@ import ch.so.agi.datenportal.web.view.DownloadSectionVm;
 import ch.so.agi.datenportal.web.view.IssueDetailPageVm;
 import ch.so.agi.datenportal.web.view.MetadataItemVm;
 import ch.so.agi.datenportal.web.view.MetadataSectionVm;
+import ch.so.agi.datenportal.web.view.QualityVm;
 import ch.so.agi.datenportal.web.view.RelatedIssueVm;
 import ch.so.agi.datenportal.web.view.RelatedIssuesVm;
 import ch.so.agi.datenportal.web.view.SeriesDetailPageVm;
 import ch.so.agi.datenportal.web.view.SeriesIssueVm;
 import ch.so.agi.datenportal.web.view.SeriesIssuesVm;
-import ch.so.agi.datenportal.web.view.StructureQualityPageVm;
+import ch.so.agi.datenportal.web.view.StructureQualityOriginPageVm;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -63,7 +63,7 @@ public final class DetailPageVmFactory {
                 dataset.type().label(),
                 accessState(dataset),
                 dataset.metadata().hasStructureInformation(),
-                urlFactory.datasetStructureQuality(dataset.identifier()),
+                urlFactory.datasetStructureQualityOrigin(dataset.identifier()),
                 formatDate(dataset.modified()),
                 formatDate(dataset.metadata().issued()).orElse(""),
                 detailFeatures(dataset),
@@ -76,7 +76,6 @@ public final class DetailPageVmFactory {
                 new MetadataSectionVm("temporal-coverage", "Zeitliche Abdeckung", temporalCoverageItems(dataset)),
                 new MetadataSectionVm("topics", "Themen und Schlagworte", datasetTopicItems(dataset)),
                 responsibilitiesContactSection(dataset),
-                new MetadataSectionVm("other-information", "Übrige Informationen", otherInformationItems(dataset)),
                 metadataSections(dataset, dataset.distributions(), accessState(dataset)));
     }
 
@@ -116,8 +115,8 @@ public final class DetailPageVmFactory {
                 issueAccessState,
                 issue.metadata().hasStructureInformation(),
                 currentIssue
-                        ? urlFactory.currentIssueStructureQuality(series.identifier())
-                        : urlFactory.issueStructureQuality(series.identifier(), issue.identifier()),
+                        ? urlFactory.currentIssueStructureQualityOrigin(series.identifier())
+                        : urlFactory.issueStructureQualityOrigin(series.identifier(), issue.identifier()),
                 currentIssue,
                 formatDate(issue.modified()),
                 formatDate(issue.metadata().issued()).orElse(""),
@@ -131,24 +130,27 @@ public final class DetailPageVmFactory {
                 new MetadataSectionVm("temporal-coverage", "Zeitliche Abdeckung", temporalCoverageItems(issue)),
                 new MetadataSectionVm("topics", "Themen und Schlagworte", datasetTopicItems(issue)),
                 responsibilitiesContactSection(issue),
-                new MetadataSectionVm("other-information", "Übrige Informationen", otherInformationItems(issue)),
                 relatedIssues(series, issue.identifier(), currentIdentifier));
     }
 
-    public StructureQualityPageVm datasetStructureQuality(DatasetEntry dataset) {
-        return new StructureQualityPageVm(
-                pageChromeFactory.datasetStructureQualityPage(dataset),
-                "Struktur & Qualität",
+    public StructureQualityOriginPageVm datasetStructureQualityOrigin(DatasetEntry dataset) {
+        return new StructureQualityOriginPageVm(
+                pageChromeFactory.datasetStructureQualityOriginPage(dataset),
+                "Struktur, Qualität und Herkunft",
                 attributeRows(dataset.metadata().attributes()),
-                dataModel(dataset.metadata()));
+                "Für dieses Datenthema sind keine Attribute beschrieben.",
+                quality(dataset.metadata()),
+                section("origin-usage", "Herkunft & Verwendung", originUsageItems(dataset)));
     }
 
-    public StructureQualityPageVm issueStructureQuality(DatasetSeriesEntry series, DatasetIssueEntry issue) {
-        return new StructureQualityPageVm(
-                pageChromeFactory.issueStructureQualityPage(series, issue),
-                "Struktur & Qualität",
+    public StructureQualityOriginPageVm issueStructureQualityOrigin(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        return new StructureQualityOriginPageVm(
+                pageChromeFactory.issueStructureQualityOriginPage(series, issue),
+                "Struktur, Qualität und Herkunft",
                 attributeRows(issue.metadata().attributes()),
-                dataModel(issue.metadata()));
+                "Für dieses Datenthema sind keine Attribute beschrieben.",
+                quality(issue.metadata()),
+                section("origin-usage", "Herkunft & Verwendung", originUsageItems(issue)));
     }
 
     private SeriesIssuesVm seriesIssues(DatasetSeriesEntry series) {
@@ -200,9 +202,15 @@ public final class DetailPageVmFactory {
                 .toList();
     }
 
-    private static Optional<DataModelVm> dataModel(CatalogEntryMetadata metadata) {
+    private static QualityVm quality(CatalogEntryMetadata metadata) {
         return metadata.model()
-                .map(model -> new DataModelVm(model, "#", "ilivalidator.log", "#"));
+                .map(model -> new QualityVm(Optional.of(model), "#", "ilivalidator.log", "#", Optional.empty()))
+                .orElseGet(() -> new QualityVm(
+                        Optional.empty(),
+                        "#",
+                        "ilivalidator.log",
+                        "#",
+                        Optional.of("Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.")));
     }
 
     private static Comparator<DatasetIssueEntry> seriesIssueOrder(String currentIdentifier) {
@@ -342,17 +350,24 @@ public final class DetailPageVmFactory {
         return items;
     }
 
-    private List<MetadataItemVm> otherInformationItems(CatalogEntry entry) {
+    private List<MetadataItemVm> originUsageItems(CatalogEntry entry) {
         List<MetadataItemVm> items = new ArrayList<>();
         entry.metadata().surveyMethod()
                 .ifPresent(value -> items.add(item("Erhebungs- / Messmethode", value)));
-        entry.metadata().dataAvailableFrom()
-                .ifPresent(value -> items.add(item("Verfügbare Daten ab", value)));
-        entry.metadata().furtherUses()
-                .ifPresent(value -> items.add(item("Weitere Verwendungen", value)));
         entry.metadata().auxiliaryData()
                 .ifPresent(value -> items.add(item("Hilfsdaten", value)));
+        entry.metadata().furtherUses()
+                .ifPresent(value -> items.add(item("Weitere Verwendungen", value)));
+        entry.metadata().dataAvailableFrom()
+                .ifPresent(value -> items.add(item("Verfügbare Daten ab", value)));
         return items;
+    }
+
+    private static Optional<MetadataSectionVm> section(String id, String title, List<MetadataItemVm> items) {
+        if (items.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(new MetadataSectionVm(id, title, items));
     }
 
     private ContactMetadataSectionVm responsibilitiesContactSection(CatalogEntry entry) {

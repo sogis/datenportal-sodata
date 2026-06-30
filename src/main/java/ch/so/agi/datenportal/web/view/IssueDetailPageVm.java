@@ -11,7 +11,7 @@ public record IssueDetailPageVm(
         String description,
         AccessStateVm accessState,
         boolean structureDescribed,
-        String structureQualityHref,
+        String structureQualityOriginHref,
         boolean currentIssue,
         String modifiedLabel,
         String issuedLabel,
@@ -21,7 +21,6 @@ public record IssueDetailPageVm(
         MetadataSectionVm temporalCoverage,
         MetadataSectionVm topics,
         ContactMetadataSectionVm responsibilitiesContact,
-        MetadataSectionVm otherInformation,
         RelatedIssuesVm relatedIssues) {
 
     public IssueDetailPageVm {

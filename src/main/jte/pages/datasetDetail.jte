@@ -25,14 +25,11 @@
             @template.components.metadataSection(section = page.topics())
           @endif
           @template.components.contactMetadataSection(section = page.responsibilitiesContact())
-          @if(!page.otherInformation().items().isEmpty())
-            @template.components.metadataSection(section = page.otherInformation())
-          @endif
         </div>
         <aside class="dp-detail-side" aria-label="Aktionen">
           @template.components.detailActionPanel(
-            structureQualityHref = page.structureQualityHref(),
-            structureQualityLabel = "Struktur & Qualität"
+            structureQualityOriginHref = page.structureQualityOriginHref(),
+            structureQualityOriginLabel = "Struktur, Qualität und Herkunft"
           )
         </aside>
       </div>
