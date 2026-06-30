@@ -697,13 +697,13 @@ Pflichtbereiche:
 
 Temporäre Umsetzungsnotiz:
 
-- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, den ersten drei Metadatenkarten (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und einer rechten vertikalen Aktionsspalte (`Struktur, Qualität und Herkunft`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
+- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, den ersten drei Metadatenkarten (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und einem rechten vertikalen Seitenpanel `Daten nutzen` (`Struktur, Qualität und Herkunft`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
 - Die Datenmerkmale `Open Data`, `Attribute beschrieben` und `Daten validiert` verwenden Feature-Status-Icons: verfuegbare Merkmale nutzen `var(--dp-color-status-ok-circle)`, nicht verfuegbare Merkmale nutzen `var(--dp-color-status-negative-circle)`. Diese Icons sind keine Status-Badges; Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` duerfen nicht als Icon-Farbe verwendet werden.
 - Zusätzlich zeigt die normale Datensatz-Detailseite die Card `Zuständigkeiten und Kontakt` direkt nach `Themen und Schlagworte`. Sie verwendet dieselben Metadaten-Card-Styles und enthält `Datenproduzent`, `Kontakt` und `Herausgeber`.
 - Die frühere Card `Übrige Informationen` wird auf Datensatz- und Ausgabe-Detailseiten nicht mehr gerendert. `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab` gehören zur Subseite `Struktur, Qualität und Herkunft`.
 - Die tieferen Metadatenbereiche unterhalb dieser Cards sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
 
-Die Subseite `Struktur, Qualität und Herkunft` ist serverseitig gerendert und wird ueber die Aktionsspalte aufgerufen. Sie zeigt:
+Die Subseite `Struktur, Qualität und Herkunft` ist serverseitig gerendert und wird ueber das Seitenpanel `Daten nutzen` aufgerufen. Sie zeigt:
 
 - Titel `Struktur, Qualität und Herkunft` in derselben H1-Groesse und Farbe wie Detailseiten.
 - Attribute als plain table ohne Card. Wenn keine Attribute beschrieben sind, erscheint `Für dieses Datenthema sind keine Attribute beschrieben.`
@@ -734,7 +734,7 @@ Die Detailseite einer Ausgabe zeigt den Serienkontext nur im oberen Kicker und �
 - Datenmerkmale-/Download-Zeile der konkreten Ausgabe
 - Metadaten-Cards analog zur normalen Datensatz-Detailseite
 - Card `Weitere Ausgaben` als schlanke Linkliste ohne Downloads; die verlinkten Ausgabentitel sind rote Textlinks analog zu Metadatenlinks wie `Lizenz`
-- rechte Aktionsspalte analog zur normalen Datensatz-Detailseite
+- rechtes Seitenpanel `Daten nutzen` analog zur normalen Datensatz-Detailseite
 
 Auch auf Ausgaben-Detailseiten gilt fuer die Datenmerkmale: verfuegbare Feature-Icons verwenden `var(--dp-color-status-ok-circle)`, nicht verfuegbare Feature-Icons verwenden `var(--dp-color-status-negative-circle)`. Badge-Background-Tokens bleiben Status-Badges vorbehalten und duerfen nicht fuer diese Circle-Icon-Farben eingesetzt werden.
 
@@ -1076,7 +1076,7 @@ Pflichttests:
 - Aufgeklappte Datenreihe rendert Ausgabezeilen ebenfalls ohne Zusatz `aktuelle Ausgabe`.
 - Kartenansicht rendert `dp-type-badge`, bei offenen Eintraegen `Open Data`, bei nicht offenen Eintraegen den Zugriffstext und `Struktur beschrieben` dort, wo fachlich zutreffend.
 - Detailseite enthält keine Datenvorschau.
-- Detailseite einer Serienausgabe zeigt Serien-Kicker, aktuelles-Ausgabe-Badge im Titel, Dataset-Detail-Cards, `Weitere Ausgaben` und Aktionsspalte.
+- Detailseite einer Serienausgabe zeigt Serien-Kicker, aktuelles-Ausgabe-Badge im Titel, Dataset-Detail-Cards, `Weitere Ausgaben` und das Seitenpanel `Daten nutzen`.
 
 ### 11.2 Accessibility Smoke Checks
 

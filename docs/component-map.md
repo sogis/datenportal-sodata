@@ -50,14 +50,14 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 |---|---|---|---|
 | Datensatzdetail | `pages/datasetDetail.jte` | `DatasetDetailPageVm` | keine Datenvorschau |
 | Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | vereinfachte Serienübersicht mit Ausgabenliste |
-| Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Serien-Kicker, aktuelles-Ausgabe-Badge, Dataset-Detail-Cards und Aktionsspalte |
+| Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Serien-Kicker, aktuelles-Ausgabe-Badge, Dataset-Detail-Cards und Seitenpanel `Daten nutzen` |
 | Struktur, Qualität und Herkunft | `pages/structureQualityOrigin.jte`, `components/attributeTable.jte`, `components/qualityCard.jte`, `components/metadataSection.jte` | `StructureQualityOriginPageVm`, `AttributeRowVm`, `QualityVm`, `MetadataSectionVm` | Datensatz- und Ausgabe-Routen, Attribute als Tabelle, Qualitäts-Card sowie `Herkunft & Verwendung` optional |
 | Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `DownloadSectionVm` | Datenmerkmale plus Downloads, mobile gestapelt |
 | Datensatz-Übersicht | `components/metadataSection.jte` | `DatasetDetailPageVm.overview` | erste Metadatenkarte unterhalb Datenmerkmale/Downloads |
 | Datensatz-Zeitliche Abdeckung | `components/metadataSection.jte` | `DatasetDetailPageVm.temporalCoverage` | Stichtag oder Zeitraum |
 | Datensatz-Themen und Schlagworte | `components/metadataSection.jte` | `DatasetDetailPageVm.topics` | Themen und Schlagworte komma-separiert |
 | Datensatz-Zuständigkeiten und Kontakt | `components/contactMetadataSection.jte` | `DatasetDetailPageVm.responsibilitiesContact` | Datenproduzent, Kontakt und Herausgeber mehrzeilig mit Links |
-| Datensatz-Aktionsspalte | `components/detailActionPanel.jte` | `DatasetDetailPageVm.structureQualityOriginHref`, `IssueDetailPageVm.structureQualityOriginHref` | vertikale Aktionshinweise mit sekundären Textlinks |
+| Datensatz-Seitenpanel `Daten nutzen` | `components/detailActionPanel.jte` | `DatasetDetailPageVm.structureQualityOriginHref`, `IssueDetailPageVm.structureQualityOriginHref` | vertikale Nutzungshinweise mit sekundären Textlinks |
 | Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet oder Schloss fuer nicht offene Eintraege |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
 | Serien-Ausgabenliste | `components/seriesIssues.jte` | `SeriesIssuesVm` | aktuelle/ältere Ausgaben auf der Serienübersicht |

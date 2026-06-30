@@ -26,7 +26,7 @@
           @endif
           @template.components.contactMetadataSection(section = page.responsibilitiesContact())
         </div>
-        <aside class="dp-detail-side" aria-label="Aktionen">
+        <aside class="dp-detail-side" aria-label="Daten nutzen">
           @template.components.detailActionPanel(
             structureQualityOriginHref = page.structureQualityOriginHref(),
             structureQualityOriginLabel = "Struktur, Qualität und Herkunft"

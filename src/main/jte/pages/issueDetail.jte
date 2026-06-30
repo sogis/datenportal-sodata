@@ -31,7 +31,7 @@
           @template.components.contactMetadataSection(section = page.responsibilitiesContact())
           @template.components.relatedIssuesCard(relatedIssues = page.relatedIssues())
         </div>
-        <aside class="dp-detail-side" aria-label="Aktionen">
+        <aside class="dp-detail-side" aria-label="Daten nutzen">
           @template.components.detailActionPanel(
             structureQualityOriginHref = page.structureQualityOriginHref(),
             structureQualityOriginLabel = "Struktur, Qualität und Herkunft"

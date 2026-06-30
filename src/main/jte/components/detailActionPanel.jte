@@ -1,7 +1,7 @@
 @param String structureQualityOriginHref
 @param String structureQualityOriginLabel
 <section class="dp-detail-panel dp-detail-actions" aria-labelledby="detail-actions-title">
-  <h2 id="detail-actions-title">Aktionen</h2>
+  <h2 id="detail-actions-title">Daten nutzen</h2>
   <div class="dp-detail-action-list">
     <article class="dp-detail-action-item">
       <div class="dp-detail-action-item__icon" aria-hidden="true">
@@ -12,9 +12,9 @@
       </div>
       <div class="dp-detail-action-item__content">
         <h3>${structureQualityOriginLabel}</h3>
-        <p>Attribute, Qualität, Herkunft und Verwendung anzeigen.</p>
-        <a class="dp-detail-action-link" href="${structureQualityOriginHref}" aria-label="Details ansehen: Struktur, Qualität und Herkunft">
-          Details ansehen <span aria-hidden="true">&rarr;</span>
+        <p>Attribute, Datenmodell, Validierung und Qualitätshinweise einsehen.</p>
+        <a class="dp-detail-action-link" href="${structureQualityOriginHref}" aria-label="Struktur, Qualität und Herkunft anzeigen">
+          Struktur, Qualität und Herkunft anzeigen <span aria-hidden="true">&rarr;</span>
         </a>
       </div>
     </article>
@@ -26,7 +26,7 @@
       </div>
       <div class="dp-detail-action-item__content">
         <h3>Erkunden</h3>
-        <p>Daten fachlich einordnen und Inhalte verstehen.</p>
+        <p>Datenvorschau öffnen und Inhalte fachlich einordnen.</p>
         <a class="dp-detail-action-link" href="#" aria-label="Datenvorschau anzeigen: Daten erkunden">
           Datenvorschau anzeigen <span aria-hidden="true">&rarr;</span>
         </a>
@@ -40,7 +40,7 @@
       </div>
       <div class="dp-detail-action-item__content">
         <h3>Verwenden</h3>
-        <p>Downloads und Formate nutzen.</p>
+        <p>Downloads, Formate und Codebeispiele anzeigen.</p>
         <a class="dp-detail-action-link" href="#" aria-label="Downloads anzeigen: Daten verwenden">
           Downloads anzeigen <span aria-hidden="true">&rarr;</span>
         </a>
