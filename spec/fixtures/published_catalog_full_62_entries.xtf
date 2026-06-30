@@ -301,6 +301,12 @@
             <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
             <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
             <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>36176</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.wasserqualitaet_grundwasser/distribution/csv</distributionUri>
@@ -447,6 +453,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_Geobasisdaten_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T02:28:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.bauinventar/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>26349</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.bauinventar/distribution/csv</distributionUri>
@@ -599,6 +619,20 @@
             <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
             <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
             <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T05:13:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.2581.baumkataster/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>12373</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.2581.baumkataster/distribution/csv</distributionUri>
@@ -744,6 +778,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_Geobasisdaten_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T01:52:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.denkmalgeschuetzte_objekte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>33769</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.denkmalgeschuetzte_objekte/distribution/csv</distributionUri>
@@ -896,6 +944,20 @@
             <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
             <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
             <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-27T01:54:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.polizei.einsatzlagen.laufend/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>33628</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.polizei.einsatzlagen.laufend/distribution/csv</distributionUri>
@@ -1043,6 +1105,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-27T05:46:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.einwohnergemeinden_adressen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>29567</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.einwohnergemeinden_adressen/distribution/csv</distributionUri>
@@ -1194,6 +1270,20 @@
             <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
             <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
             <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T03:16:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.gewaessernetz/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>6805</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.gewaessernetz/distribution/csv</distributionUri>
@@ -1341,6 +1431,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoLuftqualitaetTageswerte_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T01:42:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.luftqualitaet_tageswerte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>65282</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.luftqualitaet_tageswerte/distribution/csv</distributionUri>
@@ -1500,6 +1604,20 @@
             <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
             <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
             <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T05:56:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.laermbelastung_strassenverkehr/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>65043</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.laermbelastung_strassenverkehr/distribution/csv</distributionUri>
@@ -1646,6 +1764,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_Geobasisdaten_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T01:06:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.naturschutzobjekte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>46898</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.naturschutzobjekte/distribution/csv</distributionUri>
@@ -1796,6 +1928,20 @@
             <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
             <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
             <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T04:40:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.notfalltreffpunkte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>65</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.notfalltreffpunkte/distribution/csv</distributionUri>
@@ -1951,6 +2097,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T03:23:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.admin.bfs.pendlerstatistik.gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>6813</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.admin.bfs.pendlerstatistik.gemeinden/distribution/csv</distributionUri>
@@ -2101,6 +2261,20 @@
             <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
             <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
             <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T03:16:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.schulstandorte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>26656</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.schulstandorte/distribution/csv</distributionUri>
@@ -2247,6 +2421,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_Geobasisdaten_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T01:12:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.schutzgebiete/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>3808</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.schutzgebiete/distribution/csv</distributionUri>
@@ -2397,6 +2585,20 @@
             <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
             <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
             <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-27T05:22:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.sirenenstandorte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>112</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.sirenenstandorte/distribution/csv</distributionUri>
@@ -2544,6 +2746,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AEE_Energieanlagen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T03:07:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.solaranlagen_register/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>12137</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.solaranlagen_register/distribution/csv</distributionUri>
@@ -2698,6 +2914,20 @@
             <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
             <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
             <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T03:52:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.sozialdienste.faelle.detail/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>24672</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.sozialdienste.faelle.detail/distribution/csv</distributionUri>
@@ -2844,6 +3074,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoSpitalstandorte_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T05:49:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.spitalstandorte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>30720</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.spitalstandorte/distribution/csv</distributionUri>
@@ -2994,6 +3238,20 @@
             <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
             <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
             <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T02:19:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.unternehmensregister/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>17142</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.unternehmensregister/distribution/csv</distributionUri>
@@ -3147,6 +3405,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T03:17:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.velorouten/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>72395</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.velorouten/distribution/csv</distributionUri>
@@ -3305,6 +3577,20 @@
             <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
             <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
             <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T02:05:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.verkehrszaehlstellen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>189</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.verkehrszaehlstellen/distribution/csv</distributionUri>
@@ -3445,6 +3731,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoVerwaltungseinheiten_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T02:16:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.verwaltungseinheiten/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>57733</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.verwaltungseinheiten/distribution/csv</distributionUri>
@@ -3595,6 +3895,20 @@
             <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
             <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
             <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T03:09:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.waldflaechen_bestandeskarte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>50684</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.waldflaechen_bestandeskarte/distribution/csv</distributionUri>
@@ -3735,6 +4049,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoWetterstationenTageswerte_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-27T04:19:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.wetterstationen_tageswerte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>124</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.wetterstationen_tageswerte/distribution/csv</distributionUri>
@@ -3885,6 +4213,20 @@
             <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
             <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
             <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T01:28:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.oeffentliche_abfallstellen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>72355</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.oeffentliche_abfallstellen/distribution/csv</distributionUri>
@@ -4038,6 +4380,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AEE_Energieanlagen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T04:55:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.oeffentliche_ladestationen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>41908</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.oeffentliche_ladestationen/distribution/csv</distributionUri>
@@ -4196,6 +4552,20 @@
             <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
             <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
             <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T05:34:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.oev_haltestellen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>1159</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <distributions>
               <Distribution>
                 <distributionUri>https://data.so.ch/dataset/ch.so.oev_haltestellen/distribution/csv</distributionUri>
@@ -4289,6 +4659,12 @@
                 <base:endDate>2025-12-31</base:endDate>
               </base:TemporalCoverage>
             </temporalCoverage>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>14787</objectCount>
+                <attributeCount>0</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025</resourceUri>
@@ -4408,6 +4784,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T04:10:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.bevoelkerung.altersstruktur_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>5101</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025/distribution/csv</distributionUri>
@@ -4565,6 +4955,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_Gemeindegrenzen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T05:08:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.gemeindegrenzen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>214</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2025</resourceUri>
@@ -4697,6 +5101,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T02:09:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.gemeindegrenzen_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2025/distribution/csv</distributionUri>
@@ -4852,6 +5270,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_Gemeindegrenzen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T02:57:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.gemeindegrenzen_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindegrenzen_2026/distribution/csv</distributionUri>
@@ -5008,6 +5440,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AFIN_Bevoelkerung_Statistik_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T01:13:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>14032</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025</resourceUri>
@@ -5138,6 +5584,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T01:46:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>2902</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.wohnbevoelkerung.gemeinde_altersgruppen_geschlecht_2025/distribution/csv</distributionUri>
@@ -5285,6 +5745,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T01:35:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.abstimmungsresultate/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>1850</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.abstimmungsresultate_2023</resourceUri>
@@ -5401,6 +5875,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T01:48:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.abstimmungsresultate_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>497</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.abstimmungsresultate_2023/distribution/csv</distributionUri>
@@ -5550,6 +6038,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T04:29:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.abstimmungsresultate_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>503</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.abstimmungsresultate_2024/distribution/csv</distributionUri>
@@ -5695,6 +6197,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T01:20:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.abstimmungsresultate_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>488</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.abstimmungsresultate_2025/distribution/csv</distributionUri>
@@ -5844,6 +6360,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T02:11:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.abstimmungsresultate_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>474</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.abstimmungsresultate_2026/distribution/csv</distributionUri>
@@ -5988,6 +6518,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoArbeitslosenquote_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T01:54:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.arbeitslosenquote/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>66255</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.arbeitslosenquote_2023</resourceUri>
@@ -6103,6 +6647,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoArbeitslosenquote2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T02:17:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.arbeitslosenquote_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>31889</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.arbeitslosenquote_2023/distribution/csv</distributionUri>
@@ -6250,6 +6808,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T05:15:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.arbeitslosenquote_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>19612</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.arbeitslosenquote_2024/distribution/csv</distributionUri>
@@ -6393,6 +6965,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoArbeitslosenquote2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T04:06:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.arbeitslosenquote_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>12250</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.arbeitslosenquote_2025/distribution/csv</distributionUri>
@@ -6539,6 +7125,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T02:38:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.arbeitslosenquote_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>38703</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.arbeitslosenquote_2026/distribution/csv</distributionUri>
@@ -6699,6 +7299,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AFU_Wasserqualitaet_Monitoring_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T02:47:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.badegewaesser_qualitaet/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>162</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.badegewaesser_qualitaet_2023</resourceUri>
@@ -6829,6 +7443,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AFU_Wasserqualitaet_Monitoring_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T03:51:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.badegewaesser_qualitaet_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>45</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.badegewaesser_qualitaet_2023/distribution/csv</distributionUri>
@@ -6991,6 +7619,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T01:14:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.badegewaesser_qualitaet_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>40</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.badegewaesser_qualitaet_2024/distribution/csv</distributionUri>
@@ -7148,6 +7790,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AFU_Wasserqualitaet_Monitoring_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:35:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.badegewaesser_qualitaet_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>48</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.badegewaesser_qualitaet_2025/distribution/csv</distributionUri>
@@ -7310,6 +7966,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T04:35:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.badegewaesser_qualitaet_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>39</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.badegewaesser_qualitaet_2026/distribution/csv</distributionUri>
@@ -7455,6 +8125,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoBaubewilligungenGemeinden_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T05:36:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.baubewilligungen_gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>428</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.baubewilligungen_gemeinden_2023</resourceUri>
@@ -7570,6 +8254,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoBaubewilligungenGemeinden2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T01:52:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.baubewilligungen_gemeinden_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baubewilligungen_gemeinden_2023/distribution/csv</distributionUri>
@@ -7716,6 +8414,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T05:33:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.baubewilligungen_gemeinden_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baubewilligungen_gemeinden_2024/distribution/csv</distributionUri>
@@ -7859,6 +8571,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoBaubewilligungenGemeinden2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T04:46:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.baubewilligungen_gemeinden_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baubewilligungen_gemeinden_2025/distribution/csv</distributionUri>
@@ -8006,6 +8732,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T04:27:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.baubewilligungen_gemeinden_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baubewilligungen_gemeinden_2026/distribution/csv</distributionUri>
@@ -8166,6 +8906,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T03:03:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.baustellen.koordinationsplanung/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>32231</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.baustellen.koordinationsplanung_2024</resourceUri>
@@ -8295,6 +9049,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T01:23:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.baustellen.koordinationsplanung_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>17055</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baustellen.koordinationsplanung_2024/distribution/csv</distributionUri>
@@ -8457,6 +9225,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:12:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.baustellen.koordinationsplanung_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>31003</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baustellen.koordinationsplanung_2025/distribution/csv</distributionUri>
@@ -8615,6 +9397,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T01:57:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.baustellen.koordinationsplanung_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>32410</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.baustellen.koordinationsplanung_2026/distribution/csv</distributionUri>
@@ -8766,6 +9562,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoBeschaeftigteBranche_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-27T02:14:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.beschaeftigte_branche/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>64786</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.beschaeftigte_branche_2023</resourceUri>
@@ -8890,6 +9700,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T02:22:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.beschaeftigte_branche_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>41597</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.beschaeftigte_branche_2023/distribution/csv</distributionUri>
@@ -9039,6 +9863,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoBeschaeftigteBranche2024_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T02:39:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.beschaeftigte_branche_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>26081</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.beschaeftigte_branche_2024/distribution/csv</distributionUri>
@@ -9192,6 +10030,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T01:26:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.beschaeftigte_branche_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>39227</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.beschaeftigte_branche_2025/distribution/csv</distributionUri>
@@ -9337,6 +10189,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoBibliothekenKennzahlen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T04:15:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.bibliotheken_kennzahlen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>21178</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.bibliotheken_kennzahlen_2023</resourceUri>
@@ -9451,6 +10317,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoBibliothekenKennzahlen2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T04:52:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.bibliotheken_kennzahlen_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>30588</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.bibliotheken_kennzahlen_2023/distribution/csv</distributionUri>
@@ -9598,6 +10478,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T03:37:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.bibliotheken_kennzahlen_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>8465</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.bibliotheken_kennzahlen_2024/distribution/csv</distributionUri>
@@ -9741,6 +10635,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoBibliothekenKennzahlen2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T03:32:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.bibliotheken_kennzahlen_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>10938</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.bibliotheken_kennzahlen_2025/distribution/csv</distributionUri>
@@ -9887,6 +10795,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AEE_Energieanlagen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T01:50:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.energieverbrauch_gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>60036</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.energieverbrauch_gemeinden_2023</resourceUri>
@@ -10006,6 +10928,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T04:09:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.energieverbrauch_gemeinden_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>4374</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.energieverbrauch_gemeinden_2023/distribution/csv</distributionUri>
@@ -10150,6 +11086,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AEE_Energieanlagen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:22:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.energieverbrauch_gemeinden_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>5594</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.energieverbrauch_gemeinden_2024/distribution/csv</distributionUri>
@@ -10298,6 +11248,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T01:39:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.energieverbrauch_gemeinden_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>42183</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.energieverbrauch_gemeinden_2025/distribution/csv</distributionUri>
@@ -10442,6 +11406,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AEE_Energieanlagen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T01:50:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.energieverbrauch_gemeinden_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>34146</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.energieverbrauch_gemeinden_2026/distribution/csv</distributionUri>
@@ -10592,6 +11570,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoGebaeudesanierungenFoerderprogramm_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T02:17:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.gebaeudesanierungen_foerderprogramm/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>55187</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.gebaeudesanierungen_foerderprogramm_2023</resourceUri>
@@ -10717,6 +11709,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T02:59:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.gebaeudesanierungen_foerderprogramm_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>29812</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gebaeudesanierungen_foerderprogramm_2023/distribution/csv</distributionUri>
@@ -10866,6 +11872,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoGebaeudesanierungenFoerderprogramm2024_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T04:06:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.gebaeudesanierungen_foerderprogramm_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>12715</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gebaeudesanierungen_foerderprogramm_2024/distribution/csv</distributionUri>
@@ -11019,6 +12039,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T01:58:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.gebaeudesanierungen_foerderprogramm_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>37576</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gebaeudesanierungen_foerderprogramm_2025/distribution/csv</distributionUri>
@@ -11156,6 +12190,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AFIN_Finanzen_Gemeindestatistik_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T05:02:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.gemeindefinanzen_kennzahlen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>428</objectCount>
+                <attributeCount>5</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.gemeindefinanzen_kennzahlen_2023</resourceUri>
@@ -11264,6 +12312,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AFIN_Finanzen_Gemeindestatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T03:17:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.gemeindefinanzen_kennzahlen_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindefinanzen_kennzahlen_2023/distribution/csv</distributionUri>
@@ -11404,6 +12466,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T04:04:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.gemeindefinanzen_kennzahlen_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindefinanzen_kennzahlen_2024/distribution/csv</distributionUri>
@@ -11540,6 +12616,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AFIN_Finanzen_Gemeindestatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T03:23:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.gemeindefinanzen_kennzahlen_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.gemeindefinanzen_kennzahlen_2025/distribution/csv</distributionUri>
@@ -11690,6 +12780,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoGrundstueckspreiseGemeinden_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T04:40:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.grundstueckspreise_gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>39808</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.grundstueckspreise_gemeinden_2023</resourceUri>
@@ -11815,6 +12919,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T02:34:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.grundstueckspreise_gemeinden_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>17855</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.grundstueckspreise_gemeinden_2023/distribution/csv</distributionUri>
@@ -11964,6 +13082,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoGrundstueckspreiseGemeinden2024_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T04:49:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.grundstueckspreise_gemeinden_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>24373</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.grundstueckspreise_gemeinden_2024/distribution/csv</distributionUri>
@@ -12117,6 +13249,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T02:23:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.grundstueckspreise_gemeinden_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>20605</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.grundstueckspreise_gemeinden_2025/distribution/csv</distributionUri>
@@ -12261,6 +13407,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoHundebestandGemeinden_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T01:08:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.hundebestand_gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>59144</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.hundebestand_gemeinden_2023</resourceUri>
@@ -12376,6 +13536,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoHundebestandGemeinden2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T04:44:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.hundebestand_gemeinden_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>43965</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.hundebestand_gemeinden_2023/distribution/csv</distributionUri>
@@ -12523,6 +13697,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:09:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.hundebestand_gemeinden_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>34551</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.hundebestand_gemeinden_2024/distribution/csv</distributionUri>
@@ -12666,6 +13854,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoHundebestandGemeinden2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T04:17:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.hundebestand_gemeinden_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>43075</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.hundebestand_gemeinden_2025/distribution/csv</distributionUri>
@@ -12817,6 +14019,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_Geobasisdaten_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-27T05:22:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.admin.swisstopo.hoehenmodell.kacheln/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>5062</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.admin.swisstopo.hoehenmodell.kacheln_2024</resourceUri>
@@ -12943,6 +14159,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T04:43:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.admin.swisstopo.hoehenmodell.kacheln_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>1483</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.admin.swisstopo.hoehenmodell.kacheln_2024/distribution/csv</distributionUri>
@@ -13093,6 +14323,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_Geobasisdaten_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T02:27:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.admin.swisstopo.hoehenmodell.kacheln_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>1265</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.admin.swisstopo.hoehenmodell.kacheln_2025/distribution/csv</distributionUri>
@@ -13247,6 +14491,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T01:54:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.admin.swisstopo.hoehenmodell.kacheln_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>1619</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.admin.swisstopo.hoehenmodell.kacheln_2026/distribution/csv</distributionUri>
@@ -13398,6 +14656,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoStaatsarchivDigitalisateIntern_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T01:30:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.staatsarchiv.digitalisate.intern/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>19325</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.staatsarchiv.digitalisate.intern_2025</resourceUri>
@@ -13520,6 +14792,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoStaatsarchivDigitalisateIntern2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T02:14:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.staatsarchiv.digitalisate.intern_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>27197</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.staatsarchiv.digitalisate.intern_2025/distribution/csv</distributionUri>
@@ -13674,6 +14960,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:27:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.staatsarchiv.digitalisate.intern_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>19113</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.staatsarchiv.digitalisate.intern_2026/distribution/csv</distributionUri>
@@ -13821,6 +15121,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T03:27:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.kantonsratswahlen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>68080</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.kantonsratswahlen_2017</resourceUri>
@@ -13937,6 +15251,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T04:19:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.kantonsratswahlen_2017/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>40755</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.kantonsratswahlen_2017/distribution/csv</distributionUri>
@@ -14086,6 +15414,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:08:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.kantonsratswahlen_2021/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>3812</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.kantonsratswahlen_2021/distribution/csv</distributionUri>
@@ -14231,6 +15573,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T03:01:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.kantonsratswahlen_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>43074</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.kantonsratswahlen_2025/distribution/csv</distributionUri>
@@ -14376,6 +15732,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_DDI_Bildung_Standorte_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T04:53:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.klassengroessen_volksschule/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>78804</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.klassengroessen_volksschule_2023</resourceUri>
@@ -14494,6 +15864,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T02:51:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.klassengroessen_volksschule_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>27622</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.klassengroessen_volksschule_2023/distribution/csv</distributionUri>
@@ -14637,6 +16021,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_DDI_Bildung_Standorte_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:01:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.klassengroessen_volksschule_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>34681</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.klassengroessen_volksschule_2024/distribution/csv</distributionUri>
@@ -14784,6 +16182,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T04:23:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.klassengroessen_volksschule_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>11688</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.klassengroessen_volksschule_2025/distribution/csv</distributionUri>
@@ -14935,6 +16347,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoLandwirtschaftNutzflaechen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T04:42:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.landwirtschaft_nutzflaechen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>17968</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.landwirtschaft_nutzflaechen_2023</resourceUri>
@@ -15055,6 +16481,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoLandwirtschaftNutzflaechen2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T02:53:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.landwirtschaft_nutzflaechen_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>36741</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.landwirtschaft_nutzflaechen_2023/distribution/csv</distributionUri>
@@ -15208,6 +16648,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T01:34:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.landwirtschaft_nutzflaechen_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>1386</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.landwirtschaft_nutzflaechen_2024/distribution/csv</distributionUri>
@@ -15357,6 +16811,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoLandwirtschaftNutzflaechen2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T01:09:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.landwirtschaft_nutzflaechen_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>40912</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.landwirtschaft_nutzflaechen_2025/distribution/csv</distributionUri>
@@ -15502,6 +16970,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoLeerwohnungsziffer_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T03:01:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.leerwohnungsziffer/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>71785</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.leerwohnungsziffer_2023</resourceUri>
@@ -15620,6 +17102,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T02:08:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.leerwohnungsziffer_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>14064</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.leerwohnungsziffer_2023/distribution/csv</distributionUri>
@@ -15763,6 +17259,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoLeerwohnungsziffer2024_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T04:41:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.leerwohnungsziffer_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>23280</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.leerwohnungsziffer_2024/distribution/csv</distributionUri>
@@ -15910,6 +17420,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T03:10:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.leerwohnungsziffer_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>2274</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.leerwohnungsziffer_2025/distribution/csv</distributionUri>
@@ -16053,6 +17577,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoLeerwohnungsziffer2026_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T01:50:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.leerwohnungsziffer_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>25601</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.leerwohnungsziffer_2026/distribution/csv</distributionUri>
@@ -16203,6 +17741,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoLehrbetriebsstatistik_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T03:06:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.lehrbetriebsstatistik/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>24360</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.lehrbetriebsstatistik_2023</resourceUri>
@@ -16328,6 +17880,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:47:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.lehrbetriebsstatistik_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>19519</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.lehrbetriebsstatistik_2023/distribution/csv</distributionUri>
@@ -16477,6 +18043,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoLehrbetriebsstatistik2024_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T01:23:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.lehrbetriebsstatistik_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>14891</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.lehrbetriebsstatistik_2024/distribution/csv</distributionUri>
@@ -16630,6 +18210,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T02:09:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.lehrbetriebsstatistik_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>38748</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.lehrbetriebsstatistik_2025/distribution/csv</distributionUri>
@@ -16780,6 +18374,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoMietpreisindex_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T02:08:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.mietpreisindex/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>77072</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.mietpreisindex_2023</resourceUri>
@@ -16901,6 +18509,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoMietpreisindex2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T02:37:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.mietpreisindex_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>190</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.mietpreisindex_2023/distribution/csv</distributionUri>
@@ -17054,6 +18676,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T02:13:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.mietpreisindex_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>40593</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.mietpreisindex_2024/distribution/csv</distributionUri>
@@ -17203,6 +18839,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoMietpreisindex2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T05:46:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.mietpreisindex_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>25865</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.mietpreisindex_2025/distribution/csv</distributionUri>
@@ -17355,6 +19005,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T03:20:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.mietpreisindex_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>21458</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.mietpreisindex_2026/distribution/csv</distributionUri>
@@ -17506,6 +19170,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoNeugruendungenUnternehmen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T02:50:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.neugruendungen_unternehmen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>40603</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.neugruendungen_unternehmen_2023</resourceUri>
@@ -17627,6 +19305,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoNeugruendungenUnternehmen2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T02:42:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.neugruendungen_unternehmen_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>42036</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.neugruendungen_unternehmen_2023/distribution/csv</distributionUri>
@@ -17780,6 +19472,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T04:52:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.neugruendungen_unternehmen_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>25013</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.neugruendungen_unternehmen_2024/distribution/csv</distributionUri>
@@ -17928,6 +19634,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoNeugruendungenUnternehmen2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T04:00:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.neugruendungen_unternehmen_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>41630</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.neugruendungen_unternehmen_2025/distribution/csv</distributionUri>
@@ -18081,6 +19801,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T03:50:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.neugruendungen_unternehmen_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>8915</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.neugruendungen_unternehmen_2026/distribution/csv</distributionUri>
@@ -18241,6 +19975,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T02:07:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.pendlerstroeme/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>10637</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.pendlerstroeme_2023</resourceUri>
@@ -18371,6 +20119,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T01:52:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.pendlerstroeme_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>26308</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pendlerstroeme_2023/distribution/csv</distributionUri>
@@ -18532,6 +20294,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T02:53:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.pendlerstroeme_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>24644</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pendlerstroeme_2024/distribution/csv</distributionUri>
@@ -18690,6 +20466,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T02:31:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.pendlerstroeme_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>44990</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pendlerstroeme_2025/distribution/csv</distributionUri>
@@ -18843,6 +20633,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_ASO_SozialeSicherheit_Fallstatistik_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T05:49:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.pflegeheime_bettenangebot/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>25373</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.pflegeheime_bettenangebot_2023</resourceUri>
@@ -18970,6 +20774,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T04:52:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.pflegeheime_bettenangebot_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>13109</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pflegeheime_bettenangebot_2023/distribution/csv</distributionUri>
@@ -19120,6 +20938,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_ASO_SozialeSicherheit_Fallstatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T04:03:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.pflegeheime_bettenangebot_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>28940</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pflegeheime_bettenangebot_2024/distribution/csv</distributionUri>
@@ -19275,6 +21107,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T03:30:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.pflegeheime_bettenangebot_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>25531</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pflegeheime_bettenangebot_2025/distribution/csv</distributionUri>
@@ -19426,6 +21272,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_ASO_SozialeSicherheit_Fallstatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T03:44:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.pflegeheime_bettenangebot_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>38241</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.pflegeheime_bettenangebot_2026/distribution/csv</distributionUri>
@@ -19571,6 +21431,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoRecyclingmengenGemeinden_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T04:07:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.recyclingmengen_gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>10625</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.recyclingmengen_gemeinden_2023</resourceUri>
@@ -19689,6 +21563,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T01:09:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.recyclingmengen_gemeinden_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>37983</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.recyclingmengen_gemeinden_2023/distribution/csv</distributionUri>
@@ -19832,6 +21720,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoRecyclingmengenGemeinden2024_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T04:06:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.recyclingmengen_gemeinden_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>27078</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.recyclingmengen_gemeinden_2024/distribution/csv</distributionUri>
@@ -19979,6 +21881,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T01:33:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.recyclingmengen_gemeinden_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>4583</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.recyclingmengen_gemeinden_2025/distribution/csv</distributionUri>
@@ -20126,6 +22042,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_ASO_SozialeSicherheit_Fallstatistik_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-25T03:35:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.sozialhilfequoten_gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>40167</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.sozialhilfequoten_gemeinden_2023</resourceUri>
@@ -20242,6 +22172,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_ASO_SozialeSicherheit_Fallstatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T03:01:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.sozialhilfequoten_gemeinden_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>10257</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.sozialhilfequoten_gemeinden_2023/distribution/csv</distributionUri>
@@ -20391,6 +22335,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T02:36:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.sozialhilfequoten_gemeinden_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>24994</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.sozialhilfequoten_gemeinden_2024/distribution/csv</distributionUri>
@@ -20536,6 +22494,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_ASO_SozialeSicherheit_Fallstatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T05:21:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.sozialhilfequoten_gemeinden_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>7843</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.sozialhilfequoten_gemeinden_2025/distribution/csv</distributionUri>
@@ -20674,6 +22646,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AFIN_Finanzen_Gemeindestatistik_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T05:16:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.steuerertraege_natuerliche_personen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>12691</objectCount>
+                <attributeCount>5</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.steuerertraege_natuerliche_personen_2023</resourceUri>
@@ -20785,6 +22771,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T05:36:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.steuerertraege_natuerliche_personen_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>14580</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerertraege_natuerliche_personen_2023/distribution/csv</distributionUri>
@@ -20921,6 +22921,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AFIN_Finanzen_Gemeindestatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T05:20:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.steuerertraege_natuerliche_personen_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>40976</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerertraege_natuerliche_personen_2024/distribution/csv</distributionUri>
@@ -21061,6 +23075,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T01:27:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.steuerertraege_natuerliche_personen_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>43199</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerertraege_natuerliche_personen_2025/distribution/csv</distributionUri>
@@ -21205,6 +23233,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AFIN_Finanzen_Gemeindestatistik_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-26T04:55:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.steuerfuss_gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>428</objectCount>
+                <attributeCount>5</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.steuerfuss_gemeinden_2023</resourceUri>
@@ -21318,6 +23360,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AFIN_Finanzen_Gemeindestatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T05:57:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.steuerfuss_gemeinden_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerfuss_gemeinden_2023/distribution/csv</distributionUri>
@@ -21464,6 +23520,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T02:16:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.steuerfuss_gemeinden_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerfuss_gemeinden_2024/distribution/csv</distributionUri>
@@ -21606,6 +23676,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AFIN_Finanzen_Gemeindestatistik_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T02:56:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.steuerfuss_gemeinden_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerfuss_gemeinden_2025/distribution/csv</distributionUri>
@@ -21752,6 +23836,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T04:27:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.steuerfuss_gemeinden_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>107</objectCount>
+                    <attributeCount>5</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.steuerfuss_gemeinden_2026/distribution/csv</distributionUri>
@@ -21898,6 +23996,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-24T04:42:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.stimm_wahlbeteiligung_gemeinden/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>63488</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.stimm_wahlbeteiligung_gemeinden_2023</resourceUri>
@@ -22015,6 +24127,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T02:03:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.stimm_wahlbeteiligung_gemeinden_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>34040</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.stimm_wahlbeteiligung_gemeinden_2023/distribution/csv</distributionUri>
@@ -22164,6 +24290,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T02:35:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.stimm_wahlbeteiligung_gemeinden_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>5041</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.stimm_wahlbeteiligung_gemeinden_2024/distribution/csv</distributionUri>
@@ -22309,6 +24449,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_SK_Politik_Abstimmungen_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T02:13:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.stimm_wahlbeteiligung_gemeinden_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>38903</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.stimm_wahlbeteiligung_gemeinden_2025/distribution/csv</distributionUri>
@@ -22457,6 +24611,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T05:09:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.stimm_wahlbeteiligung_gemeinden_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>35020</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.stimm_wahlbeteiligung_gemeinden_2026/distribution/csv</distributionUri>
@@ -22616,6 +24784,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-27T04:32:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.strassenverkehrsunfaelle/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>10227</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.strassenverkehrsunfaelle_2023</resourceUri>
@@ -22745,6 +24927,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T01:41:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.strassenverkehrsunfaelle_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>1967</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.strassenverkehrsunfaelle_2023/distribution/csv</distributionUri>
@@ -22906,6 +25102,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T04:25:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.strassenverkehrsunfaelle_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>2614</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.strassenverkehrsunfaelle_2024/distribution/csv</distributionUri>
@@ -23062,6 +25272,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T03:19:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.strassenverkehrsunfaelle_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>2926</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.strassenverkehrsunfaelle_2025/distribution/csv</distributionUri>
@@ -23223,6 +25447,20 @@
                 <dataAvailableFrom>Die publizierte Datenhaltung beginnt mit dem Stand 2020.</dataAvailableFrom>
                 <furtherUses>Die Ressource eignet sich als Referenz für Portalauswertungen, Dashboards und dokumentierte Datenabgaben.</furtherUses>
                 <auxiliaryData>Zur Qualitätssicherung werden Vorjahresstände, Stammdaten und automatisierte Abgleichlisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T05:44:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.strassenverkehrsunfaelle_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>2520</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.strassenverkehrsunfaelle_2026/distribution/csv</distributionUri>
@@ -23368,6 +25606,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoTourismusLogiernaechte_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T05:29:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.tourismus_logiernaechte/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>56188</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.tourismus_logiernaechte_2023</resourceUri>
@@ -23483,6 +25735,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoTourismusLogiernaechte2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T03:34:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.tourismus_logiernaechte_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>17399</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.tourismus_logiernaechte_2023/distribution/csv</distributionUri>
@@ -23629,6 +25895,20 @@
                 <dataAvailableFrom>Zeitreihen sind ab 2011 weitgehend vollständig verfügbar.</dataAvailableFrom>
                 <furtherUses>Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.</furtherUses>
                 <auxiliaryData>Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T04:12:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.tourismus_logiernaechte_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>2377</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.tourismus_logiernaechte_2024/distribution/csv</distributionUri>
@@ -23772,6 +26052,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoTourismusLogiernaechte2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T04:58:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.tourismus_logiernaechte_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>29455</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.tourismus_logiernaechte_2025/distribution/csv</distributionUri>
@@ -23932,6 +26226,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-28T05:37:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.2601.verkehrsberuhigung.zonen/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>21370</objectCount>
+                <attributeCount>7</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.2601.verkehrsberuhigung.zonen_2024</resourceUri>
@@ -24066,6 +26374,20 @@
                 <dataAvailableFrom>Für Auswertungen stehen Daten ab dem Referenzjahr 2017 bereit.</dataAvailableFrom>
                 <furtherUses>Mögliche Nutzungen sind Verlaufsauswertungen, räumliche Vergleiche und die Vorbereitung von Entscheidungsgrundlagen.</furtherUses>
                 <auxiliaryData>Hilfsdaten umfassen Gebietseinteilungen, Publikationsmetadaten und fachliche Schlüsselverzeichnisse.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-28T01:49:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.2601.verkehrsberuhigung.zonen_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>11883</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.2601.verkehrsberuhigung.zonen_2024/distribution/csv</distributionUri>
@@ -24223,6 +26545,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AVT_Verkehr_Infrastruktur_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T01:51:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.2601.verkehrsberuhigung.zonen_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>6692</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.2601.verkehrsberuhigung.zonen_2025/distribution/csv</distributionUri>
@@ -24385,6 +26721,20 @@
                 <dataAvailableFrom>Daten in vergleichbarer Struktur sind seit 2008 verfügbar.</dataAvailableFrom>
                 <furtherUses>Die Angaben können für Berichte, Monitoring, einfache Zeitvergleiche und thematische Karten verwendet werden.</furtherUses>
                 <auxiliaryData>Bei der Aufbereitung werden Gemeindestände, administrative Referenzen und bereinigte Stammdaten beigezogen.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-25T01:26:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.2601.verkehrsberuhigung.zonen_2026/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>13356</objectCount>
+                    <attributeCount>7</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.2601.verkehrsberuhigung.zonen_2026/distribution/csv</distributionUri>
@@ -24530,6 +26880,20 @@
               </base:DatasetAttribute>
             </attributes>
             <model>SO_AGI_ChSoWohnungsbestand_Publikation_20260624</model>
+            <qualitySummary>
+              <QualitySummary>
+                <status>success</status>
+                <errors>0</errors>
+                <validatedAt>2026-06-27T05:18:00+02:00</validatedAt>
+                <reportUrl>https://data.so.ch/validation/ch.so.wohnungsbestand/ilivalidator.log</reportUrl>
+              </QualitySummary>
+            </qualitySummary>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>15861</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
             <issues>
               <DatasetIssue>
                 <resourceUri>https://data.so.ch/dataset/ch.so.wohnungsbestand_2023</resourceUri>
@@ -24645,6 +27009,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoWohnungsbestand2023_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-27T04:35:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.wohnungsbestand_2023/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>10086</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.wohnungsbestand_2023/distribution/csv</distributionUri>
@@ -24791,6 +27169,20 @@
                 <dataAvailableFrom>Historische Bestände liegen ab 2014 vor; ältere Angaben können lückenhaft sein.</dataAvailableFrom>
                 <furtherUses>Die Daten unterstützen Fachberichte, Webkarten, interne Lagebilder und wiederkehrende statistische Auswertungen.</furtherUses>
                 <auxiliaryData>Für die Harmonisierung werden kantonale Basisdaten, Zuständigkeitslisten und interne Kontrolltabellen genutzt.</auxiliaryData>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-24T04:14:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.wohnungsbestand_2024/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>31474</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.wohnungsbestand_2024/distribution/csv</distributionUri>
@@ -24934,6 +27326,20 @@
                   </base:DatasetAttribute>
                 </attributes>
                 <model>SO_AGI_ChSoWohnungsbestand2025_Publikation_20260624</model>
+                <qualitySummary>
+                  <QualitySummary>
+                    <status>success</status>
+                    <errors>0</errors>
+                    <validatedAt>2026-06-26T05:53:00+02:00</validatedAt>
+                    <reportUrl>https://data.so.ch/validation/ch.so.wohnungsbestand_2025/ilivalidator.log</reportUrl>
+                  </QualitySummary>
+                </qualitySummary>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>14806</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
                 <distributions>
                   <Distribution>
                     <distributionUri>https://data.so.ch/dataset/ch.so.wohnungsbestand_2025/distribution/csv</distributionUri>
