@@ -706,6 +706,7 @@ Temporäre Umsetzungsnotiz:
 Die Subseite `Struktur, Qualität und Herkunft` ist serverseitig gerendert und wird ueber das Seitenpanel `Daten nutzen` aufgerufen. Sie zeigt:
 
 - Titel `Struktur, Qualität und Herkunft` in derselben H1-Groesse und Farbe wie Detailseiten.
+- KPI-Reihe vor der Attributtabelle mit `Validierung`, `Objekte` und `Attribute`. Die Werte stammen aus `qualitySummary` und `structureSummary`; ohne `qualitySummary` zeigt `Validierung` den Status `Nicht prüfbar` und den Hinweis `Kein Datenmodell`. Die KPI-Cards verwenden eingebettete Bootstrap-SVG-Icons und keine grüne Erfolgsfarbe.
 - Attribute als plain table ohne Card. Wenn keine Attribute beschrieben sind, erscheint `Für dieses Datenthema sind keine Attribute beschrieben.`
 - Card `Qualität` mit Datenmodell-Link und Validierungsreport `ilivalidator.log`, falls ein Datenmodell vorhanden ist. Ohne Datenmodell erscheint `Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.`
 - Optionale Card `Herkunft & Verwendung` mit `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab`.
@@ -828,6 +829,7 @@ public record IssueDetailPageVm(
 public record StructureQualityOriginPageVm(
     PageChromeVm chrome,
     String title,
+    List<KpiVm> kpis,
     List<AttributeRowVm> attributes,
     String emptyAttributesText,
     QualityVm quality,

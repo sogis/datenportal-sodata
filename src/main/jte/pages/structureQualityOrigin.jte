@@ -7,6 +7,11 @@
         <h1 class="dp-detail-title">${page.title()}</h1>
       </header>
       <div class="dp-structure-content">
+        <div class="dp-detail-summary-layout">
+          <div class="dp-detail-summary-main">
+            @template.components.structureKpis(kpis = page.kpis())
+          </div>
+        </div>
         @template.components.attributeTable(attributes = page.attributes(), emptyText = page.emptyAttributesText())
         <div class="dp-detail-summary-layout">
           <div class="dp-detail-summary-main">

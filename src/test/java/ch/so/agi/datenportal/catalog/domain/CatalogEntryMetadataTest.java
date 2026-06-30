@@ -14,6 +14,8 @@ class CatalogEntryMetadataTest {
 
         assertThat(metadata.attributes()).isEmpty();
         assertThat(metadata.model()).isEmpty();
+        assertThat(metadata.qualitySummary()).isEmpty();
+        assertThat(metadata.structureSummary()).isEmpty();
         assertThat(metadata.hasStructureInformation()).isFalse();
     }
 

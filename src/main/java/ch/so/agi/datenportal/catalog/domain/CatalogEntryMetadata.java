@@ -19,7 +19,9 @@ public record CatalogEntryMetadata(
         Optional<String> surveyMethod,
         Optional<String> dataAvailableFrom,
         Optional<String> furtherUses,
-        Optional<String> auxiliaryData) {
+        Optional<String> auxiliaryData,
+        Optional<QualitySummary> qualitySummary,
+        Optional<StructureSummary> structureSummary) {
 
     private static final CatalogEntryMetadata EMPTY = new CatalogEntryMetadata(
             Optional.empty(),
@@ -31,6 +33,8 @@ public record CatalogEntryMetadata(
             Optional.empty(),
             Optional.empty(),
             List.of(),
+            Optional.empty(),
+            Optional.empty(),
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
@@ -62,6 +66,42 @@ public record CatalogEntryMetadata(
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty());
+    }
+
+    public CatalogEntryMetadata(
+            Optional<URI> landingPage,
+            Optional<LocalDate> issued,
+            Optional<URI> licenseUri,
+            Optional<ContactPoint> contactPoint,
+            Optional<String> accrualPeriodicity,
+            Optional<String> publicationStatus,
+            Optional<String> origin,
+            Optional<TemporalCoverage> temporalCoverage,
+            List<DatasetAttribute> attributes,
+            Optional<String> model,
+            Optional<String> surveyMethod,
+            Optional<String> dataAvailableFrom,
+            Optional<String> furtherUses,
+            Optional<String> auxiliaryData) {
+        this(
+                landingPage,
+                issued,
+                licenseUri,
+                contactPoint,
+                accrualPeriodicity,
+                publicationStatus,
+                origin,
+                temporalCoverage,
+                attributes,
+                model,
+                surveyMethod,
+                dataAvailableFrom,
+                furtherUses,
+                auxiliaryData,
+                Optional.empty(),
                 Optional.empty());
     }
 
@@ -84,6 +124,8 @@ public record CatalogEntryMetadata(
         dataAvailableFrom = cleanOptional(dataAvailableFrom);
         furtherUses = cleanOptional(furtherUses);
         auxiliaryData = cleanOptional(auxiliaryData);
+        qualitySummary = qualitySummary == null ? Optional.empty() : qualitySummary;
+        structureSummary = structureSummary == null ? Optional.empty() : structureSummary;
     }
 
     public static CatalogEntryMetadata empty() {

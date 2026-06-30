@@ -11,12 +11,15 @@ import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
+import ch.so.agi.datenportal.catalog.domain.QualitySummary;
+import ch.so.agi.datenportal.catalog.domain.StructureSummary;
 import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,6 +221,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "dataAvailableFrom" -> series.dataAvailableFrom = readOptionalText(reader, childPath).orElse(null);
                     case "furtherUses" -> series.furtherUses = readOptionalText(reader, childPath).orElse(null);
                     case "auxiliaryData" -> series.auxiliaryData = readOptionalText(reader, childPath).orElse(null);
+                    case "qualitySummary" -> series.qualitySummary = parseQualitySummaryContainer(reader, childPath).orElse(null);
+                    case "structureSummary" -> series.structureSummary = parseStructureSummaryContainer(reader, childPath).orElse(null);
                     case "issues" -> series.issues.addAll(parseIssuesContainer(reader, childPath));
                     default -> skipElement(reader);
                 }
@@ -273,6 +278,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "dataAvailableFrom" -> dataset.dataAvailableFrom = readOptionalText(reader, childPath).orElse(null);
                     case "furtherUses" -> dataset.furtherUses = readOptionalText(reader, childPath).orElse(null);
                     case "auxiliaryData" -> dataset.auxiliaryData = readOptionalText(reader, childPath).orElse(null);
+                    case "qualitySummary" -> dataset.qualitySummary = parseQualitySummaryContainer(reader, childPath).orElse(null);
+                    case "structureSummary" -> dataset.structureSummary = parseStructureSummaryContainer(reader, childPath).orElse(null);
                     case "distributions" -> {
                         RawDistribution distribution = parseDistributionContainer(reader, childPath);
                         if (distribution != null) {
@@ -357,6 +364,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "dataAvailableFrom" -> issue.dataAvailableFrom = readOptionalText(reader, childPath).orElse(null);
                     case "furtherUses" -> issue.furtherUses = readOptionalText(reader, childPath).orElse(null);
                     case "auxiliaryData" -> issue.auxiliaryData = readOptionalText(reader, childPath).orElse(null);
+                    case "qualitySummary" -> issue.qualitySummary = parseQualitySummaryContainer(reader, childPath).orElse(null);
+                    case "structureSummary" -> issue.structureSummary = parseStructureSummaryContainer(reader, childPath).orElse(null);
                     case "distributions" -> {
                         RawDistribution distribution = parseDistributionContainer(reader, childPath);
                         if (distribution != null) {
@@ -716,6 +725,96 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         throw new XMLStreamException("DatasetAttribute element is not closed");
     }
 
+    private Optional<RawQualitySummary> parseQualitySummaryContainer(XMLStreamReader reader, XtfElementPath path)
+            throws XMLStreamException {
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                if ("QualitySummary".equals(reader.getLocalName())) {
+                    return Optional.of(parseQualitySummary(reader, path.push("QualitySummary")));
+                }
+                skipElement(reader);
+                continue;
+            }
+
+            if (event == XMLStreamConstants.END_ELEMENT && "qualitySummary".equals(reader.getLocalName())) {
+                return Optional.empty();
+            }
+        }
+
+        throw new XMLStreamException("qualitySummary element is not closed");
+    }
+
+    private RawQualitySummary parseQualitySummary(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+        RawQualitySummary summary = new RawQualitySummary(path);
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                String localName = reader.getLocalName();
+                XtfElementPath childPath = path.push(localName);
+                switch (localName) {
+                    case "status" -> summary.status = readRequiredText(reader, childPath);
+                    case "errors" -> summary.errors = parseRequiredInt(reader, childPath);
+                    case "validatedAt" -> summary.validatedAt = parseRequiredOffsetDateTime(reader, childPath);
+                    case "reportUrl" -> summary.reportUrl = parseRequiredUri(reader, childPath);
+                    default -> skipElement(reader);
+                }
+                continue;
+            }
+
+            if (event == XMLStreamConstants.END_ELEMENT && "QualitySummary".equals(reader.getLocalName())) {
+                return summary;
+            }
+        }
+
+        throw new XMLStreamException("QualitySummary element is not closed");
+    }
+
+    private Optional<RawStructureSummary> parseStructureSummaryContainer(XMLStreamReader reader, XtfElementPath path)
+            throws XMLStreamException {
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                if ("StructureSummary".equals(reader.getLocalName())) {
+                    return Optional.of(parseStructureSummary(reader, path.push("StructureSummary")));
+                }
+                skipElement(reader);
+                continue;
+            }
+
+            if (event == XMLStreamConstants.END_ELEMENT && "structureSummary".equals(reader.getLocalName())) {
+                return Optional.empty();
+            }
+        }
+
+        throw new XMLStreamException("structureSummary element is not closed");
+    }
+
+    private RawStructureSummary parseStructureSummary(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+        RawStructureSummary summary = new RawStructureSummary(path);
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                String localName = reader.getLocalName();
+                XtfElementPath childPath = path.push(localName);
+                switch (localName) {
+                    case "objectCount" -> summary.objectCount = parseRequiredInt(reader, childPath);
+                    case "attributeCount" -> summary.attributeCount = parseRequiredInt(reader, childPath);
+                    default -> skipElement(reader);
+                }
+                continue;
+            }
+
+            if (event == XMLStreamConstants.END_ELEMENT && "StructureSummary".equals(reader.getLocalName())) {
+                return summary;
+            }
+        }
+
+        throw new XMLStreamException("StructureSummary element is not closed");
+    }
+
     private RawDistribution parseDistribution(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
         RawDistribution distribution = new RawDistribution(path);
 
@@ -805,6 +904,24 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         }
     }
 
+    private int parseRequiredInt(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+        String value = readRequiredText(reader, path);
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ex) {
+            throw validationError(path, "Invalid integer value: " + value);
+        }
+    }
+
+    private OffsetDateTime parseRequiredOffsetDateTime(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+        String value = readRequiredText(reader, path);
+        try {
+            return OffsetDateTime.parse(value);
+        } catch (DateTimeParseException ex) {
+            throw validationError(path, "Invalid date-time value: " + value);
+        }
+    }
+
     private boolean parseRequiredBoolean(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
         String value = readRequiredText(reader, path);
         return switch (value.toLowerCase()) {
@@ -856,6 +973,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         String dataAvailableFrom;
         String furtherUses;
         String auxiliaryData;
+        RawQualitySummary qualitySummary;
+        RawStructureSummary structureSummary;
 
         RawEntry(XtfElementPath path) {
             this.path = path;
@@ -918,7 +1037,9 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     Optional.ofNullable(surveyMethod),
                     Optional.ofNullable(dataAvailableFrom),
                     Optional.ofNullable(furtherUses),
-                    Optional.ofNullable(auxiliaryData));
+                    Optional.ofNullable(auxiliaryData),
+                    Optional.ofNullable(qualitySummary).map(RawQualitySummary::toDomain),
+                    Optional.ofNullable(structureSummary).map(RawStructureSummary::toDomain));
         }
 
         private static void require(Object value, XtfElementPath path) {
@@ -1107,6 +1228,62 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     Optional.ofNullable(description),
                     Optional.ofNullable(unit),
                     mandatory);
+        }
+    }
+
+    private static final class RawQualitySummary {
+        final XtfElementPath path;
+        String status;
+        Integer errors;
+        OffsetDateTime validatedAt;
+        URI reportUrl;
+
+        RawQualitySummary(XtfElementPath path) {
+            this.path = path;
+        }
+
+        QualitySummary toDomain() {
+            if (status == null || status.isBlank()) {
+                throw validationError(path.push("status"), "Required field is missing.");
+            }
+            if (errors == null) {
+                throw validationError(path.push("errors"), "Required field is missing.");
+            }
+            if (validatedAt == null) {
+                throw validationError(path.push("validatedAt"), "Required field is missing.");
+            }
+            if (reportUrl == null) {
+                throw validationError(path.push("reportUrl"), "Required field is missing.");
+            }
+            try {
+                return new QualitySummary(status, errors, validatedAt, reportUrl);
+            } catch (IllegalArgumentException ex) {
+                throw validationError(path, ex.getMessage());
+            }
+        }
+    }
+
+    private static final class RawStructureSummary {
+        final XtfElementPath path;
+        Integer objectCount;
+        Integer attributeCount;
+
+        RawStructureSummary(XtfElementPath path) {
+            this.path = path;
+        }
+
+        StructureSummary toDomain() {
+            if (objectCount == null) {
+                throw validationError(path.push("objectCount"), "Required field is missing.");
+            }
+            if (attributeCount == null) {
+                throw validationError(path.push("attributeCount"), "Required field is missing.");
+            }
+            try {
+                return new StructureSummary(objectCount, attributeCount);
+            } catch (IllegalArgumentException ex) {
+                throw validationError(path, ex.getMessage());
+            }
         }
     }
 

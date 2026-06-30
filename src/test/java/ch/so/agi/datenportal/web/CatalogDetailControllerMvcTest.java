@@ -114,6 +114,17 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets/ch.so.bauinventar\">Bauinventar</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Struktur, Qualität und Herkunft</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("Struktur, Qualität und Herkunft")))
+                .andExpect(content().string(containsString("class=\"dp-structure-kpis\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-shield-check\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-database\"")))
+                .andExpect(content().string(containsString("class=\"bi bi-table\"")))
+                .andExpect(content().string(containsString("Validierung")))
+                .andExpect(content().string(containsString("<p class=\"dp-structure-kpi__value\">Erfolgreich</p>")))
+                .andExpect(content().string(containsString("0 Fehler")))
+                .andExpect(content().string(containsString("Objekte")))
+                .andExpect(content().string(containsString("<p class=\"dp-structure-kpi__value\">26349</p>")))
+                .andExpect(content().string(containsString("Attribute")))
+                .andExpect(content().string(containsString("<p class=\"dp-structure-kpi__value\">6</p>")))
                 .andExpect(content().string(containsString("class=\"dp-attribute-table\"")))
                 .andExpect(content().string(containsString("<th scope=\"col\">Attribut</th>")))
                 .andExpect(content().string(containsString("<th scope=\"col\">Typ</th>")))
@@ -132,8 +143,23 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("SO_AGI_Geobasisdaten_Publikation_20260624")))
                 .andExpect(content().string(containsString("Validierungsreport")))
                 .andExpect(content().string(containsString("ilivalidator.log")))
+                .andExpect(content().string(not(containsString("Gemeinden"))))
+                .andExpect(content().string(not(containsString("Felder"))))
+                .andExpect(content().string(not(containsString("dp-status-badge--positive"))))
+                .andExpect(content().string(not(containsString("dp-color-status-ok-circle"))))
                 .andExpect(content().string(not(containsString("Beispiel"))))
-                .andExpect(content().string(not(containsString("dp-detail-actions"))));
+                .andExpect(content().string(not(containsString("dp-detail-actions"))))
+                .andExpect(result -> {
+                    String html = result.getResponse().getContentAsString();
+                    int firstSummaryLayout = html.indexOf("class=\"dp-detail-summary-layout\"");
+                    int kpis = html.indexOf("class=\"dp-structure-kpis\"");
+                    int attributeTable = html.indexOf("class=\"dp-attribute-table\"");
+                    int cardSummaryLayout = html.indexOf("class=\"dp-detail-summary-layout\"", attributeTable);
+                    assertThat(firstSummaryLayout).isGreaterThanOrEqualTo(0);
+                    assertThat(firstSummaryLayout).isLessThan(kpis);
+                    assertThat(kpis).isLessThan(attributeTable);
+                    assertThat(cardSummaryLayout).isGreaterThan(attributeTable);
+                });
     }
 
     @Test
@@ -143,6 +169,10 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<th scope=\"row\">jahr</th>")))
                 .andExpect(content().string(containsString("Jahr der Messung.")))
                 .andExpect(content().string(containsString("<td>Jahr</td>")))
+                .andExpect(content().string(containsString("<p class=\"dp-structure-kpi__value\">Nicht prüfbar</p>")))
+                .andExpect(content().string(containsString("Kein Datenmodell")))
+                .andExpect(content().string(containsString("<p class=\"dp-structure-kpi__value\">36176</p>")))
+                .andExpect(content().string(containsString("<p class=\"dp-structure-kpi__value\">7</p>")))
                 .andExpect(content().string(containsString("dp-quality-card")))
                 .andExpect(content().string(containsString("Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.")))
                 .andExpect(content().string(containsString("Herkunft &amp; Verwendung")))
@@ -150,6 +180,8 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("Hilfsdaten")))
                 .andExpect(content().string(containsString("Weitere Verwendungen")))
                 .andExpect(content().string(containsString("Verfügbare Daten ab")))
+                .andExpect(content().string(not(containsString("Gemeinden"))))
+                .andExpect(content().string(not(containsString("Felder"))))
                 .andExpect(content().string(not(containsString(">Herkunft</h2>"))))
                 .andExpect(content().string(not(containsString(">Verwendung</h2>"))))
                 .andExpect(content().string(not(containsString("dp-data-model-card"))));

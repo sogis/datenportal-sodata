@@ -74,6 +74,12 @@ class XtfPublishedCatalogParserTest {
                 .contains("Geeignet für Übersichten, Plausibilitätsvergleiche, Kennzahlen und vorbereitende Analysen.");
         assertThat(dataset.metadata().auxiliaryData())
                 .contains("Ergänzend werden Referenztabellen, Geocodierungen und technische Prüflisten verwendet.");
+        assertThat(dataset.metadata().qualitySummary()).isEmpty();
+        assertThat(dataset.metadata().structureSummary()).get()
+                .satisfies(summary -> {
+                    assertThat(summary.objectCount()).isEqualTo(36176);
+                    assertThat(summary.attributeCount()).isEqualTo(7);
+                });
         assertThat(dataset.metadata().attributes())
                 .extracting(attribute -> attribute.name())
                 .containsExactly(
@@ -102,6 +108,27 @@ class XtfPublishedCatalogParserTest {
                         "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.csv",
                         "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.xlsx",
                         "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.parquet");
+    }
+
+    @Test
+    void mapsQualityAndStructureSummaries() throws Exception {
+        DatasetEntry dataset = parseFixture().datasets().stream()
+                .filter(entry -> entry.identifier().equals("ch.so.bauinventar"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(dataset.metadata().qualitySummary()).get()
+                .satisfies(summary -> {
+                    assertThat(summary.status()).isEqualTo("success");
+                    assertThat(summary.errors()).isEqualTo(0);
+                    assertThat(summary.validatedAt().toString()).isEqualTo("2026-06-24T02:28+02:00");
+                    assertThat(summary.reportUrl()).isEqualTo(URI.create("https://data.so.ch/validation/ch.so.bauinventar/ilivalidator.log"));
+                });
+        assertThat(dataset.metadata().structureSummary()).get()
+                .satisfies(summary -> {
+                    assertThat(summary.objectCount()).isEqualTo(26349);
+                    assertThat(summary.attributeCount()).isEqualTo(6);
+                });
     }
 
     @Test

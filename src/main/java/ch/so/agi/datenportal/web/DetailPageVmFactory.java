@@ -21,6 +21,7 @@ import ch.so.agi.datenportal.web.view.DetailFeatureVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
 import ch.so.agi.datenportal.web.view.DownloadSectionVm;
 import ch.so.agi.datenportal.web.view.IssueDetailPageVm;
+import ch.so.agi.datenportal.web.view.KpiVm;
 import ch.so.agi.datenportal.web.view.MetadataItemVm;
 import ch.so.agi.datenportal.web.view.MetadataSectionVm;
 import ch.so.agi.datenportal.web.view.QualityVm;
@@ -137,6 +138,7 @@ public final class DetailPageVmFactory {
         return new StructureQualityOriginPageVm(
                 pageChromeFactory.datasetStructureQualityOriginPage(dataset),
                 "Struktur, Qualität und Herkunft",
+                structureKpis(dataset.metadata()),
                 attributeRows(dataset.metadata().attributes()),
                 "Für dieses Datenthema sind keine Attribute beschrieben.",
                 quality(dataset.metadata()),
@@ -147,6 +149,7 @@ public final class DetailPageVmFactory {
         return new StructureQualityOriginPageVm(
                 pageChromeFactory.issueStructureQualityOriginPage(series, issue),
                 "Struktur, Qualität und Herkunft",
+                structureKpis(issue.metadata()),
                 attributeRows(issue.metadata().attributes()),
                 "Für dieses Datenthema sind keine Attribute beschrieben.",
                 quality(issue.metadata()),
@@ -211,6 +214,25 @@ public final class DetailPageVmFactory {
                         "ilivalidator.log",
                         "#",
                         Optional.of("Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.")));
+    }
+
+    private static List<KpiVm> structureKpis(CatalogEntryMetadata metadata) {
+        String validationValue = metadata.qualitySummary()
+                .map(summary -> "success".equalsIgnoreCase(summary.status()) ? "Erfolgreich" : "Nicht erfolgreich")
+                .orElse("Nicht prüfbar");
+        String validationDetail = metadata.qualitySummary()
+                .map(summary -> summary.errors() + " Fehler")
+                .orElse("Kein Datenmodell");
+        String objectCount = metadata.structureSummary()
+                .map(summary -> Integer.toString(summary.objectCount()))
+                .orElse("–");
+        String attributeCount = metadata.structureSummary()
+                .map(summary -> Integer.toString(summary.attributeCount()))
+                .orElse("–");
+        return List.of(
+                new KpiVm("Validierung", validationValue, Optional.of(validationDetail), "shield-check"),
+                new KpiVm("Objekte", objectCount, Optional.empty(), "database"),
+                new KpiVm("Attribute", attributeCount, Optional.empty(), "table"));
     }
 
     private static Comparator<DatasetIssueEntry> seriesIssueOrder(String currentIdentifier) {

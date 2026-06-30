@@ -13,12 +13,15 @@ import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
+import ch.so.agi.datenportal.catalog.domain.QualitySummary;
+import ch.so.agi.datenportal.catalog.domain.StructureSummary;
 import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.config.WebComponentsProperties;
 import ch.so.agi.datenportal.support.JsonAttributeEncoder;
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -392,10 +395,50 @@ class DetailPageVmFactoryTest {
     }
 
     @Test
+    void structureQualityOriginMapsKpisWithSummaries() {
+        CatalogEntryMetadata metadata = new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                List.of(),
+                Optional.of("SO_AGI_TestModel"),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(new QualitySummary(
+                        "success",
+                        0,
+                        OffsetDateTime.parse("2026-06-24T02:28:00+02:00"),
+                        URI.create("https://data.so.ch/validation/test/ilivalidator.log"))),
+                Optional.of(new StructureSummary(26349, 6)));
+
+        var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(metadata));
+
+        assertThat(page.kpis())
+                .extracting(kpi -> kpi.title(), kpi -> kpi.value(), kpi -> kpi.detail(), kpi -> kpi.iconName())
+                .containsExactly(
+                        tuple("Validierung", "Erfolgreich", Optional.of("0 Fehler"), "shield-check"),
+                        tuple("Objekte", "26349", Optional.empty(), "database"),
+                        tuple("Attribute", "6", Optional.empty(), "table"));
+    }
+
+    @Test
     void structureQualityOriginShowsQualityMessageWhenModelIsMissing() {
         var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(CatalogEntryMetadata.empty()));
 
         assertThat(page.attributes()).isEmpty();
+        assertThat(page.kpis())
+                .extracting(kpi -> kpi.title(), kpi -> kpi.value(), kpi -> kpi.detail(), kpi -> kpi.iconName())
+                .containsExactly(
+                        tuple("Validierung", "Nicht prüfbar", Optional.of("Kein Datenmodell"), "shield-check"),
+                        tuple("Objekte", "–", Optional.empty(), "database"),
+                        tuple("Attribute", "–", Optional.empty(), "table"));
         assertThat(page.quality().modelName()).isEmpty();
         assertThat(page.quality().missingModelMessage())
                 .contains("Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.");
