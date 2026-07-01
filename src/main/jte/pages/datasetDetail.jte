@@ -30,7 +30,8 @@
           @template.components.detailActionPanel(
             structureQualityOriginHref = page.structureQualityOriginHref(),
             structureQualityOriginLabel = "Struktur, Qualität und Herkunft",
-            usageHref = page.usageHref()
+            usageHref = page.usageHref(),
+            openData = page.accessState().openData()
           )
         </aside>
       </div>
