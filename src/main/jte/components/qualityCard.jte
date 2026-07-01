@@ -1,6 +1,6 @@
 @import ch.so.agi.datenportal.web.view.QualityVm
 @param QualityVm quality
-<section class="dp-detail-panel dp-quality-card" aria-labelledby="quality-title">
+<section class="dp-quality-card" aria-labelledby="quality-title">
   <h2 id="quality-title">Qualität</h2>
   @if(quality.modelName().isPresent())
     <dl class="dp-metadata-list">

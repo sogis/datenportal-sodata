@@ -352,6 +352,51 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
+    void structureQualityOriginKeepsKpisFramedAndUsesUnframedLowerSections() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/ch.so.wasserqualitaet_grundwasser/structure-quality-origin"));
+
+            BoundingBox kpis = requireBoundingBox(page.locator(".dp-structure-kpis"));
+            BoundingBox attributeTable = requireBoundingBox(page.locator(".dp-structure-section"));
+            Locator firstKpi = page.locator(".dp-structure-kpi").first();
+            Locator qualityCard = page.locator(".dp-quality-card");
+            Locator originUsage = page.locator("#metadata-origin-usage");
+
+            assertThat(cssValue(page.locator(".dp-structure-content"), "row-gap")).isEqualTo("96px");
+            assertThat(cssValue(page.locator(".dp-structure-quality-origin-page .dp-detail-summary-layout").first(), "row-gap"))
+                    .isEqualTo("96px");
+            assertThat(cssValue(page.locator(".dp-structure-quality-origin-page .dp-detail-summary-main").last(), "row-gap"))
+                    .isEqualTo("96px");
+            assertThat(Math.abs(requireGap(kpis, attributeTable) - 96d)).isLessThan(1.5d);
+
+            assertThat(cssValue(firstKpi, "border-top-width")).isEqualTo("1px");
+            assertThat(cssValue(firstKpi, "padding-top")).isEqualTo("16px");
+            assertThat(cssValue(firstKpi, "border-top-left-radius")).isEqualTo("4px");
+
+            assertThat(cssValue(qualityCard, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(qualityCard, "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(qualityCard, "border-top-left-radius")).isEqualTo("0px");
+            assertThat(cssValue(originUsage, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(originUsage, "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(originUsage, "border-top-left-radius")).isEqualTo("0px");
+        }
+    }
+
+    @Test
+    void usagePageUsesRoomyChapterSpacing() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/ch.so.verwaltungseinheiten/usage"));
+
+            Locator usageMain = page.locator(".dp-usage-page .dp-detail-summary-main");
+
+            assertThat(cssValue(usageMain, "row-gap")).isEqualTo("96px");
+            assertThat(page.locator(".dp-usage-section").count()).isGreaterThanOrEqualTo(3);
+        }
+    }
+
+    @Test
     void desktopPopoverEscapeAndOutsideClickDiscardDraftStateAndReturnFocusToTrigger() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();
@@ -601,6 +646,8 @@ class CatalogFiltersPlaywrightTest {
 
             Locator currentIssueBadge = page.locator(".dp-status-badge--info").first();
             Locator seriesIssuesIntro = page.locator(".dp-series-issues-intro").first();
+            Locator seriesIssues = page.locator(".dp-series-issues");
+            Locator firstSeriesIssue = page.locator(".dp-series-issue").first();
             Locator seriesIssueTitleLink = page.locator(".dp-series-issue h2 a").first();
             Locator seriesIssueMeta = page.locator(".dp-series-issue__meta").first();
             Locator seriesIssueDetailLink = page.locator(".dp-series-issue__detail-link").first();
@@ -613,6 +660,9 @@ class CatalogFiltersPlaywrightTest {
             assertThat(seriesIssuesIntro.textContent()).isEqualTo("Zu dieser Serie sind folgende Ausgaben verfügbar:");
             assertThat(cssValue(seriesIssuesIntro, "font-weight")).isEqualTo("400");
             assertThat(cssValue(seriesIssuesIntro, "color")).isEqualTo("rgb(47, 72, 88)");
+            assertThat(cssValue(seriesIssues, "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(seriesIssues, "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(firstSeriesIssue, "border-bottom-width")).isEqualTo("1px");
             assertThat(fontSize(currentIssueBadge)).isEqualTo("16px");
             assertThat(cssValue(currentIssueBadge, "font-weight")).isEqualTo("400");
             assertThat(cssValue(currentIssueBadge, "border-top-width")).isEqualTo("0px");

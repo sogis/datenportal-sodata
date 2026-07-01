@@ -2,7 +2,7 @@
 @param SeriesIssuesVm issues
 @param boolean showTitle
 @if(!issues.issues().isEmpty())
-  <section class="dp-detail-panel dp-series-issues" aria-labelledby="${showTitle ? "series-issues-title" : null}" aria-label="${showTitle ? null : issues.title()}">
+  <section class="dp-series-issues" aria-labelledby="${showTitle ? "series-issues-title" : null}" aria-label="${showTitle ? null : issues.title()}">
     @if(showTitle)
       <h2 id="series-issues-title">${issues.title()}</h2>
     @endif

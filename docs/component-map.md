@@ -49,9 +49,9 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | UI-Bereich | JTE | Java | Tests |
 |---|---|---|---|
 | Datensatzdetail | `pages/datasetDetail.jte` | `DatasetDetailPageVm` | keine Datenvorschau |
-| Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | vereinfachte Serienübersicht mit Ausgabenliste |
+| Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | vereinfachte Serienübersicht mit unframed Ausgabenliste |
 | Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Serien-Kicker, aktuelles-Ausgabe-Badge, unframed Datenmerkmale-/Download-Strip, unframed Metadatenbereiche, Seitenpanel `Daten nutzen` und Card `Weitere Ausgaben` |
-| Struktur, Qualität und Herkunft | `pages/structureQualityOrigin.jte`, `components/structureKpis.jte`, `components/attributeTable.jte`, `components/qualityCard.jte`, `components/metadataSection.jte` | `StructureQualityOriginPageVm`, `KpiVm`, `AttributeRowVm`, `QualityVm`, `MetadataSectionVm` | Datensatz- und Ausgabe-Routen, neutrale KPI-Reihe, Attribute als Tabelle, Qualitäts-Card sowie `Herkunft & Verwendung` optional |
+| Struktur, Qualität und Herkunft | `pages/structureQualityOrigin.jte`, `components/structureKpis.jte`, `components/attributeTable.jte`, `components/qualityCard.jte`, `components/metadataSection.jte` | `StructureQualityOriginPageVm`, `KpiVm`, `AttributeRowVm`, `QualityVm`, `MetadataSectionVm` | Datensatz- und Ausgabe-Routen, neutrale KPI-Reihe, Attribute als Tabelle, unframed Qualität sowie `Herkunft & Verwendung` optional |
 | Daten verwenden | `pages/usage.jte`, `components/usageDirectAccess.jte`, `components/usageCodeExamples.jte`, `components/usageStarterRecipes.jte` | `UsagePageVm`, `DirectAccessRowVm`, `CodeExampleVm`, `StarterRecipeVm` | Datensatz- und Ausgabe-Routen, Direktzugriff ohne Inhalt-Spalte, Format-Badges, Copy-Feedback, Codebeispiel-Tabs, Starter-Rezepte mit lokalen PNG-Icons, keine rechte Spalte |
 | Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `DownloadSectionVm` | unframed Datenmerkmale-/Download-Strip, mobile gestapelt |
 | Datensatz-Übersicht | `components/metadataSection.jte` | `DatasetDetailPageVm.overview` | unframed Metadatenbereich unterhalb Datenmerkmale/Downloads |
@@ -61,7 +61,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datensatz-Seitenpanel `Daten nutzen` | `components/detailActionPanel.jte` | `DatasetDetailPageVm.structureQualityOriginHref`, `IssueDetailPageVm.structureQualityOriginHref` | unframed Seitenpanel mit vertikalen Nutzungshinweisen und sekundären Textlinks |
 | Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet oder Schloss fuer nicht offene Eintraege |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
-| Serien-Ausgabenliste | `components/seriesIssues.jte` | `SeriesIssuesVm` | aktuelle/ältere Ausgaben auf der Serienübersicht |
+| Serien-Ausgabenliste | `components/seriesIssues.jte` | `SeriesIssuesVm` | unframed aktuelle/ältere Ausgaben auf der Serienübersicht mit Trennlinien |
 | Weitere Ausgaben | `components/relatedIssuesCard.jte` | `RelatedIssuesVm`, `RelatedIssueVm` | schlanke Linkliste anderer Ausgaben auf Ausgabendetails |
 | Fehlerseite | `pages/notFound.jte` | `CatalogErrorControllerAdvice` | unbekannte Identifier liefern 404 |
 
