@@ -11,7 +11,10 @@ public final class ExploreCodeSnippetService {
             return List.of();
         }
 
-        ExploreTableDto table = tables.getFirst();
+        ExploreTableDto table = tables.stream()
+                .filter(ExploreTableDto::primary)
+                .findFirst()
+                .orElseGet(tables::getFirst);
         String url = table.parquetUrl();
         return List.of(
                 new ExploreCodeSnippetDto(

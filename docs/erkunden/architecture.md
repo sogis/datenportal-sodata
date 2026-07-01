@@ -1,6 +1,6 @@
 # Erkunden Architektur-Notizen
 
-Status: Phase 5 charting implemented
+Status: Phase 6 code snippets and local history implemented
 
 Dieses Dokument beschreibt den Ist-Zustand des Repositories, die Backend-Integration, die Frontend-Insel und die Architekturentscheidungen fuer die folgenden Erkunden-Phasen.
 
@@ -86,7 +86,7 @@ Die interaktive Erkunden-Oberflaeche ist als isolierte React/Vite-Insel unter fo
 src/main/frontend/explore/
 ```
 
-Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Seit Phase 3 initialisiert sie DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und laedt eine Standardvorschau. Seit Phase 4 stellt sie ein SQL-Labor mit generierten Rezepten, Editor, guard/limit-normalisierter Ausfuehrung, Resultattabelle und CSV-Export bereit. Seit Phase 5 erzeugt sie einfache Diagramme aus dem aktuellen SQL-Resultat.
+Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Seit Phase 3 initialisiert sie DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und laedt eine Standardvorschau. Seit Phase 4 stellt sie ein SQL-Labor mit generierten Rezepten, Editor, guard/limit-normalisierter Ausfuehrung, Resultattabelle und CSV-Export bereit. Seit Phase 5 erzeugt sie einfache Diagramme aus dem aktuellen SQL-Resultat. Seit Phase 6 rendert sie statische Codebeispiele und eine lokale Query-Historie.
 
 Wichtige Dateien:
 
@@ -99,6 +99,8 @@ Wichtige Dateien:
 - `src/main/frontend/explore/src/results/ResultPanel.tsx`
 - `src/main/frontend/explore/src/charts/ChartPanel.tsx`
 - `src/main/frontend/explore/src/charts/chartInference.ts`
+- `src/main/frontend/explore/src/code/CodeSnippetsPanel.tsx`
+- `src/main/frontend/explore/src/sql/QueryHistory.ts`
 - `src/main/frontend/explore/src/styles/explore.css`
 
 Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library. SQLRooms DuckDB- und SQL-Editor-Pakete werden fuer DuckDB-Wasm und den SQL-Editor verwendet. Phase 5 verwendet `@sqlrooms/recharts@0.28.0` fuer Recharts-Primitive und SQLRooms-Chart-Wrappers; die Styles bleiben Datenportal-eigene CSS-Tokens. `@sqlrooms/ui` wird nicht direkt in Datenportal-Komponenten eingebunden, weil die Datenportal-UI eigene Design-Tokens nutzt.
@@ -120,6 +122,15 @@ Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library
 - Die UI bleibt bewusst klein: Diagrammtyp, X-/Y-Spalten und Diagramm-Zeilenlimit. Es gibt keinen Dashboard-Builder und keinen Spec-Editor.
 - DuckDB `count(*)` liefert im Browser BigInt-Werte. Fuer Recharts werden nur die Diagrammzeilen in plain JavaScript-Zahlen/Strings normalisiert; Resultattabelle und CSV-Export behalten die originalen Resultatwerte.
 - Vitest mockt `@sqlrooms/recharts`, weil das Paket wie `@sqlrooms/sql-editor` extensionless interne ESM-Imports enthaelt, die der Test-Runner nicht direkt aufloest. Typecheck, Vite-Build und Playwright pruefen den echten Produktionspfad.
+
+## Codebeispiele und lokale Historie ab Phase 6
+
+- `ExploreCodeSnippetService` generiert statische Beispiele fuer DuckDB CLI, Python mit DuckDB und R mit `duckdb`.
+- Bei mehreren Parquet-Tabellen verwenden die Codebeispiele die primaere Tabelle; ohne markierte primaere Tabelle wird die erste Tabelle verwendet.
+- Das Frontend rendert die Beispiele im Tab `Code` ueber `CodeSnippetsPanel` mit Kopieraktion. Es gibt keine Ausfuehren-Schaltflaeche und keine WebR-Laufzeit.
+- `QueryHistory.ts` speichert erfolgreiche lokale SQL-Ausfuehrungen pro Datenthema unter `datenportal.explore.history.<datasetId>` in `localStorage`.
+- Gespeichert werden SQL, Ausfuehrungszeitpunkt und optionale Metadaten wie Rezepttitel, Zeilenzahl und Dauer. Resultatzeilen werden nie gespeichert.
+- Die Historie ist auf 20 Eintraege begrenzt, newest first, und ist eine Browser-Komfortfunktion. Fehler beim Lesen oder Schreiben von `localStorage` duerfen die SQL-Ausfuehrung nicht unterbrechen.
 
 ## Frontend-Asset-Build
 

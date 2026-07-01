@@ -99,6 +99,21 @@ describe('ExploreApp', () => {
     expect(screen.getByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
   });
 
+  it('renders static code snippets in the Code tab', async () => {
+    const user = userEvent.setup();
+    render(<ExploreApp context={sampleExploreContext} />);
+
+    expect(await screen.findByText('Bereit')).toBeInTheDocument();
+    await user.click(screen.getByRole('tab', {name: 'Code'}));
+
+    expect(screen.getByRole('tab', {name: 'Code'})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('heading', {name: 'Weiterverwenden'})).toBeInTheDocument();
+    expect(screen.getByRole('tab', {name: 'DuckDB CLI'})).toBeInTheDocument();
+    expect(screen.getByRole('tab', {name: 'Python mit DuckDB'})).toBeInTheDocument();
+    expect(screen.getByRole('tab', {name: 'R mit duckdb'})).toBeInTheDocument();
+    expect(screen.queryByText('Reproduzierbare Codebeispiele werden in Phase 6 interaktiv kopierbar.')).not.toBeInTheDocument();
+  });
+
   it('shows registration errors without crashing the island', async () => {
     mocks.registerParquetTables.mockResolvedValue([
       {

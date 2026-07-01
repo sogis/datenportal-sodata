@@ -3,6 +3,7 @@ import type {Table} from 'apache-arrow';
 import type {DuckDbConnector} from '@sqlrooms/duckdb';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
 import {ChartPanel} from '../charts/ChartPanel';
+import {CodeSnippetsPanel} from '../code/CodeSnippetsPanel';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
 import {assertSafeTableName, registerParquetTables, type RegisteredTable} from '../duckdb/registerParquetTables';
 import {idleQueryResult, type QueryResultState} from '../results/queryResultTypes';
@@ -215,7 +216,7 @@ function renderActiveTab(
     case 'chart':
       return <ChartPanel result={lastQueryResult} preferred={lastQueryResult.preferredChart} />;
     case 'code':
-      return <p>Reproduzierbare Codebeispiele werden in Phase 6 interaktiv kopierbar.</p>;
+      return <CodeSnippetsPanel snippets={context.codeSnippets} />;
   }
 }
 

@@ -1661,7 +1661,7 @@ Status values:
 | 3. DuckDB-Wasm Parquet registration | DONE | DuckDB-Wasm startup, local bundle assets, same-origin Parquet extension mirror, tables registered as views, default preview table | Vitest unit/component tests, typecheck, Vite build, focused Gradle tests and Playwright same-origin Parquet test passed |
 | 4. SQL laboratory and generated recipes | DONE | recipes, editor, result table, guarded execution, CSV export | Vitest unit/component tests, typecheck, Vite build, focused Gradle tests and Playwright same-origin recipe/export test passed |
 | 5. Charting V1 with Recharts | DONE | automatic chart suggestion and chart panel | Vitest chart inference/component tests and Playwright grouped-result/mobile chart smoke tests passed |
-| 6. Code snippets and local query history | TODO | DuckDB/Python/R snippets, history | unit/component tests |
+| 6. Code snippets and local query history | DONE | DuckDB/Python/R snippets, local browser history | Vitest unit/component tests, backend snippet tests and Playwright fixture passed |
 | 7. UX hardening and browser checks | TODO | loading/error/mobile states | Playwright + manual smoke notes |
 | 8. Future hooks for AI/WebR/Vega/Mosaic | TODO | feature flags, docs, disabled UI slots | tests for disabled flags |
 

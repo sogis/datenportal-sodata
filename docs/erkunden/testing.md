@@ -1,6 +1,6 @@
 # Erkunden Tests
 
-Status: Phase 5 charting tests
+Status: Phase 6 code snippets and local history tests
 
 Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase-0-Baseline des bestehenden Projekts.
 
@@ -15,6 +15,7 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit Phase 3 prueft Playwright DuckDB-Wasm mit einer same-origin Parquet-Fixture.
 - Seit Phase 4 prueft Playwright Rezeptauswahl, SQL-Ausfuehrung, Resultattabelle und CSV-Download mit derselben Fixture.
 - Seit Phase 5 pruefen Vitest und Playwright Diagramm-Inferenz, Diagramm-Controls und echte Recharts-Renderingpfade mit derselben Fixture.
+- Seit Phase 6 pruefen Vitest und Playwright statische Codebeispiele, Kopieraktionen und lokale Query-Historie.
 
 ## Baseline am 2026-07-01
 
@@ -249,9 +250,57 @@ Ergebnis: PASS, `BUILD SUCCESSFUL in 18s`; umfasst DuckDB-Wasm-Parquet-Registrie
 
 Ergebnis: PASS, `BUILD SUCCESSFUL in 40s`; fuehrte Vitest, Typecheck, Vite-Build, Backend-Tests und Playwright aus.
 
-Phase 6 und spaeter:
+## Phase 6 am 2026-07-01
 
-- Tests fuer Code-Snippets, lokale Query-History und breitere Mobile-/UX-Hardening-Szenarien.
+Phase 6 ergaenzt:
+
+- Backend-Unit-Tests fuer `ExploreCodeSnippetService`: DuckDB/Python/R-Snippets, primaere Tabelle, Fallback-Tabelle, URL-Escaping und leere Tabellen.
+- Frontend-Unit-Tests fuer `QueryHistory`: dataset-spezifische Keys, maximal 20 Eintraege, newest first, clear, defekte Storage-Daten und keine gespeicherten Resultatzeilen.
+- React-Komponententests fuer `CodeSnippetsPanel`: Tabs, leeren Zustand und Copy-Feedback.
+- Erweiterte SQL-Labor-Tests fuer erfolgreiche History-Speicherung, Laden einer History-Abfrage, Loeschen und deaktiviertes `localHistory`-Flag.
+- Java-Playwright-Test fuer erfolgreiche Query-Historie und statische Codebeispiele im Tab `Code`.
+
+Ausgefuehrte Befehle:
+
+```bash
+npm --prefix src/main/frontend/explore test
+```
+
+Ergebnis: PASS, `Test Files 11 passed (11)`, `Tests 55 passed (55)`, Dauer `3.36s`.
+
+```bash
+npm --prefix src/main/frontend/explore run typecheck
+```
+
+Ergebnis: PASS, `tsc --noEmit` ohne Fehler.
+
+```bash
+npm --prefix src/main/frontend/explore run build
+```
+
+Ergebnis: PASS, Vite baute Explore- und DuckDB-Wasm-Assets unter `/explore/assets/`, `built in 1.35s`. Vite meldet weiterhin die erwartete Warnung zu grossen DuckDB-Wasm-Chunks.
+
+```bash
+./gradlew test --tests 'ch.so.agi.datenportal.explore.*'
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 11s`.
+
+```bash
+./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 20s`; umfasst DuckDB-Wasm-Parquet-Registrierung, Preview, Rezeptausfuehrung, CSV-Download, Diagramm-Rendering, lokale Query-Historie und statische Codebeispiele.
+
+```bash
+./gradlew clean check
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 41s`; fuehrte Vitest, Typecheck, Vite-Build, Backend-Tests und Playwright aus.
+
+Phase 7 und spaeter:
+
+- Breitere Mobile-/UX-Hardening-Szenarien und manuelle Browsermatrix.
 
 ## Standard-Verifikation
 

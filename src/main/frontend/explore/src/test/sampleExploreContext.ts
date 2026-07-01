@@ -52,6 +52,18 @@ export const sampleExploreContext: ExploreContextDto = {
       title: 'DuckDB CLI',
       language: 'sql',
       code: "select * from read_parquet('https://data.so.ch/download/ch.so.bauinventar.parquet') limit 100;"
+    },
+    {
+      id: 'python-duckdb',
+      title: 'Python mit DuckDB',
+      language: 'python',
+      code: 'import duckdb\n\nurl = "https://data.so.ch/download/ch.so.bauinventar.parquet"'
+    },
+    {
+      id: 'r-duckdb',
+      title: 'R mit duckdb',
+      language: 'r',
+      code: 'library(duckdb)\n\nurl <- "https://data.so.ch/download/ch.so.bauinventar.parquet"'
     }
   ],
   featureFlags: {

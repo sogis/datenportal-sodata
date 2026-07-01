@@ -97,10 +97,19 @@ class ExploreIslandParquetPlaywrightTest {
             var result = page.locator("[aria-label='SQL Ergebnis']");
             assertThat(result.locator("text=anzahl").count()).isGreaterThanOrEqualTo(1);
             assertThat(result.locator("text=2").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.locator("text=Lokale Historie").count()).isEqualTo(1);
+            assertThat(page.locator("[aria-label='Lokale Abfragen'] >> text=select count(*) as anzahl").count()).isGreaterThanOrEqualTo(1);
 
             Download download = page.waitForDownload(() ->
                     page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Resultat als CSV")).click());
             assertThat(download.suggestedFilename()).isEqualTo("datenportal-explore-fixture-result.csv");
+
+            page.getByRole(com.microsoft.playwright.options.AriaRole.TAB, new Page.GetByRoleOptions().setName("Code")).click();
+            assertThat(page.locator("text=Weiterverwenden").count()).isEqualTo(1);
+            assertThat(page.locator("button[role='tab']:has-text('DuckDB CLI')").count()).isEqualTo(1);
+            assertThat(page.locator("button[role='tab']:has-text('Python mit DuckDB')").count()).isEqualTo(1);
+            assertThat(page.locator("button[role='tab']:has-text('R mit duckdb')").count()).isEqualTo(1);
+            assertThat(page.locator("text=read_parquet").count()).isGreaterThanOrEqualTo(1);
         }
     }
 

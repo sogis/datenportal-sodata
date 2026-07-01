@@ -1,8 +1,8 @@
 # Erkunden Troubleshooting
 
-Status: Phase 5 charting
+Status: Phase 6 code snippets and local history
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden. Seit Phase 5 koennen SQL-Resultate als einfache Recharts-Diagramme angezeigt werden.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden. Seit Phase 5 koennen SQL-Resultate als einfache Recharts-Diagramme angezeigt werden. Seit Phase 6 koennen statische Codebeispiele kopiert und erfolgreiche Abfragen lokal im Browser wiedergefunden werden.
 
 ## Phase-2-Island laedt nicht
 
@@ -105,6 +105,25 @@ Verhalten ab Phase 4:
 - Mutation und gefaehrliche DuckDB-Kommandos werden nicht als unterstuetzter Workflow angeboten.
 - Erlaubt sind im MVP `select`, `with`, `describe`, `show` und `pragma table_info`.
 - Blockiert werden offensichtliche Mutations- und Systemkommandos wie `insert`, `update`, `delete`, `drop`, `alter`, `create table`, `copy ... to`, `attach`, `install`, `load`, `call` und `set`.
+
+## Codebeispiele
+
+Verhalten ab Phase 6:
+
+- Der Tab `Code` zeigt statische Beispiele fuer DuckDB CLI, Python und R.
+- Die Beispiele werden nicht im Browser ausgefuehrt. Insbesondere wird keine WebR-Laufzeit geladen.
+- Die Beispiele verwenden die primaere Parquet-Tabelle des Datenthemas oder, falls keine primaere Tabelle markiert ist, die erste Parquet-Tabelle.
+- Wenn ein Datenthema keine Parquet-Distribution hat, bleiben `codeSnippets` leer und der Explore-Tab zeigt die Nicht-verfuegbar-Meldung.
+
+## Lokale Query-Historie
+
+Verhalten ab Phase 6:
+
+- Erfolgreiche SQL-Abfragen werden pro Datenthema in `localStorage` gespeichert.
+- Der Schluessel lautet `datenportal.explore.history.<datasetId>`.
+- Es werden maximal 20 Eintraege gespeichert, newest first.
+- Gespeichert werden SQL und kleine Metadaten wie Zeit, Rezepttitel, Zeilenzahl und Dauer. Resultatzeilen werden nicht gespeichert.
+- Wenn `localStorage` nicht verfuegbar ist, voll ist oder ungueltige Daten enthaelt, wird die Historie leer angezeigt; SQL-Ausfuehrung, Resultattabelle, CSV-Export und Diagramme bleiben nutzbar.
 
 ## SQLRooms Editor in Tests
 

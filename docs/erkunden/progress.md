@@ -12,7 +12,7 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | 3. DuckDB-Wasm Parquet registration | DONE | DuckDB-Wasm starts locally, Parquet views register, same-origin preview fixture passes. |
 | 4. SQL laboratory and generated recipes | DONE | SQL-Labor, generated recipe execution, guarded/limited queries, result table and CSV export implemented. |
 | 5. Charting V1 with Recharts | DONE | Automatic chart inference and Recharts panel from SQL results implemented. |
-| 6. Code snippets and local query history | TODO | Not started. |
+| 6. Code snippets and local query history | DONE | Static DuckDB/Python/R snippets and per-dataset local history implemented. |
 | 7. UX hardening and browser checks | TODO | Not started. |
 | 8. Future hooks for AI/WebR/Vega/Mosaic | TODO | Not started. |
 
@@ -283,3 +283,44 @@ Known limitations:
 - Code snippets and local query history remain deferred to Phase 6.
 - Broader UX hardening, manual browser matrix checks and real external `https://data.so.ch` Parquet smoke tests remain deferred to Phase 7.
 - Vite still reports expected large DuckDB-Wasm bundle warnings.
+
+## Phase 6 Entry
+
+Date: 2026-07-01
+
+Branch: `main`
+
+Scope:
+
+- Added copyable static code snippets in the Explore `Code` tab for DuckDB CLI, Python and R.
+- Hardened backend snippet generation to prefer the primary Parquet table and fall back to the first table.
+- Added browser-local, per-dataset query history for successful SQL executions.
+- Kept history behind `featureFlags.localHistory`; disabled history does not read or write `localStorage`.
+- Stored only SQL and small execution metadata in history; result rows are not persisted.
+- Added clear-history and load-from-history actions in the SQL laboratory.
+- Kept WebR execution, server-side SQL execution, saved views and new heavy dependencies out of scope.
+- Updated Phase 6 tracking in the Erkunden MVP specification.
+
+Implementation notes:
+
+- Local history key format is `datenportal.explore.history.<datasetId>`.
+- The history stores at most 20 entries, newest first.
+- `localStorage` read/write and JSON errors are ignored so SQL execution remains usable.
+- Static R snippets remain copy-only and do not load WebR.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 11 passed (11)`, `Tests 55 passed (55)`, duration `3.36s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore and DuckDB-Wasm assets under `/explore/assets/`, `built in 1.35s`; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 11s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 20s`; includes local history and static code snippets |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 41s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+Known limitations:
+
+- Query history is browser-local only and is not synchronized across devices or sessions outside the same browser storage.
+- Clearing browser storage removes local history.
+- Broader UX hardening, manual browser matrix checks and real external `https://data.so.ch` Parquet smoke tests remain deferred to Phase 7.
