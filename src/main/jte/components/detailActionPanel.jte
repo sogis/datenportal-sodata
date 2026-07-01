@@ -1,5 +1,6 @@
 @param String structureQualityOriginHref
 @param String structureQualityOriginLabel
+@param String exploreHref
 @param String usageHref
 @param boolean openData
 <section class="dp-detail-panel dp-detail-actions" aria-labelledby="detail-actions-title">
@@ -20,7 +21,7 @@
         </a>
       </div>
     </article>
-    <article class="${openData ? "dp-detail-action-item" : "dp-detail-action-item dp-detail-action-item--disabled"}">
+    <article class="${openData && !exploreHref.isBlank() ? "dp-detail-action-item" : "dp-detail-action-item dp-detail-action-item--disabled"}">
       <div class="dp-detail-action-item__icon" aria-hidden="true">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
           <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
@@ -29,8 +30,8 @@
       <div class="dp-detail-action-item__content">
         <h3>Erkunden</h3>
         <p>Datenvorschau öffnen und Inhalte fachlich einordnen.</p>
-        @if(openData)
-          <a class="dp-detail-action-link" href="#" aria-label="Datenvorschau anzeigen: Daten erkunden">
+        @if(openData && !exploreHref.isBlank())
+          <a class="dp-detail-action-link" href="${exploreHref}" aria-label="Datenvorschau anzeigen: Daten erkunden">
             Datenvorschau anzeigen <span aria-hidden="true">&rarr;</span>
           </a>
         @else

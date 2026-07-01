@@ -70,6 +70,7 @@ public final class DetailPageVmFactory {
                 accessState(dataset),
                 dataset.metadata().hasStructureInformation(),
                 urlFactory.datasetStructureQualityOrigin(dataset.identifier()),
+                urlFactory.datasetExplore(dataset.identifier()),
                 urlFactory.datasetUsage(dataset.identifier()),
                 formatDate(dataset.modified()),
                 formatDate(dataset.metadata().issued()).orElse(""),

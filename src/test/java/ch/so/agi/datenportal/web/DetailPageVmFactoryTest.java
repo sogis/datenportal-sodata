@@ -345,6 +345,7 @@ class DetailPageVmFactoryTest {
         var page = factory.dataset(datasetWithMetadata(CatalogEntryMetadata.empty()));
 
         assertThat(page.structureQualityOriginHref()).isEqualTo("/datasets/dataset/structure-quality-origin");
+        assertThat(page.exploreHref()).isEqualTo("/datasets/dataset/explore");
     }
 
     @Test
