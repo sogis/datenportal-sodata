@@ -56,7 +56,8 @@ describe('SqlLaboratory', () => {
     expect(await screen.findByLabelText('SQL Ergebnis')).toBeInTheDocument();
     expect(screen.getByText('Solothurn')).toBeInTheDocument();
     expect(screen.getByText('Olten')).toBeInTheDocument();
-    expect(screen.getByText("Maximal 10'000 Zeilen angezeigt")).toBeInTheDocument();
+    expect(screen.getByText(/Maximal 10.?000 Zeilen angezeigt/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
   });
 
   it('shows query guard errors for blocked SQL', async () => {

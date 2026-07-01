@@ -1,10 +1,10 @@
 # Erkunden
 
-Status: Phase 4 SQL laboratory implemented
+Status: Phase 5 charting implemented
 
 Erkunden ist ein lokales SQL-Labor pro Datenthema. Die Abfragen laufen im Browser mit DuckDB-Wasm direkt auf den Parquet-Dateien.
 
-Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Bis Phase 4 existieren die Backend-Kontext-Route, die eingebettete React/Vite-Insel, DuckDB-Wasm-Parquet-Registrierung, generierte Beispielabfragen, ein SQL-Labor, Resultattabelle und CSV-Export.
+Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Bis Phase 5 existieren die Backend-Kontext-Route, die eingebettete React/Vite-Insel, DuckDB-Wasm-Parquet-Registrierung, generierte Beispielabfragen, ein SQL-Labor, Resultattabelle, CSV-Export und einfache Diagramme aus SQL-Resultaten.
 
 ## Produktidee
 
@@ -14,7 +14,7 @@ Die Seite soll pro Datenthema eine kleine, nuetzliche Explorationsflaeche anbiet
 - Nutzerinnen und Nutzer koennen Tabellen, Attribute, SQL-Rezepte und Resultate erkunden.
 - SQL bleibt sichtbar und reproduzierbar.
 - Resultate koennen als CSV exportiert werden; exportiert wird nur das aktuelle Resultat.
-- Diagramme entstehen ab Phase 5 aus SQL-Resultaten.
+- Diagramme entstehen aus dem aktuellen SQL-Resultat; bevorzugte Diagrammtypen aus Rezepten werden nur bei unveraendert ausgefuehrtem Rezept verwendet.
 - Es gibt keine serverseitige SQL-Ausfuehrung und keine gespeicherten Sessions.
 
 ## Benennung

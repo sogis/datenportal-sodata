@@ -20,3 +20,22 @@ vi.mock('@sqlrooms/sql-editor', () => ({
     onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => onChange?.(event.target.value)
   })
 }));
+
+const chartComponent = (tag: string) => ({children}: {children?: React.ReactNode; [key: string]: unknown}) =>
+  React.createElement(tag, {}, children);
+
+vi.mock('@sqlrooms/recharts', () => ({
+  Bar: chartComponent('div'),
+  BarChart: chartComponent('div'),
+  CartesianGrid: chartComponent('div'),
+  ChartContainer: ({children, className}: {children?: React.ReactNode; className?: string}) =>
+    React.createElement('div', {className, 'data-testid': 'chart-container'}, children),
+  ChartTooltip: chartComponent('div'),
+  ChartTooltipContent: chartComponent('div'),
+  Line: chartComponent('div'),
+  LineChart: chartComponent('div'),
+  Scatter: chartComponent('div'),
+  ScatterChart: chartComponent('div'),
+  XAxis: chartComponent('div'),
+  YAxis: chartComponent('div')
+}));

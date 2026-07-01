@@ -104,6 +104,52 @@ class ExploreIslandParquetPlaywrightTest {
         }
     }
 
+    @Test
+    void sqlLaboratoryRendersChartForGroupedRecipe() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+            page.waitForSelector(".dp-explore-status--ready");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.TAB, new Page.GetByRoleOptions().setName("SQL-Labor")).click();
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Nach gemeinde gruppieren")).click();
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
+
+            page.waitForSelector("[aria-label='SQL Ergebnis']");
+            page.waitForSelector(".dp-explore-chart [data-chart-type='bar']");
+            assertThat(page.locator(".dp-explore-chart").count()).isEqualTo(1);
+            assertThat(page.locator(".dp-explore-chart svg").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.locator("[aria-label='Diagrammsteuerung'] select").count()).isGreaterThanOrEqualTo(4);
+        }
+    }
+
+    @Test
+    void chartControlsRemainInsideMobileViewport() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(390, 844))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+            page.waitForSelector(".dp-explore-status--ready");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.TAB, new Page.GetByRoleOptions().setName("SQL-Labor")).click();
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Nach gemeinde gruppieren")).click();
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
+
+            page.waitForSelector("[aria-label='SQL Ergebnis']");
+            page.waitForSelector(".dp-explore-chart [data-chart-type='bar']");
+            var chart = page.locator(".dp-explore-chart");
+            chart.scrollIntoViewIfNeeded();
+
+            var chartBox = chart.boundingBox();
+            var controlsBox = page.locator("[aria-label='Diagrammsteuerung']").boundingBox();
+            assertThat(chartBox).isNotNull();
+            assertThat(controlsBox).isNotNull();
+            assertThat(chartBox.x).isGreaterThanOrEqualTo(0);
+            assertThat(chartBox.x + chartBox.width).isLessThanOrEqualTo(391);
+            assertThat(controlsBox.x).isGreaterThanOrEqualTo(0);
+            assertThat(controlsBox.x + controlsBox.width).isLessThanOrEqualTo(391);
+        }
+    }
+
     private String baseUrl(String path) {
         return "http://localhost:" + port + path;
     }

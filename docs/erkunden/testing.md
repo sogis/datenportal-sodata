@@ -1,6 +1,6 @@
 # Erkunden Tests
 
-Status: Phase 4 SQL laboratory tests
+Status: Phase 5 charting tests
 
 Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase-0-Baseline des bestehenden Projekts.
 
@@ -14,6 +14,7 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - `check` haengt zusaetzlich von `npmTestExplore` und `npmTypecheckExplore` ab.
 - Seit Phase 3 prueft Playwright DuckDB-Wasm mit einer same-origin Parquet-Fixture.
 - Seit Phase 4 prueft Playwright Rezeptauswahl, SQL-Ausfuehrung, Resultattabelle und CSV-Download mit derselben Fixture.
+- Seit Phase 5 pruefen Vitest und Playwright Diagramm-Inferenz, Diagramm-Controls und echte Recharts-Renderingpfade mit derselben Fixture.
 
 ## Baseline am 2026-07-01
 
@@ -207,9 +208,50 @@ Ergebnis: PASS, `BUILD SUCCESSFUL in 12s`; umfasst DuckDB-Wasm-Parquet-Registrie
 
 Ergebnis: PASS, `BUILD SUCCESSFUL in 23s`. Der Lauf fuehrte Vitest, Typecheck, Vite-Build, Backend-Tests und Playwright aus.
 
-Phase 5 und spaeter:
+## Phase 5 am 2026-07-01
 
-- Tests fuer Charting, Code-Snippets, lokale Query-History und Mobile-/UX-Hardening.
+Phase 5 ergaenzt:
+
+- Frontend-Unit-Tests fuer `chartInference`: Balken, Linie, Punktdiagramm, Histogramm, bevorzugte Rezeptdiagramme, Fallbacks, Histogramm-Bins und Warnungen fuer grosse Resultate.
+- React-Komponententests fuer `ChartPanel`: leerer Zustand, Balkensteuerung, Typ-/Achsen-/Zeilenlimit-Wechsel, Warnzustand und Histogramm.
+- Erweiterte SQL-Labor- und App-Komponententests fuer Diagramm-Anzeige aus erfolgreichem SQL-Resultat.
+- Java-Playwright-Smoke-Tests fuer gruppierte Rezeptausfuehrung mit Balkendiagramm und mobilem Viewport ohne horizontales Clipping.
+
+Ausgefuehrte Befehle:
+
+```bash
+npm --prefix src/main/frontend/explore test
+```
+
+Ergebnis: PASS, `Test Files 9 passed (9)`, `Tests 42 passed (42)`, Dauer `2.11s`.
+
+```bash
+npm --prefix src/main/frontend/explore run typecheck
+```
+
+Ergebnis: PASS, `tsc --noEmit` ohne Fehler.
+
+```bash
+npm --prefix src/main/frontend/explore run build
+```
+
+Ergebnis: PASS, Vite baute Explore- und DuckDB-Wasm-Assets unter `/explore/assets/`, `built in 851ms`. Vite meldet weiterhin die erwartete Warnung zu grossen DuckDB-Wasm-Chunks.
+
+```bash
+./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 18s`; umfasst DuckDB-Wasm-Parquet-Registrierung, Preview, Rezeptausfuehrung, CSV-Download, Diagramm-Rendering und mobilen Chart-Smoke-Test.
+
+```bash
+./gradlew clean check
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 40s`; fuehrte Vitest, Typecheck, Vite-Build, Backend-Tests und Playwright aus.
+
+Phase 6 und spaeter:
+
+- Tests fuer Code-Snippets, lokale Query-History und breitere Mobile-/UX-Hardening-Szenarien.
 
 ## Standard-Verifikation
 

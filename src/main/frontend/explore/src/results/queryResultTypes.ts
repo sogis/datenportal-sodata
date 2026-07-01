@@ -1,4 +1,5 @@
 import type {Table} from 'apache-arrow';
+import type {ExploreChartConfigDto} from '../app/ExploreContext';
 
 export type QueryStatus = 'idle' | 'running' | 'success' | 'error' | 'cancelled' | 'timeout';
 
@@ -12,6 +13,7 @@ export interface QueryResultState {
   durationMs?: number;
   maxRowsApplied?: boolean;
   arrowTable?: Table;
+  preferredChart?: ExploreChartConfigDto;
   error?: string;
 }
 
@@ -22,4 +24,3 @@ export const idleQueryResult: QueryResultState = {
   rows: [],
   rowCount: 0
 };
-

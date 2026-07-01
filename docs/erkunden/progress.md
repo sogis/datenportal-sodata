@@ -11,7 +11,7 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | 2. Frontend island bootstrap | DONE | React/Vite island embedded in JTE and built through Gradle/npm. |
 | 3. DuckDB-Wasm Parquet registration | DONE | DuckDB-Wasm starts locally, Parquet views register, same-origin preview fixture passes. |
 | 4. SQL laboratory and generated recipes | DONE | SQL-Labor, generated recipe execution, guarded/limited queries, result table and CSV export implemented. |
-| 5. Charting V1 with Recharts | TODO | Not started. |
+| 5. Charting V1 with Recharts | DONE | Automatic chart inference and Recharts panel from SQL results implemented. |
 | 6. Code snippets and local query history | TODO | Not started. |
 | 7. UX hardening and browser checks | TODO | Not started. |
 | 8. Future hooks for AI/WebR/Vega/Mosaic | TODO | Not started. |
@@ -243,3 +243,43 @@ Known limitations:
 - Code snippets and local query history remain deferred to Phase 6.
 - Query cancellation depends on the SQLRooms/DuckDB-Wasm query handle; the UI exposes cancellation while a query is running, but long-running browser behavior still needs broader Phase-7 hardening.
 - The browser fixture covers same-origin Parquet; external `https://data.so.ch` CORS/Range behavior remains a manual/operational smoke test.
+
+## Phase 5 Entry
+
+Date: 2026-07-01
+
+Branch: `main`
+
+Scope:
+
+- Added automatic chart inference for SQL result rows.
+- Added a compact `ChartPanel` with chart type, axis and row-limit controls.
+- Added Balken, Linie, Punkte and Histogramm chart components using `@sqlrooms/recharts@0.28.0`.
+- Wired charts into the SQL-Labor and the top-level `Diagramm` tab through the existing `QueryResultState`.
+- Used recipe `preferredChart` only for unchanged recipe SQL; edited/manual SQL falls back to result inference.
+- Kept charting frontend-only; no backend SQL execution, dashboard builder, Vega, Mosaic, AI or WebR work was added.
+- Added chart inference, component and browser smoke tests, including a mobile viewport check.
+- Updated Phase 5 tracking in the Erkunden MVP specification.
+
+Implementation notes:
+
+- `@sqlrooms/recharts@0.28.0` typechecks and builds with the current React 19/Vite stack. No fallback to direct `recharts` imports was needed.
+- Vitest mocks `@sqlrooms/recharts` because the package has extensionless internal ESM imports that Vitest cannot resolve directly in this project setup. Typecheck, Vite build and Playwright use the real package.
+- DuckDB `count(*)` returns BigInt values in the browser. Chart rows are normalized to plain JavaScript values before Recharts rendering; SQL result rows remain unchanged for the result table and CSV export.
+- Bar and line suggestions warn when the result has more than 500 rows and render only the selected chart row limit.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 9 passed (9)`, `Tests 42 passed (42)`, duration `2.11s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore and DuckDB-Wasm assets under `/explore/assets/`, `built in 851ms` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 18s`; includes chart rendering and mobile viewport smoke checks |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 40s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+Known limitations:
+
+- Code snippets and local query history remain deferred to Phase 6.
+- Broader UX hardening, manual browser matrix checks and real external `https://data.so.ch` Parquet smoke tests remain deferred to Phase 7.
+- Vite still reports expected large DuckDB-Wasm bundle warnings.

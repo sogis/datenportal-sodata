@@ -1,9 +1,11 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {Table} from 'apache-arrow';
 import type {DuckDbConnector} from '@sqlrooms/duckdb';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
+import {ChartPanel} from '../charts/ChartPanel';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
 import {assertSafeTableName, registerParquetTables, type RegisteredTable} from '../duckdb/registerParquetTables';
+import {idleQueryResult, type QueryResultState} from '../results/queryResultTypes';
 import {SqlLaboratory} from '../sql/SqlLaboratory';
 
 type ExploreTab = 'preview' | 'sql' | 'chart' | 'code';
@@ -30,8 +32,12 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [registeredTables, setRegisteredTables] = useState<RegisteredTable[]>([]);
   const [connector, setConnector] = useState<DuckDbConnector | undefined>(undefined);
   const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
+  const [lastQueryResult, setLastQueryResult] = useState<QueryResultState>(idleQueryResult);
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
   const room = useMemo(() => createExploreRoomStore(context), [context]);
+  const handleResultChange = useCallback((result: QueryResultState) => {
+    setLastQueryResult(result);
+  }, []);
 
   useEffect(() => {
     if (context.tables.length === 0 || !primaryTable) {
@@ -171,7 +177,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
           </p>
           {runtimeError && <p className="dp-explore-runtime-error">{runtimeError}</p>}
           <h3>{activeTabLabel(activeTab)}</h3>
-          {renderActiveTab(activeTab, context, primaryTable, phase, previewResult, connector)}
+          {renderActiveTab(activeTab, context, primaryTable, phase, previewResult, connector, lastQueryResult, handleResultChange)}
         </main>
 
         <aside className="dp-explore-panel" aria-labelledby="explore-tables-title">
@@ -197,15 +203,17 @@ function renderActiveTab(
   primaryTable: ExploreTableDto | undefined,
   phase: RuntimePhase,
   previewResult: PreviewResult | null,
-  connector: DuckDbConnector | undefined
+  connector: DuckDbConnector | undefined,
+  lastQueryResult: QueryResultState,
+  onResultChange: (result: QueryResultState) => void
 ) {
   switch (activeTab) {
     case 'preview':
       return <PreviewPanel context={context} primaryTable={primaryTable} phase={phase} previewResult={previewResult} />;
     case 'sql':
-      return <SqlLaboratory context={context} connector={connector} ready={phase === 'ready' || phase === 'error'} />;
+      return <SqlLaboratory context={context} connector={connector} ready={phase === 'ready' || phase === 'error'} onResultChange={onResultChange} />;
     case 'chart':
-      return <p>Diagramme entstehen in Phase 5 aus SQL-Resultaten.</p>;
+      return <ChartPanel result={lastQueryResult} preferred={lastQueryResult.preferredChart} />;
     case 'code':
       return <p>Reproduzierbare Codebeispiele werden in Phase 6 interaktiv kopierbar.</p>;
   }

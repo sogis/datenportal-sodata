@@ -4,6 +4,7 @@ import type {Table} from 'apache-arrow';
 import type {ExploreContextDto, ExploreRecipeDto} from '../app/ExploreContext';
 import {hasResultLimitApplied, normalizeSqlForExecution, queryTimeoutMessage} from '../duckdb/querySafety';
 import {RecipeList} from '../recipes/RecipeList';
+import {ChartPanel} from '../charts/ChartPanel';
 import {ResultPanel} from '../results/ResultPanel';
 import {idleQueryResult, type QueryResultState} from '../results/queryResultTypes';
 import {successfulQueryResult} from '../results/arrowResult';
@@ -55,10 +56,10 @@ export function SqlLaboratory({
 
   async function runRecipe(recipe: ExploreRecipeDto) {
     selectRecipe(recipe);
-    await runSql(recipe.sql);
+    await runSql(recipe.sql, recipe, false);
   }
 
-  async function runSql(sourceSql = sql) {
+  async function runSql(sourceSql = sql, recipeForExecution = selectedRecipe, modifiedForExecution = modified) {
     if (!connector || !ready) {
       setResult(errorResult(sourceSql, 'DuckDB ist noch nicht bereit.'));
       return;
@@ -91,13 +92,16 @@ export function SqlLaboratory({
       const handle = connector.query(executedSql, {signal: timeoutController.signal});
       activeQuery.current = handle;
       const table = await handle;
-      setResult(successfulQueryResult({
-        sourceSql,
-        executedSql,
-        table,
-        durationMs: performance.now() - startedAt,
-        maxRowsApplied
-      }));
+      setResult({
+        ...successfulQueryResult({
+          sourceSql,
+          executedSql,
+          table,
+          durationMs: performance.now() - startedAt,
+          maxRowsApplied
+        }),
+        preferredChart: preferredChartForSql(sourceSql, recipeForExecution, modifiedForExecution)
+      });
     } catch (error) {
       const status = timeoutController.signal.aborted ? 'timeout' : activeQuery.current?.signal.aborted ? 'cancelled' : 'error';
       setResult({
@@ -170,8 +174,24 @@ export function SqlLaboratory({
         <h4 id="explore-result-title">Ergebnis</h4>
         <ResultPanel result={result} maxRows={context.execution.maxResultRows} datasetId={context.datasetId} />
       </section>
+
+      <section className="dp-explore-lab__chart" aria-labelledby="explore-chart-title">
+        <h4 id="explore-chart-title">Visualisierung</h4>
+        <ChartPanel result={result} preferred={result.preferredChart} />
+      </section>
     </div>
   );
+}
+
+function preferredChartForSql(sourceSql: string, recipe: ExploreRecipeDto | undefined, modified: boolean) {
+  if (modified || !recipe?.preferredChart) {
+    return undefined;
+  }
+  return normalizeSql(sourceSql) === normalizeSql(recipe.sql) ? recipe.preferredChart : undefined;
+}
+
+function normalizeSql(sql: string): string {
+  return sql.trim().replace(/;$/, '').trim();
 }
 
 function errorResult(sourceSql: string, error: string): QueryResultState {

@@ -1,6 +1,6 @@
 # Erkunden Architektur-Notizen
 
-Status: Phase 4 SQL laboratory implemented
+Status: Phase 5 charting implemented
 
 Dieses Dokument beschreibt den Ist-Zustand des Repositories, die Backend-Integration, die Frontend-Insel und die Architekturentscheidungen fuer die folgenden Erkunden-Phasen.
 
@@ -86,7 +86,7 @@ Die interaktive Erkunden-Oberflaeche ist als isolierte React/Vite-Insel unter fo
 src/main/frontend/explore/
 ```
 
-Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Seit Phase 3 initialisiert sie DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und laedt eine Standardvorschau. Seit Phase 4 stellt sie ein SQL-Labor mit generierten Rezepten, Editor, guard/limit-normalisierter Ausfuehrung, Resultattabelle und CSV-Export bereit.
+Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Seit Phase 3 initialisiert sie DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und laedt eine Standardvorschau. Seit Phase 4 stellt sie ein SQL-Labor mit generierten Rezepten, Editor, guard/limit-normalisierter Ausfuehrung, Resultattabelle und CSV-Export bereit. Seit Phase 5 erzeugt sie einfache Diagramme aus dem aktuellen SQL-Resultat.
 
 Wichtige Dateien:
 
@@ -97,9 +97,11 @@ Wichtige Dateien:
 - `src/main/frontend/explore/src/sql/SqlLaboratory.tsx`
 - `src/main/frontend/explore/src/recipes/RecipeList.tsx`
 - `src/main/frontend/explore/src/results/ResultPanel.tsx`
+- `src/main/frontend/explore/src/charts/ChartPanel.tsx`
+- `src/main/frontend/explore/src/charts/chartInference.ts`
 - `src/main/frontend/explore/src/styles/explore.css`
 
-Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library. SQLRooms DuckDB- und SQL-Editor-Pakete werden fuer DuckDB-Wasm und den SQL-Editor verwendet. `@sqlrooms/ui` ist bewusst nicht eingebunden, weil es Tailwind-Peer-Dependencies einfuehrt und die Datenportal-UI eigene Design-Tokens nutzt.
+Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library. SQLRooms DuckDB- und SQL-Editor-Pakete werden fuer DuckDB-Wasm und den SQL-Editor verwendet. Phase 5 verwendet `@sqlrooms/recharts@0.28.0` fuer Recharts-Primitive und SQLRooms-Chart-Wrappers; die Styles bleiben Datenportal-eigene CSS-Tokens. `@sqlrooms/ui` wird nicht direkt in Datenportal-Komponenten eingebunden, weil die Datenportal-UI eigene Design-Tokens nutzt.
 
 ## SQL-Labor ab Phase 4
 
@@ -109,6 +111,15 @@ Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library
 - Query-Ausfuehrung verwendet den in Phase 3 initialisierten DuckDB-Connector mit `AbortSignal` fuer Timeout und Abbruch.
 - Resultate werden als bewusst einfache, portalgestylte HTML-Tabelle gerendert. `@sqlrooms/data-table` bleibt installiert, wird aber fuer Phase 4 nicht als Primaerrenderer verwendet, weil die vorhandene Tabelle stabiler zu den Datenportal-Styles und Tests passt.
 - CSV-Export erzeugt clientseitig eine Semikolon-getrennte CSV-Datei mit CRLF-Zeilenenden und exportiert nur die aktuell gerenderten Resultatzeilen.
+
+## Diagramme ab Phase 5
+
+- `ChartPanel` erhaelt ausschliesslich das aktuelle `QueryResultState`; es fuehrt keine eigene SQL-Abfrage aus.
+- `chartInference` klassifiziert Resultatspalten aus den angezeigten Zeilen und schlaegt Balken-, Linien-, Punkt- oder Histogramm-Diagramme vor.
+- Rezept-`preferredChart` wird nur verwendet, wenn das unveraenderte Rezept-SQL ausgefuehrt wurde. Geaendertes oder manuelles SQL verwendet immer Inferenz aus dem Resultat.
+- Die UI bleibt bewusst klein: Diagrammtyp, X-/Y-Spalten und Diagramm-Zeilenlimit. Es gibt keinen Dashboard-Builder und keinen Spec-Editor.
+- DuckDB `count(*)` liefert im Browser BigInt-Werte. Fuer Recharts werden nur die Diagrammzeilen in plain JavaScript-Zahlen/Strings normalisiert; Resultattabelle und CSV-Export behalten die originalen Resultatwerte.
+- Vitest mockt `@sqlrooms/recharts`, weil das Paket wie `@sqlrooms/sql-editor` extensionless interne ESM-Imports enthaelt, die der Test-Runner nicht direkt aufloest. Typecheck, Vite-Build und Playwright pruefen den echten Produktionspfad.
 
 ## Frontend-Asset-Build
 
@@ -157,4 +168,4 @@ Wichtige Leitplanken:
 - CSP-Erweiterungen fuer Wasm und Worker, falls SQLRooms/DuckDB-Wasm sie ab Phase 3 benoetigt.
 - SQLRooms transitive Peer-Warnings mit React 19, insbesondere `react-virtual` und `react-dnd-multi-backend`.
 - Das installierte `@sqlrooms/sql-editor@0.28.0` exportiert `SqlMonacoEditor`, aber nicht den in neueren SQLRooms-Dokumenten beschriebenen `SqlCodeMirrorEditor`.
-- Vitest kann die extensionless ESM-Internals von `@sqlrooms/sql-editor` nicht direkt aufloesen; die Tests mocken den Editor und testen die Datenportal-Querylogik separat.
+- Vitest kann die extensionless ESM-Internals von `@sqlrooms/sql-editor` und `@sqlrooms/recharts` nicht direkt aufloesen; die Tests mocken diese UI-Pakete und testen die Datenportal-Query- und Chartlogik separat.

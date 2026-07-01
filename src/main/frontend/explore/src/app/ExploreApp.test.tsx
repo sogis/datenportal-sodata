@@ -87,11 +87,16 @@ describe('ExploreApp', () => {
     expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByLabelText('Beispielabfragen')).toBeInTheDocument();
     expect(screen.getByLabelText('SQL Ergebnis')).toBeInTheDocument();
+    expect(screen.getByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Resultat als CSV'})).toBeEnabled();
     expect(mocks.connector.query).toHaveBeenLastCalledWith(
       expect.stringContaining('select * from ch_so_bauinventar limit 100'),
       expect.objectContaining({signal: expect.any(AbortSignal)})
     );
+
+    await user.click(screen.getByRole('tab', {name: 'Diagramm'}));
+    expect(screen.getByRole('tab', {name: 'Diagramm'})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
   });
 
   it('shows registration errors without crashing the island', async () => {

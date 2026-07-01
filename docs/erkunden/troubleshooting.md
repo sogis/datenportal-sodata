@@ -1,8 +1,8 @@
 # Erkunden Troubleshooting
 
-Status: Phase 4 SQL laboratory
+Status: Phase 5 charting
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden. Seit Phase 5 koennen SQL-Resultate als einfache Recharts-Diagramme angezeigt werden.
 
 ## Phase-2-Island laedt nicht
 
@@ -92,7 +92,8 @@ Verhalten ab Phase 4:
 - Rezepte mit eigenem `limit` behalten dieses Limit.
 - CSV-Export exportiert nur das aktuelle Resultat, nicht die gesamte Quelldatei.
 - Nutzertexte duerfen keine serverseitige Ausfuehrung versprechen.
-- Diagrammvorschlaege warnen ab Phase 5 bei zu vielen Zeilen.
+- Diagrammvorschlaege warnen bei mehr als 500 Zeilen fuer Balken- und Liniencharts und zeigen nur das gewaehlt begrenzte Diagramm-Subset.
+- Recharts kann keine BigInt-Werte skalieren. DuckDB `count(*)`-Resultate werden deshalb nur fuer die Diagrammdaten in JavaScript-`number` normalisiert; die eigentlichen SQL-Resultatwerte bleiben unveraendert.
 
 ## Query-Fehler
 
@@ -108,3 +109,7 @@ Verhalten ab Phase 4:
 ## SQLRooms Editor in Tests
 
 Der Produktions-Build verwendet `SqlMonacoEditor` aus `@sqlrooms/sql-editor@0.28.0`. In Vitest wird dieser Editor gemockt, weil das installierte Paket extensionless interne ESM-Imports verwendet, die der Test-Runner nicht direkt aufloest. Die Query-Guards, Rezeptauswahl, Ausfuehrungslogik, Copy-Feedback und CSV-Export werden unabhaengig davon getestet.
+
+## SQLRooms Recharts in Tests
+
+Der Produktions-Build verwendet `@sqlrooms/recharts@0.28.0`. Typecheck, Vite-Build und Playwright laufen gegen den echten Produktionspfad. Vitest mockt die Recharts-Exports, weil `@sqlrooms/recharts` extensionless interne ESM-Imports verwendet, die Vitest in dieser Konfiguration nicht direkt aufloest. Die Inferenz-, Konfigurations- und Render-Entscheidungen der Datenportal-Komponenten werden trotzdem durch Unit- und Komponententests abgedeckt.

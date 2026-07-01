@@ -1660,7 +1660,7 @@ Status values:
 | 2. Frontend island bootstrap | DONE | React/Vite app embedded in JTE, Gradle/npm asset pipeline | `npm test`, `npm run typecheck`, `npm run build`, focused Gradle tests and page smoke test passed |
 | 3. DuckDB-Wasm Parquet registration | DONE | DuckDB-Wasm startup, local bundle assets, same-origin Parquet extension mirror, tables registered as views, default preview table | Vitest unit/component tests, typecheck, Vite build, focused Gradle tests and Playwright same-origin Parquet test passed |
 | 4. SQL laboratory and generated recipes | DONE | recipes, editor, result table, guarded execution, CSV export | Vitest unit/component tests, typecheck, Vite build, focused Gradle tests and Playwright same-origin recipe/export test passed |
-| 5. Charting V1 with Recharts | TODO | automatic chart suggestion and chart panel | chart inference/component/e2e tests |
+| 5. Charting V1 with Recharts | DONE | automatic chart suggestion and chart panel | Vitest chart inference/component tests and Playwright grouped-result/mobile chart smoke tests passed |
 | 6. Code snippets and local query history | TODO | DuckDB/Python/R snippets, history | unit/component tests |
 | 7. UX hardening and browser checks | TODO | loading/error/mobile states | Playwright + manual smoke notes |
 | 8. Future hooks for AI/WebR/Vega/Mosaic | TODO | feature flags, docs, disabled UI slots | tests for disabled flags |
