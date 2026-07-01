@@ -1,8 +1,8 @@
 # Erkunden Troubleshooting
 
-Status: Phase 3 DuckDB-Wasm Parquet registration
+Status: Phase 4 SQL laboratory
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden.
 
 ## Phase-2-Island laedt nicht
 
@@ -85,18 +85,26 @@ Zu pruefen ab Phase 7:
 
 ## Grosse Dateien und Resultate
 
-Geplantes MVP-Verhalten:
+Verhalten ab Phase 4:
 
 - Resultate werden begrenzt.
-- Diagrammvorschlaege warnen bei zu vielen Zeilen.
+- `select`- und `with`-Abfragen ohne Top-Level-`limit` werden clientseitig auf `datenportal.explore.max-result-rows` begrenzt.
+- Rezepte mit eigenem `limit` behalten dieses Limit.
 - CSV-Export exportiert nur das aktuelle Resultat, nicht die gesamte Quelldatei.
 - Nutzertexte duerfen keine serverseitige Ausfuehrung versprechen.
+- Diagrammvorschlaege warnen ab Phase 5 bei zu vielen Zeilen.
 
 ## Query-Fehler
 
-Geplantes MVP-Verhalten:
+Verhalten ab Phase 4:
 
 - SQL bleibt sichtbar.
 - Fehlermeldungen werden lesbar angezeigt.
 - Clientseitige Query-Guards sind UX-Schutz, keine Sicherheitskontrolle.
 - Mutation und gefaehrliche DuckDB-Kommandos werden nicht als unterstuetzter Workflow angeboten.
+- Erlaubt sind im MVP `select`, `with`, `describe`, `show` und `pragma table_info`.
+- Blockiert werden offensichtliche Mutations- und Systemkommandos wie `insert`, `update`, `delete`, `drop`, `alter`, `create table`, `copy ... to`, `attach`, `install`, `load`, `call` und `set`.
+
+## SQLRooms Editor in Tests
+
+Der Produktions-Build verwendet `SqlMonacoEditor` aus `@sqlrooms/sql-editor@0.28.0`. In Vitest wird dieser Editor gemockt, weil das installierte Paket extensionless interne ESM-Imports verwendet, die der Test-Runner nicht direkt aufloest. Die Query-Guards, Rezeptauswahl, Ausfuehrungslogik, Copy-Feedback und CSV-Export werden unabhaengig davon getestet.

@@ -35,6 +35,14 @@ export function normalizeSqlForExecution(sql: string, maxRows: number): string {
   return applyResultLimit(statement, maxRows);
 }
 
+export function hasResultLimitApplied(originalSql: string, executedSql: string): boolean {
+  return stripTrailingSemicolon(originalSql.trim()) !== stripTrailingSemicolon(executedSql.trim());
+}
+
+export function queryTimeoutMessage(timeoutMs: number): string {
+  return `Die Abfrage wurde nach ${Math.round(timeoutMs / 1000)} Sekunden abgebrochen.`;
+}
+
 function stripTrailingSemicolon(sql: string): string {
   return sql.replace(/;\s*$/, '');
 }

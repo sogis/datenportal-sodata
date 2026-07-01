@@ -16,6 +16,7 @@ import ch.so.agi.datenportal.catalog.domain.Theme;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import java.net.URI;
@@ -76,6 +77,30 @@ class ExploreIslandParquetPlaywrightTest {
             assertThat(page.locator("[aria-label='Tabellenvorschau']").count()).isEqualTo(1);
             assertThat(page.locator("text=Solothurn").count()).isGreaterThanOrEqualTo(1);
             assertThat(page.locator("text=Olten").count()).isGreaterThanOrEqualTo(1);
+        }
+    }
+
+    @Test
+    void sqlLaboratoryRunsGeneratedRecipeAndExportsCsv() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+                .setViewportSize(1280, 900)
+                .setAcceptDownloads(true))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+            page.waitForSelector(".dp-explore-status--ready");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.TAB, new Page.GetByRoleOptions().setName("SQL-Labor")).click();
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Anzahl Datensätze")).click();
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
+
+            page.waitForSelector("[aria-label='SQL Ergebnis']");
+            var result = page.locator("[aria-label='SQL Ergebnis']");
+            assertThat(result.locator("text=anzahl").count()).isGreaterThanOrEqualTo(1);
+            assertThat(result.locator("text=2").count()).isGreaterThanOrEqualTo(1);
+
+            Download download = page.waitForDownload(() ->
+                    page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Resultat als CSV")).click());
+            assertThat(download.suggestedFilename()).isEqualTo("datenportal-explore-fixture-result.csv");
         }
     }
 

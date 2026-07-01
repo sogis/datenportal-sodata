@@ -1,8 +1,10 @@
 import {useEffect, useMemo, useState} from 'react';
 import type {Table} from 'apache-arrow';
+import type {DuckDbConnector} from '@sqlrooms/duckdb';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
 import {assertSafeTableName, registerParquetTables, type RegisteredTable} from '../duckdb/registerParquetTables';
+import {SqlLaboratory} from '../sql/SqlLaboratory';
 
 type ExploreTab = 'preview' | 'sql' | 'chart' | 'code';
 type RuntimePhase = 'idle' | 'initializing' | 'registering' | 'previewing' | 'ready' | 'error';
@@ -26,6 +28,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [phase, setPhase] = useState<RuntimePhase>('idle');
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const [registeredTables, setRegisteredTables] = useState<RegisteredTable[]>([]);
+  const [connector, setConnector] = useState<DuckDbConnector | undefined>(undefined);
   const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
   const room = useMemo(() => createExploreRoomStore(context), [context]);
@@ -42,6 +45,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
       setPhase('initializing');
       setRuntimeError(null);
       setRegisteredTables(context.tables.map((table) => ({table, status: 'pending', sql: ''})));
+      setConnector(undefined);
       setPreviewResult(null);
 
       try {
@@ -51,6 +55,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         }
 
         const connector = await room.roomStore.getState().db.getConnector();
+        setConnector(connector);
         setPhase('registering');
         const registrations = await registerParquetTables(connector, context.tables);
         if (!active) {
@@ -166,7 +171,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
           </p>
           {runtimeError && <p className="dp-explore-runtime-error">{runtimeError}</p>}
           <h3>{activeTabLabel(activeTab)}</h3>
-          {renderActiveTab(activeTab, context, primaryTable, phase, previewResult)}
+          {renderActiveTab(activeTab, context, primaryTable, phase, previewResult, connector)}
         </main>
 
         <aside className="dp-explore-panel" aria-labelledby="explore-tables-title">
@@ -191,18 +196,14 @@ function renderActiveTab(
   context: ExploreContextDto,
   primaryTable: ExploreTableDto | undefined,
   phase: RuntimePhase,
-  previewResult: PreviewResult | null
+  previewResult: PreviewResult | null,
+  connector: DuckDbConnector | undefined
 ) {
   switch (activeTab) {
     case 'preview':
       return <PreviewPanel context={context} primaryTable={primaryTable} phase={phase} previewResult={previewResult} />;
     case 'sql':
-      return (
-        <>
-          <p>Der SQL-Editor folgt in Phase 4. Die Standardabfrage läuft bereits lokal mit DuckDB-Wasm.</p>
-          {primaryTable && <pre className="dp-explore-sql" aria-label="SQL Vorschau">{buildPreviewSql(primaryTable, context.execution.maxPreviewRows)}</pre>}
-        </>
-      );
+      return <SqlLaboratory context={context} connector={connector} ready={phase === 'ready' || phase === 'error'} />;
     case 'chart':
       return <p>Diagramme entstehen in Phase 5 aus SQL-Resultaten.</p>;
     case 'code':

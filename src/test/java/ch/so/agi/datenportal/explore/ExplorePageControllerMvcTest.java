@@ -38,7 +38,7 @@ class ExplorePageControllerMvcTest {
                 .andExpect(content().string(containsString("\"mode\":\"browser-local\"")))
                 .andExpect(content().string(containsString("\"charts\":true")))
                 .andExpect(content().string(containsString("\"aiAssistant\":false")))
-                .andExpect(content().string(containsString("SQL-Labor wird vorbereitet")))
+                .andExpect(content().string(containsString("SQL-Labor lädt")))
                 .andExpect(content().string(containsString("rel=\"stylesheet\" href=\"/explore/assets/explore.css\"")))
                 .andExpect(content().string(containsString("type=\"module\" src=\"/explore/assets/explore.js\"")));
     }

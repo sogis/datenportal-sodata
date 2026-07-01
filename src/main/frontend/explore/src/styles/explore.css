@@ -1,5 +1,7 @@
 .dp-explore-page {
   --dp-explore-panel-width: minmax(13rem, 17rem);
+  --dp-color-action: var(--dp-color-accent);
+  --dp-color-on-action: #ffffff;
 }
 
 .dp-explore-island {
@@ -199,6 +201,193 @@
   color: var(--dp-color-badge-positive-text);
 }
 
+.dp-explore-lab {
+  display: grid;
+  gap: var(--dp-space-4);
+  min-width: 0;
+}
+
+.dp-explore-lab__editor,
+.dp-explore-lab__result {
+  display: grid;
+  gap: var(--dp-space-3);
+  min-width: 0;
+}
+
+.dp-explore-lab__heading {
+  display: grid;
+  gap: var(--dp-space-1);
+}
+
+.dp-explore-lab__heading h4,
+.dp-explore-recipes h4,
+.dp-explore-lab__result h4 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.dp-explore-lab__heading p {
+  color: var(--dp-color-text-muted);
+  font-size: 16px;
+}
+
+.dp-explore-recipes {
+  display: grid;
+  gap: var(--dp-space-3);
+}
+
+.dp-explore-recipes__table,
+.dp-explore-recipes__list {
+  display: grid;
+  gap: var(--dp-space-2);
+}
+
+.dp-explore-recipes__list {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.dp-explore-recipe {
+  display: grid;
+  gap: var(--dp-space-1);
+  min-height: 7rem;
+  padding: var(--dp-space-3);
+  border: 1px solid var(--dp-color-border);
+  border-radius: var(--dp-radius-sm);
+  background: var(--dp-color-surface);
+  color: var(--dp-color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dp-explore-recipe:hover,
+.dp-explore-recipe:focus-visible {
+  border-color: var(--dp-color-action);
+}
+
+.dp-explore-recipe:focus-visible {
+  outline: 2px solid var(--dp-color-focus);
+  outline-offset: 2px;
+}
+
+.dp-explore-recipe.is-active {
+  border-color: var(--dp-color-action);
+  box-shadow: inset 3px 0 0 var(--dp-color-action);
+}
+
+.dp-explore-recipe__meta {
+  justify-self: start;
+  min-height: 1.6rem;
+  padding: 0 var(--dp-space-2);
+  border-radius: var(--dp-radius-sm);
+  background: var(--dp-color-badge);
+  color: var(--dp-color-text-muted);
+  font-size: 14px;
+}
+
+.dp-explore-recipe__title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dp-explore-recipe__description {
+  color: var(--dp-color-text-muted);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.dp-explore-editor {
+  display: grid;
+  gap: var(--dp-space-2);
+  min-width: 0;
+}
+
+.dp-explore-editor label {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dp-explore-editor__monaco {
+  overflow: hidden;
+  border: 1px solid var(--dp-color-border);
+  border-radius: var(--dp-radius-sm);
+}
+
+.dp-explore-editor__textarea {
+  display: none;
+  width: 100%;
+  min-height: 14rem;
+  padding: var(--dp-space-3);
+  border: 1px solid var(--dp-color-border);
+  border-radius: var(--dp-radius-sm);
+  background: var(--dp-color-surface-subtle);
+  color: var(--dp-color-text);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.dp-explore-sql-toolbar,
+.dp-explore-result__summary,
+.dp-explore-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dp-space-2);
+  align-items: center;
+}
+
+.dp-explore-button {
+  min-height: 2.5rem;
+  padding: 0 var(--dp-space-3);
+  border: 1px solid var(--dp-color-border);
+  border-radius: var(--dp-radius-sm);
+  background: var(--dp-color-badge);
+  color: var(--dp-color-text);
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.dp-explore-button:hover:not(:disabled),
+.dp-explore-button:focus-visible {
+  border-color: var(--dp-color-action);
+  color: var(--dp-color-action);
+}
+
+.dp-explore-button:focus-visible {
+  outline: 2px solid var(--dp-color-focus);
+  outline-offset: 2px;
+}
+
+.dp-explore-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.dp-explore-button--primary {
+  border-color: var(--dp-color-action);
+  background: var(--dp-color-action);
+  color: var(--dp-color-on-action);
+}
+
+.dp-explore-button--primary:hover:not(:disabled),
+.dp-explore-button--primary:focus-visible {
+  color: var(--dp-color-on-action);
+}
+
+.dp-explore-result {
+  display: grid;
+  gap: var(--dp-space-3);
+  min-width: 0;
+}
+
+.dp-explore-result__summary {
+  color: var(--dp-color-text-muted);
+  font-size: 16px;
+}
+
 .dp-explore-preview {
   display: grid;
   gap: var(--dp-space-2);
@@ -275,5 +464,9 @@
   .dp-explore-panel,
   .dp-explore-workspace {
     padding: var(--dp-space-3);
+  }
+
+  .dp-explore-recipes__list {
+    grid-template-columns: 1fr;
   }
 }

@@ -16,10 +16,10 @@
         <div class="dp-detail-summary-main">
           @if(page.available())
             <section class="dp-metadata-section" aria-labelledby="explore-placeholder-title">
-              <h2 id="explore-placeholder-title">SQL-Labor wird vorbereitet</h2>
-              <p>Die interaktive Erkunden-Oberfläche wird in der nächsten Phase eingebunden. Die Metadaten für dieses Datenthema stehen bereits als JSON-Kontext bereit.</p>
+              <h2 id="explore-placeholder-title">SQL-Labor lädt</h2>
+              <p>Das SQL-Labor läuft lokal im Browser mit DuckDB-Wasm. Wenn JavaScript deaktiviert ist, bleiben Downloads und Metadaten auf der Datensatzseite verfügbar.</p>
               <noscript>
-                <p>JavaScript ist deaktiviert. Für das spätere SQL-Labor wird JavaScript benötigt; die Downloads bleiben auf der Datensatzseite verfügbar.</p>
+                <p>JavaScript ist deaktiviert. Für das SQL-Labor wird JavaScript benötigt; die Downloads bleiben auf der Datensatzseite verfügbar.</p>
               </noscript>
             </section>
           @else

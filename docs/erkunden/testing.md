@@ -1,6 +1,6 @@
 # Erkunden Tests
 
-Status: Phase 3 DuckDB-Wasm Parquet tests
+Status: Phase 4 SQL laboratory tests
 
 Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase-0-Baseline des bestehenden Projekts.
 
@@ -13,6 +13,7 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit Phase 2 gibt es ein separates npm/Vite/React/Vitest-Frontend-Paket unter `src/main/frontend/explore`.
 - `check` haengt zusaetzlich von `npmTestExplore` und `npmTypecheckExplore` ab.
 - Seit Phase 3 prueft Playwright DuckDB-Wasm mit einer same-origin Parquet-Fixture.
+- Seit Phase 4 prueft Playwright Rezeptauswahl, SQL-Ausfuehrung, Resultattabelle und CSV-Download mit derselben Fixture.
 
 ## Baseline am 2026-07-01
 
@@ -159,9 +160,56 @@ Ergebnis: PASS, `BUILD SUCCESSFUL in 7s`.
 
 Ergebnis: PASS, `BUILD SUCCESSFUL in 23s`. Der Lauf fuehrte Vitest, Typecheck, Vite-Build, Backend-Tests und Playwright aus.
 
-Phase 4 und spaeter:
+## Phase 4 am 2026-07-01
 
-- Tests fuer SQL-Editor, Rezeptausfuehrung, Resultat-Export, Charting und Mobile-Layout.
+Phase 4 ergaenzt:
+
+- Frontend-Unit-Tests fuer erweiterte Query-Guards, Timeout-Text und Limit-Erkennung.
+- Frontend-Unit-Tests fuer CSV-Serialisierung, Dateinamen und Object-URL-Cleanup.
+- React-Komponententests fuer Rezeptauswahl, SQL-Aenderungen, Ausfuehrung, Guard-Fehler, Copy-Feedback und Resultatanzeige.
+- Java-Playwright-Test fuer SQL-Labor: Rezept auswaehlen, ausfuehren, Resultat sehen und CSV-Download starten.
+
+Ausgefuehrte Befehle:
+
+```bash
+npm --prefix src/main/frontend/explore test
+```
+
+Ergebnis: PASS, `Test Files 7 passed (7)`, `Tests 28 passed (28)`, Dauer `1.43s`.
+
+```bash
+npm --prefix src/main/frontend/explore run typecheck
+```
+
+Ergebnis: PASS, `tsc --noEmit` ohne Fehler.
+
+```bash
+npm --prefix src/main/frontend/explore run build
+```
+
+Ergebnis: PASS, Vite baute Explore- und DuckDB-Wasm-Assets unter `/explore/assets/`, `built in 1.07s`. Vite meldet weiterhin die erwartete Warnung zu grossen DuckDB-Wasm-Chunks.
+
+```bash
+./gradlew test --tests 'ch.so.agi.datenportal.explore.*'
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 5s`.
+
+```bash
+./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 12s`; umfasst DuckDB-Wasm-Parquet-Registrierung, Preview, Rezeptausfuehrung und CSV-Download.
+
+```bash
+./gradlew clean check
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 23s`. Der Lauf fuehrte Vitest, Typecheck, Vite-Build, Backend-Tests und Playwright aus.
+
+Phase 5 und spaeter:
+
+- Tests fuer Charting, Code-Snippets, lokale Query-History und Mobile-/UX-Hardening.
 
 ## Standard-Verifikation
 

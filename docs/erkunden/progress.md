@@ -10,7 +10,7 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | 1. Backend context and route | DONE | Backend context, JSON endpoint, JTE host page and backend tests implemented. |
 | 2. Frontend island bootstrap | DONE | React/Vite island embedded in JTE and built through Gradle/npm. |
 | 3. DuckDB-Wasm Parquet registration | DONE | DuckDB-Wasm starts locally, Parquet views register, same-origin preview fixture passes. |
-| 4. SQL laboratory and generated recipes | TODO | Not started. |
+| 4. SQL laboratory and generated recipes | DONE | SQL-Labor, generated recipe execution, guarded/limited queries, result table and CSV export implemented. |
 | 5. Charting V1 with Recharts | TODO | Not started. |
 | 6. Code snippets and local query history | TODO | Not started. |
 | 7. UX hardening and browser checks | TODO | Not started. |
@@ -202,3 +202,44 @@ Known limitations:
 - Production Parquet URLs still require browser-visible CORS and byte Range support.
 - The mirrored Parquet extension is tied to DuckDB-Wasm `v1.4.3/wasm_mvp`; upgrading `@duckdb/duckdb-wasm` requires refreshing the extension path and binary.
 - Large DuckDB-Wasm assets are expected in Phase 3; code-splitting is deferred until broader UX hardening unless load time becomes a measured problem.
+
+## Phase 4 Entry
+
+Date: 2026-07-01
+
+Branch: `main`
+
+Scope:
+
+- Added SQL-Labor UI with generated recipe list, SQL editor, toolbar, execution status, result table and CSV export.
+- Wired recipe selection and manual SQL execution to the existing Phase-3 DuckDB-Wasm connector.
+- Kept all execution browser-local; no backend SQL route or server-side SQL execution was added.
+- Extended query guards for single read-only statements, blocked mutation/system commands, result-limit detection and timeout text.
+- Updated the server-rendered no-JS/loading fallback copy for the now-live SQL laboratory.
+- Added frontend unit/component tests and extended the same-origin Parquet Playwright test to run a generated recipe and verify CSV download.
+- Updated Phase 4 tracking in the Erkunden MVP specification.
+
+Implementation notes:
+
+- Production uses `SqlMonacoEditor` from installed `@sqlrooms/sql-editor@0.28.0`; Vitest mocks the editor because that package has extensionless ESM internals that the test runner cannot resolve directly.
+- Result rendering uses a portal-styled accessible HTML table instead of `DataTableArrowPaginated` for Phase 4. This keeps the result view consistent with the existing preview table and avoids pulling SQLRooms UI styling into the Datenportal surface.
+- CSV export uses semicolon delimiters, CRLF line endings, RFC-style quote escaping, no UTF-8 BOM, and filenames like `datenportal-<datasetId>-result.csv`.
+- Client-side query guards are documented as UX protection, not a security boundary.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 7 passed (7)`, `Tests 28 passed (28)`, duration `1.43s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore and DuckDB-Wasm assets under `/explore/assets/`, `built in 1.07s` |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 5s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 12s`; includes recipe execution and CSV download |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 23s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+Known limitations:
+
+- Charting remains deferred to Phase 5; the `Diagramm` tab still states that charts come from SQL results later.
+- Code snippets and local query history remain deferred to Phase 6.
+- Query cancellation depends on the SQLRooms/DuckDB-Wasm query handle; the UI exposes cancellation while a query is running, but long-running browser behavior still needs broader Phase-7 hardening.
+- The browser fixture covers same-origin Parquet; external `https://data.so.ch` CORS/Range behavior remains a manual/operational smoke test.

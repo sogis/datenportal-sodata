@@ -76,14 +76,22 @@ describe('ExploreApp', () => {
     expect(screen.getByText('Olten')).toBeInTheDocument();
   });
 
-  it('switches placeholder text when tabs change', async () => {
+  it('switches to the SQL laboratory and runs the selected recipe', async () => {
     const user = userEvent.setup();
     render(<ExploreApp context={sampleExploreContext} />);
 
+    expect(await screen.findByText('Bereit')).toBeInTheDocument();
     await user.click(screen.getByRole('tab', {name: 'SQL-Labor'}));
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
 
     expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText('Der SQL-Editor folgt in Phase 4. Die Standardabfrage läuft bereits lokal mit DuckDB-Wasm.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Beispielabfragen')).toBeInTheDocument();
+    expect(screen.getByLabelText('SQL Ergebnis')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Resultat als CSV'})).toBeEnabled();
+    expect(mocks.connector.query).toHaveBeenLastCalledWith(
+      expect.stringContaining('select * from ch_so_bauinventar limit 100'),
+      expect.objectContaining({signal: expect.any(AbortSignal)})
+    );
   });
 
   it('shows registration errors without crashing the island', async () => {
