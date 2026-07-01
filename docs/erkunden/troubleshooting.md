@@ -1,8 +1,8 @@
 # Erkunden Troubleshooting
 
-Status: Phase 7 UX hardening and browser checks
+Status: Phase 8 future hooks
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden. Seit Phase 5 koennen SQL-Resultate als einfache Recharts-Diagramme angezeigt werden. Seit Phase 6 koennen statische Codebeispiele kopiert und erfolgreiche Abfragen lokal im Browser wiedergefunden werden. Seit Phase 7 sind Lade-/Fehlerzustaende, Tastaturbedienung und mobile Layoutchecks gehaertet.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden. Seit Phase 5 koennen SQL-Resultate als einfache Recharts-Diagramme angezeigt werden. Seit Phase 6 koennen statische Codebeispiele kopiert und erfolgreiche Abfragen lokal im Browser wiedergefunden werden. Seit Phase 7 sind Lade-/Fehlerzustaende, Tastaturbedienung und mobile Layoutchecks gehaertet. Seit Phase 8 sind Zukunftsflags vorbereitet, bleiben aber deaktiviert und laden keine schweren Runtime-Pakete.
 
 ## Phase-2-Island laedt nicht
 
@@ -140,6 +140,26 @@ Verhalten ab Phase 6:
 - Es werden maximal 20 Eintraege gespeichert, newest first.
 - Gespeichert werden SQL und kleine Metadaten wie Zeit, Rezepttitel, Zeilenzahl und Dauer. Resultatzeilen werden nicht gespeichert.
 - Wenn `localStorage` nicht verfuegbar ist, voll ist oder ungueltige Daten enthaelt, wird die Historie leer angezeigt; SQL-Ausfuehrung, Resultattabelle, CSV-Export und Diagramme bleiben nutzbar.
+
+## Zukunftsflags und schwere Pakete
+
+Standardverhalten:
+
+- `datenportal.explore.ai-enabled=false`
+- `datenportal.explore.webr-enabled=false`
+- `datenportal.explore.vega-enabled=false`
+- `datenportal.explore.mosaic-enabled=false`
+- `datenportal.explore.geospatial-enabled=false`
+
+Wenn ein Zukunftsbereich versehentlich sichtbar wird, zuerst die JSON-Flags unter `/datasets/{datasetId}/explore/context.json` pruefen. Bei Standardkonfiguration darf `FutureExtensionSlots` nichts rendern.
+
+`npm --prefix src/main/frontend/explore run check:future-deps` prueft:
+
+- keine direkten Zukunftsabhaengigkeiten in `package.json`
+- keine Source-Imports fuer AI, WebR, Vega, Mosaic oder Kartenframeworks
+- keine entsprechenden Paketmarker in gebauten Explore-Assets
+
+Das vorhandene transitive `react-mosaic-component` ist eine Abhaengigkeit aktueller SQLRooms Shell-/Editor-Pakete. Es ist kein aktivierter Mosaic-Crossfilter-Modus.
 
 ## SQLRooms Editor in Tests
 

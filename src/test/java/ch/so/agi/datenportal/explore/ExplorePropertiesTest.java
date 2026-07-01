@@ -8,7 +8,7 @@ class ExplorePropertiesTest {
 
     @Test
     void normalizesLimitsAndBuildsNestedDtos() {
-        var properties = new ExploreProperties(true, 0, -1, 0, true, true, false, false, false, false);
+        var properties = new ExploreProperties(true, 0, -1, 0, true, true, false, false, false, false, false);
 
         assertThat(properties.execution().engine()).isEqualTo("duckdb-wasm");
         assertThat(properties.execution().mode()).isEqualTo("browser-local");
@@ -18,5 +18,9 @@ class ExplorePropertiesTest {
         assertThat(properties.featureFlags().charts()).isTrue();
         assertThat(properties.featureFlags().localHistory()).isTrue();
         assertThat(properties.featureFlags().aiAssistant()).isFalse();
+        assertThat(properties.featureFlags().webR()).isFalse();
+        assertThat(properties.featureFlags().vega()).isFalse();
+        assertThat(properties.featureFlags().mosaic()).isFalse();
+        assertThat(properties.featureFlags().geospatial()).isFalse();
     }
 }

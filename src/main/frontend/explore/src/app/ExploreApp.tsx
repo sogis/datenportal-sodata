@@ -3,6 +3,7 @@ import type {Table} from 'apache-arrow';
 import type {DuckDbConnector} from '@sqlrooms/duckdb';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
 import {classifyExploreRuntimeError, type ExploreRuntimeError} from './ExploreRuntimeError';
+import {FutureExtensionSlots} from './FutureExtensionSlots';
 import {ChartPanel} from '../charts/ChartPanel';
 import {CodeSnippetsPanel} from '../code/CodeSnippetsPanel';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
@@ -173,6 +174,8 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         <span>{context.recipes.length === 1 ? '1 Beispielabfrage' : `${context.recipes.length} Beispielabfragen`}</span>
         <span>Maximal {formatSwissNumber(context.execution.maxResultRows)} Zeilen angezeigt</span>
       </div>
+
+      <FutureExtensionSlots flags={context.featureFlags} />
 
       <div className="dp-explore-tabs" role="tablist" aria-label="Erkunden Bereiche">
         {tabs.map((tab) => (

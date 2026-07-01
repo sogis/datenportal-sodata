@@ -10,7 +10,14 @@ describe('loadEmbeddedExploreContext', () => {
     expect(loadEmbeddedExploreContext(documentRef)).toMatchObject({
       version: 1,
       datasetId: 'ch.so.bauinventar',
-      title: 'Bauinventar'
+      title: 'Bauinventar',
+      featureFlags: {
+        aiAssistant: false,
+        webR: false,
+        vega: false,
+        mosaic: false,
+        geospatial: false
+      }
     });
   });
 

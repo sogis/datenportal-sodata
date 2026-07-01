@@ -82,6 +82,6 @@ class ExploreRecipeServiceTest {
     }
 
     private static ExploreProperties properties() {
-        return new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, false, false, false);
+        return new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, false, false, false, false);
     }
 }

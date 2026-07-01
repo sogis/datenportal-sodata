@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "check:future-deps": "node scripts/checkFutureDeps.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

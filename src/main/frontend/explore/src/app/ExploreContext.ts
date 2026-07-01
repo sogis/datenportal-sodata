@@ -67,7 +67,8 @@ export const exploreFeatureFlagsSchema = z.object({
   aiAssistant: z.boolean(),
   webR: z.boolean(),
   vega: z.boolean(),
-  mosaic: z.boolean()
+  mosaic: z.boolean(),
+  geospatial: z.boolean()
 });
 
 export const exploreExecutionSchema = z.object({

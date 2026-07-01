@@ -45,6 +45,7 @@ class ExploreContextServiceTest {
                 .contains(ExploreSnippetLanguage.SQL, ExploreSnippetLanguage.PYTHON, ExploreSnippetLanguage.R);
         assertThat(context.featureFlags().charts()).isTrue();
         assertThat(context.featureFlags().aiAssistant()).isFalse();
+        assertThat(context.featureFlags().geospatial()).isFalse();
     }
 
     @Test
@@ -85,7 +86,7 @@ class ExploreContextServiceTest {
                 "test"));
         var sanitizer = new ExploreSqlNameSanitizer();
         var roleDetector = new ExploreColumnRoleDetector();
-        var properties = new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, false, false, false);
+        var properties = new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, false, false, false, false);
         return new ExploreContextService(
                 catalogService,
                 new ExploreTableService(sanitizer, roleDetector),

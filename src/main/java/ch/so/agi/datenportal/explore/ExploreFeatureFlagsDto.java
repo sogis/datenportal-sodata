@@ -6,5 +6,6 @@ public record ExploreFeatureFlagsDto(
         boolean aiAssistant,
         boolean webR,
         boolean vega,
-        boolean mosaic) {
+        boolean mosaic,
+        boolean geospatial) {
 }

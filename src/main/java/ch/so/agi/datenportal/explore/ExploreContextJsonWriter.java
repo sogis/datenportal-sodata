@@ -187,6 +187,8 @@ public final class ExploreContextJsonWriter {
         field(json, "vega", flags.vega());
         comma(json);
         field(json, "mosaic", flags.mosaic());
+        comma(json);
+        field(json, "geospatial", flags.geospatial());
         json.append('}');
     }
 

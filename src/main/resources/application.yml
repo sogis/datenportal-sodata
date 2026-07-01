@@ -55,6 +55,7 @@ datenportal:
     webr-enabled: false
     vega-enabled: false
     mosaic-enabled: false
+    geospatial-enabled: false
   search:
     max-results: 500
     default-page-size: 10

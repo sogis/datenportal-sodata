@@ -14,7 +14,7 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | 5. Charting V1 with Recharts | DONE | Automatic chart inference and Recharts panel from SQL results implemented. |
 | 6. Code snippets and local query history | DONE | Static DuckDB/Python/R snippets and per-dataset local history implemented. |
 | 7. UX hardening and browser checks | DONE | Loading/error states, accessibility, mobile robustness and browser checks documented. |
-| 8. Future hooks for AI/WebR/Vega/Mosaic | TODO | Not started. |
+| 8. Future hooks for AI/WebR/Vega/Mosaic | DONE | Disabled AI/WebR/Vega/Mosaic/geospatial flags, hidden extension slot, docs and dependency guard implemented. |
 
 ## Phase 0 Entry
 
@@ -363,3 +363,41 @@ Known limitations:
 
 - Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.
 - Large DuckDB-Wasm bundle warnings remain expected for the MVP.
+
+## Phase 8 Entry
+
+Date: 2026-07-01
+
+Branch: `main`
+
+Scope:
+
+- Added additive `geospatial` future flag beside the existing disabled AI, WebR, Vega and Mosaic flags.
+- Added `datenportal.explore.geospatial-enabled=false` to the default configuration.
+- Passed all future flags through backend properties, JSON serialization, frontend validation and frontend sample context.
+- Added a quiet `FutureExtensionSlots` component that renders nothing while future flags are disabled.
+- Added `npm run check:future-deps` to catch direct disabled future dependencies, source imports and built asset markers for AI, WebR, Vega, Mosaic and map runtimes.
+- Documented future extension paths for AI, WebR/r-stats, Vega-Lite, Mosaic crossfilter, geospatial exploration and shareable SQL URLs.
+- Updated Phase 8 tracking in the Erkunden MVP specification.
+
+Implementation notes:
+
+- No AI, WebR, Vega, Mosaic, map or geospatial runtime dependency was added.
+- No public MVP UI is visible for disabled future features.
+- The existing transitive `react-mosaic-component` package comes from current SQLRooms Shell-/Editor dependencies and is not treated as enabled `@sqlrooms/mosaic`.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 14 passed (14)`, `Tests 65 passed (65)`, duration `3.40s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore and DuckDB-Wasm assets under `/explore/assets/`, `built in 964ms`; expected large DuckDB-Wasm chunk warning remains |
+| `npm --prefix src/main/frontend/explore run check:future-deps` | PASS, `Future dependency check passed: no disabled AI/WebR/Vega/Mosaic/geospatial packages are directly loaded.` |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 7s`; included focused Explore backend tests and frontend asset build |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 52s`; included Vitest, TypeScript, Vite build, backend tests and Playwright |
+
+Known limitations:
+
+- Future flags are extension points only. Enabling one does not implement production AI, WebR, Vega, Mosaic or map behavior.
+- Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.

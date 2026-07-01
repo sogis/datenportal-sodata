@@ -72,6 +72,7 @@ export const sampleExploreContext: ExploreContextDto = {
     aiAssistant: false,
     webR: false,
     vega: false,
-    mosaic: false
+    mosaic: false,
+    geospatial: false
   }
 };

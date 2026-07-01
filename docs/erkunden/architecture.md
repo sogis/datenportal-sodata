@@ -1,6 +1,6 @@
 # Erkunden Architektur-Notizen
 
-Status: Phase 6 code snippets and local history implemented
+Status: Phase 8 future hooks implemented
 
 Dieses Dokument beschreibt den Ist-Zustand des Repositories, die Backend-Integration, die Frontend-Insel und die Architekturentscheidungen fuer die folgenden Erkunden-Phasen.
 
@@ -86,7 +86,7 @@ Die interaktive Erkunden-Oberflaeche ist als isolierte React/Vite-Insel unter fo
 src/main/frontend/explore/
 ```
 
-Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Seit Phase 3 initialisiert sie DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und laedt eine Standardvorschau. Seit Phase 4 stellt sie ein SQL-Labor mit generierten Rezepten, Editor, guard/limit-normalisierter Ausfuehrung, Resultattabelle und CSV-Export bereit. Seit Phase 5 erzeugt sie einfache Diagramme aus dem aktuellen SQL-Resultat. Seit Phase 6 rendert sie statische Codebeispiele und eine lokale Query-Historie.
+Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Seit Phase 3 initialisiert sie DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und laedt eine Standardvorschau. Seit Phase 4 stellt sie ein SQL-Labor mit generierten Rezepten, Editor, guard/limit-normalisierter Ausfuehrung, Resultattabelle und CSV-Export bereit. Seit Phase 5 erzeugt sie einfache Diagramme aus dem aktuellen SQL-Resultat. Seit Phase 6 rendert sie statische Codebeispiele und eine lokale Query-Historie. Seit Phase 8 enthaelt sie einen stillen Erweiterungspunkt fuer spaetere AI-, WebR-, Vega-, Mosaic- und Geodaten-Funktionen.
 
 Wichtige Dateien:
 
@@ -94,6 +94,7 @@ Wichtige Dateien:
 - `src/main/frontend/explore/src/app/ExploreApp.tsx`
 - `src/main/frontend/explore/src/app/ExploreContextLoader.ts`
 - `src/main/frontend/explore/src/app/ExploreContext.ts`
+- `src/main/frontend/explore/src/app/FutureExtensionSlots.tsx`
 - `src/main/frontend/explore/src/sql/SqlLaboratory.tsx`
 - `src/main/frontend/explore/src/recipes/RecipeList.tsx`
 - `src/main/frontend/explore/src/results/ResultPanel.tsx`
@@ -131,6 +132,33 @@ Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library
 - `QueryHistory.ts` speichert erfolgreiche lokale SQL-Ausfuehrungen pro Datenthema unter `datenportal.explore.history.<datasetId>` in `localStorage`.
 - Gespeichert werden SQL, Ausfuehrungszeitpunkt und optionale Metadaten wie Rezepttitel, Zeilenzahl und Dauer. Resultatzeilen werden nie gespeichert.
 - Die Historie ist auf 20 Eintraege begrenzt, newest first, und ist eine Browser-Komfortfunktion. Fehler beim Lesen oder Schreiben von `localStorage` duerfen die SQL-Ausfuehrung nicht unterbrechen.
+
+## Zukunfts-Hooks ab Phase 8
+
+Der Kontext enthaelt deaktivierte Feature Flags fuer spaetere Erweiterungen:
+
+```json
+{
+  "aiAssistant": false,
+  "webR": false,
+  "vega": false,
+  "mosaic": false,
+  "geospatial": false
+}
+```
+
+Die Flags werden ueber `datenportal.explore.*-enabled` konfiguriert und bleiben im MVP standardmaessig `false`. `FutureExtensionSlots` rendert bei deaktivierten Flags nichts und importiert keine Zukunftspakete.
+
+Geplante Anschlussstellen:
+
+- AI: spaeter nur hinter Flag, mit begrenztem Kontext, Nutzerfreigabe vor SQL-Ausfuehrung und denselben Query-Guards wie manuelles SQL.
+- WebR / r-stats: spaeter als optionales Panel fuer kleine aktuelle SQL-Resultate, nicht fuer direkte grosse Parquet-Verarbeitung.
+- Vega-Lite: spaeter als erweiterter Chartmodus nach Recharts V1, nicht als Default.
+- Mosaic: spaeter als Advanced-Crossfilter-Labor, weil es Produkt- und Performance-Erwartungen veraendert.
+- Geospatial: spaeter zuerst Geometrieprofil und kleine Karten-Vorschau, bevor schwere Kartenframeworks geprueft werden.
+- Shareable SQL URLs: spaeter nur SQL und optionale Chart-Konfiguration im URL-Hash, nie Resultatzeilen.
+
+`npm run check:future-deps` prueft, dass keine direkten Zukunftsabhaengigkeiten oder Source-/Bundle-Imports fuer AI, WebR, Vega, Mosaic oder Kartenframeworks aktiv sind. Das vorhandene transitive `react-mosaic-component` stammt aus den bestehenden SQLRooms Shell-/Editor-Abhaengigkeiten und ist nicht `@sqlrooms/mosaic`.
 
 ## UX-Hardening ab Phase 7
 
@@ -188,3 +216,4 @@ Wichtige Leitplanken:
 - SQLRooms transitive Peer-Warnings mit React 19, insbesondere `react-virtual` und `react-dnd-multi-backend`.
 - Das installierte `@sqlrooms/sql-editor@0.28.0` exportiert `SqlMonacoEditor`, aber nicht den in neueren SQLRooms-Dokumenten beschriebenen `SqlCodeMirrorEditor`.
 - Vitest kann die extensionless ESM-Internals von `@sqlrooms/sql-editor` und `@sqlrooms/recharts` nicht direkt aufloesen; die Tests mocken diese UI-Pakete und testen die Datenportal-Query- und Chartlogik separat.
+- Zukunftsflags sind nur vorbereitete Anschlussstellen. Das Aktivieren eines Flags implementiert noch keine produktive AI-, WebR-, Vega-, Mosaic- oder Kartenfunktion.

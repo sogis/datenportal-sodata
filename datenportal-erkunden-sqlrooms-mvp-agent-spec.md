@@ -371,6 +371,7 @@ export interface ExploreFeatureFlagsDto {
   webR: boolean;
   vega: boolean;
   mosaic: boolean;
+  geospatial: boolean;
 }
 ```
 
@@ -456,7 +457,8 @@ export interface ExploreFeatureFlagsDto {
     "aiAssistant": false,
     "webR": false,
     "vega": false,
-    "mosaic": false
+    "mosaic": false,
+    "geospatial": false
   }
 }
 ```
@@ -930,6 +932,7 @@ datenportal.explore.ai-enabled=false
 datenportal.explore.webr-enabled=false
 datenportal.explore.vega-enabled=false
 datenportal.explore.mosaic-enabled=false
+datenportal.explore.geospatial-enabled=false
 ```
 
 ## 10. Frontend Implementation Specification
@@ -1663,7 +1666,7 @@ Status values:
 | 5. Charting V1 with Recharts | DONE | automatic chart suggestion and chart panel | Vitest chart inference/component tests and Playwright grouped-result/mobile chart smoke tests passed |
 | 6. Code snippets and local query history | DONE | DuckDB/Python/R snippets, local browser history | Vitest unit/component tests, backend snippet tests and Playwright fixture passed |
 | 7. UX hardening and browser checks | DONE | loading/error/mobile states, accessibility and browser robustness | Vitest state/a11y tests, Playwright keyboard/error/mobile overflow checks passed; real `data.so.ch` check blocked by DNS |
-| 8. Future hooks for AI/WebR/Vega/Mosaic | TODO | feature flags, docs, disabled UI slots | tests for disabled flags |
+| 8. Future hooks for AI/WebR/Vega/Mosaic | DONE | feature flags, docs, disabled UI slots, future dependency guard | frontend/backend disabled-flag tests and future dependency check passed |
 
 ## 15. Phase 0: Repository Orientation and Documentation Scaffold
 

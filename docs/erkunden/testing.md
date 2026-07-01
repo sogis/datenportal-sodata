@@ -1,6 +1,6 @@
 # Erkunden Tests
 
-Status: Phase 6 code snippets and local history tests
+Status: Phase 8 future hooks tests
 
 Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase-0-Baseline des bestehenden Projekts.
 
@@ -17,6 +17,7 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit Phase 5 pruefen Vitest und Playwright Diagramm-Inferenz, Diagramm-Controls und echte Recharts-Renderingpfade mit derselben Fixture.
 - Seit Phase 6 pruefen Vitest und Playwright statische Codebeispiele, Kopieraktionen und lokale Query-Historie.
 - Seit Phase 7 pruefen Vitest und Playwright zusaetzlich Status-/Fehlerzustaende, Haupt-Tab-Tastaturbedienung, fehlende Parquet-Dateien, Browser-Konsole und page-level Mobile-Overflow.
+- Seit Phase 8 pruefen Backend-, Frontend- und npm-Guard-Tests deaktivierte Zukunftsflags und verhindern direkte AI/WebR/Vega/Mosaic/Karten-Abhaengigkeiten.
 
 ## Baseline am 2026-07-01
 
@@ -356,6 +357,18 @@ Ergebnis: FAIL in der Agent-Umgebung, `curl: (6) Could not resolve host: data.so
 Phase 8 und spaeter:
 
 - Manuelle Browsermatrix fuer echte Chrome-/Firefox-/Safari-Installationen und real erreichbares `data.so.ch` bleiben operative Smoke-Checks.
+
+## Phase 8 am 2026-07-01
+
+Phase 8 ergaenzt:
+
+- Backend-Tests fuer deaktivierte Zukunftsflags `aiAssistant`, `webR`, `vega`, `mosaic` und `geospatial`.
+- MVC-/JSON-Tests fuer die serialisierte `featureFlags`-Form.
+- Frontend-Kontext-Parsing fuer `geospatial`.
+- React-Komponententests, dass vorbereitete Erweiterungsslots bei deaktivierten Flags nicht sichtbar sind.
+- `npm run check:future-deps` als Guard gegen direkte Zukunftspakete und Source-/Bundle-Imports fuer AI, WebR, Vega, Mosaic und Kartenframeworks.
+
+Ausgefuehrte Befehle werden in `docs/erkunden/progress.md` mit exakten Ergebnissen dokumentiert.
 
 ## Standard-Verifikation
 

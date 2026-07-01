@@ -13,7 +13,8 @@ public record ExploreProperties(
         boolean aiEnabled,
         boolean webrEnabled,
         boolean vegaEnabled,
-        boolean mosaicEnabled) {
+        boolean mosaicEnabled,
+        boolean geospatialEnabled) {
 
     private static final int DEFAULT_MAX_PREVIEW_ROWS = 100;
     private static final int DEFAULT_MAX_RESULT_ROWS = 10_000;
@@ -41,6 +42,7 @@ public record ExploreProperties(
                 aiEnabled,
                 webrEnabled,
                 vegaEnabled,
-                mosaicEnabled);
+                mosaicEnabled,
+                geospatialEnabled);
     }
 }

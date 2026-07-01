@@ -70,6 +70,7 @@ describe('ExploreApp', () => {
     expect(screen.getByRole('tab', {name: 'Code'})).toBeInTheDocument();
     expect(screen.getByRole('status', {name: 'Erkunden Status'})).toHaveTextContent('DuckDB wird initialisiert');
     expect(screen.getByText('DuckDB wird initialisiert')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Vorbereitete Erweiterungen')).not.toBeInTheDocument();
     expect(screen.getByLabelText('SQL Vorschau')).toHaveTextContent('select *');
     expect(await screen.findByText('Bereit')).toBeInTheDocument();
     expect(screen.getByText('Registriert')).toBeInTheDocument();
