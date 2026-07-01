@@ -38,7 +38,7 @@ public final class ExplorePageController {
     }
 
     @GetMapping("/datasets/{datasetId}/explore")
-    public String explorePage(@PathVariable String datasetId, Model model) {
+    public String explorePage(@PathVariable("datasetId") String datasetId, Model model) {
         return catalogService.withSnapshot(snapshot -> {
             DatasetEntry dataset = findDataset(snapshot, datasetId);
             ExploreContextDto context = contextService.buildContext(datasetId);
@@ -60,7 +60,7 @@ public final class ExplorePageController {
     @GetMapping(
             value = "/datasets/{datasetId}/explore/context.json",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> exploreContext(@PathVariable String datasetId) {
+    public ResponseEntity<String> exploreContext(@PathVariable("datasetId") String datasetId) {
         String contextJson = contextService.buildContextJson(datasetId);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
