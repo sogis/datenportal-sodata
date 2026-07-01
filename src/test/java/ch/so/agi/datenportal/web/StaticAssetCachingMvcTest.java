@@ -42,6 +42,13 @@ class StaticAssetCachingMvcTest {
     }
 
     @Test
+    void exploreDuckDbExtensionsUseLongCacheHeader() throws Exception {
+        mockMvc.perform(get("/explore-extensions/v1.4.3/wasm_mvp/parquet.duckdb_extension.wasm"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))));
+    }
+
+    @Test
     void htmxAssetUsesMediumCacheHeader() throws Exception {
         mockMvc.perform(get("/js/htmx.min.js"))
                 .andExpect(status().isOk())
@@ -121,6 +128,9 @@ class StaticAssetCachingMvcTest {
                 .andExpect(header().string("Referrer-Policy", "strict-origin-when-cross-origin"))
                 .andExpect(header().string("X-Frame-Options", "DENY"))
                 .andExpect(header().string("Permissions-Policy", containsString("geolocation=()")))
-                .andExpect(header().string("Content-Security-Policy", containsString("default-src 'self'")));
+                .andExpect(header().string("Content-Security-Policy", containsString("default-src 'self'")))
+                .andExpect(header().string("Content-Security-Policy", containsString("script-src 'self' 'wasm-unsafe-eval'")))
+                .andExpect(header().string("Content-Security-Policy", containsString("connect-src 'self' https://data.so.ch")))
+                .andExpect(header().string("Content-Security-Policy", containsString("worker-src 'self' blob:")));
     }
 }

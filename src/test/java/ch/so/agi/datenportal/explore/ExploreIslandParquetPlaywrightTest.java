@@ -1,0 +1,135 @@
+package ch.so.agi.datenportal.explore;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import ch.so.agi.datenportal.DatenportalApplication;
+import ch.so.agi.datenportal.catalog.domain.AccessLevel;
+import ch.so.agi.datenportal.catalog.domain.Catalog;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
+import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
+import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
+import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
+import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
+import ch.so.agi.datenportal.catalog.domain.DistributionLink;
+import ch.so.agi.datenportal.catalog.domain.Office;
+import ch.so.agi.datenportal.catalog.domain.Theme;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+
+@Tag("playwright")
+@SpringBootTest(
+        classes = {DatenportalApplication.class, ExploreIslandParquetPlaywrightTest.ExploreFixtureCatalogConfiguration.class},
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ExploreIslandParquetPlaywrightTest {
+
+    @LocalServerPort
+    private int port;
+
+    private Playwright playwright;
+    private Browser browser;
+
+    @BeforeAll
+    void setUpBrowser() {
+        playwright = Playwright.create();
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+    }
+
+    @AfterAll
+    void tearDownBrowser() {
+        if (browser != null) {
+            browser.close();
+        }
+        if (playwright != null) {
+            playwright.close();
+        }
+    }
+
+    @Test
+    void explorePageRegistersSameOriginParquetAndShowsPreviewRows() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+            page.waitForSelector(".dp-explore-status--ready");
+            page.waitForSelector("[aria-label='Tabellenvorschau']");
+
+            assertThat(page.locator("text=Registriert").count()).isEqualTo(1);
+            assertThat(page.locator("[aria-label='Tabellenvorschau']").count()).isEqualTo(1);
+            assertThat(page.locator("text=Solothurn").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.locator("text=Olten").count()).isGreaterThanOrEqualTo(1);
+        }
+    }
+
+    private String baseUrl(String path) {
+        return "http://localhost:" + port + path;
+    }
+
+    @TestConfiguration
+    static class ExploreFixtureCatalogConfiguration {
+
+        @Bean
+        @Primary
+        CatalogSnapshot exploreFixtureCatalogSnapshot() {
+            return CatalogSnapshot.of(
+                    new Catalog(List.of(fixtureDataset()), List.of()),
+                    Instant.parse("2026-07-01T08:00:00Z"),
+                    "explore-parquet-fixture");
+        }
+
+        private static DatasetEntry fixtureDataset() {
+            var office = new Office("agi", "Amt für Geoinformation", Optional.of("AGI"));
+            var theme = new Theme("mobilitaet", "Mobilität");
+            return new DatasetEntry(
+                    "explore-fixture",
+                    "ÖV-Haltestellen Fixture",
+                    "Kleine Parquet-Fixture für DuckDB-Wasm.",
+                    office,
+                    office,
+                    List.of(theme),
+                    List.of("Parquet"),
+                    LocalDate.parse("2026-06-30"),
+                    AccessLevel.OPEN,
+                    metadata(),
+                    List.of(new DistributionLink(
+                            URI.create("/datasets/explore-fixture"),
+                            URI.create("/explore-fixtures/ch.so.oev_haltestellen.parquet"),
+                            DistributionFormat.PARQUET)));
+        }
+
+        private static CatalogEntryMetadata metadata() {
+            return new CatalogEntryMetadata(
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    List.of(
+                            new DatasetAttribute("objekt_id", "VARCHAR", Optional.of("Objekt-ID"), Optional.empty(), true),
+                            new DatasetAttribute("gemeinde", "VARCHAR", Optional.of("Gemeinde"), Optional.empty(), false),
+                            new DatasetAttribute("wert", "DOUBLE", Optional.of("Messwert"), Optional.empty(), false)),
+                    Optional.empty());
+        }
+    }
+}

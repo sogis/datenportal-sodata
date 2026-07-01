@@ -51,7 +51,11 @@ class ExploreIslandPlaywrightTest {
             page.waitForSelector(".dp-explore-island");
 
             assertThat(page.locator(".dp-explore-island h2:has-text('Bauinventar')").count()).isEqualTo(1);
-            assertThat(page.locator("text=DuckDB wird vorbereitet").count()).isEqualTo(1);
+            assertThat(page.locator("text=DuckDB wird initialisiert").count()
+                    + page.locator("text=Parquet-Dateien werden registriert").count()
+                    + page.locator("text=Vorschau wird geladen").count()
+                    + page.locator("text=Bereit").count()
+                    + page.locator("text=DuckDB-Hinweis").count()).isGreaterThanOrEqualTo(1);
             assertThat(page.locator("button[role='tab']:has-text('Vorschau')").count()).isEqualTo(1);
             assertThat(page.locator("button[role='tab']:has-text('SQL-Labor')").count()).isEqualTo(1);
             assertThat(page.locator("button[role='tab']:has-text('Diagramm')").count()).isEqualTo(1);

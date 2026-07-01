@@ -37,11 +37,12 @@ public class SecurityHeadersConfiguration {
 
     private static String csp() {
         return "default-src 'self'; "
-                + "script-src 'self'; "
+                + "script-src 'self' 'wasm-unsafe-eval'; "
                 + "style-src 'self' 'unsafe-inline'; "
                 + "img-src 'self' data:; "
                 + "font-src 'self'; "
-                + "connect-src 'self'; "
+                + "connect-src 'self' https://data.so.ch; "
+                + "worker-src 'self' blob:; "
                 + "object-src 'none'; "
                 + "base-uri 'self'; "
                 + "frame-ancestors 'none'; "

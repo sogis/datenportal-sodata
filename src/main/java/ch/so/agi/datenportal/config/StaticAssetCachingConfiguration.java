@@ -26,6 +26,9 @@ public class StaticAssetCachingConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/explore/**")
                 .addResourceLocations("classpath:/static/explore/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePublic());
+        registry.addResourceHandler("/explore-extensions/**")
+                .addResourceLocations("classpath:/static/explore-extensions/")
+                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)).cachePublic());
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/static/images/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic());

@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import {resolve} from 'node:path';
 
 export default defineConfig({
+  base: '/explore/',
   plugins: [react()],
   build: {
     outDir: resolve(__dirname, '../../../../build/generated-resources/explore/static/explore'),

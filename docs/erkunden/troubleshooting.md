@@ -1,8 +1,8 @@
 # Erkunden Troubleshooting
 
-Status: Phase 2 frontend island bootstrap
+Status: Phase 3 DuckDB-Wasm Parquet registration
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die spaeteren DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Phase 2 laedt nur die React/Vite-Insel und validiert den eingebetteten JSON-Kontext. DuckDB-Wasm, Worker, Wasm-Dateien, CORS und Range Requests werden noch nicht ausgefuehrt.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau.
 
 ## Phase-2-Island laedt nicht
 
@@ -18,22 +18,33 @@ Geplantes Verhalten:
 - Wenn der Kontext fehlt oder ungueltig ist, zeigt die Insel eine kurze Fehlermeldung.
 - Die normale Datensatzseite und Downloads bleiben erreichbar.
 
-## Phase 2 und DuckDB-Wasm
+## DuckDB-Wasm startet nicht
 
-Noch nicht betroffen:
+Pruefen:
 
-- CORS
-- Range Requests
-- DuckDB-Wasm-Initialisierung
-- Worker-Ladepfade
-- Wasm-CSP
-- Parquet-HTTP-Fehler
+- Sind `/explore/assets/duckdb-browser-mvp.worker.js` und `/explore/assets/duckdb-mvp.wasm` erreichbar?
+- Enthaelt die CSP `worker-src 'self' blob:`?
+- Enthaelt die CSP `script-src 'self' 'wasm-unsafe-eval'`?
+- Wurde der Vite-Build mit `base: '/explore/'` ausgefuehrt, damit Worker/Wasm-URLs unter `/explore/assets/` liegen?
 
-Diese Pfade beginnen in Phase 3.
+Phase-3-Fund:
+
+- Die DuckDB-Wasm Worker- und Wasm-Dateien werden lokal ueber Vite `?url` aus `@duckdb/duckdb-wasm` gebuendelt; jsDelivr/CDN-Bundles werden nicht verwendet.
+- Die SQLRooms-Auswahl verwendet im MVP die stabile DuckDB-Wasm-MVP-Variante. Die EH-Variante wurde in Chromium Headless zwar automatisch bevorzugt, brach in dieser Umgebung aber mit `RuntimeError: function signature mismatch` ab.
+
+## DuckDB Parquet Extension
+
+DuckDB-Wasm laedt die Parquet-Erweiterung beim ersten `read_parquet(...)`. Ohne weitere Konfiguration versucht DuckDB dafuer `https://extensions.duckdb.org/.../parquet.duckdb_extension.wasm`.
+
+Phase-3-Entscheid:
+
+- Die signierte offizielle Parquet-Erweiterung fuer DuckDB-Wasm `v1.4.3/wasm_mvp` liegt same-origin unter `/explore-extensions/v1.4.3/wasm_mvp/parquet.duckdb_extension.wasm`.
+- Die React-Insel setzt beim DuckDB-Start `custom_extension_repository` auf `${location.origin}/explore-extensions`.
+- Dadurch bleibt `connect-src 'self' https://data.so.ch` eng, und CI/Playwright braucht keinen Zugriff auf `extensions.duckdb.org`.
 
 ## Keine Parquet-Distribution
 
-Geplantes Verhalten:
+Verhalten:
 
 - Die Explore-Seite bleibt im normalen Datenportal-Layout nutzbar.
 - Es wird kurz erklaert, dass Erkunden fuer dieses Datenthema noch nicht verfuegbar ist, weil keine Parquet-Datei publiziert ist.
@@ -41,9 +52,13 @@ Geplantes Verhalten:
 
 ## CORS und Range Requests
 
-DuckDB-Wasm liest Parquet-Dateien im Browser. Echte Download-URLs muessen deshalb browserseitig abrufbar sein.
+DuckDB-Wasm liest Parquet-Dateien im Browser. Echte Download-URLs muessen deshalb browserseitig abrufbar sein. Phase 3 erlaubt browserseitig nur same-origin und `https://data.so.ch`:
 
-Zu pruefen ab Phase 3:
+```text
+connect-src 'self' https://data.so.ch
+```
+
+Zu pruefen fuer produktive Parquet-Hosts:
 
 - `Access-Control-Allow-Origin`
 - `Accept-Ranges`
@@ -52,6 +67,12 @@ Zu pruefen ab Phase 3:
 - Content-Type und Content-Length
 
 Fehler sollen klar zwischen Netzwerk-, CORS-, Range-Request- und Parquet-Ladeproblemen unterscheiden, soweit technisch moeglich.
+
+Phase-3-Fund:
+
+- CI/Playwright verwendet eine same-origin Fixture unter `/explore-fixtures/ch.so.oev_haltestellen.parquet`.
+- `data.so.ch`-Fixture-URLs konnten in der Implementierungs-/Planungsumgebung nicht per DNS aufgeloest werden (`Could not resolve host: data.so.ch`). Die echte externe Parquet-Pruefung bleibt deshalb ein manueller/operativer Smoke-Test, sobald der Produktionshost aus der Zielumgebung erreichbar ist.
+- Externe Parquet-Hosts muessen CORS fuer den Portal-Origin erlauben und Byte Range Requests unterstuetzen. Ohne Range-Unterstuetzung kann DuckDB-Wasm grosse Parquet-Dateien ineffizient oder gar nicht laden.
 
 ## Safari und WebAssembly
 

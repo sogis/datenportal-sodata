@@ -9,7 +9,7 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | 0. Repository orientation and documentation scaffold | DONE | Documentation scaffold created; baseline tests recorded. |
 | 1. Backend context and route | DONE | Backend context, JSON endpoint, JTE host page and backend tests implemented. |
 | 2. Frontend island bootstrap | DONE | React/Vite island embedded in JTE and built through Gradle/npm. |
-| 3. DuckDB-Wasm Parquet registration | TODO | CORS and Range Request checks pending. |
+| 3. DuckDB-Wasm Parquet registration | DONE | DuckDB-Wasm starts locally, Parquet views register, same-origin preview fixture passes. |
 | 4. SQL laboratory and generated recipes | TODO | Not started. |
 | 5. Charting V1 with Recharts | TODO | Not started. |
 | 6. Code snippets and local query history | TODO | Not started. |
@@ -158,3 +158,47 @@ Known limitations:
 - The island is a bootstrap skeleton only.
 - No DuckDB-Wasm runtime, worker, Wasm binary, CORS or Range Request path is exercised yet.
 - No SQL editor, query execution, result table, chart inference, chart rendering, CSV export or local history is implemented yet.
+
+## Phase 3 Entry
+
+Date: 2026-07-01
+
+Branch: `main`
+
+Scope:
+
+- Added browser-local DuckDB-Wasm startup through SQLRooms room-store and DuckDB slice APIs.
+- Bundled DuckDB-Wasm worker/wasm assets locally with Vite `?url`; no jsDelivr runtime bundles are used.
+- Added Phase-3 Parquet view registration for every backend-provided table using `read_parquet('<absolute-url>')`.
+- Added per-table registration state and a default preview query for the primary table.
+- Added compact table catalog and preview result table in the existing Explore React island.
+- Added Phase-3 query-safety helper coverage for single read-only statements and result limits.
+- Updated CSP for Wasm, blob workers and `https://data.so.ch` Parquet fetches.
+- Added same-origin DuckDB-Wasm Parquet extension mirror under `/explore-extensions/v1.4.3/wasm_mvp/`.
+- Added same-origin Parquet Playwright fixture under `/explore-fixtures/`.
+- Charting, SQL editor wiring, result export and local history remain deferred.
+
+Implementation notes:
+
+- The SQLRooms connector uses `createWasmDuckDbConnector`, `createDuckDbSlice`, `createBaseRoomSlice` and `createRoomStore`.
+- DuckDB-Wasm is pinned to the MVP bundle for Phase 3. Chromium Headless selected the EH bundle automatically when offered, but that path failed in this environment with `RuntimeError: function signature mismatch`.
+- DuckDB-Wasm loads Parquet through a loadable extension. The official signed `parquet.duckdb_extension.wasm` was mirrored same-origin and DuckDB is initialized with `custom_extension_repository = '<origin>/explore-extensions'`.
+- The installed SQLRooms query helper package uses extensionless ESM internals that Vitest could not import directly. Phase 3 therefore keeps local equivalent query guard logic for `splitSqlStatements`/limit wrapping behavior and tests it explicitly.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 4 passed (4)`, `Tests 17 passed (17)`, duration `1.30s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore bundle plus DuckDB worker/wasm assets under `/explore/assets/`, `built in 990ms` |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 3s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 7s`; includes same-origin Parquet registration and preview rows |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 23s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+Known limitations:
+
+- External `https://data.so.ch` Parquet smoke remains manual because DNS resolution for `data.so.ch` failed from the implementation/planning environment.
+- Production Parquet URLs still require browser-visible CORS and byte Range support.
+- The mirrored Parquet extension is tied to DuckDB-Wasm `v1.4.3/wasm_mvp`; upgrading `@duckdb/duckdb-wasm` requires refreshing the extension path and binary.
+- Large DuckDB-Wasm assets are expected in Phase 3; code-splitting is deferred until broader UX hardening unless load time becomes a measured problem.

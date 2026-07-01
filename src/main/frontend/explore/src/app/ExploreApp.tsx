@@ -1,7 +1,18 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
+import type {Table} from 'apache-arrow';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
+import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
+import {assertSafeTableName, registerParquetTables, type RegisteredTable} from '../duckdb/registerParquetTables';
 
 type ExploreTab = 'preview' | 'sql' | 'chart' | 'code';
+type RuntimePhase = 'idle' | 'initializing' | 'registering' | 'previewing' | 'ready' | 'error';
+
+interface PreviewResult {
+  sql: string;
+  columns: string[];
+  rows: Array<Record<string, unknown>>;
+  rowCount: number;
+}
 
 const tabs: Array<{id: ExploreTab; label: string}> = [
   {id: 'preview', label: 'Vorschau'},
@@ -12,7 +23,79 @@ const tabs: Array<{id: ExploreTab; label: string}> = [
 
 export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [activeTab, setActiveTab] = useState<ExploreTab>('preview');
+  const [phase, setPhase] = useState<RuntimePhase>('idle');
+  const [runtimeError, setRuntimeError] = useState<string | null>(null);
+  const [registeredTables, setRegisteredTables] = useState<RegisteredTable[]>([]);
+  const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
+  const room = useMemo(() => createExploreRoomStore(context), [context]);
+
+  useEffect(() => {
+    if (context.tables.length === 0 || !primaryTable) {
+      return undefined;
+    }
+
+    let active = true;
+    const primary = primaryTable;
+
+    async function initializeDuckDb() {
+      setPhase('initializing');
+      setRuntimeError(null);
+      setRegisteredTables(context.tables.map((table) => ({table, status: 'pending', sql: ''})));
+      setPreviewResult(null);
+
+      try {
+        await room.roomStore.getState().db.initialize();
+        if (!active) {
+          return;
+        }
+
+        const connector = await room.roomStore.getState().db.getConnector();
+        setPhase('registering');
+        const registrations = await registerParquetTables(connector, context.tables);
+        if (!active) {
+          return;
+        }
+        setRegisteredTables(registrations);
+
+        const primaryRegistration = registrations.find((registration) => registration.table.id === primary.id);
+        if (!primaryRegistration || primaryRegistration.status === 'failed') {
+          throw new Error(primaryRegistration?.error ?? 'Die primäre Parquet-Datei konnte nicht registriert werden.');
+        }
+
+        setPhase('previewing');
+        const previewSql = buildPreviewSql(primary, context.execution.maxPreviewRows);
+        const timeoutController = new AbortController();
+        const timeoutId = window.setTimeout(() => timeoutController.abort(), context.execution.queryTimeoutMs);
+        try {
+          const arrowTable = await connector.query(previewSql, {signal: timeoutController.signal});
+          if (!active) {
+            return;
+          }
+          setPreviewResult(toPreviewResult(previewSql, arrowTable));
+          setPhase(registrations.some((registration) => registration.status === 'failed') ? 'error' : 'ready');
+          if (registrations.some((registration) => registration.status === 'failed')) {
+            setRuntimeError('Mindestens eine Parquet-Datei konnte nicht registriert werden. Die Vorschau der primären Tabelle ist verfügbar.');
+          }
+        } finally {
+          window.clearTimeout(timeoutId);
+        }
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+        setRuntimeError(toErrorMessage(error));
+        setPhase('error');
+      }
+    }
+
+    void initializeDuckDb();
+
+    return () => {
+      active = false;
+      void room.roomStore.getState().db.destroy();
+    };
+  }, [context, primaryTable, room]);
 
   if (context.tables.length === 0) {
     return (
@@ -78,24 +161,17 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         </aside>
 
         <main className="dp-explore-workspace" aria-live="polite">
-          <p className="dp-explore-status">DuckDB wird vorbereitet</p>
+          <p className={`dp-explore-status dp-explore-status--${phase}`}>
+            {statusText(phase)}
+          </p>
+          {runtimeError && <p className="dp-explore-runtime-error">{runtimeError}</p>}
           <h3>{activeTabLabel(activeTab)}</h3>
-          <p>{placeholderText(activeTab)}</p>
-          {primaryTable && (
-            <pre className="dp-explore-sql" aria-label="SQL Vorschau">{`select *\nfrom ${primaryTable.name}\nlimit ${context.execution.maxPreviewRows};`}</pre>
-          )}
+          {renderActiveTab(activeTab, context, primaryTable, phase, previewResult)}
         </main>
 
         <aside className="dp-explore-panel" aria-labelledby="explore-tables-title">
           <h3 id="explore-tables-title">Tabellen</h3>
-          <ul className="dp-explore-table-list">
-            {context.tables.map((table) => (
-              <li key={table.id}>
-                <strong>{table.title}</strong>
-                <span>{table.columns.length === 1 ? '1 Attribut' : `${table.columns.length} Attribute`}</span>
-              </li>
-            ))}
-          </ul>
+          <TableCatalog tables={context.tables} registrations={registeredTables} />
         </aside>
       </div>
     </section>
@@ -110,19 +186,175 @@ function activeTabLabel(activeTab: ExploreTab): string {
   return tabs.find((tab) => tab.id === activeTab)?.label ?? 'Vorschau';
 }
 
-function placeholderText(activeTab: ExploreTab): string {
+function renderActiveTab(
+  activeTab: ExploreTab,
+  context: ExploreContextDto,
+  primaryTable: ExploreTableDto | undefined,
+  phase: RuntimePhase,
+  previewResult: PreviewResult | null
+) {
   switch (activeTab) {
     case 'preview':
-      return 'Die Tabellenübersicht ist bereit. Die DuckDB-Registrierung folgt in der nächsten Phase.';
+      return <PreviewPanel context={context} primaryTable={primaryTable} phase={phase} previewResult={previewResult} />;
     case 'sql':
-      return 'Der SQL-Editor wird hier eingebunden, sobald DuckDB-Wasm initialisiert wird.';
+      return (
+        <>
+          <p>Der SQL-Editor folgt in Phase 4. Die Standardabfrage läuft bereits lokal mit DuckDB-Wasm.</p>
+          {primaryTable && <pre className="dp-explore-sql" aria-label="SQL Vorschau">{buildPreviewSql(primaryTable, context.execution.maxPreviewRows)}</pre>}
+        </>
+      );
     case 'chart':
-      return 'Diagramme entstehen später aus SQL-Resultaten. Für Phase 2 bleibt dies ein Platzhalter.';
+      return <p>Diagramme entstehen in Phase 5 aus SQL-Resultaten.</p>;
     case 'code':
-      return 'Reproduzierbare Codebeispiele werden in einer späteren Phase interaktiv kopierbar.';
+      return <p>Reproduzierbare Codebeispiele werden in Phase 6 interaktiv kopierbar.</p>;
   }
 }
 
 function formatSwissNumber(value: number): string {
   return new Intl.NumberFormat('de-CH').format(value);
+}
+
+function statusText(phase: RuntimePhase): string {
+  switch (phase) {
+    case 'idle':
+    case 'initializing':
+      return 'DuckDB wird initialisiert';
+    case 'registering':
+      return 'Parquet-Dateien werden registriert';
+    case 'previewing':
+      return 'Vorschau wird geladen';
+    case 'ready':
+      return 'Bereit';
+    case 'error':
+      return 'DuckDB-Hinweis';
+  }
+}
+
+function buildPreviewSql(table: ExploreTableDto, maxPreviewRows: number): string {
+  assertSafeTableName(table.name);
+  return `select *
+from ${table.name}
+limit ${maxPreviewRows};`;
+}
+
+function PreviewPanel({
+  context,
+  primaryTable,
+  phase,
+  previewResult
+}: {
+  context: ExploreContextDto;
+  primaryTable: ExploreTableDto | undefined;
+  phase: RuntimePhase;
+  previewResult: PreviewResult | null;
+}) {
+  if (!primaryTable) {
+    return <p>Keine Parquet-Tabelle verfügbar.</p>;
+  }
+  return (
+    <>
+      <p>Standardvorschau für {primaryTable.title}. Maximal {formatSwissNumber(context.execution.maxPreviewRows)} Zeilen.</p>
+      <pre className="dp-explore-sql" aria-label="SQL Vorschau">{buildPreviewSql(primaryTable, context.execution.maxPreviewRows)}</pre>
+      {previewResult ? (
+        <PreviewTable result={previewResult} />
+      ) : (
+        <p className="dp-explore-muted">{phase === 'error' ? 'Keine Vorschau verfügbar.' : 'Die Vorschau wird vorbereitet.'}</p>
+      )}
+    </>
+  );
+}
+
+function PreviewTable({result}: {result: PreviewResult}) {
+  return (
+    <div className="dp-explore-preview" aria-label="Tabellenvorschau">
+      <div className="dp-explore-preview__summary">
+        {result.rowCount === 1 ? '1 Zeile geladen' : `${formatSwissNumber(result.rowCount)} Zeilen geladen`}
+      </div>
+      <div className="dp-explore-preview__scroll">
+        <table>
+          <thead>
+            <tr>
+              {result.columns.map((column) => (
+                <th key={column} scope="col">{column}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {result.rows.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {result.columns.map((column) => (
+                  <td key={column}>{formatCell(row[column])}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function TableCatalog({tables, registrations}: {tables: ExploreTableDto[]; registrations: RegisteredTable[]}) {
+  return (
+    <ul className="dp-explore-table-list">
+      {tables.map((table) => {
+        const registration = registrations.find((item) => item.table.id === table.id);
+        return (
+          <li key={table.id}>
+            <strong>{table.title}</strong>
+            <span>{table.columns.length === 1 ? '1 Attribut' : `${table.columns.length} Attribute`}</span>
+            <span className={registration?.status === 'registered' ? 'dp-explore-table-status is-ok' : 'dp-explore-table-status'}>
+              {registrationStatusText(registration)}
+            </span>
+            {registration?.status === 'failed' && registration.error && (
+              <small>{registration.error}</small>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function registrationStatusText(registration: RegisteredTable | undefined): string {
+  if (!registration) {
+    return 'Wartet';
+  }
+  if (registration.status === 'registered') {
+    return 'Registriert';
+  }
+  return registration.status === 'pending' ? 'Wird registriert' : 'Fehler';
+}
+
+function toPreviewResult(sql: string, table: Table): PreviewResult {
+  const columns = table.schema.fields.map((field) => field.name);
+  const rows: Array<Record<string, unknown>> = [];
+  for (let rowIndex = 0; rowIndex < table.numRows; rowIndex++) {
+    const row: Record<string, unknown> = {};
+    columns.forEach((column, columnIndex) => {
+      row[column] = table.getChildAt(columnIndex)?.get(rowIndex) ?? null;
+    });
+    rows.push(row);
+  }
+  return {sql, columns, rows, rowCount: table.numRows};
+}
+
+function formatCell(value: unknown): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+  return String(value);
+}
+
+function toErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
 }
