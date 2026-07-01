@@ -7,8 +7,10 @@
 .dp-explore-island {
   display: grid;
   gap: var(--dp-space-5);
+  min-width: 0;
   width: 100%;
   color: var(--dp-color-text);
+  overflow-wrap: break-word;
 }
 
 .dp-explore-island h2,
@@ -135,6 +137,12 @@
   min-height: 20rem;
 }
 
+.dp-explore-tab-panel {
+  display: grid;
+  gap: var(--dp-space-3);
+  min-width: 0;
+}
+
 .dp-explore-status {
   justify-self: start;
   padding: var(--dp-space-1) var(--dp-space-2);
@@ -148,7 +156,30 @@
   color: var(--dp-color-badge-warning-text);
 }
 
-.dp-explore-runtime-error,
+.dp-explore-runtime-error {
+  display: grid;
+  gap: var(--dp-space-2);
+  min-width: 0;
+  padding: var(--dp-space-2);
+  border-radius: var(--dp-radius-sm);
+  background: var(--dp-color-badge-warning-bg);
+  color: var(--dp-color-badge-warning-text);
+  font-size: 16px;
+}
+
+.dp-explore-runtime-error details {
+  min-width: 0;
+}
+
+.dp-explore-runtime-error summary {
+  cursor: pointer;
+}
+
+.dp-explore-runtime-error details p {
+  margin-top: var(--dp-space-2);
+  overflow-wrap: anywhere;
+}
+
 .dp-explore-muted {
   color: var(--dp-color-text-muted);
   font-size: 16px;
@@ -341,6 +372,10 @@
   flex-wrap: wrap;
   gap: var(--dp-space-2);
   align-items: center;
+}
+
+.dp-explore-sql-toolbar > .dp-explore-muted {
+  flex-basis: 100%;
 }
 
 .dp-explore-button {
@@ -676,6 +711,14 @@
   .dp-explore-shell {
     grid-template-columns: 1fr;
   }
+
+  .dp-explore-panel {
+    order: 2;
+  }
+
+  .dp-explore-workspace {
+    order: 1;
+  }
 }
 
 @media (max-width: 36rem) {
@@ -701,10 +744,35 @@
   }
 
   .dp-explore-chart__controls {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 
   .dp-explore-chart__canvas {
     height: 16rem;
+  }
+}
+
+@media (max-width: 28rem) {
+  .dp-explore-island {
+    gap: var(--dp-space-4);
+  }
+
+  .dp-explore-tabs__tab,
+  .dp-explore-button,
+  .dp-explore-code__tab {
+    min-width: 0;
+    padding-inline: var(--dp-space-2);
+  }
+
+  .dp-explore-sql-toolbar .dp-explore-button,
+  .dp-explore-result__actions .dp-explore-button,
+  .dp-explore-code__header .dp-explore-button,
+  .dp-explore-history__header .dp-explore-button {
+    flex: 1 1 100%;
+  }
+
+  .dp-explore-code__tabs {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 }

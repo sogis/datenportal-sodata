@@ -1,10 +1,10 @@
 # Erkunden
 
-Status: Phase 6 code snippets and local history implemented
+Status: Phase 7 UX hardening and browser checks implemented
 
 Erkunden ist ein lokales SQL-Labor pro Datenthema. Die Abfragen laufen im Browser mit DuckDB-Wasm direkt auf den Parquet-Dateien.
 
-Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Bis Phase 6 existieren die Backend-Kontext-Route, die eingebettete React/Vite-Insel, DuckDB-Wasm-Parquet-Registrierung, generierte Beispielabfragen, ein SQL-Labor, Resultattabelle, CSV-Export, einfache Diagramme aus SQL-Resultaten, statische Codebeispiele und lokale Query-Historie.
+Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Bis Phase 7 existieren die Backend-Kontext-Route, die eingebettete React/Vite-Insel, DuckDB-Wasm-Parquet-Registrierung, generierte Beispielabfragen, ein SQL-Labor, Resultattabelle, CSV-Export, einfache Diagramme aus SQL-Resultaten, statische Codebeispiele, lokale Query-Historie sowie gehaertete Lade-/Fehlerzustaende, Tastaturbedienung und mobile Browserchecks.
 
 ## Produktidee
 
@@ -17,6 +17,7 @@ Die Seite soll pro Datenthema eine kleine, nuetzliche Explorationsflaeche anbiet
 - Diagramme entstehen aus dem aktuellen SQL-Resultat; bevorzugte Diagrammtypen aus Rezepten werden nur bei unveraendert ausgefuehrtem Rezept verwendet.
 - Statische Codebeispiele fuer DuckDB CLI, Python und R koennen kopiert werden.
 - Erfolgreich ausgefuehrte SQL-Abfragen werden pro Datenthema lokal im Browser gespeichert; Resultatzeilen werden nicht gespeichert.
+- Lade-, Parquet- und Query-Fehler werden sichtbar und ohne serverseitige SQL-Ausfuehrung behandelt.
 - Es gibt keine serverseitige SQL-Ausfuehrung und keine gespeicherten Sessions.
 
 ## Benennung

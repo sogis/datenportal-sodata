@@ -1,8 +1,8 @@
 # Erkunden Troubleshooting
 
-Status: Phase 6 code snippets and local history
+Status: Phase 7 UX hardening and browser checks
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden. Seit Phase 5 koennen SQL-Resultate als einfache Recharts-Diagramme angezeigt werden. Seit Phase 6 koennen statische Codebeispiele kopiert und erfolgreiche Abfragen lokal im Browser wiedergefunden werden.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Seit Phase 3 initialisiert die React-Insel DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und laedt eine Standardvorschau. Seit Phase 4 koennen generierte Rezepte und manuelles SQL lokal ausgefuehrt und als aktuelles Resultat exportiert werden. Seit Phase 5 koennen SQL-Resultate als einfache Recharts-Diagramme angezeigt werden. Seit Phase 6 koennen statische Codebeispiele kopiert und erfolgreiche Abfragen lokal im Browser wiedergefunden werden. Seit Phase 7 sind Lade-/Fehlerzustaende, Tastaturbedienung und mobile Layoutchecks gehaertet.
 
 ## Phase-2-Island laedt nicht
 
@@ -68,20 +68,36 @@ Zu pruefen fuer produktive Parquet-Hosts:
 
 Fehler sollen klar zwischen Netzwerk-, CORS-, Range-Request- und Parquet-Ladeproblemen unterscheiden, soweit technisch moeglich.
 
+Verhalten ab Phase 7:
+
+- Die React-Insel klassifiziert Browserfehler best-effort in DuckDB-Wasm-, CORS-, Range-, HTTP/IO- und Parquet-Ladefehler.
+- Die Fehlerbox bleibt im normalen Datenportal-Layout; der Link `Zur Datensatzseite` im Hostbereich bleibt erreichbar.
+- Playwright prueft eine fehlende same-origin Parquet-Datei als reproduzierbaren Fehlerpfad.
+
 Phase-3-Fund:
 
 - CI/Playwright verwendet eine same-origin Fixture unter `/explore-fixtures/ch.so.oev_haltestellen.parquet`.
 - `data.so.ch`-Fixture-URLs konnten in der Implementierungs-/Planungsumgebung nicht per DNS aufgeloest werden (`Could not resolve host: data.so.ch`). Die echte externe Parquet-Pruefung bleibt deshalb ein manueller/operativer Smoke-Test, sobald der Produktionshost aus der Zielumgebung erreichbar ist.
 - Externe Parquet-Hosts muessen CORS fuer den Portal-Origin erlauben und Byte Range Requests unterstuetzen. Ohne Range-Unterstuetzung kann DuckDB-Wasm grosse Parquet-Dateien ineffizient oder gar nicht laden.
 
+Phase-7-Fund:
+
+- `curl -I --max-time 10 https://data.so.ch/download/ch.so.oev_haltestellen.parquet` schlug in der Agent-Umgebung weiterhin fehl mit `curl: (6) Could not resolve host: data.so.ch`.
+
 ## Safari und WebAssembly
 
-Zu pruefen ab Phase 7:
+Automatisiert geprueft ab Phase 7:
+
+- Chromium Headless via Java Playwright fuer DuckDB-Wasm-Initialisierung, same-origin Parquet, SQL, Diagramm, Code, Fehlerzustand und mobile Overflow-Checks.
+
+Weiterhin manuell/operativ zu pruefen:
 
 - DuckDB-Wasm-Initialisierung.
 - Worker- und Wasm-Ladepfade.
 - Speichergrenzen bei grossen Dateien.
 - CSP-Anforderungen fuer Wasm und Worker.
+
+Chrome, Firefox und Safari sind auf dem lokalen System als Apps vorhanden, wurden in diesem Agent-Lauf aber nicht als kontrollierbare GUI-Browser manuell verifiziert.
 
 ## Grosse Dateien und Resultate
 

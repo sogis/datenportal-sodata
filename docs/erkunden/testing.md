@@ -16,6 +16,7 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit Phase 4 prueft Playwright Rezeptauswahl, SQL-Ausfuehrung, Resultattabelle und CSV-Download mit derselben Fixture.
 - Seit Phase 5 pruefen Vitest und Playwright Diagramm-Inferenz, Diagramm-Controls und echte Recharts-Renderingpfade mit derselben Fixture.
 - Seit Phase 6 pruefen Vitest und Playwright statische Codebeispiele, Kopieraktionen und lokale Query-Historie.
+- Seit Phase 7 pruefen Vitest und Playwright zusaetzlich Status-/Fehlerzustaende, Haupt-Tab-Tastaturbedienung, fehlende Parquet-Dateien, Browser-Konsole und page-level Mobile-Overflow.
 
 ## Baseline am 2026-07-01
 
@@ -298,9 +299,63 @@ Ergebnis: PASS, `BUILD SUCCESSFUL in 20s`; umfasst DuckDB-Wasm-Parquet-Registrie
 
 Ergebnis: PASS, `BUILD SUCCESSFUL in 41s`; fuehrte Vitest, Typecheck, Vite-Build, Backend-Tests und Playwright aus.
 
-Phase 7 und spaeter:
+## Phase 7 am 2026-07-01
 
-- Breitere Mobile-/UX-Hardening-Szenarien und manuelle Browsermatrix.
+Phase 7 ergaenzt:
+
+- Frontend-Unit-Tests fuer Runtime-Fehlerklassifizierung: CORS, Range, HTTP/IO, DuckDB-Wasm.
+- React-Komponententests fuer Haupt-Tab-Tastaturbedienung und ARIA-Status-/Alert-Regionen.
+- React-Komponententests fuer Resultatzustaende: idle, running, cancelled, timeout und query error.
+- Java-Playwright-Tests fuer Browser-Konsole ohne Fehler im Erfolgsfall, Tastatur-Navigation, fehlende Parquet-Datei mit lesbarer Fehlerbox und mobilen Overflow bei 320, 390 und 768 Pixel Breite.
+- Externer Parquet-Host-Check per `curl`.
+
+Ausgefuehrte Befehle:
+
+```bash
+npm --prefix src/main/frontend/explore test
+```
+
+Ergebnis: PASS, `Test Files 13 passed (13)`, `Tests 63 passed (63)`, Dauer `4.52s`.
+
+```bash
+npm --prefix src/main/frontend/explore run typecheck
+```
+
+Ergebnis: PASS, `tsc --noEmit` ohne Fehler.
+
+```bash
+npm --prefix src/main/frontend/explore run build
+```
+
+Ergebnis: PASS, Vite baute Explore- und DuckDB-Wasm-Assets unter `/explore/assets/`, `built in 1.58s`. Vite meldet weiterhin die erwartete Warnung zu grossen DuckDB-Wasm-Chunks.
+
+```bash
+./gradlew test --tests 'ch.so.agi.datenportal.explore.*'
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 10s`.
+
+```bash
+./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 24s`; umfasst erfolgreiche DuckDB-Wasm-Parquet-Registrierung, Browser-Konsolencheck, Tastatur-Tabnavigation, fehlende Parquet-Datei, SQL-Resultat, Diagramm, Codebeispiele und mobile Overflow-Checks.
+
+```bash
+./gradlew clean check
+```
+
+Ergebnis: PASS, `BUILD SUCCESSFUL in 50s`; fuehrte Vitest, Typecheck, Vite-Build, Backend-Tests und Playwright aus.
+
+```bash
+curl -I --max-time 10 https://data.so.ch/download/ch.so.oev_haltestellen.parquet
+```
+
+Ergebnis: FAIL in der Agent-Umgebung, `curl: (6) Could not resolve host: data.so.ch`.
+
+Phase 8 und spaeter:
+
+- Manuelle Browsermatrix fuer echte Chrome-/Firefox-/Safari-Installationen und real erreichbares `data.so.ch` bleiben operative Smoke-Checks.
 
 ## Standard-Verifikation
 

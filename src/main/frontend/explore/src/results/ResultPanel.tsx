@@ -12,23 +12,23 @@ export function ResultPanel({
   datasetId: string;
 }) {
   if (result.status === 'idle') {
-    return <p className="dp-explore-muted">Noch keine Abfrage ausgeführt.</p>;
+    return <p className="dp-explore-muted" role="status">Noch keine Abfrage ausgeführt.</p>;
   }
 
   if (result.status === 'running') {
-    return <p className="dp-explore-muted">Abfrage läuft.</p>;
+    return <p className="dp-explore-muted" role="status" aria-live="polite">Abfrage läuft.</p>;
   }
 
   if (result.status === 'cancelled') {
-    return <p className="dp-explore-muted">Abfrage abgebrochen.</p>;
+    return <p className="dp-explore-muted" role="status">Abfrage abgebrochen.</p>;
   }
 
   if (result.status === 'timeout') {
-    return <p className="dp-explore-runtime-error">Abfrage nach dem Zeitlimit abgebrochen.</p>;
+    return <p className="dp-explore-runtime-error" role="alert">Abfrage nach dem Zeitlimit abgebrochen.</p>;
   }
 
   if (result.status === 'error') {
-    return <p className="dp-explore-runtime-error">{result.error ?? 'Die Abfrage konnte nicht ausgeführt werden.'}</p>;
+    return <p className="dp-explore-runtime-error" role="alert">{result.error ?? 'Die Abfrage konnte nicht ausgeführt werden.'}</p>;
   }
 
   return (
@@ -93,4 +93,3 @@ function formatDuration(durationMs: number): string {
 function formatSwissNumber(value: number): string {
   return new Intl.NumberFormat('de-CH').format(value);
 }
-

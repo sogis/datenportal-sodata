@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {tableFromArrays} from 'apache-arrow';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -68,12 +68,35 @@ describe('ExploreApp', () => {
     expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toBeInTheDocument();
     expect(screen.getByRole('tab', {name: 'Diagramm'})).toBeInTheDocument();
     expect(screen.getByRole('tab', {name: 'Code'})).toBeInTheDocument();
+    expect(screen.getByRole('status', {name: 'Erkunden Status'})).toHaveTextContent('DuckDB wird initialisiert');
     expect(screen.getByText('DuckDB wird initialisiert')).toBeInTheDocument();
     expect(screen.getByLabelText('SQL Vorschau')).toHaveTextContent('select *');
     expect(await screen.findByText('Bereit')).toBeInTheDocument();
     expect(screen.getByText('Registriert')).toBeInTheDocument();
     expect(screen.getByText('Solothurn')).toBeInTheDocument();
     expect(screen.getByText('Olten')).toBeInTheDocument();
+  });
+
+  it('supports keyboard navigation in the main tab list', async () => {
+    const user = userEvent.setup();
+    render(<ExploreApp context={sampleExploreContext} />);
+
+    expect(await screen.findByText('Bereit')).toBeInTheDocument();
+    const previewTab = screen.getByRole('tab', {name: 'Vorschau'});
+    previewTab.focus();
+
+    await user.keyboard('{ArrowRight}');
+    await waitFor(() => expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toHaveFocus());
+    expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel', {name: 'SQL-Labor'})).toBeInTheDocument();
+
+    await user.keyboard('{End}');
+    await waitFor(() => expect(screen.getByRole('tab', {name: 'Code'})).toHaveFocus());
+    expect(screen.getByRole('tab', {name: 'Code'})).toHaveAttribute('aria-selected', 'true');
+
+    await user.keyboard('{Home}');
+    await waitFor(() => expect(screen.getByRole('tab', {name: 'Vorschau'})).toHaveFocus());
+    expect(screen.getByRole('tab', {name: 'Vorschau'})).toHaveAttribute('aria-selected', 'true');
   });
 
   it('switches to the SQL laboratory and runs the selected recipe', async () => {
@@ -127,6 +150,8 @@ describe('ExploreApp', () => {
     render(<ExploreApp context={sampleExploreContext} />);
 
     expect(await screen.findByText('DuckDB-Hinweis')).toBeInTheDocument();
+    expect(screen.getByRole('alert', {name: 'Erkunden Status'})).toHaveTextContent('DuckDB-Hinweis');
+    expect(screen.getAllByText('Parquet-Datei konnte wegen CORS nicht im Browser geladen werden.').length).toBeGreaterThan(0);
     expect(screen.getAllByText('CORS blocked').length).toBeGreaterThan(0);
     expect(screen.getByText('Fehler')).toBeInTheDocument();
   });

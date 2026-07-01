@@ -13,7 +13,7 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | 4. SQL laboratory and generated recipes | DONE | SQL-Labor, generated recipe execution, guarded/limited queries, result table and CSV export implemented. |
 | 5. Charting V1 with Recharts | DONE | Automatic chart inference and Recharts panel from SQL results implemented. |
 | 6. Code snippets and local query history | DONE | Static DuckDB/Python/R snippets and per-dataset local history implemented. |
-| 7. UX hardening and browser checks | TODO | Not started. |
+| 7. UX hardening and browser checks | DONE | Loading/error states, accessibility, mobile robustness and browser checks documented. |
 | 8. Future hooks for AI/WebR/Vega/Mosaic | TODO | Not started. |
 
 ## Phase 0 Entry
@@ -324,3 +324,42 @@ Known limitations:
 - Query history is browser-local only and is not synchronized across devices or sessions outside the same browser storage.
 - Clearing browser storage removes local history.
 - Broader UX hardening, manual browser matrix checks and real external `https://data.so.ch` Parquet smoke tests remain deferred to Phase 7.
+
+## Phase 7 Entry
+
+Date: 2026-07-01
+
+Branch: `main`
+
+Scope:
+
+- Added accessible runtime status semantics for the Explore island (`role="status"`, alert state, `aria-busy`).
+- Added keyboard navigation for the main Explore tablist with ArrowLeft/ArrowRight/Home/End.
+- Added readable runtime error classification for browser-local DuckDB-Wasm, HTTP/CORS/Range/Parquet and IO loading failures.
+- Kept the dataset detail page reachable through the existing `Zur Datensatzseite` link when the browser-local runtime fails.
+- Hardened mobile CSS for the SQL toolbar, code tabs, chart controls and page-level horizontal overflow at common narrow widths.
+- Added a broken same-origin Parquet fixture route in Playwright to test failure rendering without depending on external DNS/CORS.
+- No backend SQL execution, persistence, AI/WebR/Vega/Mosaic feature or public DTO change was added.
+
+Implementation notes:
+
+- Runtime error classification is best-effort because DuckDB-Wasm error messages vary by browser and failure layer.
+- The local automated browser path remains Chromium Playwright. Chrome, Firefox and Safari applications are installed locally, but this agent run did not perform a controllable GUI smoke test in those applications.
+- The real hosted Parquet check against `https://data.so.ch/download/ch.so.oev_haltestellen.parquet` could not reach DNS from this environment.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 13 passed (13)`, `Tests 63 passed (63)`, duration `4.52s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore and DuckDB-Wasm assets under `/explore/assets/`, `built in 1.58s`; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 10s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 24s`; includes same-origin Parquet registration, console-error check, keyboard tab navigation, broken-Parquet error state, SQL result/chart/code flows and mobile overflow checks at 320/390/768px |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 50s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+| `curl -I --max-time 10 https://data.so.ch/download/ch.so.oev_haltestellen.parquet` | FAIL from this environment, `curl: (6) Could not resolve host: data.so.ch` |
+
+Known limitations:
+
+- Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.
+- Large DuckDB-Wasm bundle warnings remain expected for the MVP.

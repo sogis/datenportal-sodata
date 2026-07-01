@@ -132,6 +132,14 @@ Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library
 - Gespeichert werden SQL, Ausfuehrungszeitpunkt und optionale Metadaten wie Rezepttitel, Zeilenzahl und Dauer. Resultatzeilen werden nie gespeichert.
 - Die Historie ist auf 20 Eintraege begrenzt, newest first, und ist eine Browser-Komfortfunktion. Fehler beim Lesen oder Schreiben von `localStorage` duerfen die SQL-Ausfuehrung nicht unterbrechen.
 
+## UX-Hardening ab Phase 7
+
+- Die React-Insel rendert den Runtime-Status als zugängliche Status-/Alert-Region und markiert den Arbeitsbereich waehrend Initialisierung, Registrierung und Vorschau als busy.
+- Die Haupt-Tabs `Vorschau`, `SQL-Labor`, `Diagramm` und `Code` unterstuetzen ArrowLeft/ArrowRight/Home/End und sind mit `tabpanel`-Bereichen verbunden.
+- Browserlokale Ladefehler werden best-effort klassifiziert: DuckDB-Wasm-Start, CORS, Range Requests, HTTP/IO und Parquet-Ladefehler. Die Klassifizierung ist UI-Hilfe und keine Garantie fuer exakte Netzwerkdiagnose.
+- Mobile CSS haelt Panel, Toolbar, Codebeispiele, Tabellen und Diagrammsteuerung innerhalb des Viewports; breite Tabellen und Codebloecke scrollen lokal statt die Seite zu verbreitern.
+- Playwright verwendet weiterhin eine same-origin Parquet-Fixture fuer stabile CI-Pfade und eine absichtlich fehlende Parquet-Fixture fuer den Fehlerzustand.
+
 ## Frontend-Asset-Build
 
 Gradle besitzt eigene npm-Tasks:

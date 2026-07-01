@@ -16,12 +16,14 @@ import ch.so.agi.datenportal.catalog.domain.Theme;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.ConsoleMessage;
 import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;
@@ -68,6 +70,7 @@ class ExploreIslandParquetPlaywrightTest {
     void explorePageRegistersSameOriginParquetAndShowsPreviewRows() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
             Page page = context.newPage();
+            List<String> browserErrors = collectBrowserErrors(page);
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             page.waitForSelector(".dp-explore-status--ready");
@@ -77,6 +80,43 @@ class ExploreIslandParquetPlaywrightTest {
             assertThat(page.locator("[aria-label='Tabellenvorschau']").count()).isEqualTo(1);
             assertThat(page.locator("text=Solothurn").count()).isGreaterThanOrEqualTo(1);
             assertThat(page.locator("text=Olten").count()).isGreaterThanOrEqualTo(1);
+            assertThat(browserErrors).isEmpty();
+        }
+    }
+
+    @Test
+    void exploreTabsSupportKeyboardNavigation() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+            page.waitForSelector(".dp-explore-status--ready");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.TAB, new Page.GetByRoleOptions().setName("Vorschau")).focus();
+            page.keyboard().press("ArrowRight");
+
+            assertThat(page.locator("button[role='tab'][aria-selected='true']:has-text('SQL-Labor')").count()).isEqualTo(1);
+            assertThat(page.locator("[role='tabpanel'] [aria-label='Beispielabfragen']").count()).isEqualTo(1);
+
+            page.keyboard().press("End");
+            assertThat(page.locator("button[role='tab'][aria-selected='true']:has-text('Code')").count()).isEqualTo(1);
+
+            page.keyboard().press("Home");
+            assertThat(page.locator("button[role='tab'][aria-selected='true']:has-text('Vorschau')").count()).isEqualTo(1);
+        }
+    }
+
+    @Test
+    void parquetLoadingFailureShowsReadableErrorAndKeepsDatasetLink() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/explore-broken-parquet/explore"));
+
+            page.waitForSelector(".dp-explore-status--error");
+
+            assertThat(page.locator(".dp-explore-runtime-error").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.LINK,
+                    new Page.GetByRoleOptions().setName("Zur Datensatzseite")).getAttribute("href"))
+                    .isEqualTo("/datasets/explore-broken-parquet");
         }
     }
 
@@ -159,8 +199,50 @@ class ExploreIslandParquetPlaywrightTest {
         }
     }
 
+    @Test
+    void exploreLayoutDoesNotCreatePageLevelHorizontalOverflowAtCommonWidths() {
+        for (int width : List.of(320, 390, 768)) {
+            try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(width, 844))) {
+                Page page = context.newPage();
+                page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+                page.waitForSelector(".dp-explore-status--ready");
+                page.getByRole(com.microsoft.playwright.options.AriaRole.TAB, new Page.GetByRoleOptions().setName("SQL-Labor")).click();
+                page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Nach gemeinde gruppieren")).click();
+                page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
+                page.waitForSelector("[aria-label='SQL Ergebnis']");
+                page.waitForSelector(".dp-explore-chart [data-chart-type='bar']");
+
+                assertThat(pageLevelHorizontalOverflow(page)).as("viewport width " + width).isLessThanOrEqualTo(1);
+            }
+        }
+    }
+
     private String baseUrl(String path) {
         return "http://localhost:" + port + path;
+    }
+
+    private static List<String> collectBrowserErrors(Page page) {
+        List<String> errors = new ArrayList<>();
+        page.onConsoleMessage(message -> collectConsoleError(message, errors));
+        page.onPageError(errors::add);
+        return errors;
+    }
+
+    private static void collectConsoleError(ConsoleMessage message, List<String> errors) {
+        if ("error".equals(message.type())) {
+            errors.add(message.text());
+        }
+    }
+
+    private static int pageLevelHorizontalOverflow(Page page) {
+        Number overflow = (Number) page.evaluate("""
+                () => Math.max(
+                  document.documentElement.scrollWidth,
+                  document.body.scrollWidth
+                ) - window.innerWidth
+                """);
+        return overflow.intValue();
     }
 
     @TestConfiguration
@@ -170,7 +252,7 @@ class ExploreIslandParquetPlaywrightTest {
         @Primary
         CatalogSnapshot exploreFixtureCatalogSnapshot() {
             return CatalogSnapshot.of(
-                    new Catalog(List.of(fixtureDataset()), List.of()),
+                    new Catalog(List.of(fixtureDataset(), brokenParquetDataset()), List.of()),
                     Instant.parse("2026-07-01T08:00:00Z"),
                     "explore-parquet-fixture");
         }
@@ -192,6 +274,26 @@ class ExploreIslandParquetPlaywrightTest {
                     List.of(new DistributionLink(
                             URI.create("/datasets/explore-fixture"),
                             URI.create("/explore-fixtures/ch.so.oev_haltestellen.parquet"),
+                            DistributionFormat.PARQUET)));
+        }
+
+        private static DatasetEntry brokenParquetDataset() {
+            var office = new Office("agi", "Amt für Geoinformation", Optional.of("AGI"));
+            var theme = new Theme("mobilitaet", "Mobilität");
+            return new DatasetEntry(
+                    "explore-broken-parquet",
+                    "Defekte Parquet Fixture",
+                    "Fixture mit fehlender Parquet-Datei für Fehlerzustände.",
+                    office,
+                    office,
+                    List.of(theme),
+                    List.of("Parquet"),
+                    LocalDate.parse("2026-06-30"),
+                    AccessLevel.OPEN,
+                    metadata(),
+                    List.of(new DistributionLink(
+                            URI.create("/datasets/explore-broken-parquet"),
+                            URI.create("/explore-fixtures/missing.parquet"),
                             DistributionFormat.PARQUET)));
         }
 

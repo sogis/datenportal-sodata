@@ -1,7 +1,8 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {Table} from 'apache-arrow';
 import type {DuckDbConnector} from '@sqlrooms/duckdb';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
+import {classifyExploreRuntimeError, type ExploreRuntimeError} from './ExploreRuntimeError';
 import {ChartPanel} from '../charts/ChartPanel';
 import {CodeSnippetsPanel} from '../code/CodeSnippetsPanel';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
@@ -29,16 +30,49 @@ const tabs: Array<{id: ExploreTab; label: string}> = [
 export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [activeTab, setActiveTab] = useState<ExploreTab>('preview');
   const [phase, setPhase] = useState<RuntimePhase>('idle');
-  const [runtimeError, setRuntimeError] = useState<string | null>(null);
+  const [runtimeError, setRuntimeError] = useState<ExploreRuntimeError | null>(null);
   const [registeredTables, setRegisteredTables] = useState<RegisteredTable[]>([]);
   const [connector, setConnector] = useState<DuckDbConnector | undefined>(undefined);
   const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
   const [lastQueryResult, setLastQueryResult] = useState<QueryResultState>(idleQueryResult);
+  const tabRefs = useRef<Record<ExploreTab, HTMLButtonElement | null>>({
+    preview: null,
+    sql: null,
+    chart: null,
+    code: null
+  });
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
   const room = useMemo(() => createExploreRoomStore(context), [context]);
   const handleResultChange = useCallback((result: QueryResultState) => {
     setLastQueryResult(result);
   }, []);
+
+  const selectTab = useCallback((tab: ExploreTab, focus = false) => {
+    setActiveTab(tab);
+    if (focus) {
+      window.requestAnimationFrame(() => tabRefs.current[tab]?.focus());
+    }
+  }, []);
+
+  const handleTabKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>, currentTab: ExploreTab) => {
+    const currentIndex = tabs.findIndex((tab) => tab.id === currentTab);
+    let nextIndex = currentIndex;
+
+    if (event.key === 'ArrowRight') {
+      nextIndex = (currentIndex + 1) % tabs.length;
+    } else if (event.key === 'ArrowLeft') {
+      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = tabs.length - 1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    selectTab(tabs[nextIndex].id, true);
+  }, [selectTab]);
 
   useEffect(() => {
     if (context.tables.length === 0 || !primaryTable) {
@@ -87,7 +121,9 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
           setPreviewResult(toPreviewResult(previewSql, arrowTable));
           setPhase(registrations.some((registration) => registration.status === 'failed') ? 'error' : 'ready');
           if (registrations.some((registration) => registration.status === 'failed')) {
-            setRuntimeError('Mindestens eine Parquet-Datei konnte nicht registriert werden. Die Vorschau der primären Tabelle ist verfügbar.');
+            setRuntimeError({
+              summary: 'Mindestens eine Parquet-Datei konnte nicht registriert werden. Die Vorschau der primären Tabelle ist verfügbar.'
+            });
           }
         } finally {
           window.clearTimeout(timeoutId);
@@ -96,7 +132,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         if (!active) {
           return;
         }
-        setRuntimeError(toErrorMessage(error));
+        setRuntimeError(classifyExploreRuntimeError(error));
         setPhase('error');
       }
     }
@@ -142,11 +178,18 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            id={tabId(tab.id)}
+            ref={(element) => {
+              tabRefs.current[tab.id] = element;
+            }}
             type="button"
             role="tab"
             aria-selected={activeTab === tab.id}
+            aria-controls={tabPanelId(tab.id)}
+            tabIndex={activeTab === tab.id ? 0 : -1}
             className={activeTab === tab.id ? 'dp-explore-tabs__tab is-active' : 'dp-explore-tabs__tab'}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => selectTab(tab.id)}
+            onKeyDown={(event) => handleTabKeyDown(event, tab.id)}
           >
             {tab.label}
           </button>
@@ -172,13 +215,24 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
           </dl>
         </aside>
 
-        <main className="dp-explore-workspace" aria-live="polite">
-          <p className={`dp-explore-status dp-explore-status--${phase}`}>
+        <main className="dp-explore-workspace" aria-busy={isBusyPhase(phase)} aria-live="polite">
+          <p
+            className={`dp-explore-status dp-explore-status--${phase}`}
+            role={phase === 'error' ? 'alert' : 'status'}
+            aria-label="Erkunden Status"
+          >
             {statusText(phase)}
           </p>
-          {runtimeError && <p className="dp-explore-runtime-error">{runtimeError}</p>}
+          {runtimeError && <RuntimeErrorMessage error={runtimeError} />}
           <h3>{activeTabLabel(activeTab)}</h3>
-          {renderActiveTab(activeTab, context, primaryTable, phase, previewResult, connector, lastQueryResult, handleResultChange)}
+          <div
+            id={tabPanelId(activeTab)}
+            className="dp-explore-tab-panel"
+            role="tabpanel"
+            aria-labelledby={tabId(activeTab)}
+          >
+            {renderActiveTab(activeTab, context, primaryTable, phase, previewResult, connector, lastQueryResult, handleResultChange)}
+          </div>
         </main>
 
         <aside className="dp-explore-panel" aria-labelledby="explore-tables-title">
@@ -196,6 +250,18 @@ function selectPrimaryTable(tables: ExploreTableDto[]): ExploreTableDto | undefi
 
 function activeTabLabel(activeTab: ExploreTab): string {
   return tabs.find((tab) => tab.id === activeTab)?.label ?? 'Vorschau';
+}
+
+function tabId(tab: ExploreTab): string {
+  return `explore-tab-${tab}`;
+}
+
+function tabPanelId(tab: ExploreTab): string {
+  return `explore-tab-panel-${tab}`;
+}
+
+function isBusyPhase(phase: RuntimePhase): boolean {
+  return phase === 'idle' || phase === 'initializing' || phase === 'registering' || phase === 'previewing';
 }
 
 function renderActiveTab(
@@ -238,6 +304,20 @@ function statusText(phase: RuntimePhase): string {
     case 'error':
       return 'DuckDB-Hinweis';
   }
+}
+
+function RuntimeErrorMessage({error}: {error: ExploreRuntimeError}) {
+  return (
+    <div className="dp-explore-runtime-error" role="alert">
+      <p>{error.summary}</p>
+      {error.detail && error.detail !== error.summary && (
+        <details>
+          <summary>Technische Details</summary>
+          <p>{error.detail}</p>
+        </details>
+      )}
+    </div>
+  );
 }
 
 function buildPreviewSql(table: ExploreTableDto, maxPreviewRows: number): string {
@@ -309,6 +389,9 @@ function TableCatalog({tables, registrations}: {tables: ExploreTableDto[]; regis
     <ul className="dp-explore-table-list">
       {tables.map((table) => {
         const registration = registrations.find((item) => item.table.id === table.id);
+        const registrationError = registration?.status === 'failed' && registration.error
+          ? classifyExploreRuntimeError(registration.error)
+          : undefined;
         return (
           <li key={table.id}>
             <strong>{table.title}</strong>
@@ -316,8 +399,16 @@ function TableCatalog({tables, registrations}: {tables: ExploreTableDto[]; regis
             <span className={registration?.status === 'registered' ? 'dp-explore-table-status is-ok' : 'dp-explore-table-status'}>
               {registrationStatusText(registration)}
             </span>
-            {registration?.status === 'failed' && registration.error && (
-              <small>{registration.error}</small>
+            {registrationError && (
+              <small>
+                {registrationError.summary}
+                {registrationError.detail && registrationError.detail !== registrationError.summary && (
+                  <>
+                    {' '}
+                    <span>{registrationError.detail}</span>
+                  </>
+                )}
+              </small>
             )}
           </li>
         );
@@ -360,11 +451,4 @@ function formatCell(value: unknown): string {
     return value.toString();
   }
   return String(value);
-}
-
-function toErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return String(error);
 }
