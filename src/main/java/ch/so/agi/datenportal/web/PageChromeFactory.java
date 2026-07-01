@@ -43,6 +43,15 @@ public class PageChromeFactory {
                 footerViewModelFactory.create());
     }
 
+    public PageChromeVm datasetExplorePage(DatasetEntry dataset) {
+        return new PageChromeVm(
+                "Erkunden | " + dataset.title() + " | Datenportal",
+                headerViewModelFactory.forDetailPage(),
+                breadcrumbFactory.datasetExplore(dataset),
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
+    }
+
     public PageChromeVm datasetStructureQualityOriginPage(DatasetEntry dataset) {
         return new PageChromeVm(
                 "Struktur, Qualität und Herkunft | " + dataset.title() + " | Datenportal",

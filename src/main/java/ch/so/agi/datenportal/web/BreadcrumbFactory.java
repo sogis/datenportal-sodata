@@ -28,6 +28,13 @@ public class BreadcrumbFactory {
         return new BreadcrumbVm(items);
     }
 
+    public BreadcrumbVm datasetExplore(DatasetEntry dataset) {
+        var items = catalogItems();
+        items.add(new BreadcrumbItemVm(dataset.title(), Optional.of("/datasets/" + encode(dataset.identifier())), false));
+        items.add(new BreadcrumbItemVm("Erkunden", Optional.empty(), true));
+        return new BreadcrumbVm(items);
+    }
+
     public BreadcrumbVm datasetStructureQualityOrigin(DatasetEntry dataset) {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(dataset.title(), Optional.of("/datasets/" + encode(dataset.identifier())), false));

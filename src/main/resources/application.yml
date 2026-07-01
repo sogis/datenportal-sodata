@@ -44,6 +44,17 @@ datenportal:
     max-size: 50MB
   admin:
     reload-token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN:}
+  explore:
+    enabled: true
+    max-preview-rows: 100
+    max-result-rows: 10000
+    query-timeout-ms: 30000
+    charts-enabled: true
+    local-history-enabled: true
+    ai-enabled: false
+    webr-enabled: false
+    vega-enabled: false
+    mosaic-enabled: false
   search:
     max-results: 500
     default-page-size: 10

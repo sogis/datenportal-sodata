@@ -93,6 +93,14 @@ public final class CatalogUrlFactory {
         return "/datasets/" + pathSegment(identifier);
     }
 
+    public String datasetExplore(String identifier) {
+        return datasetDetail(identifier) + "/explore";
+    }
+
+    public String datasetExploreContext(String identifier) {
+        return datasetExplore(identifier) + "/context.json";
+    }
+
     public String datasetStructureQualityOrigin(String identifier) {
         return datasetDetail(identifier) + "/structure-quality-origin";
     }

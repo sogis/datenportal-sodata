@@ -1656,7 +1656,7 @@ Status values:
 | Phase | Status | Artifact | Test Evidence |
 |---|---|---|---|
 | 0. Repository orientation and documentation scaffold | DONE | `docs/erkunden/` scaffold, implementation notes | `./gradlew test`, `./gradlew check`, `./gradlew clean check` passed |
-| 1. Backend context and route | TODO | `/datasets/{id}/explore`, `context.json` | backend unit/web tests |
+| 1. Backend context and route | DONE | `/datasets/{id}/explore`, `context.json`, backend DTOs/services, JTE host page | `./gradlew test` passed; `./gradlew clean check` passed |
 | 2. Frontend island bootstrap | TODO | React/Vite app embedded in JTE | frontend unit test, page smoke test |
 | 3. DuckDB-Wasm Parquet registration | TODO | tables registered as views | integration test with tiny Parquet |
 | 4. SQL laboratory and generated recipes | TODO | recipes, editor, result table | unit/component/e2e tests |

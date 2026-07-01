@@ -1,6 +1,6 @@
 # Erkunden Tests
 
-Status: Phase 0 baseline
+Status: Phase 1 backend tests
 
 Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase-0-Baseline des bestehenden Projekts.
 
@@ -36,12 +36,35 @@ Ergebnis: `BUILD SUCCESSFUL in 16s`
 
 Hinweis: `check` und `clean check` fuehrten den vorhandenen `playwrightTest`-Task aus. Ein separates Frontend-Testkommando existiert in Phase 0 noch nicht.
 
-## Ziel fuer spaetere Phasen
+## Phase 1 am 2026-07-01
 
-Phase 1:
+Phase 1 ergaenzt Backend-Unit- und MVC-Tests:
 
 - Backend-Unit-Tests fuer SQL-Namen, Rollen, Rezepte und Kontextaufbau.
 - MVC-Tests fuer `/datasets/{datasetId}/explore` und `/datasets/{datasetId}/explore/context.json`.
+- MVC-Test fuer Datensaetze ohne Parquet-Distribution.
+
+Ausgefuehrte Befehle:
+
+```bash
+./gradlew test --tests 'ch.so.agi.datenportal.explore.*'
+```
+
+Ergebnis: `BUILD SUCCESSFUL in 2s`
+
+```bash
+./gradlew test
+```
+
+Ergebnis: `BUILD SUCCESSFUL in 5s`
+
+```bash
+./gradlew clean check
+```
+
+Ergebnis: `BUILD SUCCESSFUL in 17s`
+
+Hinweis: Der erste fokussierte Implementierungslauf schlug voruebergehend fehl, weil Jackson nicht im Application Compile Classpath verfuegbar ist. Phase 1 verwendet deshalb einen projektlokalen JSON Writer und der fokussierte Testlauf wurde danach erfolgreich wiederholt.
 
 Phase 2:
 

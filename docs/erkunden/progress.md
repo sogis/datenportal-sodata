@@ -7,7 +7,7 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | Phase | Status | Notes |
 |---|---|---|
 | 0. Repository orientation and documentation scaffold | DONE | Documentation scaffold created; baseline tests recorded. |
-| 1. Backend context and route | TODO | Use `/datasets/{datasetId}/explore`, not `/erkunden`. |
+| 1. Backend context and route | DONE | Backend context, JSON endpoint, JTE host page and backend tests implemented. |
 | 2. Frontend island bootstrap | TODO | No existing frontend package tooling found. |
 | 3. DuckDB-Wasm Parquet registration | TODO | CORS and Range Request checks pending. |
 | 4. SQL laboratory and generated recipes | TODO | Not started. |
@@ -72,3 +72,40 @@ Known limitations:
 - SQLRooms, DuckDB-Wasm and React/Vite package compatibility has not yet been checked.
 - CORS and Range Request behavior against real Parquet URLs has not yet been tested.
 - CSP changes for Wasm/Worker/module assets are not yet known.
+
+## Phase 1 Entry
+
+Date: 2026-07-01
+
+Branch: `main`
+
+Scope:
+
+- Added `/datasets/{datasetId}/explore` as a server-rendered portal page.
+- Added `/datasets/{datasetId}/explore/context.json` as the backend context endpoint.
+- Added `ch.so.agi.datenportal.explore` DTOs, services, properties, SQL name sanitizer, column role detector, generated recipes and static code snippets.
+- Added a JTE host template with embedded JSON context and a server-side placeholder for the Phase-2 frontend island.
+- Added unavailable handling for datasets without Parquet distributions.
+- Updated phase tracking in the Erkunden MVP specification.
+
+Implementation notes:
+
+- Only normal `DatasetEntry` identifiers are accepted for the explore route.
+- Parquet tables are derived from `DistributionFormat.PARQUET`.
+- Column metadata comes from `CatalogEntryMetadata.attributes()` when available.
+- The JSON endpoint uses the project-local JSON writer because Jackson is not part of the current application compile classpath.
+- No React, Vite, SQLRooms, DuckDB-Wasm, frontend package or module asset was introduced in Phase 1.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 2s` |
+| `./gradlew test` | PASS, `BUILD SUCCESSFUL in 5s` |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 17s` |
+
+Known limitations:
+
+- The Explore page currently shows only a server-rendered placeholder; the interactive island starts in Phase 2.
+- CORS and Range Request behavior for real Parquet files remains untested until DuckDB-Wasm registration work begins.
+- Charting, query history and runtime SQL execution are represented only as context flags and generated metadata.

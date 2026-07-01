@@ -1,8 +1,8 @@
 # Erkunden Architektur-Notizen
 
-Status: Phase 0 repository findings
+Status: Phase 1 backend context and route implemented
 
-Dieses Dokument beschreibt den Ist-Zustand des Repositories und die Architekturentscheidungen fuer die folgenden Erkunden-Phasen. Es fuehrt noch kein Produktverhalten ein.
+Dieses Dokument beschreibt den Ist-Zustand des Repositories, die Phase-1-Backend-Integration und die Architekturentscheidungen fuer die folgenden Erkunden-Phasen.
 
 ## Bestehender Anwendungskontext
 
@@ -36,9 +36,9 @@ GET /datasets/{datasetId}/explore/context.json
 
 Die Route verwendet `explore`, nicht `erkunden`. UI-Texte bleiben deutsch.
 
-## Geplante Backend-Grenze
+## Backend-Grenze ab Phase 1
 
-Phase 1 soll die neue Funktion unter `ch.so.agi.datenportal.explore` anlegen. Die geplante Struktur:
+Phase 1 legt die neue Funktion unter `ch.so.agi.datenportal.explore` an. Die Struktur:
 
 ```text
 ch.so.agi.datenportal.explore
@@ -52,6 +52,31 @@ ch.so.agi.datenportal.explore
 ```
 
 Controller bleiben duenn und lesen Daten ueber den bestehenden `CatalogService`. Templates erhalten vorbereitete ViewModels und keine Domain- oder Parserlogik.
+
+Die oeffentlichen Phase-1-Routen sind:
+
+```text
+GET /datasets/{datasetId}/explore
+GET /datasets/{datasetId}/explore/context.json
+```
+
+Nur normale `DatasetEntry`-Identifier sind gueltig. Datenreihen, Ausgaben und unbekannte Identifier laufen ueber das bestehende 404-Verhalten.
+
+## Phase-1-Kontext
+
+Der Backend-Kontext folgt `ExploreContextDto` Version `1`.
+
+Phase-1-Quellen:
+
+- Datensatz-Metadaten aus dem aktiven `CatalogSnapshot`.
+- Parquet-Tabellen aus `DistributionFormat.PARQUET`.
+- Attribute aus `CatalogEntryMetadata.attributes()`, wenn vorhanden.
+- Generierte Startrezepte aus den bekannten Tabellen und Spaltenrollen.
+- Statische Code-Snippets fuer DuckDB CLI, Python und R.
+
+Wenn ein Datensatz keine Parquet-Distribution hat, rendert die Explore-Seite eine klare Nicht-verfuegbar-Meldung. Der JSON-Kontext bleibt gueltig, enthaelt aber leere `tables`, `recipes` und `codeSnippets`.
+
+Der eingebettete JSON-Kontext wird mit einem kleinen projektlokalen Writer erzeugt und fuer das `application/json`-Script-Element gegen `</script>`-Sequenzen abgesichert. Das vermeidet eine neue JSON-Bibliotheksabhaengigkeit im Application Compile Classpath.
 
 ## Geplante Frontend-Grenze
 
@@ -67,7 +92,7 @@ Offene Integrationsentscheidung fuer Phase 2:
 
 ## Datenvertrag
 
-Der Backend-Kontext folgt dem `ExploreContextDto` aus der MVP-Spezifikation. In Phase 0 wird der Vertrag nur dokumentiert, nicht implementiert.
+Der Backend-Kontext folgt dem `ExploreContextDto` aus der MVP-Spezifikation und ist seit Phase 1 implementiert.
 
 Wichtige Leitplanken:
 

@@ -8,6 +8,7 @@ import ch.so.agi.datenportal.catalog.importxtf.HttpCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.PublishedCatalogParser;
 import ch.so.agi.datenportal.catalog.importxtf.XtfPublishedCatalogParser;
 import ch.so.agi.datenportal.catalog.service.CatalogSnapshotLoader;
+import ch.so.agi.datenportal.explore.ExploreProperties;
 import java.time.Clock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +16,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 
 @Configuration
-@EnableConfigurationProperties({AdminProperties.class, CatalogProperties.class, SearchProperties.class, WebComponentsProperties.class})
+@EnableConfigurationProperties({
+        AdminProperties.class,
+        CatalogProperties.class,
+        ExploreProperties.class,
+        SearchProperties.class,
+        WebComponentsProperties.class})
 public class CatalogImportConfiguration {
 
     @Bean
