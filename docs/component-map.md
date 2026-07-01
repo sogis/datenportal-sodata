@@ -50,15 +50,15 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 |---|---|---|---|
 | Datensatzdetail | `pages/datasetDetail.jte` | `DatasetDetailPageVm` | keine Datenvorschau |
 | Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | vereinfachte Serienübersicht mit Ausgabenliste |
-| Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Serien-Kicker, aktuelles-Ausgabe-Badge, Dataset-Detail-Cards und Seitenpanel `Daten nutzen` |
+| Ausgabendetail | `pages/issueDetail.jte` | `IssueDetailPageVm` | Serien-Kicker, aktuelles-Ausgabe-Badge, unframed Datenmerkmale-/Download-Strip, unframed Metadatenbereiche, Seitenpanel `Daten nutzen` und Card `Weitere Ausgaben` |
 | Struktur, Qualität und Herkunft | `pages/structureQualityOrigin.jte`, `components/structureKpis.jte`, `components/attributeTable.jte`, `components/qualityCard.jte`, `components/metadataSection.jte` | `StructureQualityOriginPageVm`, `KpiVm`, `AttributeRowVm`, `QualityVm`, `MetadataSectionVm` | Datensatz- und Ausgabe-Routen, neutrale KPI-Reihe, Attribute als Tabelle, Qualitäts-Card sowie `Herkunft & Verwendung` optional |
 | Daten verwenden | `pages/usage.jte`, `components/usageDirectAccess.jte`, `components/usageCodeExamples.jte`, `components/usageStarterRecipes.jte` | `UsagePageVm`, `DirectAccessRowVm`, `CodeExampleVm`, `StarterRecipeVm` | Datensatz- und Ausgabe-Routen, Direktzugriff ohne Inhalt-Spalte, Format-Badges, Copy-Feedback, Codebeispiel-Tabs, Starter-Rezepte mit lokalen PNG-Icons, keine rechte Spalte |
-| Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `DownloadSectionVm` | Datenmerkmale plus Downloads, mobile gestapelt |
-| Datensatz-Übersicht | `components/metadataSection.jte` | `DatasetDetailPageVm.overview` | erste Metadatenkarte unterhalb Datenmerkmale/Downloads |
-| Datensatz-Zeitliche Abdeckung | `components/metadataSection.jte` | `DatasetDetailPageVm.temporalCoverage` | Stichtag oder Zeitraum |
-| Datensatz-Themen und Schlagworte | `components/metadataSection.jte` | `DatasetDetailPageVm.topics` | Themen und Schlagworte komma-separiert |
-| Datensatz-Zuständigkeiten und Kontakt | `components/contactMetadataSection.jte` | `DatasetDetailPageVm.responsibilitiesContact` | Datenproduzent, Kontakt und Herausgeber mehrzeilig mit Links |
-| Datensatz-Seitenpanel `Daten nutzen` | `components/detailActionPanel.jte` | `DatasetDetailPageVm.structureQualityOriginHref`, `IssueDetailPageVm.structureQualityOriginHref` | vertikale Nutzungshinweise mit sekundären Textlinks |
+| Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `DownloadSectionVm` | unframed Datenmerkmale-/Download-Strip, mobile gestapelt |
+| Datensatz-Übersicht | `components/metadataSection.jte` | `DatasetDetailPageVm.overview` | unframed Metadatenbereich unterhalb Datenmerkmale/Downloads |
+| Datensatz-Zeitliche Abdeckung | `components/metadataSection.jte` | `DatasetDetailPageVm.temporalCoverage` | unframed Metadatenbereich mit Stichtag oder Zeitraum |
+| Datensatz-Themen und Schlagworte | `components/metadataSection.jte` | `DatasetDetailPageVm.topics` | unframed Metadatenbereich, Themen und Schlagworte komma-separiert |
+| Datensatz-Zuständigkeiten und Kontakt | `components/contactMetadataSection.jte` | `DatasetDetailPageVm.responsibilitiesContact` | unframed Metadatenbereich, Datenproduzent, Kontakt und Herausgeber mehrzeilig mit Links |
+| Datensatz-Seitenpanel `Daten nutzen` | `components/detailActionPanel.jte` | `DatasetDetailPageVm.structureQualityOriginHref`, `IssueDetailPageVm.structureQualityOriginHref` | unframed Seitenpanel mit vertikalen Nutzungshinweisen und sekundären Textlinks |
 | Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet oder Schloss fuer nicht offene Eintraege |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
 | Serien-Ausgabenliste | `components/seriesIssues.jte` | `SeriesIssuesVm` | aktuelle/ältere Ausgaben auf der Serienübersicht |

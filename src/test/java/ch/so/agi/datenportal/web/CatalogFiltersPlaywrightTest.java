@@ -235,6 +235,7 @@ class CatalogFiltersPlaywrightTest {
             BoundingBox summaryLayout = requireBoundingBox(page.locator(".dp-detail-summary-layout"));
             BoundingBox summaryCard = requireBoundingBox(page.locator(".dp-detail-summary-main"));
             BoundingBox featureStrip = requireBoundingBox(page.locator(".dp-detail-feature-downloads"));
+            BoundingBox featureArea = requireBoundingBox(page.locator(".dp-detail-feature-downloads__features"));
             BoundingBox downloads = requireBoundingBox(page.locator(".dp-detail-feature-downloads__downloads"));
             BoundingBox actionPanel = requireBoundingBox(page.locator(".dp-detail-actions"));
             BoundingBox overviewCard = requireBoundingBox(page.locator("#metadata-overview"));
@@ -252,11 +253,24 @@ class CatalogFiltersPlaywrightTest {
             assertThat(description.width).isLessThan(hero.width - 300d);
             assertThat(cssValue(page.locator(".dp-detail-description"), "color")).isEqualTo("rgb(47, 72, 88)");
             assertThat(page.locator(".dp-detail-facts").count()).isZero();
+            assertThat(cssValue(page.locator(".dp-detail-summary-layout"), "column-gap")).isEqualTo("96px");
+            assertThat(cssValue(page.locator(".dp-detail-summary-main"), "row-gap")).isEqualTo("96px");
             assertThat(cssValue(page.locator(".dp-detail-feature-downloads"), "background-color")).isEqualTo("rgb(255, 255, 255)");
-            assertThat(cssValue(page.locator(".dp-detail-feature-downloads"), "border-top-width")).isEqualTo("1px");
-            assertThat(cssValue(page.locator(".dp-detail-feature-downloads"), "border-top-color")).isEqualTo("rgb(217, 224, 230)");
-            assertThat(cssValue(page.locator(".dp-detail-feature-downloads"), "border-top-left-radius")).isEqualTo("4px");
-            assertThat(cssValue(page.locator(".dp-detail-feature-downloads__downloads"), "border-left-width")).isEqualTo("1px");
+            assertThat(cssValue(page.locator(".dp-detail-feature-downloads"), "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-feature-downloads"), "border-top-left-radius")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-feature-downloads"), "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-feature-downloads__downloads"), "border-left-width")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-feature-downloads__downloads"), "padding-left")).isEqualTo("0px");
+            assertThat(cssValue(page.locator("#metadata-overview"), "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(page.locator("#metadata-overview"), "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(page.locator("#metadata-overview"), "border-top-left-radius")).isEqualTo("0px");
+            assertThat(cssValue(page.locator("#metadata-temporal-coverage"), "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(page.locator("#metadata-temporal-coverage"), "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(page.locator("#metadata-topics"), "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(page.locator("#metadata-topics"), "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-actions"), "border-top-width")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-actions"), "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-actions"), "border-top-left-radius")).isEqualTo("0px");
             assertThat(fontSize(page.locator(".dp-detail-feature").first())).isEqualTo("18px");
             assertThat(cssValue(availableFeatureIcon, "width")).isEqualTo("24px");
             assertThat(cssValue(availableFeatureIcon, "height")).isEqualTo("24px");
@@ -274,6 +288,7 @@ class CatalogFiltersPlaywrightTest {
             assertThat(Math.abs(featureStrip.y - actionPanel.y)).isLessThan(1.5d);
             assertThat(Math.abs(featureStrip.x - summaryCard.x)).isLessThan(1.5d);
             assertThat(downloads.x).isGreaterThan(featureStrip.x);
+            assertThat(Math.abs(downloads.x - (featureArea.x + featureArea.width) - 48d)).isLessThan(1.5d);
             assertThat(actionPanel.x).isGreaterThan(featureStrip.x + featureStrip.width - 1d);
             assertThat(overviewCard.y).isGreaterThan(lowerEdge(featureStrip));
             assertThat(requireGap(featureStrip, overviewCard)).isGreaterThanOrEqualTo(24d);
@@ -290,6 +305,12 @@ class CatalogFiltersPlaywrightTest {
             assertThat(fontSize(page.locator("#metadata-temporal-coverage .dp-metadata-list dd").first())).isEqualTo("18px");
             assertThat(fontSize(page.locator("#metadata-topics .dp-metadata-list dt").first())).isEqualTo("14.4px");
             assertThat(fontSize(page.locator("#metadata-topics .dp-metadata-list dd").first())).isEqualTo("18px");
+            assertThat(cssValue(page.locator("#metadata-topics .dp-metadata-list dd").first(), "line-height"))
+                    .isEqualTo("24.3px");
+            assertThat(cssValue(
+                            page.locator("#metadata-responsibilities-contact .dp-metadata-list dd").first(),
+                            "line-height"))
+                    .isEqualTo("24.3px");
         }
 
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(390, 844))) {
@@ -305,6 +326,8 @@ class CatalogFiltersPlaywrightTest {
 
             assertThat(Math.abs(featureArea.x - downloads.x)).isLessThan(1.5d);
             assertThat(downloads.y).isGreaterThan(lowerEdge(featureArea));
+            assertThat(cssValue(page.locator(".dp-detail-feature-downloads__downloads"), "padding-top")).isEqualTo("0px");
+            assertThat(cssValue(page.locator(".dp-detail-feature-downloads__downloads"), "border-top-width")).isEqualTo("0px");
             assertThat(actionPanel.y).isGreaterThan(lowerEdge(featureStrip));
             assertThat(Math.abs(firstAction.x - secondAction.x)).isLessThan(1.5d);
             assertThat(secondAction.y).isGreaterThanOrEqualTo(lowerEdge(firstAction));

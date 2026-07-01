@@ -1,7 +1,7 @@
 @import ch.so.agi.datenportal.web.view.IssueDetailPageVm
 @param IssueDetailPageVm page
 @template.layouts.main(chrome = page.chrome(), content = @`
-  <section class="dp-detail-page">
+  <section class="dp-detail-page dp-issue-detail-page">
     <div class="dp-container">
       <p class="dp-detail-kicker">
         Datenreihe:

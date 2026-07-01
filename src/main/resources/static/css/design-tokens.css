@@ -30,6 +30,11 @@
   --dp-space-6: 2rem;
   --dp-space-8: 3rem;
   --dp-space-10: 4.5rem;
+  --dp-space-12: 6rem;     /* 96px */
+  --dp-space-16: 8rem;     /* 128px */
+  --dp-space-20: 10rem;    /* 160px */
+  --dp-space-24: 12rem;    /* 192px */
+  --dp-space-32: 16rem;    /* 256px */  
   --dp-page-max-width: 1440px;
   --dp-page-gutter: 1.5rem;
   --dp-readable-width: 84ch;

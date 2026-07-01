@@ -1,7 +1,7 @@
 @import ch.so.agi.datenportal.web.view.DatasetDetailPageVm
 @param DatasetDetailPageVm page
 @template.layouts.main(chrome = page.chrome(), content = @`
-  <section class="dp-detail-page">
+  <section class="dp-detail-page dp-dataset-detail-page">
     <div class="dp-container">
       @template.components.detailHero(
         title = page.title(),
