@@ -368,25 +368,29 @@ public final class DetailPageVmFactory {
     private static List<StarterRecipeVm> starterRecipes() {
         return List.of(
                 new StarterRecipeVm(
-                        "file-earmark-excel",
+                        "/images/usage-recipes/excel.png",
+                        "",
                         "In Excel öffnen",
                         "Datensatz in Microsoft Excel öffnen und weiterverarbeiten.",
                         "#",
                         "Anleitung anzeigen"),
                 new StarterRecipeVm(
-                        "database",
+                        "/images/usage-recipes/duckdb.png",
+                        "",
                         "Mit DuckDB analysieren",
                         "Schnell lokale Analysen mit DuckDB durchführen.",
                         "#",
                         "Anleitung anzeigen"),
                 new StarterRecipeVm(
-                        "r-circle",
+                        "/images/usage-recipes/r.png",
+                        "",
                         "In R auswerten",
                         "Daten in R einlesen und analysieren (readr oder data.table).",
                         "#",
                         "Anleitung anzeigen"),
                 new StarterRecipeVm(
-                        "filetype-py",
+                        "/images/usage-recipes/python.png",
+                        "",
                         "In Python weiterverarbeiten",
                         "Daten mit pandas laden und weiterverarbeiten.",
                         "#",

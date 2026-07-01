@@ -1,7 +1,8 @@
 package ch.so.agi.datenportal.web.view;
 
 public record StarterRecipeVm(
-        String icon,
+        String iconSrc,
+        String iconAlt,
         String title,
         String description,
         String href,

@@ -831,8 +831,8 @@
   color: var(--dp-color-text);
 }
 
-.dp-usage-recipe strong {
-  font-weight: 700;
+.dp-usage-recipe__name {
+  font-weight: 400;
 }
 
 .dp-usage-recipe__title,
@@ -850,6 +850,13 @@
   display: inline-flex;
   color: var(--dp-color-text);
   line-height: 0;
+}
+
+.dp-usage-recipe__icon img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .dp-usage-recipe__icon svg,

@@ -43,6 +43,13 @@ class StaticAssetCachingMvcTest {
     }
 
     @Test
+    void imageAssetUsesMediumCacheHeader() throws Exception {
+        mockMvc.perform(get("/images/usage-recipes/excel.png"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=2592000"), containsString("public"))));
+    }
+
+    @Test
     void webComponentAssetUsesLongCacheHeaderAndStillServesContent() throws Exception {
         mockMvc.perform(get("/vendor/so-web-components/0.1.10/index.js"))
                 .andExpect(status().isOk())

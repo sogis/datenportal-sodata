@@ -723,7 +723,7 @@ Die Subseite `Daten verwenden` ist serverseitig gerendert und wird ueber das Sei
 - Aktionen `Herunterladen` und `URL kopieren` verwenden eingebettete Bootstrap-SVG-Icons, transparente Flaeche und `1px solid var(--dp-color-border)`. `URL kopieren` kopiert die vorhandene URL in die Zwischenablage und zeigt kurz `URL kopiert` mit gruenem Check-Icon.
 - Abschnitt `Codebeispiele` mit Tabs `cURL`, `Python`, `DuckDB` im Tab-Styling des Datenblatt-Editors. Codetext verwendet den lokal vendorten Font `JetBrains Mono`; Bash-Beispiele sind so umbrochen, dass keine horizontale Scrollbar noetig ist.
 - Codebeispiel-Copy verwendet dasselbe Clipboard-zu-Check-Feedback.
-- Abschnitt `Starter-Rezepte` mit `18px` Typografie, Standard-Textfarbe, roten Links auf `#`, Bootstrap-Produkt-/Werkzeug-Icons vor dem Namen und einem Absprung-Icon im Link. Der Rezeptname verwendet `font-weight: 700`; die Titelsaeule bricht nicht um. MVP-Rezepte: Excel, DuckDB, R und Python.
+- Abschnitt `Starter-Rezepte` mit `18px` Typografie, Standard-Textfarbe, roten Links auf `#`, lokalen PNG-Produkticons vor dem Namen und einem Bootstrap-Absprung-Icon im Link. Die Produkticons werden auf `24px` mal `24px` begrenzt. Der Rezeptname verwendet `font-weight: 400`; die Titelsaeule bricht nicht um. MVP-Rezepte: Excel, DuckDB, R und Python.
 - Keine Card `Hinweise zur Verwendung`.
 
 ### 8.2 Detailseite für Datenreihen und Ausgaben
