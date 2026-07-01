@@ -1,0 +1,39 @@
+{
+  "name": "datenportal-explore",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sqlrooms/data-table": "0.28.0",
+    "@sqlrooms/duckdb": "0.28.0",
+    "@sqlrooms/recharts": "0.28.0",
+    "@sqlrooms/room-shell": "0.28.0",
+    "@sqlrooms/room-store": "0.28.0",
+    "@sqlrooms/schema-tree": "0.28.0",
+    "@sqlrooms/sql-editor": "0.28.0",
+    "apache-arrow": "17.0.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-hook-form": "7.80.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
+    "@types/node": "26.0.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "jsdom": "29.1.1",
+    "typescript": "6.0.3",
+    "vite": "8.1.2",
+    "vitest": "4.1.9"
+  }
+}

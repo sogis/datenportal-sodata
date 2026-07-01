@@ -8,7 +8,7 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 |---|---|---|
 | 0. Repository orientation and documentation scaffold | DONE | Documentation scaffold created; baseline tests recorded. |
 | 1. Backend context and route | DONE | Backend context, JSON endpoint, JTE host page and backend tests implemented. |
-| 2. Frontend island bootstrap | TODO | No existing frontend package tooling found. |
+| 2. Frontend island bootstrap | DONE | React/Vite island embedded in JTE and built through Gradle/npm. |
 | 3. DuckDB-Wasm Parquet registration | TODO | CORS and Range Request checks pending. |
 | 4. SQL laboratory and generated recipes | TODO | Not started. |
 | 5. Charting V1 with Recharts | TODO | Not started. |
@@ -109,3 +109,52 @@ Known limitations:
 - The Explore page currently shows only a server-rendered placeholder; the interactive island starts in Phase 2.
 - CORS and Range Request behavior for real Parquet files remains untested until DuckDB-Wasm registration work begins.
 - Charting, query history and runtime SQL execution are represented only as context flags and generated metadata.
+
+## Phase 2 Entry
+
+Date: 2026-07-01
+
+Branch: `main`
+
+Current HEAD before Phase-2 edits: `6ada81b71846`
+
+Scope:
+
+- Added isolated React/Vite/TypeScript frontend package under `src/main/frontend/explore`.
+- Added npm lockfile and Gradle tasks for `npm ci`, frontend build, Vitest and typecheck.
+- Integrated Vite build output into Spring static resources at `/explore/assets/explore.js` and `/explore/assets/explore.css`.
+- Changed the Explore JTE host page to load the built island assets via `ExploreAssetLinks`.
+- Added Zod validation for the embedded `ExploreContextDto`.
+- Rendered Phase-2 static island UI with dataset title, table count, tabs and `DuckDB wird vorbereitet`.
+- Added frontend unit/component tests, MVC asset-link/cache tests and a Java Playwright smoke test.
+- Updated phase tracking in the Erkunden MVP specification.
+
+Implementation notes:
+
+- DuckDB-Wasm is not initialized in Phase 2.
+- Parquet tables are not registered in Phase 2.
+- SQLRooms core dependencies are installed for future phases, but not imported into the Phase-2 bundle.
+- `@sqlrooms/ui` remains deferred because it introduces Tailwind peer dependencies.
+- CSP remains unchanged; Wasm, worker and external Parquet loading policies will be handled in Phase 3.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 2 passed (2)`, `Tests 7 passed (7)`, duration `808ms` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built `explore.css` and `explore.js`, `built in 141ms` |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 19s` |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 21s`; included `npmTestExplore`, `npmTypecheckExplore`, `npmBuildExplore`, backend tests and `playwrightTest` |
+
+Dependency notes:
+
+- `npm install` / `npm ci` reports peer warnings from SQLRooms transitive packages with React 19, especially `react-virtual`, `react-dnd-multi-backend`, `react-dom@18.3.1` nested under `react-mosaic-component`, and `react-dnd-preview`.
+- npm reports deprecated transitive packages `uuid@9.0.1` and `recharts@2.15.4`.
+- npm audit currently reports 10 findings: `4 low`, `6 moderate`.
+
+Known limitations:
+
+- The island is a bootstrap skeleton only.
+- No DuckDB-Wasm runtime, worker, Wasm binary, CORS or Range Request path is exercised yet.
+- No SQL editor, query execution, result table, chart inference, chart rendering, CSV export or local history is implemented yet.

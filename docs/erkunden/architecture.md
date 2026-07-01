@@ -1,8 +1,8 @@
 # Erkunden Architektur-Notizen
 
-Status: Phase 1 backend context and route implemented
+Status: Phase 2 frontend island bootstrap implemented
 
-Dieses Dokument beschreibt den Ist-Zustand des Repositories, die Phase-1-Backend-Integration und die Architekturentscheidungen fuer die folgenden Erkunden-Phasen.
+Dieses Dokument beschreibt den Ist-Zustand des Repositories, die Backend-Integration, die Phase-2-Frontend-Insel und die Architekturentscheidungen fuer die folgenden Erkunden-Phasen.
 
 ## Bestehender Anwendungskontext
 
@@ -78,17 +78,52 @@ Wenn ein Datensatz keine Parquet-Distribution hat, rendert die Explore-Seite ein
 
 Der eingebettete JSON-Kontext wird mit einem kleinen projektlokalen Writer erzeugt und fuer das `application/json`-Script-Element gegen `</script>`-Sequenzen abgesichert. Das vermeidet eine neue JSON-Bibliotheksabhaengigkeit im Application Compile Classpath.
 
-## Geplante Frontend-Grenze
+## Frontend-Insel ab Phase 2
 
-Im Repository gibt es aktuell kein Node-, Vite-, React- oder TypeScript-Setup. Die bestehende Anwendung nutzt vendorte statische JS-Dateien.
+Die interaktive Erkunden-Oberflaeche ist als isolierte React/Vite-Insel unter folgendem Pfad angelegt:
 
-Fuer die SQLRooms-Insel ist deshalb in Phase 2 eine neue, klar isolierte Frontend-Build-Strecke noetig. Sie soll sich in die bestehende Spring-Boot-Asset-Auslieferung einfuegen, statt die ganze UI in eine SPA umzubauen.
+```text
+src/main/frontend/explore/
+```
 
-Offene Integrationsentscheidung fuer Phase 2:
+Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Phase 2 zeigt nur Titel, Tabellenanzahl, Tabs und den Status `DuckDB wird vorbereitet`. Es gibt noch keine DuckDB-Initialisierung, keine Parquet-Registrierung und keine SQL-Ausfuehrung.
 
-- Wo die Frontend-Quellen liegen.
-- Wie Vite-Artefakte in `src/main/resources/static` oder ein Build-Ausgabeverzeichnis kopiert werden.
-- Wie fingerprinted Assets oder stabile Pfade mit den bestehenden Cache-Regeln zusammenspielen.
+Wichtige Dateien:
+
+- `src/main/frontend/explore/src/main.tsx`
+- `src/main/frontend/explore/src/app/ExploreApp.tsx`
+- `src/main/frontend/explore/src/app/ExploreContextLoader.ts`
+- `src/main/frontend/explore/src/app/ExploreContext.ts`
+- `src/main/frontend/explore/src/styles/explore.css`
+
+Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library. SQLRooms-Kernpakete sind bereits als Abhaengigkeiten vorhanden, werden aber in Phase 2 noch nicht importiert. `@sqlrooms/ui` ist bewusst nicht eingebunden, weil es Tailwind-Peer-Dependencies einfuehrt und die Datenportal-UI eigene Design-Tokens nutzt.
+
+## Frontend-Asset-Build
+
+Gradle besitzt eigene npm-Tasks:
+
+```text
+npmInstallExplore
+npmBuildExplore
+npmTestExplore
+npmTypecheckExplore
+```
+
+`processResources` haengt von `npmBuildExplore` ab. Dadurch landen die Vite-Artefakte im normalen Spring-Boot-Classpath:
+
+```text
+build/generated-resources/explore/static/explore/assets/explore.js
+build/generated-resources/explore/static/explore/assets/explore.css
+```
+
+Die oeffentlichen Pfade sind stabil und nicht fingerprinted:
+
+```text
+/explore/assets/explore.js
+/explore/assets/explore.css
+```
+
+`StaticAssetCachingConfiguration` liefert `/explore/**` mit kurzer Cache-Zeit aus. Die JTE-Seite erhaelt die Pfade ueber `ExploreAssetLinks`.
 
 ## Datenvertrag
 
@@ -106,5 +141,5 @@ Wichtige Leitplanken:
 - Route-Konflikte mit bestehenden `/datasets/{identifier}`-Detailseiten.
 - CORS- und Range-Request-Verhalten echter Parquet-URLs.
 - DuckDB-Wasm-Ladeverhalten in Safari und in restriktiven Browserumgebungen.
-- CSP-Erweiterungen fuer Modulskripte, Wasm und Worker, falls SQLRooms/DuckDB-Wasm sie benoetigt.
-- Frontend-Build-Integration in ein bisher Java-zentriertes Gradle-Projekt.
+- CSP-Erweiterungen fuer Wasm und Worker, falls SQLRooms/DuckDB-Wasm sie ab Phase 3 benoetigt.
+- SQLRooms transitive Peer-Warnings mit React 19, insbesondere `react-virtual` und `react-dnd-multi-backend`.

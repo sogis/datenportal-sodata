@@ -1,10 +1,10 @@
 # Erkunden
 
-Status: Phase 0 documentation scaffold
+Status: Phase 2 frontend island bootstrap implemented
 
 Erkunden ist ein lokales SQL-Labor pro Datenthema. Die Abfragen laufen im Browser mit DuckDB-Wasm direkt auf den Parquet-Dateien.
 
-Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Phase 0 fuehrt noch kein Produktverhalten ein. Sie haelt nur fest, wie das bestehende Repository aufgebaut ist und welche Entscheidungen fuer die folgenden Phasen gelten.
+Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Bis Phase 2 existieren die Backend-Kontext-Route und eine eingebettete React/Vite-Insel als sichtbarer Bootstrap. DuckDB-Wasm wird noch nicht initialisiert.
 
 ## Produktidee
 

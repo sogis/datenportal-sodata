@@ -59,11 +59,15 @@ def gitCommitProvider = providers.provider {
     gitCommit
 }
 
+def exploreFrontendDir = layout.projectDirectory.dir('src/main/frontend/explore')
+def exploreGeneratedResourcesDir = layout.buildDirectory.dir('generated-resources/explore')
+
 // Damit sind die Inhalte dieses Verzeichnisses via Classpath greifbar.
 sourceSets {
     main {
         resources {
             srcDir 'spec/fixtures'
+            srcDir exploreGeneratedResourcesDir
         }
     }
 }
@@ -89,6 +93,60 @@ tasks.named('test') {
     useJUnitPlatform {
         excludeTags 'playwright'
     }
+}
+
+tasks.register('npmInstallExplore', Exec) {
+    group = 'build'
+    description = 'Installs the npm dependencies for the Explore frontend island.'
+    workingDir = exploreFrontendDir.asFile
+    commandLine 'npm', 'ci'
+    inputs.file exploreFrontendDir.file('package.json')
+    inputs.file exploreFrontendDir.file('package-lock.json')
+    outputs.dir exploreFrontendDir.dir('node_modules')
+}
+
+tasks.register('npmTestExplore', Exec) {
+    group = 'verification'
+    description = 'Runs Vitest tests for the Explore frontend island.'
+    workingDir = exploreFrontendDir.asFile
+    commandLine 'npm', 'test'
+    dependsOn tasks.named('npmInstallExplore')
+    inputs.dir exploreFrontendDir.dir('src')
+    inputs.file exploreFrontendDir.file('package.json')
+    inputs.file exploreFrontendDir.file('package-lock.json')
+    inputs.file exploreFrontendDir.file('tsconfig.json')
+    inputs.file exploreFrontendDir.file('vite.config.ts')
+}
+
+tasks.register('npmTypecheckExplore', Exec) {
+    group = 'verification'
+    description = 'Runs TypeScript type checking for the Explore frontend island.'
+    workingDir = exploreFrontendDir.asFile
+    commandLine 'npm', 'run', 'typecheck'
+    dependsOn tasks.named('npmInstallExplore')
+    inputs.dir exploreFrontendDir.dir('src')
+    inputs.file exploreFrontendDir.file('package.json')
+    inputs.file exploreFrontendDir.file('package-lock.json')
+    inputs.file exploreFrontendDir.file('tsconfig.json')
+    inputs.file exploreFrontendDir.file('vite.config.ts')
+}
+
+tasks.register('npmBuildExplore', Exec) {
+    group = 'build'
+    description = 'Builds the Explore frontend island into generated Spring static resources.'
+    workingDir = exploreFrontendDir.asFile
+    commandLine 'npm', 'run', 'build'
+    dependsOn tasks.named('npmInstallExplore')
+    inputs.dir exploreFrontendDir.dir('src')
+    inputs.file exploreFrontendDir.file('package.json')
+    inputs.file exploreFrontendDir.file('package-lock.json')
+    inputs.file exploreFrontendDir.file('tsconfig.json')
+    inputs.file exploreFrontendDir.file('vite.config.ts')
+    outputs.dir exploreGeneratedResourcesDir
+}
+
+tasks.named('processResources') {
+    dependsOn tasks.named('npmBuildExplore')
 }
 
 def playwrightBrowsersPath = layout.projectDirectory.dir('.gradle/playwright-browsers').asFile.absolutePath
@@ -133,6 +191,8 @@ springBoot {
 
 tasks.named('check') {
     dependsOn tasks.named('playwrightTest')
+    dependsOn tasks.named('npmTestExplore')
+    dependsOn tasks.named('npmTypecheckExplore')
 }
 
 tasks.named('wrapper') {

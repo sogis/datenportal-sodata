@@ -18,6 +18,8 @@ public final class ExplorePageController {
 
     private static final String UNAVAILABLE_REASON =
             "Erkunden ist für dieses Datenthema noch nicht verfügbar, weil keine Parquet-Datei publiziert ist.";
+    private static final ExploreAssetLinks ASSET_LINKS =
+            new ExploreAssetLinks("/explore/assets/explore.js", "/explore/assets/explore.css");
 
     private final CatalogService catalogService;
     private final ExploreContextService contextService;
@@ -50,7 +52,7 @@ public final class ExplorePageController {
                     contextService.toEmbeddableJson(context),
                     available,
                     available ? "" : UNAVAILABLE_REASON,
-                    ExploreAssetLinks.none()));
+                    ASSET_LINKS));
             return "pages/explore";
         });
     }

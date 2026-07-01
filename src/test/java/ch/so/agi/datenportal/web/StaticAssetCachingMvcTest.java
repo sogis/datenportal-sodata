@@ -29,6 +29,19 @@ class StaticAssetCachingMvcTest {
     }
 
     @Test
+    void exploreIslandAssetsUseShortCacheHeader() throws Exception {
+        mockMvc.perform(get("/explore/assets/explore.js"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=3600"), containsString("public"))))
+                .andExpect(content().string(containsString("datenportal-explore-root")));
+
+        mockMvc.perform(get("/explore/assets/explore.css"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=3600"), containsString("public"))))
+                .andExpect(content().string(containsString(".dp-explore-island")));
+    }
+
+    @Test
     void htmxAssetUsesMediumCacheHeader() throws Exception {
         mockMvc.perform(get("/js/htmx.min.js"))
                 .andExpect(status().isOk())

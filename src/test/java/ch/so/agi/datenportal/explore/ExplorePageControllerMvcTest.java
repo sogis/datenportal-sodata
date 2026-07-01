@@ -1,7 +1,6 @@
 package ch.so.agi.datenportal.explore;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -40,8 +39,8 @@ class ExplorePageControllerMvcTest {
                 .andExpect(content().string(containsString("\"charts\":true")))
                 .andExpect(content().string(containsString("\"aiAssistant\":false")))
                 .andExpect(content().string(containsString("SQL-Labor wird vorbereitet")))
-                .andExpect(content().string(not(containsString("type=\"module\" src=\"/explore"))))
-                .andExpect(content().string(not(containsString("rel=\"stylesheet\" href=\"/explore"))));
+                .andExpect(content().string(containsString("rel=\"stylesheet\" href=\"/explore/assets/explore.css\"")))
+                .andExpect(content().string(containsString("type=\"module\" src=\"/explore/assets/explore.js\"")));
     }
 
     @Test

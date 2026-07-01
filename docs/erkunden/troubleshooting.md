@@ -1,8 +1,35 @@
 # Erkunden Troubleshooting
 
-Status: Phase 0 placeholder
+Status: Phase 2 frontend island bootstrap
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die spaeteren DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Phase 0 hat diese Laufzeitpfade noch nicht implementiert.
+Dieses Dokument sammelt bekannte Risikofelder fuer die spaeteren DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Phase 2 laedt nur die React/Vite-Insel und validiert den eingebetteten JSON-Kontext. DuckDB-Wasm, Worker, Wasm-Dateien, CORS und Range Requests werden noch nicht ausgefuehrt.
+
+## Phase-2-Island laedt nicht
+
+Pruefen:
+
+- Ist `/explore/assets/explore.js` erreichbar?
+- Ist `/explore/assets/explore.css` erreichbar?
+- Wurde `npm --prefix src/main/frontend/explore run build` oder ein Gradle-Task mit `processResources` ausgefuehrt?
+- Enthaelt die Seite `#datenportal-explore-context` mit gueltigem JSON?
+
+Geplantes Verhalten:
+
+- Wenn der Kontext fehlt oder ungueltig ist, zeigt die Insel eine kurze Fehlermeldung.
+- Die normale Datensatzseite und Downloads bleiben erreichbar.
+
+## Phase 2 und DuckDB-Wasm
+
+Noch nicht betroffen:
+
+- CORS
+- Range Requests
+- DuckDB-Wasm-Initialisierung
+- Worker-Ladepfade
+- Wasm-CSP
+- Parquet-HTTP-Fehler
+
+Diese Pfade beginnen in Phase 3.
 
 ## Keine Parquet-Distribution
 
