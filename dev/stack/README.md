@@ -47,7 +47,7 @@ dev/stack/
 ## Enthaltene Services
 
 - `garage`: Single-Node Garage mit S3 API, Website Endpoint und Admin API
-- `downloads`: Caddy-Proxy für öffentliche Downloads unter `http://localhost:8081`
+- `downloads`: Caddy-Proxy für öffentliche Downloads unter `http://localhost:8081/ch.so.datenportal`
 - `seed`: Einmaliger Seed-Container für Website/CORS und Upload der Demo-Daten
 - `aws`: AWS-CLI-Hilfscontainer für lokale S3-Kommandos gegen Garage
 
@@ -60,7 +60,7 @@ Bucket:              ch.so.datenportal
 Region:              garage
 S3 API, Host:         http://localhost:3900
 S3 API, Docker:       http://garage:3900
-Public Downloads:    http://localhost:8081
+Public Downloads:    http://localhost:8081/ch.so.datenportal
 Access key ID:       GK0123456789abcdef0123456789abcdef
 Secret access key:   0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 ```
@@ -79,13 +79,13 @@ cd dev/stack
 Danach:
 
 ```bash
-open http://localhost:8081/index.html
+open http://localhost:8081/ch.so.datenportal/index.html
 ```
 
 Beispiel:
 
 ```bash
-curl -I http://localhost:8081/downloads/ch.so.abstimmungsresultate_2026.csv
+curl -I http://localhost:8081/ch.so.datenportal/downloads/ch.so.abstimmungsresultate_2026.csv
 ```
 
 ## Nützliche Kommandos
@@ -139,14 +139,14 @@ datenportal.s3.region=garage
 datenportal.s3.bucket=ch.so.datenportal
 datenportal.s3.access-key-id=GK0123456789abcdef0123456789abcdef
 datenportal.s3.secret-access-key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-datenportal.download-base-url=http://localhost:8081
+datenportal.download-base-url=http://localhost:8081/ch.so.datenportal
 ```
 
 Wenn die App selbst im gleichen Compose-Netz läuft:
 
 ```properties
 datenportal.s3.endpoint-url=http://garage:3900
-datenportal.download-base-url=http://downloads:8081
+datenportal.download-base-url=http://downloads:8081/ch.so.datenportal
 ```
 
 ## Nutzung aus Jenkins/GRETL lokal

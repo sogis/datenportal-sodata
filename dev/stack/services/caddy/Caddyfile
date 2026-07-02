@@ -1,16 +1,33 @@
 :8081 {
-    @options method OPTIONS
-    respond @options 204
+	route {
+		@options method OPTIONS
 
-    header {
-        Access-Control-Allow-Origin "*"
-        Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
-        Access-Control-Allow-Headers "*"
-        Access-Control-Expose-Headers "ETag, Content-Length, Content-Type"
-    }
+		header {
+			Access-Control-Allow-Origin "*"
+			Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+			Access-Control-Allow-Headers "*"
+			Access-Control-Expose-Headers "Accept-Ranges, Content-Range, ETag, Content-Length, Content-Type"
+		}
 
-    reverse_proxy garage:3902 {
-        # Garage Website Endpoint erwartet Host = <bucket>.<root_domain>.
-        header_up Host ch.so.datenportal.web.garage.localhost
-    }
+		respond @options 204
+
+		@bucketRoot path /ch.so.datenportal
+		redir @bucketRoot /ch.so.datenportal/ 308
+
+		handle_path /ch.so.datenportal/* {
+			reverse_proxy garage:3902 {
+				# Garage Website Endpoint erwartet Host = <bucket>.<root_domain>.
+				header_up Host ch.so.datenportal.web.garage.localhost
+				header_down -Access-Control-Allow-Headers
+				header_down -Access-Control-Allow-Methods
+				header_down -Access-Control-Allow-Origin
+				header_down -Access-Control-Expose-Headers
+			}
+		}
+
+		@legacyPublicPaths path /index.html /README.md /404.html /downloads/* /metadata/* /models/* /testdata/*
+		redir @legacyPublicPaths /ch.so.datenportal{uri} 308
+
+		respond 404
+	}
 }
