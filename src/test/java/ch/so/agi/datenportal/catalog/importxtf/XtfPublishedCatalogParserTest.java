@@ -105,9 +105,9 @@ class XtfPublishedCatalogParserTest {
         assertThat(dataset.primaryDistributions())
                 .extracting(distribution -> distribution.preferredHref().toString())
                 .containsExactly(
-                        "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.csv",
-                        "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.xlsx",
-                        "https://data.so.ch/download/ch.so.wasserqualitaet_grundwasser.parquet");
+                        "http://localhost:8081/ch.so.datenportal/downloads/ch.so.wasserqualitaet_grundwasser.csv",
+                        "http://localhost:8081/ch.so.datenportal/downloads/ch.so.wasserqualitaet_grundwasser.xlsx",
+                        "http://localhost:8081/ch.so.datenportal/downloads/ch.so.wasserqualitaet_grundwasser.parquet");
     }
 
     @Test
@@ -173,9 +173,9 @@ class XtfPublishedCatalogParserTest {
         assertThat(series.distributionsForListing())
                 .extracting(distribution -> distribution.preferredHref().toString())
                 .containsExactly(
-                        "https://data.so.ch/download/ch.so.abstimmungsresultate_2026.csv",
-                        "https://data.so.ch/download/ch.so.abstimmungsresultate_2026.xlsx",
-                        "https://data.so.ch/download/ch.so.abstimmungsresultate_2026.parquet");
+                        "http://localhost:8081/ch.so.datenportal/downloads/ch.so.abstimmungsresultate_2026.csv",
+                        "http://localhost:8081/ch.so.datenportal/downloads/ch.so.abstimmungsresultate_2026.xlsx",
+                        "http://localhost:8081/ch.so.datenportal/downloads/ch.so.abstimmungsresultate_2026.parquet");
     }
 
     @Test
@@ -386,8 +386,12 @@ class XtfPublishedCatalogParserTest {
     }
 
     private static Catalog parseFixture() throws Exception {
+        String sourceDescription = "classpath:published_catalog_full_62_entries.xtf";
         try (var inputStream = new ClassPathResource("published_catalog_full_62_entries.xtf").getInputStream()) {
-            return PARSER.parse(inputStream, "classpath:published_catalog_full_62_entries.xtf");
+            var bytes = new CatalogBytes(inputStream.readAllBytes(), sourceDescription);
+            var resolvedBytes = new CatalogDownloadUrlPlaceholderResolver()
+                    .resolve(bytes, "http://localhost:8081/ch.so.datenportal/downloads");
+            return PARSER.parse(resolvedBytes.inputStream(), sourceDescription);
         }
     }
 
@@ -455,7 +459,7 @@ class XtfPublishedCatalogParserTest {
                         <Distribution>
                           <distributionUri>https://data.so.ch/dataset/test/distribution/csv</distributionUri>
                           <accessURL>https://data.so.ch/dataset/test</accessURL>
-                          <downloadURL>https://data.so.ch/download/test.csv</downloadURL>
+                          <downloadURL>http://localhost:8081/ch.so.datenportal/downloads/test.csv</downloadURL>
                           <format>csv</format>
                         </Distribution>
                       </distributions>

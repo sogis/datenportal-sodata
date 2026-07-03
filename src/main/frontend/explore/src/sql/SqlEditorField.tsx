@@ -1,22 +1,65 @@
-import {useCallback} from 'react';
-import {SqlMonacoEditor} from '@sqlrooms/sql-editor';
-import type {DuckDbConnector} from '@sqlrooms/duckdb';
+import {useCallback, useEffect, useRef} from 'react';
+import {SqlMonacoEditor, type SqlMonacoEditorProps} from '@sqlrooms/sql-editor';
+import type {DataTable} from '@sqlrooms/duckdb';
+
+type MonacoEditorInstance = Parameters<NonNullable<SqlMonacoEditorProps['onMount']>>[0];
 
 export function SqlEditorField({
   value,
   onChange,
   onRun,
   disabled,
-  connector,
-  tableNames
+  tableSchemas,
+  getLatestSchemas
 }: {
   value: string;
   onChange: (value: string) => void;
   onRun: () => void;
   disabled: boolean;
-  connector?: DuckDbConnector;
-  tableNames: string[];
+  tableSchemas: DataTable[];
+  getLatestSchemas: () => {tableSchemas: DataTable[]};
 }) {
+  const editorRef = useRef<MonacoEditorInstance | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const layoutFrameRef = useRef<number | null>(null);
+
+  const layoutEditor = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    if (layoutFrameRef.current !== null) {
+      window.cancelAnimationFrame(layoutFrameRef.current);
+    }
+    layoutFrameRef.current = window.requestAnimationFrame(() => {
+      layoutFrameRef.current = null;
+      editorRef.current?.layout();
+    });
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return undefined;
+    }
+
+    const observer = new ResizeObserver(() => layoutEditor());
+    observer.observe(container);
+    layoutEditor();
+
+    return () => {
+      observer.disconnect();
+      if (layoutFrameRef.current !== null) {
+        window.cancelAnimationFrame(layoutFrameRef.current);
+        layoutFrameRef.current = null;
+      }
+    };
+  }, [layoutEditor]);
+
+  const handleEditorMount = useCallback<NonNullable<SqlMonacoEditorProps['onMount']>>((editor) => {
+    editorRef.current = editor;
+    layoutEditor();
+  }, [layoutEditor]);
+
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
       event.preventDefault();
@@ -26,23 +69,35 @@ export function SqlEditorField({
 
   return (
     <div className="dp-explore-editor" onKeyDown={handleKeyDown}>
-      <label htmlFor="dp-explore-sql-fallback">SQL</label>
-      <div className="dp-explore-editor__monaco" data-testid="sql-monaco-editor">
+      <label className="dp-visually-hidden" htmlFor="dp-explore-sql-fallback">SQL Fallback bearbeiten</label>
+      <div className="dp-explore-editor__monaco" data-testid="sql-monaco-editor" ref={containerRef}>
         <SqlMonacoEditor
           value={value}
           onChange={(nextValue) => onChange(nextValue ?? '')}
-          connector={connector}
-          customKeywords={tableNames}
+          tableSchemas={tableSchemas}
+          getLatestSchemas={getLatestSchemas}
           theme="light"
-          height="240px"
+          height="100%"
+          readOnly={disabled}
+          onMount={handleEditorMount}
           options={{
             minimap: {enabled: false},
             readOnly: disabled,
-            fontSize: 15,
+            fontSize: 13,
             scrollBeyondLastLine: false,
+            quickSuggestions: {other: true, comments: false, strings: false},
+            quickSuggestionsDelay: 80,
+            suggestOnTriggerCharacters: true,
             wordWrap: 'on',
             automaticLayout: true,
-            lineNumbers: 'on'
+            lineNumbers: 'on',
+            fontFamily: 'JetBrains Mono',
+            lineHeight: 20,
+            glyphMargin: false,
+            folding: false,
+            renderLineHighlight: 'none',
+            overviewRulerBorder: false,
+            hideCursorInOverviewRuler: true
           }}
         />
       </div>
@@ -58,7 +113,6 @@ export function SqlEditorField({
           }
         }}
         disabled={disabled}
-        aria-label="SQL Fallback bearbeiten"
       />
     </div>
   );

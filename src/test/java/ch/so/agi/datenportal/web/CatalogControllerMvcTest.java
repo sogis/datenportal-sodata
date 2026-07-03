@@ -210,7 +210,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("Baumkataster")))
                 .andExpect(content().string(containsString("Öffentlich mit Bedingungen")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
-                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.2581.baumkataster.csv\""))))
+                .andExpect(content().string(not(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.2581.baumkataster.csv\""))))
                 .andExpect(content().string(not(containsString(">CSV</a>"))));
     }
 
@@ -223,8 +223,8 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("Baustellen-Koordinationsplanung")))
                 .andExpect(content().string(containsString("Baustellen-Koordinationsplanung 2026")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
-                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2026.csv\""))))
-                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.so.baustellen.koordinationsplanung_2025.csv\""))));
+                .andExpect(content().string(not(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.baustellen.koordinationsplanung_2026.csv\""))))
+                .andExpect(content().string(not(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.baustellen.koordinationsplanung_2025.csv\""))));
     }
 
     @Test
@@ -238,7 +238,7 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString(">Öffentlich mit Bedingungen</span>")))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
                 .andExpect(content().string(not(containsString(">Open Data</span>"))))
-                .andExpect(content().string(not(containsString("href=\"https://data.so.ch/download/ch.2581.baumkataster.csv\""))));
+                .andExpect(content().string(not(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.2581.baumkataster.csv\""))));
     }
 
     @Test

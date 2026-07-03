@@ -9,14 +9,13 @@ import {sampleExploreContext} from '../test/sampleExploreContext';
 const contextWithRecipes = {
   ...sampleExploreContext,
   recipes: [
-    ...sampleExploreContext.recipes,
     {
-      id: 'ch_so_bauinventar-count',
-      title: 'Anzahl Datensätze',
-      description: 'Zählt alle Zeilen.',
+      id: 'ch_so_bauinventar-preview',
+      title: 'Vorschau',
+      description: 'Zeigt die ersten Zeilen.',
       tableId: 'ch_so_bauinventar',
-      category: 'profile' as const,
-      sql: 'select count(*) as anzahl from ch_so_bauinventar;'
+      category: 'preview' as const,
+      sql: 'select * from ch_so_bauinventar;'
     }
   ]
 };
@@ -33,32 +32,78 @@ describe('SqlLaboratory', () => {
     }));
   });
 
-  it('selects recipes and marks edited SQL as modified', async () => {
-    const user = userEvent.setup();
+  it('renders the initial registered-view query without secondary panels', () => {
     render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
 
-    await user.click(screen.getByRole('button', {name: /Anzahl Datensätze/}));
-
-    expect(screen.getByRole('button', {name: /Anzahl Datensätze/})).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue('select count(*) as anzahl from ch_so_bauinventar;');
-
-    await user.type(screen.getByLabelText('SQL bearbeiten'), ' -- angepasst');
-
-    expect(screen.getByText('Anzahl Datensätze · geändert')).toBeInTheDocument();
+    const editor = screen.getByLabelText('SQL bearbeiten');
+    expect(editor).toHaveValue('select * from ch_so_bauinventar;');
+    expect(editor).toHaveAttribute('data-has-connector', 'false');
+    expect(editor).toHaveAttribute('data-table-schemas', 'ch_so_bauinventar');
+    expect(editor).toHaveAttribute('data-table-columns', 'egid,gemeindename');
+    expect(editor).toHaveAttribute('data-latest-schemas', 'ch_so_bauinventar');
+    expect(editor).toHaveAttribute('data-custom-keywords', '');
+    expect(screen.queryByRole('button', {name: 'Abfrage 1'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', {name: 'SQL'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', {name: 'Resultat'})).not.toBeInTheDocument();
+    expect(screen.getByLabelText('SQL-Editor und Resultattabelle Grösse anpassen')).toBeInTheDocument();
+    expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__actions')).toBeInTheDocument();
+    expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__export')).toBeInTheDocument();
+    expect(screen.queryByText('Beispielabfragen')).not.toBeInTheDocument();
+    expect(screen.queryByText('Lokale Historie')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Diagramm aus Resultat')).not.toBeInTheDocument();
   });
 
-  it('runs SQL through the guard and renders result rows', async () => {
+  it('renders a red run button with the Bootstrap play icon', () => {
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    const runButton = screen.getByRole('button', {name: 'Ausführen'});
+    expect(runButton).toHaveClass('dp-explore-button--primary');
+    expect(runButton.querySelector('svg.bi-play-fill')).toBeInTheDocument();
+  });
+
+  it('runs SQL through the guard and renders a compact result table', async () => {
     const user = userEvent.setup();
     render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
 
-    await user.click(screen.getByRole('button', {name: /Anzahl Datensätze/}));
     await user.click(screen.getByRole('button', {name: 'Ausführen'}));
 
     expect(await screen.findByLabelText('SQL Ergebnis')).toBeInTheDocument();
     expect(screen.getByText('Solothurn')).toBeInTheDocument();
     expect(screen.getByText('Olten')).toBeInTheDocument();
-    expect(screen.getByText(/Maximal 10.?000 Zeilen angezeigt/)).toBeInTheDocument();
-    expect(screen.getByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
+    expect(screen.getByText('gemeindename')).toBeInTheDocument();
+    expect(screen.getAllByText(/Dictionary|Float64|Value/).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', {name: 'CSV'})).toBeEnabled();
+    expect(query).toHaveBeenCalledWith(
+      expect.stringContaining('limit 1000'),
+      expect.objectContaining({signal: expect.any(AbortSignal)})
+    );
+  });
+
+  it('uses the selected row limit in the query guard', async () => {
+    const user = userEvent.setup();
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    await screen.findByLabelText('SQL Ergebnis');
+    await user.selectOptions(screen.getByLabelText('Anzahl zurückgelieferter Resultatzeilen'), '100');
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+
+    expect(query).toHaveBeenLastCalledWith(
+      expect.stringMatching(/\blimit 100$/),
+      expect.objectContaining({signal: expect.any(AbortSignal)})
+    );
+  });
+
+  it('opens the result export split-button menu', async () => {
+    const user = userEvent.setup();
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    await screen.findByLabelText('SQL Ergebnis');
+    await user.click(screen.getByRole('button', {name: 'Exportformat auswählen'}));
+
+    expect(screen.getByRole('menu', {name: 'Exportformate'})).toBeInTheDocument();
+    expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual(['CSV', 'XLSX', 'Parquet']);
   });
 
   it('shows query guard errors for blocked SQL', async () => {
@@ -73,78 +118,29 @@ describe('SqlLaboratory', () => {
     expect(query).not.toHaveBeenCalled();
   });
 
-  it('copies SQL with visible feedback', async () => {
+  it('copies SQL with visible compact feedback', async () => {
     const user = userEvent.setup();
     render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
 
-    await user.click(screen.getByRole('button', {name: 'SQL kopieren'}));
+    const copyButton = screen.getByRole('button', {name: 'SQL kopieren'});
+    expect(copyButton).toHaveClass('dp-explore-button--copy');
+    expect(copyButton).toHaveClass('dp-explore-button--secondary');
+    await user.click(copyButton);
 
-    expect(await screen.findByRole('button', {name: 'SQL kopiert'})).toBeInTheDocument();
+    expect(await screen.findByRole('button', {name: '✓ SQL kopiert'})).toHaveClass('dp-explore-button--copy');
   });
 
-  it('saves successful queries to local history without result rows', async () => {
-    const user = userEvent.setup();
-    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
-
-    await user.click(screen.getByRole('button', {name: /Anzahl Datensätze/}));
-    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
-
-    expect(await screen.findByLabelText('SQL Ergebnis')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: /select count\(\*\) as anzahl from ch_so_bauinventar/})).toBeInTheDocument();
-    const raw = window.localStorage.getItem('datenportal.explore.history.ch.so.bauinventar');
-    expect(raw).toContain('select count(*) as anzahl from ch_so_bauinventar;');
-    expect(raw).not.toContain('Solothurn');
-    expect(raw).not.toContain('rows');
-  });
-
-  it('loads a local history item into the editor', async () => {
-    const user = userEvent.setup();
-    window.localStorage.setItem('datenportal.explore.history.ch.so.bauinventar', JSON.stringify([
-      {
-        id: 'manual-query',
-        sql: 'select gemeindename from ch_so_bauinventar limit 5;',
-        executedAt: '2026-07-01T08:00:00.000Z',
-        rowCount: 5,
-        durationMs: 12
-      }
-    ]));
-
-    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
-    await user.click(screen.getByRole('button', {name: /select gemeindename from ch_so_bauinventar limit 5/}));
-
-    expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue('select gemeindename from ch_so_bauinventar limit 5;');
-  });
-
-  it('clears local history for the current dataset', async () => {
-    const user = userEvent.setup();
-    window.localStorage.setItem('datenportal.explore.history.ch.so.bauinventar', JSON.stringify([
-      {
-        id: 'manual-query',
-        sql: 'select 1;',
-        executedAt: '2026-07-01T08:00:00.000Z'
-      }
-    ]));
-
-    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
-    await user.click(screen.getByRole('button', {name: 'Historie löschen'}));
-
-    expect(window.localStorage.getItem('datenportal.explore.history.ch.so.bauinventar')).toBeNull();
-    expect(screen.getByText('Noch keine lokalen Abfragen für dieses Datenthema.')).toBeInTheDocument();
-  });
-
-  it('hides and skips history storage when local history is disabled', async () => {
+  it('does not save hidden local history while running queries', async () => {
     const user = userEvent.setup();
     render(<SqlLaboratory
       context={{
         ...contextWithRecipes,
-        featureFlags: {...contextWithRecipes.featureFlags, localHistory: false}
+        featureFlags: {...contextWithRecipes.featureFlags, localHistory: true}
       }}
       connector={connector}
       ready
     />);
 
-    expect(screen.queryByText('Lokale Historie')).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', {name: /Anzahl Datensätze/}));
     await user.click(screen.getByRole('button', {name: 'Ausführen'}));
 
     expect(await screen.findByLabelText('SQL Ergebnis')).toBeInTheDocument();

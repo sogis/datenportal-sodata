@@ -1,6 +1,6 @@
 # Erkunden Architektur-Notizen
 
-Status: Phase 8 future hooks implemented
+Status: SQL-Labor redesign implemented
 
 Dieses Dokument beschreibt den Ist-Zustand des Repositories, die Backend-Integration, die Frontend-Insel und die Architekturentscheidungen fuer die folgenden Erkunden-Phasen.
 
@@ -86,7 +86,7 @@ Die interaktive Erkunden-Oberflaeche ist als isolierte React/Vite-Insel unter fo
 src/main/frontend/explore/
 ```
 
-Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Seit Phase 3 initialisiert sie DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und laedt eine Standardvorschau. Seit Phase 4 stellt sie ein SQL-Labor mit generierten Rezepten, Editor, guard/limit-normalisierter Ausfuehrung, Resultattabelle und CSV-Export bereit. Seit Phase 5 erzeugt sie einfache Diagramme aus dem aktuellen SQL-Resultat. Seit Phase 6 rendert sie statische Codebeispiele und eine lokale Query-Historie. Seit Phase 8 enthaelt sie einen stillen Erweiterungspunkt fuer spaetere AI-, WebR-, Vega-, Mosaic- und Geodaten-Funktionen.
+Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Sie initialisiert DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und zeigt danach ein vollflaechiges SQL-Labor. Die Startabfrage verwendet den registrierten View-Namen ohne sichtbares Preview-Limit, zum Beispiel `select * from ch_so_bauinventar;`. Die aktuelle UI besteht aus linker Schema-Spalte mit `Geladen`-Badge fuer lokal verfuegbare DuckDB-Wasm-Views, editierbarem Monaco-SQL-Editor mit SQLRooms-Completion ueber `tableSchemas` und memoisiertes `getLatestSchemas`, rotem Run-Button mit Play-Icon, SQL-Copy-Button und Export-Splitbutton fuer CSV, XLSX und Parquet. Der DuckDB-Connector wird fuer Query-Ausfuehrung und Exporte verwendet, aber nicht an `SqlMonacoEditor` uebergeben, weil SQLRooms `0.28.0` fuer dynamische `duckdb_functions()`-Metadaten einen CSP-blockierten `Function(...)`-Pfad nutzt. Auf Desktop nutzt sie `react-resizable-panels`, um Schema/Labor horizontal sowie Editor/Resultat vertikal pro Datensatz in `localStorage` zu speichern; versionierte Auto-Save-IDs ignorieren alte defekte Panelgroessen. Auf Mobile bleibt die Ansicht gestapelt und nicht resizable. Diagramm-, Codebeispiel- und lokale History-Komponenten bleiben im Code fuer spaetere Wiederaufnahme, werden im redesignierten Primaerpfad aber nicht gerendert. Seit Phase 8 enthaelt die Insel ausserdem einen stillen Erweiterungspunkt fuer spaetere AI-, WebR-, Vega-, Mosaic- und Geodaten-Funktionen.
 
 Wichtige Dateien:
 
@@ -104,23 +104,25 @@ Wichtige Dateien:
 - `src/main/frontend/explore/src/sql/QueryHistory.ts`
 - `src/main/frontend/explore/src/styles/explore.css`
 
-Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library. SQLRooms DuckDB- und SQL-Editor-Pakete werden fuer DuckDB-Wasm und den SQL-Editor verwendet. Phase 5 verwendet `@sqlrooms/recharts@0.28.0` fuer Recharts-Primitive und SQLRooms-Chart-Wrappers; die Styles bleiben Datenportal-eigene CSS-Tokens. `@sqlrooms/ui` wird nicht direkt in Datenportal-Komponenten eingebunden, weil die Datenportal-UI eigene Design-Tokens nutzt.
+Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library. SQLRooms DuckDB- und SQL-Editor-Pakete werden fuer DuckDB-Wasm und den SQL-Editor verwendet. Phase 5 verwendet `@sqlrooms/recharts@0.28.0` fuer Recharts-Primitive und SQLRooms-Chart-Wrappers; die Styles bleiben Datenportal-eigene CSS-Tokens. `react-resizable-panels@3.0.6` ist direkte Explore-Abhaengigkeit fuer die SQLRooms-aehnlichen Griffleisten. `@radix-ui/react-scroll-area@1.2.13` ist direkte Explore-Abhaengigkeit fuer die Resultat-Scrollbars, weil native Overlay-Scrollbars Hover auf macOS/Chromium nicht verlaesslich sichtbar machen. `@sqlrooms/ui` wird nicht direkt in Datenportal-Komponenten eingebunden, weil die Datenportal-UI eigene Design-Tokens nutzt.
 
 ## SQL-Labor ab Phase 4
 
-- Backend-generierte `ExploreRecipeDto` werden gruppiert nach Tabelle angezeigt.
-- Ein Klick auf ein Rezept laedt dessen SQL in den Editor; `Ausfuehren` oder `Ctrl/Cmd + Enter` startet die lokale DuckDB-Abfrage.
-- Jede Abfrage laeuft durch `querySafety`: genau eine read-only-Anweisung, blockierte Mutations-/Systemkommandos und automatische `maxResultRows`-Begrenzung fuer `select`/`with`, sofern kein Top-Level-`limit` vorhanden ist.
+- Backend-generierte `ExploreRecipeDto` bleiben Teil des Kontextes. Die primaere Labor-UI zeigt aber keine Rezeptliste; sie startet mit einer einzelnen Abfrage gegen den registrierten View.
+- `Ausfuehren` oder `Ctrl/Cmd + Enter` startet die lokale DuckDB-Abfrage.
+- Der Monaco-Editor ist sichtbar und editierbar; `readOnly` wird nur waehrend einer laufenden Query gesetzt.
+- `SQL kopieren` ist ein sekundar rot gerahmter Button mit stabilem Feedback `✓ SQL kopiert`.
+- Jede Abfrage laeuft durch `querySafety`: genau eine read-only-Anweisung, blockierte Mutations-/Systemkommandos und automatische Row-Limit-Begrenzung fuer `select`/`with`, sofern kein Top-Level-`limit` vorhanden ist. Die UI bietet `100`, `1'000` und `10'000` Zeilen an; Standard ist `1'000`.
 - Query-Ausfuehrung verwendet den in Phase 3 initialisierten DuckDB-Connector mit `AbortSignal` fuer Timeout und Abbruch.
-- Resultate werden als bewusst einfache, portalgestylte HTML-Tabelle gerendert. `@sqlrooms/data-table` bleibt installiert, wird aber fuer Phase 4 nicht als Primaerrenderer verwendet, weil die vorhandene Tabelle stabiler zu den Datenportal-Styles und Tests passt.
-- CSV-Export erzeugt clientseitig eine Semikolon-getrennte CSV-Datei mit CRLF-Zeilenenden und exportiert nur die aktuell gerenderten Resultatzeilen.
+- Resultate werden als kompakte HTML-Tabelle im SQLRooms-Stil gerendert: sticky Header, Zeilenindex, Typ-Badges im Header, Radix-ScrollArea mit Datenportal-eigenen Hover-/Fokus-Scrollbars und Footerzeile mit Row-Limit-Combobox.
+- CSV-Export erzeugt clientseitig eine Semikolon-getrennte CSV-Datei mit CRLF-Zeilenenden. XLSX und Parquet werden in DuckDB-Wasm per `COPY (<executedSql>) TO '<tmp>' WITH (...)` erzeugt und anschliessend aus dem virtuellen DuckDB-Dateisystem heruntergeladen. Alle Exportformate enthalten nur das aktuell gelieferte Query-Resultat, nicht die originalen Quelldateien.
 
-## Diagramme ab Phase 5
+## Diagramme
 
 - `ChartPanel` erhaelt ausschliesslich das aktuelle `QueryResultState`; es fuehrt keine eigene SQL-Abfrage aus.
 - `chartInference` klassifiziert Resultatspalten aus den angezeigten Zeilen und schlaegt Balken-, Linien-, Punkt- oder Histogramm-Diagramme vor.
 - Rezept-`preferredChart` wird nur verwendet, wenn das unveraenderte Rezept-SQL ausgefuehrt wurde. Geaendertes oder manuelles SQL verwendet immer Inferenz aus dem Resultat.
-- Die UI bleibt bewusst klein: Diagrammtyp, X-/Y-Spalten und Diagramm-Zeilenlimit. Es gibt keinen Dashboard-Builder und keinen Spec-Editor.
+- Im SQL-Labor-Redesign ist `ChartPanel` nicht sichtbar. Es gibt aktuell keinen Diagramm-Tab, keine Diagrammsteuerung, keinen Dashboard-Builder und keinen Spec-Editor.
 - DuckDB `count(*)` liefert im Browser BigInt-Werte. Fuer Recharts werden nur die Diagrammzeilen in plain JavaScript-Zahlen/Strings normalisiert; Resultattabelle und CSV-Export behalten die originalen Resultatwerte.
 - Vitest mockt `@sqlrooms/recharts`, weil das Paket wie `@sqlrooms/sql-editor` extensionless interne ESM-Imports enthaelt, die der Test-Runner nicht direkt aufloest. Typecheck, Vite-Build und Playwright pruefen den echten Produktionspfad.
 
@@ -128,10 +130,10 @@ Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library
 
 - `ExploreCodeSnippetService` generiert statische Beispiele fuer DuckDB CLI, Python mit DuckDB und R mit `duckdb`.
 - Bei mehreren Parquet-Tabellen verwenden die Codebeispiele die primaere Tabelle; ohne markierte primaere Tabelle wird die erste Tabelle verwendet.
-- Das Frontend rendert die Beispiele im Tab `Code` ueber `CodeSnippetsPanel` mit Kopieraktion. Es gibt keine Ausfuehren-Schaltflaeche und keine WebR-Laufzeit.
+- `CodeSnippetsPanel` bleibt im Code, ist im SQL-Labor-Redesign aber nicht sichtbar. Es gibt keine WebR-Laufzeit.
 - `QueryHistory.ts` speichert erfolgreiche lokale SQL-Ausfuehrungen pro Datenthema unter `datenportal.explore.history.<datasetId>` in `localStorage`.
 - Gespeichert werden SQL, Ausfuehrungszeitpunkt und optionale Metadaten wie Rezepttitel, Zeilenzahl und Dauer. Resultatzeilen werden nie gespeichert.
-- Die Historie ist auf 20 Eintraege begrenzt, newest first, und ist eine Browser-Komfortfunktion. Fehler beim Lesen oder Schreiben von `localStorage` duerfen die SQL-Ausfuehrung nicht unterbrechen.
+- Die Historie ist auf 20 Eintraege begrenzt, newest first, bleibt aber im redesignierten Primaerpfad unsichtbar. Fehler beim Lesen oder Schreiben von `localStorage` duerfen die SQL-Ausfuehrung nicht unterbrechen.
 
 ## Zukunfts-Hooks ab Phase 8
 
@@ -162,10 +164,11 @@ Geplante Anschlussstellen:
 
 ## UX-Hardening ab Phase 7
 
-- Die React-Insel rendert den Runtime-Status als zugängliche Status-/Alert-Region und markiert den Arbeitsbereich waehrend Initialisierung, Registrierung und Vorschau als busy.
-- Die Haupt-Tabs `Vorschau`, `SQL-Labor`, `Diagramm` und `Code` unterstuetzen ArrowLeft/ArrowRight/Home/End und sind mit `tabpanel`-Bereichen verbunden.
+- Die React-Insel rendert den Runtime-Status als zugängliche Status-/Alert-Region und markiert den Arbeitsbereich waehrend Initialisierung und Registrierung als busy.
+- Es gibt keine Haupt-Tabs `Vorschau`, `SQL-Labor`, `Diagramm` und `Code` mehr. Die Browserchecks pruefen stattdessen die Workbench, die Tastaturausloesung des Run-Buttons und das Fehlen der alten Tabs.
+- Es gibt keine sichtbaren `Abfrage 1`-, `SQL`- oder `Resultat`-Header mehr; die Bereiche bleiben ueber `aria-label` benannt.
 - Browserlokale Ladefehler werden best-effort klassifiziert: DuckDB-Wasm-Start, CORS, Range Requests, HTTP/IO und Parquet-Ladefehler. Die Klassifizierung ist UI-Hilfe und keine Garantie fuer exakte Netzwerkdiagnose.
-- Mobile CSS haelt Panel, Toolbar, Codebeispiele, Tabellen und Diagrammsteuerung innerhalb des Viewports; breite Tabellen und Codebloecke scrollen lokal statt die Seite zu verbreitern.
+- Mobile CSS haelt Schema-Spalte, Toolbar, Monaco-Editor und Resultattabelle innerhalb des Viewports; breite Tabellen scrollen lokal statt die Seite zu verbreitern.
 - Playwright verwendet weiterhin eine same-origin Parquet-Fixture fuer stabile CI-Pfade und eine absichtlich fehlende Parquet-Fixture fuer den Fehlerzustand.
 
 ## Frontend-Asset-Build

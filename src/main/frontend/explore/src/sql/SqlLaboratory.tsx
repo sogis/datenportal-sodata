@@ -1,17 +1,19 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
-import type {DuckDbConnector, QueryHandle} from '@sqlrooms/duckdb';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {makeQualifiedTableName, type DataTable, type DuckDbConnector, type QueryHandle} from '@sqlrooms/duckdb';
 import type {Table} from 'apache-arrow';
-import type {ExploreContextDto, ExploreRecipeDto} from '../app/ExploreContext';
+import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
+import type {ExploreContextDto, ExploreRecipeDto, ExploreTableDto} from '../app/ExploreContext';
 import {hasResultLimitApplied, normalizeSqlForExecution, queryTimeoutMessage} from '../duckdb/querySafety';
-import {RecipeList} from '../recipes/RecipeList';
-import {ChartPanel} from '../charts/ChartPanel';
 import {ResultPanel} from '../results/ResultPanel';
 import {idleQueryResult, type QueryResultState} from '../results/queryResultTypes';
 import {successfulQueryResult} from '../results/arrowResult';
+import {exportQueryResult, type ResultExportFormat} from '../results/ResultExport';
 import {copyTextToClipboard} from './clipboard';
-import {clearQueryHistory, loadQueryHistory, saveQueryHistory, type QueryHistoryItem} from './QueryHistory';
 import {SqlEditorField} from './SqlEditorField';
 import {SqlToolbar} from './SqlToolbar';
+
+const DEFAULT_ROW_LIMIT = 1000;
+const ROW_LIMIT_OPTIONS = [100, 1000, 10000] as const;
 
 export function SqlLaboratory({
   context,
@@ -25,49 +27,44 @@ export function SqlLaboratory({
   onResultChange?: (result: QueryResultState) => void;
 }) {
   const initialRecipe = useMemo(() => context.recipes[0], [context.recipes]);
-  const [selectedRecipeId, setSelectedRecipeId] = useState<string | undefined>(initialRecipe?.id);
-  const [sql, setSql] = useState(initialRecipe?.sql ?? '');
-  const [modified, setModified] = useState(false);
+  const initialSql = useMemo(() => initialRecipe?.sql ?? buildInitialSql(context.tables[0]), [
+    context.tables,
+    initialRecipe
+  ]);
+  const rowLimitOptions = useMemo(() => {
+    const options = ROW_LIMIT_OPTIONS.filter((limit) => limit <= context.execution.maxResultRows);
+    return options.length > 0 ? options : [context.execution.maxResultRows];
+  }, [context.execution.maxResultRows]);
+  const [sql, setSql] = useState(initialSql);
   const [result, setResult] = useState<QueryResultState>(idleQueryResult);
   const [copied, setCopied] = useState(false);
-  const [history, setHistory] = useState<QueryHistoryItem[]>(() =>
-    context.featureFlags.localHistory ? loadQueryHistory(context.datasetId) : []
-  );
+  const [rowLimit, setRowLimit] = useState(Math.min(DEFAULT_ROW_LIMIT, context.execution.maxResultRows));
+  const [exportingFormat, setExportingFormat] = useState<ResultExportFormat | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const tableSchemas = useMemo(() => context.tables.map(toSqlRoomsDataTable), [context.tables]);
+  const getLatestSchemas = useCallback(() => ({tableSchemas}), [tableSchemas]);
   const activeQuery = useRef<QueryHandle<Table> | null>(null);
-  const selectedRecipe = context.recipes.find((recipe) => recipe.id === selectedRecipeId);
 
   useEffect(() => {
-    setSelectedRecipeId(initialRecipe?.id);
-    setSql(initialRecipe?.sql ?? '');
-    setModified(false);
+    setSql(initialSql);
     setResult(idleQueryResult);
-  }, [initialRecipe]);
+  }, [initialSql]);
+
+  useEffect(() => {
+    if (!rowLimitOptions.includes(rowLimit as (typeof rowLimitOptions)[number])) {
+      setRowLimit(rowLimitOptions[0] ?? context.execution.maxResultRows);
+    }
+  }, [context.execution.maxResultRows, rowLimit, rowLimitOptions]);
 
   useEffect(() => {
     onResultChange?.(result);
   }, [onResultChange, result]);
 
-  useEffect(() => {
-    setHistory(context.featureFlags.localHistory ? loadQueryHistory(context.datasetId) : []);
-  }, [context.datasetId, context.featureFlags.localHistory]);
-
-  function selectRecipe(recipe: ExploreRecipeDto) {
-    setSelectedRecipeId(recipe.id);
-    setSql(recipe.sql);
-    setModified(false);
-  }
-
   function changeSql(value: string) {
     setSql(value);
-    setModified(selectedRecipe?.sql.trim() !== value.trim());
   }
 
-  async function runRecipe(recipe: ExploreRecipeDto) {
-    selectRecipe(recipe);
-    await runSql(recipe.sql, recipe, false);
-  }
-
-  async function runSql(sourceSql = sql, recipeForExecution = selectedRecipe, modifiedForExecution = modified) {
+  async function runSql(sourceSql = sql, recipeForExecution = initialRecipe) {
     if (!connector || !ready) {
       setResult(errorResult(sourceSql, 'DuckDB ist noch nicht bereit.'));
       return;
@@ -75,7 +72,7 @@ export function SqlLaboratory({
 
     let executedSql: string;
     try {
-      executedSql = normalizeSqlForExecution(sourceSql, context.execution.maxResultRows);
+      executedSql = normalizeSqlForExecution(sourceSql, rowLimit);
     } catch (error) {
       setResult(errorResult(sourceSql, toErrorMessage(error)));
       return;
@@ -94,6 +91,7 @@ export function SqlLaboratory({
       rowCount: 0,
       maxRowsApplied
     };
+    setExportError(null);
     setResult(runningResult);
 
     try {
@@ -109,20 +107,9 @@ export function SqlLaboratory({
           durationMs,
           maxRowsApplied
         }),
-        preferredChart: preferredChartForSql(sourceSql, recipeForExecution, modifiedForExecution)
+        preferredChart: preferredChartForSql(sourceSql, recipeForExecution)
       };
       setResult(successResult);
-      if (context.featureFlags.localHistory) {
-        saveQueryHistory(context.datasetId, {
-          id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          sql: sourceSql,
-          executedAt: new Date().toISOString(),
-          recipeTitle: recipeForExecution?.title,
-          rowCount: successResult.rowCount,
-          durationMs
-        });
-        setHistory(loadQueryHistory(context.datasetId));
-      }
     } catch (error) {
       const status = timeoutController.signal.aborted ? 'timeout' : activeQuery.current?.signal.aborted ? 'cancelled' : 'error';
       setResult({
@@ -151,35 +138,59 @@ export function SqlLaboratory({
     window.setTimeout(() => setCopied(false), 1800);
   }
 
-  function loadSqlFromHistory(item: QueryHistoryItem) {
-    setSelectedRecipeId(undefined);
-    setSql(item.sql);
-    setModified(false);
-  }
-
-  function clearHistory() {
-    clearQueryHistory(context.datasetId);
-    setHistory([]);
+  async function exportResult(format: ResultExportFormat) {
+    if (result.status !== 'success' || result.rows.length === 0) {
+      return;
+    }
+    setExportingFormat(format);
+    setExportError(null);
+    try {
+      await exportQueryResult(result, format, context.datasetId, connector);
+    } catch (error) {
+      console.error('Explore result export failed', error);
+      setExportError(`Export konnte nicht erstellt werden: ${toErrorMessage(error)}`);
+    } finally {
+      setExportingFormat(null);
+    }
   }
 
   const running = result.status === 'running';
-  return (
-    <div className="dp-explore-lab">
-      <RecipeList
-        recipes={context.recipes}
-        tables={context.tables}
-        selectedRecipeId={selectedRecipeId}
-        onSelect={selectRecipe}
-        onRun={(recipe) => void runRecipe(recipe)}
-      />
+  const canExport = result.status === 'success' && result.rows.length > 0;
 
-      <section className="dp-explore-lab__editor" aria-labelledby="explore-sql-title">
-        <div className="dp-explore-lab__heading">
-          <h4 id="explore-sql-title">SQL</h4>
-          {selectedRecipe && (
-            <p>
-              {selectedRecipe.title}
-              {modified ? ' · geändert' : ''}
+  return (
+    <PanelGroup
+      autoSaveId={`datenportal.explore.${context.datasetId}.sql.v2`}
+      className="dp-explore-lab dp-explore-resizable-group dp-explore-resizable-group--vertical"
+      direction="vertical"
+    >
+      <Panel
+        className="dp-explore-query-pane"
+        defaultSize={43}
+        id="query"
+        maxSize={80}
+        minSize={20}
+        order={1}
+        tagName="section"
+        aria-label="SQL Editor"
+      >
+        <div className="dp-explore-query-pane__header">
+          <div className="dp-explore-query-pane__toolbar-row">
+            <SqlToolbar
+              running={running}
+              canRun={ready && sql.trim().length > 0}
+              canCancel={running}
+              canExport={canExport}
+              exportingFormat={exportingFormat}
+              onRun={() => void runSql()}
+              onCancel={() => void cancelQuery()}
+              onCopy={() => void copySql()}
+              onExport={(format) => void exportResult(format)}
+              copied={copied}
+            />
+          </div>
+          {exportError && (
+            <p className="dp-explore-export-error" role="alert">
+              {exportError}
             </p>
           )}
         </div>
@@ -188,104 +199,56 @@ export function SqlLaboratory({
           onChange={changeSql}
           onRun={() => void runSql()}
           disabled={running}
-          connector={connector}
-          tableNames={context.tables.map((table) => table.name)}
+          tableSchemas={tableSchemas}
+          getLatestSchemas={getLatestSchemas}
         />
-        <SqlToolbar
-          running={running}
-          canRun={ready && sql.trim().length > 0}
-          canCancel={running}
-          onRun={() => void runSql()}
-          onCancel={() => void cancelQuery()}
-          onCopy={() => void copySql()}
-          copied={copied}
+      </Panel>
+
+      <ExploreResizeHandle label="SQL-Editor und Resultattabelle Grösse anpassen" />
+
+      <Panel
+        className="dp-explore-result-pane"
+        defaultSize={57}
+        id="result"
+        minSize={20}
+        order={2}
+        tagName="section"
+        aria-label="SQL Resultat"
+      >
+        <ResultPanel
+          result={result}
+          rowLimit={rowLimit}
+          rowLimitOptions={rowLimitOptions}
+          onRowLimitChange={setRowLimit}
         />
-      </section>
-
-      {context.featureFlags.localHistory && (
-        <QueryHistoryPanel history={history} onLoad={loadSqlFromHistory} onClear={clearHistory} />
-      )}
-
-      <section className="dp-explore-lab__result" aria-labelledby="explore-result-title">
-        <h4 id="explore-result-title">Ergebnis</h4>
-        <ResultPanel result={result} maxRows={context.execution.maxResultRows} datasetId={context.datasetId} />
-      </section>
-
-      <section className="dp-explore-lab__chart" aria-labelledby="explore-chart-title">
-        <h4 id="explore-chart-title">Visualisierung</h4>
-        <ChartPanel result={result} preferred={result.preferredChart} />
-      </section>
-    </div>
+      </Panel>
+    </PanelGroup>
   );
 }
 
-function QueryHistoryPanel({
-  history,
-  onLoad,
-  onClear
-}: {
-  history: QueryHistoryItem[];
-  onLoad: (item: QueryHistoryItem) => void;
-  onClear: () => void;
-}) {
-  return (
-    <section className="dp-explore-history" aria-labelledby="explore-history-title">
-      <div className="dp-explore-history__header">
-        <h4 id="explore-history-title">Lokale Historie</h4>
-        <button type="button" className="dp-explore-button" disabled={history.length === 0} onClick={onClear}>
-          Historie löschen
-        </button>
-      </div>
-      {history.length === 0 ? (
-        <p className="dp-explore-muted">Noch keine lokalen Abfragen für dieses Datenthema.</p>
-      ) : (
-        <ol className="dp-explore-history__list" aria-label="Lokale Abfragen">
-          {history.map((item) => (
-            <li key={item.id}>
-              <button type="button" className="dp-explore-history__item" onClick={() => onLoad(item)}>
-                <span className="dp-explore-history__sql">{item.sql}</span>
-                <span className="dp-explore-history__meta">
-                  {historyMeta(item)}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      )}
-    </section>
-  );
+function buildInitialSql(table: ExploreTableDto | undefined): string {
+  if (!table) {
+    return '';
+  }
+  return `select *
+from ${table.name};`;
 }
 
-function historyMeta(item: QueryHistoryItem): string {
-  const parts = [formatHistoryDate(item.executedAt)];
-  if (item.recipeTitle) {
-    parts.push(item.recipeTitle);
-  }
-  if (typeof item.rowCount === 'number') {
-    parts.push(item.rowCount === 1 ? '1 Zeile' : `${item.rowCount} Zeilen`);
-  }
-  if (typeof item.durationMs === 'number') {
-    parts.push(`${Math.round(item.durationMs)} ms`);
-  }
-  return parts.join(' · ');
+function toSqlRoomsDataTable(table: ExploreTableDto): DataTable {
+  const qualifiedName = makeQualifiedTableName({schema: 'main', table: table.name});
+  return {
+    table: qualifiedName,
+    isView: true,
+    schema: qualifiedName.schema ?? 'main',
+    tableName: table.name,
+    columns: table.columns.map((column) => ({name: column.name, type: column.type})),
+    rowCount: table.rowCountEstimate,
+    inputFileName: table.parquetUrl
+  };
 }
 
-function formatHistoryDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return new Intl.DateTimeFormat('de-CH', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
-}
-
-function preferredChartForSql(sourceSql: string, recipe: ExploreRecipeDto | undefined, modified: boolean) {
-  if (modified || !recipe?.preferredChart) {
+function preferredChartForSql(sourceSql: string, recipe: ExploreRecipeDto | undefined) {
+  if (!recipe?.preferredChart) {
     return undefined;
   }
   return normalizeSql(sourceSql) === normalizeSql(recipe.sql) ? recipe.preferredChart : undefined;
@@ -311,4 +274,16 @@ function toErrorMessage(error: unknown): string {
     return error.message;
   }
   return String(error);
+}
+
+function ExploreResizeHandle({label}: {label: string}) {
+  return (
+    <PanelResizeHandle
+      aria-label={label}
+      className="dp-explore-resize-handle dp-explore-resize-handle--horizontal"
+      hitAreaMargins={{coarse: 12, fine: 8}}
+    >
+      <span className="dp-explore-resize-handle__knob" aria-hidden="true" />
+    </PanelResizeHandle>
+  );
 }

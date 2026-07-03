@@ -15,6 +15,10 @@ public record CatalogBytes(byte[] bytes, String sourceDescription, String conten
         this(bytes, sourceDescription, sha256(bytes), Instant.EPOCH);
     }
 
+    public CatalogBytes(byte[] bytes, String sourceDescription, Instant fetchedAt) {
+        this(bytes, sourceDescription, sha256(bytes), fetchedAt);
+    }
+
     public CatalogBytes {
         Objects.requireNonNull(bytes, "bytes must not be null");
         Objects.requireNonNull(sourceDescription, "sourceDescription must not be null");

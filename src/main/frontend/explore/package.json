@@ -10,17 +10,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@radix-ui/react-scroll-area": "1.2.13",
     "@sqlrooms/data-table": "0.28.0",
     "@sqlrooms/duckdb": "0.28.0",
+    "@sqlrooms/monaco-editor": "0.28.0",
     "@sqlrooms/recharts": "0.28.0",
     "@sqlrooms/room-shell": "0.28.0",
     "@sqlrooms/room-store": "0.28.0",
     "@sqlrooms/schema-tree": "0.28.0",
     "@sqlrooms/sql-editor": "0.28.0",
     "apache-arrow": "17.0.0",
+    "monaco-editor": "0.55.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-hook-form": "7.80.0",
+    "react-resizable-panels": "3.0.6",
     "zod": "4.4.3"
   },
   "devDependencies": {

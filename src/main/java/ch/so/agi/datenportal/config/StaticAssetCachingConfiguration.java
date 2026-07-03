@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.EncodedResourceResolver;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 
 @Configuration
 public class StaticAssetCachingConfiguration implements WebMvcConfigurer {
@@ -25,10 +27,16 @@ public class StaticAssetCachingConfiguration implements WebMvcConfigurer {
                 .setCacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePublic());
         registry.addResourceHandler("/explore/**")
                 .addResourceLocations("classpath:/static/explore/")
-                .setCacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePublic());
+                .setCacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePublic())
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new PathResourceResolver());
         registry.addResourceHandler("/explore-extensions/**")
                 .addResourceLocations("classpath:/static/explore-extensions/")
-                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)).cachePublic());
+                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)).cachePublic())
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new PathResourceResolver());
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/static/images/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic());

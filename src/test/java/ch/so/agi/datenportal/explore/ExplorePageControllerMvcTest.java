@@ -1,6 +1,7 @@
 package ch.so.agi.datenportal.explore;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -29,8 +30,9 @@ class ExplorePageControllerMvcTest {
                 .andExpect(content().string(containsString("<so-breadcrumb>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets/ch.so.bauinventar\">Bauinventar</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Erkunden</so-breadcrumb-item>")))
-                .andExpect(content().string(containsString("<h1 class=\"dp-detail-title\">Bauinventar erkunden</h1>")))
-                .andExpect(content().string(containsString("Läuft lokal im Browser mit DuckDB-Wasm direkt auf den Parquet-Dateien.")))
+                .andExpect(content().string(containsString("class=\"dp-page dp-page--explore\"")))
+                .andExpect(content().string(containsString("class=\"dp-main dp-main--explore\"")))
+                .andExpect(content().string(containsString("class=\"dp-explore-host\"")))
                 .andExpect(content().string(containsString("id=\"datenportal-explore-root\"")))
                 .andExpect(content().string(containsString("id=\"datenportal-explore-context\" type=\"application/json\"")))
                 .andExpect(content().string(containsString("\"datasetId\":\"ch.so.bauinventar\"")))
@@ -43,8 +45,11 @@ class ExplorePageControllerMvcTest {
                 .andExpect(content().string(containsString("\"mosaic\":false")))
                 .andExpect(content().string(containsString("\"geospatial\":false")))
                 .andExpect(content().string(containsString("SQL-Labor lädt")))
+                .andExpect(content().string(containsString("Das SQL-Labor läuft lokal im Browser mit DuckDB-Wasm.")))
                 .andExpect(content().string(containsString("rel=\"stylesheet\" href=\"/explore/assets/explore.css\"")))
-                .andExpect(content().string(containsString("type=\"module\" src=\"/explore/assets/explore.js\"")));
+                .andExpect(content().string(containsString("type=\"module\" src=\"/explore/assets/explore.js\"")))
+                .andExpect(content().string(not(containsString("<footer"))))
+                .andExpect(content().string(not(containsString("dp-detail-page"))));
     }
 
     @Test
@@ -66,7 +71,7 @@ class ExplorePageControllerMvcTest {
                 .andExpect(jsonPath("$.recipes[0].category").value("preview"))
                 .andExpect(jsonPath("$.codeSnippets[0].language").value("sql"))
                 .andExpect(jsonPath("$.featureFlags.charts").value(true))
-                .andExpect(jsonPath("$.featureFlags.localHistory").value(true))
+                .andExpect(jsonPath("$.featureFlags.localHistory").value(false))
                 .andExpect(jsonPath("$.featureFlags.aiAssistant").value(false))
                 .andExpect(jsonPath("$.featureFlags.webR").value(false))
                 .andExpect(jsonPath("$.featureFlags.vega").value(false))

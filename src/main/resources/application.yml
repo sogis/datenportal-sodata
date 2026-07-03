@@ -42,15 +42,22 @@ datenportal:
     http-connect-timeout: 5s
     http-read-timeout: 30s
     max-size: 50MB
+    download-url: ${DOWNLOAD_URL:http://localhost:8081/ch.so.datenportal/downloads}
   admin:
     reload-token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN:}
+  security:
+    csp:
+      connect-src:
+        - "'self'"
+        - "https://data.so.ch"
+      include-catalog-download-origin: true
   explore:
     enabled: true
     max-preview-rows: 100
     max-result-rows: 10000
     query-timeout-ms: 30000
     charts-enabled: true
-    local-history-enabled: true
+    local-history-enabled: false
     ai-enabled: false
     webr-enabled: false
     vega-enabled: false

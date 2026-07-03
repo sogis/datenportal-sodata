@@ -1,4 +1,4 @@
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {tableFromArrays} from 'apache-arrow';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -59,86 +59,52 @@ describe('ExploreApp', () => {
     }));
   });
 
-  it('initializes DuckDB and renders the registered preview state', async () => {
+  it('initializes DuckDB and renders the compact SQL workbench', async () => {
     render(<ExploreApp context={sampleExploreContext} />);
 
-    expect(screen.getByRole('heading', {name: 'Bauinventar'})).toBeInTheDocument();
-    expect(screen.getByText('1 Tabelle')).toBeInTheDocument();
-    expect(screen.getByRole('tab', {name: 'Vorschau'})).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toBeInTheDocument();
-    expect(screen.getByRole('tab', {name: 'Diagramm'})).toBeInTheDocument();
-    expect(screen.getByRole('tab', {name: 'Code'})).toBeInTheDocument();
-    expect(screen.getByRole('status', {name: 'Erkunden Status'})).toHaveTextContent('DuckDB wird initialisiert');
-    expect(screen.getByText('DuckDB wird initialisiert')).toBeInTheDocument();
-    expect(screen.queryByLabelText('Vorbereitete Erweiterungen')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('SQL Vorschau')).toHaveTextContent('select *');
+    expect(screen.getByLabelText('Erkunden SQL-Labor')).toBeInTheDocument();
+    expect(screen.queryByText('DATA')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Daten und Schema')).toBeInTheDocument();
+    expect(screen.getByLabelText('Schema und SQL-Labor Grösse anpassen')).toBeInTheDocument();
+    expect(screen.getByRole('article', {name: 'ch_so_bauinventar'})).toBeInTheDocument();
+    const egidRow = screen.getByText('egid').closest('.dp-explore-schema-card__column');
+    expect(egidRow?.querySelector('dt')).toHaveTextContent('egid');
+    expect(egidRow?.querySelector('dd')).toHaveTextContent('INT');
+    expect(screen.getByText('VARCHAR')).toBeInTheDocument();
+    expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue('select * from ch_so_bauinventar;');
+    expect(screen.getByRole('button', {name: 'Ausführen'})).toHaveClass('dp-explore-button--primary');
+    expect(screen.queryByRole('tab', {name: 'Vorschau'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', {name: 'Diagramm'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', {name: 'Code'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', {name: 'Zur Datensatzseite'})).not.toBeInTheDocument();
+
     expect(await screen.findByText('Bereit')).toBeInTheDocument();
-    expect(screen.getByText('Registriert')).toBeInTheDocument();
-    expect(screen.getByText('Solothurn')).toBeInTheDocument();
-    expect(screen.getByText('Olten')).toBeInTheDocument();
+    expect(screen.getByText('Geladen')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Tabelle ch_so_bauinventar: Geladen/)).toHaveAttribute(
+      'title',
+      'Parquet ist als lokaler DuckDB-View im Browser geladen.'
+    );
   });
 
-  it('supports keyboard navigation in the main tab list', async () => {
+  it('runs the initial registered-view query and renders result rows', async () => {
     const user = userEvent.setup();
     render(<ExploreApp context={sampleExploreContext} />);
 
     expect(await screen.findByText('Bereit')).toBeInTheDocument();
-    const previewTab = screen.getByRole('tab', {name: 'Vorschau'});
-    previewTab.focus();
-
-    await user.keyboard('{ArrowRight}');
-    await waitFor(() => expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toHaveFocus());
-    expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('tabpanel', {name: 'SQL-Labor'})).toBeInTheDocument();
-
-    await user.keyboard('{End}');
-    await waitFor(() => expect(screen.getByRole('tab', {name: 'Code'})).toHaveFocus());
-    expect(screen.getByRole('tab', {name: 'Code'})).toHaveAttribute('aria-selected', 'true');
-
-    await user.keyboard('{Home}');
-    await waitFor(() => expect(screen.getByRole('tab', {name: 'Vorschau'})).toHaveFocus());
-    expect(screen.getByRole('tab', {name: 'Vorschau'})).toHaveAttribute('aria-selected', 'true');
-  });
-
-  it('switches to the SQL laboratory and runs the selected recipe', async () => {
-    const user = userEvent.setup();
-    render(<ExploreApp context={sampleExploreContext} />);
-
-    expect(await screen.findByText('Bereit')).toBeInTheDocument();
-    await user.click(screen.getByRole('tab', {name: 'SQL-Labor'}));
     await user.click(screen.getByRole('button', {name: 'Ausführen'}));
 
-    expect(screen.getByRole('tab', {name: 'SQL-Labor'})).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByLabelText('Beispielabfragen')).toBeInTheDocument();
-    expect(screen.getByLabelText('SQL Ergebnis')).toBeInTheDocument();
-    expect(screen.getByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Resultat als CSV'})).toBeEnabled();
+    expect(await screen.findByLabelText('SQL Ergebnis')).toBeInTheDocument();
+    expect(screen.getByText('Solothurn')).toBeInTheDocument();
+    expect(screen.getByText('Olten')).toBeInTheDocument();
+    expect(screen.getAllByText('egid').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('gemeindename').length).toBeGreaterThanOrEqual(1);
     expect(mocks.connector.query).toHaveBeenLastCalledWith(
-      expect.stringContaining('select * from ch_so_bauinventar limit 100'),
+      expect.stringContaining('limit 1000'),
       expect.objectContaining({signal: expect.any(AbortSignal)})
     );
-
-    await user.click(screen.getByRole('tab', {name: 'Diagramm'}));
-    expect(screen.getByRole('tab', {name: 'Diagramm'})).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
   });
 
-  it('renders static code snippets in the Code tab', async () => {
-    const user = userEvent.setup();
-    render(<ExploreApp context={sampleExploreContext} />);
-
-    expect(await screen.findByText('Bereit')).toBeInTheDocument();
-    await user.click(screen.getByRole('tab', {name: 'Code'}));
-
-    expect(screen.getByRole('tab', {name: 'Code'})).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('heading', {name: 'Weiterverwenden'})).toBeInTheDocument();
-    expect(screen.getByRole('tab', {name: 'DuckDB CLI'})).toBeInTheDocument();
-    expect(screen.getByRole('tab', {name: 'Python mit DuckDB'})).toBeInTheDocument();
-    expect(screen.getByRole('tab', {name: 'R mit duckdb'})).toBeInTheDocument();
-    expect(screen.queryByText('Reproduzierbare Codebeispiele werden in Phase 6 interaktiv kopierbar.')).not.toBeInTheDocument();
-  });
-
-  it('shows registration errors without crashing the island', async () => {
+  it('shows registration errors without crashing the workbench', async () => {
     mocks.registerParquetTables.mockResolvedValue([
       {
         table: sampleExploreContext.tables[0],
@@ -153,7 +119,7 @@ describe('ExploreApp', () => {
     expect(await screen.findByText('DuckDB-Hinweis')).toBeInTheDocument();
     expect(screen.getByRole('alert', {name: 'Erkunden Status'})).toHaveTextContent('DuckDB-Hinweis');
     expect(screen.getAllByText('Parquet-Datei konnte wegen CORS nicht im Browser geladen werden.').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('CORS blocked').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/CORS blocked/).length).toBeGreaterThan(0);
     expect(screen.getByText('Fehler')).toBeInTheDocument();
   });
 

@@ -2,7 +2,9 @@ package ch.so.agi.datenportal.config;
 
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogSource;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogDownloadUrlPlaceholderResolver;
 import ch.so.agi.datenportal.catalog.importxtf.ClasspathCatalogSource;
+import ch.so.agi.datenportal.catalog.importxtf.DownloadUrlPlaceholderCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.FileCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.HttpCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.PublishedCatalogParser;
@@ -21,6 +23,7 @@ import org.springframework.core.io.ResourceLoader;
         CatalogProperties.class,
         ExploreProperties.class,
         SearchProperties.class,
+        SecurityCspProperties.class,
         WebComponentsProperties.class})
 public class CatalogImportConfiguration {
 
@@ -31,22 +34,25 @@ public class CatalogImportConfiguration {
 
     @Bean
     CatalogSource catalogSource(CatalogProperties properties, ResourceLoader resourceLoader, Clock clock) {
+        CatalogSource source;
         if (properties.isClasspathSource()) {
-            return new ClasspathCatalogSource(resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
-        }
-        if (properties.isFileSource()) {
-            return new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
-        }
-        if (properties.isHttpSource()) {
-            return new HttpCatalogSource(
+            source = new ClasspathCatalogSource(resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
+        } else if (properties.isFileSource()) {
+            source = new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
+        } else if (properties.isHttpSource()) {
+            source = new HttpCatalogSource(
                     properties.httpUrl(),
                     properties.httpConnectTimeout(),
                     properties.httpReadTimeout(),
                     properties.maxSize(),
                     clock);
+        } else {
+            throw new IllegalStateException("Unsupported catalog source: " + properties.effectiveSourceType());
         }
-
-        throw new IllegalStateException("Unsupported catalog source: " + properties.effectiveSourceType());
+        return new DownloadUrlPlaceholderCatalogSource(
+                source,
+                new CatalogDownloadUrlPlaceholderResolver(),
+                properties.downloadUrl());
     }
 
     @Bean

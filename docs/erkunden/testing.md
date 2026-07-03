@@ -1,6 +1,6 @@
 # Erkunden Tests
 
-Status: Phase 8 future hooks tests
+Status: SQL-Labor redesign tests
 
 Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase-0-Baseline des bestehenden Projekts.
 
@@ -13,11 +13,15 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit Phase 2 gibt es ein separates npm/Vite/React/Vitest-Frontend-Paket unter `src/main/frontend/explore`.
 - `check` haengt zusaetzlich von `npmTestExplore` und `npmTypecheckExplore` ab.
 - Seit Phase 3 prueft Playwright DuckDB-Wasm mit einer same-origin Parquet-Fixture.
-- Seit Phase 4 prueft Playwright Rezeptauswahl, SQL-Ausfuehrung, Resultattabelle und CSV-Download mit derselben Fixture.
-- Seit Phase 5 pruefen Vitest und Playwright Diagramm-Inferenz, Diagramm-Controls und echte Recharts-Renderingpfade mit derselben Fixture.
-- Seit Phase 6 pruefen Vitest und Playwright statische Codebeispiele, Kopieraktionen und lokale Query-Historie.
-- Seit Phase 7 pruefen Vitest und Playwright zusaetzlich Status-/Fehlerzustaende, Haupt-Tab-Tastaturbedienung, fehlende Parquet-Dateien, Browser-Konsole und page-level Mobile-Overflow.
+- Seit Phase 4 prueft Playwright SQL-Ausfuehrung, Resultattabelle und CSV-Download mit derselben Fixture.
+- Seit Phase 5 existieren Unit-Tests fuer Diagramm-Inferenz und Diagrammkomponenten; im SQL-Labor-Redesign prueft Playwright, dass Diagramme in der primaeren UI nicht sichtbar sind.
+- Seit Phase 6 existieren Tests fuer statische Codebeispiele und lokale Query-Historie; im SQL-Labor-Redesign bleiben diese Bereiche aus der primaeren UI entfernt.
+- Seit Phase 7 pruefen Vitest und Playwright zusaetzlich Status-/Fehlerzustaende, fehlende Parquet-Dateien, Browser-Konsole und page-level Mobile-Overflow.
 - Seit Phase 8 pruefen Backend-, Frontend- und npm-Guard-Tests deaktivierte Zukunftsflags und verhindern direkte AI/WebR/Vega/Mosaic/Karten-Abhaengigkeiten.
+- Seit dem SQL-Labor-Redesign pruefen MVC, Vitest und Playwright die vollflaechige Explore-Layoutvariante, Schema-Karten, Start-SQL gegen registrierte Views, roten Run-Button, lokale Monaco-Assets, Typ-Badges in Resultat-Headern, fehlende alte Tabs und lokale Tabellen-Scrollflaechen.
+- Seit dem SQL-Labor UI-Nachschliff pruefen Vitest und Playwright zusaetzlich `Geladen` statt `Registriert`, entfernte `Abfrage 1`-/`SQL`-/`Resultat`-Header, den Play-Icon-Run-Button, den stabilen `✓ SQL kopiert`-Button, sichtbares/editierbares Monaco-SQL und pointer-bedienbare Resizer-Handles.
+- Seit dem zweiten UI-Nachschliff pruefen Vitest und Playwright zusaetzlich Start-SQL ohne sichtbares `limit`, versionierte Panel-Speicher-IDs, Row-Limit-Ausfuehrung, Export-Splitbutton fuer CSV/XLSX/Parquet, fehlenden Footer-CSV-Button und sticky Zeilennummern.
+- Seit dem Resultat-Scrollbar-Nachschliff pruefen Vitest und Playwright zusaetzlich die fokussierbare Resultattabellen-Scrollregion, echte lokale horizontale/vertikale Overflow-Situationen und sichtbare Custom-Scrollbar-Pixel bei Hover, Klick und Tastaturfokus.
 
 ## Baseline am 2026-07-01
 
@@ -130,7 +134,7 @@ Fixture-/Runtime-Hinweise:
 
 - Die Browser-Fixture liegt unter `src/test/resources/static/explore-fixtures/ch.so.oev_haltestellen.parquet`.
 - Die DuckDB-Wasm Parquet-Erweiterung wird same-origin unter `/explore-extensions/v1.4.3/wasm_mvp/parquet.duckdb_extension.wasm` ausgeliefert.
-- Der Playwright-Test erwartet, dass DuckDB den Status `Bereit` erreicht, die Tabelle als `Registriert` markiert und Preview-Zeilen mit `Solothurn` und `Olten` rendert.
+- Der Playwright-Test erwartet, dass DuckDB den Status `Bereit` erreicht, die Tabelle als `Geladen` markiert und Preview-Zeilen mit `Solothurn` und `Olten` rendert.
 
 Ausgefuehrte Befehle:
 
@@ -367,6 +371,16 @@ Phase 8 ergaenzt:
 - Frontend-Kontext-Parsing fuer `geospatial`.
 - React-Komponententests, dass vorbereitete Erweiterungsslots bei deaktivierten Flags nicht sichtbar sind.
 - `npm run check:future-deps` als Guard gegen direkte Zukunftspakete und Source-/Bundle-Imports fuer AI, WebR, Vega, Mosaic und Kartenframeworks.
+
+Ausgefuehrte Befehle werden in `docs/erkunden/progress.md` mit exakten Ergebnissen dokumentiert.
+
+## SQL-Labor Redesign am 2026-07-02
+
+Das Redesign ersetzt die alte Taboberflaeche durch eine vollflaechige SQLRooms-nahe Workbench:
+
+- MVC-Tests pruefen Header, Breadcrumb, Explore-spezifische Full-width-Klassen, eingebetteten Kontext, Asset-Links und fehlenden Footer.
+- Frontend-Tests pruefen Schema-Karten, kompakte Workbench, Start-SQL gegen den registrierten View, roten `Ausfuehren`-Button, entfernte Preview-/Diagramm-/Code-Tabs, Fehlerzustaende, Resultattabellen mit Typ-Badges, Row-Limit, SQLRooms-`tableSchemas` fuer Autocomplete und CSV/XLSX/Parquet-Exporthelfer.
+- Playwright prueft same-origin Parquet-Registrierung, lokale Monaco-Assets, initiale SQL-Ausfuehrung, CSV/XLSX/Parquet-Export aus dem Splitbutton, einheitliche Borderfarben, duennere Splitter, fehlende Diagramme, lesbare Broken-Parquet-Fehler, mobile lokale Tabellen-Scrollflaechen, Row-Limit-Wechsel und kein page-level Horizontal-Overflow.
 
 Ausgefuehrte Befehle werden in `docs/erkunden/progress.md` mit exakten Ergebnissen dokumentiert.
 

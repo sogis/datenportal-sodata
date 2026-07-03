@@ -61,6 +61,7 @@ def gitCommitProvider = providers.provider {
 
 def exploreFrontendDir = layout.projectDirectory.dir('src/main/frontend/explore')
 def exploreGeneratedResourcesDir = layout.buildDirectory.dir('generated-resources/explore')
+def precompressedStaticResourcesDir = layout.buildDirectory.dir('generated-resources/precompressed-static')
 
 // Damit sind die Inhalte dieses Verzeichnisses via Classpath greifbar.
 sourceSets {
@@ -68,6 +69,7 @@ sourceSets {
         resources {
             srcDir 'spec/fixtures'
             srcDir exploreGeneratedResourcesDir
+            srcDir precompressedStaticResourcesDir
         }
     }
 }
@@ -145,8 +147,20 @@ tasks.register('npmBuildExplore', Exec) {
     outputs.dir exploreGeneratedResourcesDir
 }
 
-tasks.named('processResources') {
+tasks.register('precompressStaticAssets', Exec) {
+    group = 'build'
+    description = 'Precompresses Explore and DuckDB static assets with Brotli and Gzip.'
+    workingDir = exploreFrontendDir.asFile
+    commandLine 'node', 'scripts/precompressStaticAssets.mjs'
     dependsOn tasks.named('npmBuildExplore')
+    inputs.dir exploreGeneratedResourcesDir
+    inputs.dir layout.projectDirectory.dir('src/main/resources/static/explore-extensions')
+    inputs.file exploreFrontendDir.file('scripts/precompressStaticAssets.mjs')
+    outputs.dir precompressedStaticResourcesDir
+}
+
+tasks.named('processResources') {
+    dependsOn tasks.named('precompressStaticAssets')
 }
 
 def playwrightBrowsersPath = layout.projectDirectory.dir('.gradle/playwright-browsers').asFile.absolutePath

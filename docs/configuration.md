@@ -16,6 +16,7 @@ datenportal:
     http-connect-timeout: 5s
     http-read-timeout: 30s
     max-size: 50MB
+    download-url: ${DOWNLOAD_URL:http://localhost:8081/ch.so.datenportal/downloads}
 ```
 
 `source-type=classpath` ist der lokale Standard. `source-type=http` lädt die vollständige PublishedCatalog-XTF/XML-Datei per HTTP GET. `source-type=file` ist für lokale Entwicklung und Tests vorgesehen.
@@ -37,6 +38,14 @@ HTTP-Quellen:
 - `max-size` begrenzt die eingelesenen Katalogbytes für alle Quellen.
 - HTTP-Status ausserhalb `2xx` führen zu einem kontrollierten Reload-Fehler.
 - Die Source-Beschreibung enthält Schema, Host, Port und Pfad, aber keine Userinfo, Query-Parameter oder Fragments.
+
+Download-URL-Platzhalter:
+
+- XTF-Dateien dürfen in Download-URLs den Platzhalter `${DOWNLOAD_URL}` enthalten, zum Beispiel `${DOWNLOAD_URL}/ch.2581.baumkataster.parquet`.
+- Vor dem XML-Parsing ersetzt die Anwendung den Platzhalter durch `datenportal.catalog.download-url`.
+- Doppelte Slashes an der Join-Stelle werden bereinigt: `download-url: http://localhost:8081/ch.so.datenportal/downloads/` plus `${DOWNLOAD_URL}//file.parquet` wird zu `http://localhost:8081/ch.so.datenportal/downloads/file.parquet`.
+- Enthält ein XTF `${DOWNLOAD_URL}` und ist `download-url` leer, schlägt der Katalog-Load kontrolliert fehl.
+- `download-url` darf eine absolute `http(s)`-URL oder ein root-relativer Pfad wie `/downloads` sein.
 
 ## Reload
 
@@ -170,3 +179,17 @@ Jede Antwort erhält grundlegende sichere Header:
 - `X-Frame-Options: DENY`
 - `Permissions-Policy` mit deaktivierten Browser-Funktionen, die diese App nicht benötigt
 - `Content-Security-Policy` für Self-hosted Assets; `style-src` erlaubt Inline-Styles, weil die aktuellen Web Components Shadow-DOM-Styles erzeugen.
+
+Die `connect-src`-Direktive ist konfigurierbar:
+
+```yaml
+datenportal:
+  security:
+    csp:
+      connect-src:
+        - "'self'"
+        - "https://data.so.ch"
+      include-catalog-download-origin: true
+```
+
+Bei `include-catalog-download-origin=true` wird die Origin aus `datenportal.catalog.download-url` automatisch ergänzt, sofern `download-url` eine absolute `http(s)`-URL ist. Für den lokalen Standard bedeutet das zusätzlich `http://localhost:8081`.

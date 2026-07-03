@@ -1,22 +1,23 @@
 # Erkunden
 
-Status: Phase 8 future hooks implemented
+Status: SQL-Labor redesign implemented
 
 Erkunden ist ein lokales SQL-Labor pro Datenthema. Die Abfragen laufen im Browser mit DuckDB-Wasm direkt auf den Parquet-Dateien.
 
-Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Bis Phase 8 existieren die Backend-Kontext-Route, die eingebettete React/Vite-Insel, DuckDB-Wasm-Parquet-Registrierung, generierte Beispielabfragen, ein SQL-Labor, Resultattabelle, CSV-Export, einfache Diagramme aus SQL-Resultaten, statische Codebeispiele, lokale Query-Historie, gehaertete Lade-/Fehlerzustaende, Tastaturbedienung, mobile Browserchecks sowie deaktivierte Zukunfts-Flags fuer AI, WebR, Vega, Mosaic und Geodaten-Erkundung.
+Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Der aktuelle Stand rendert `/datasets/{datasetId}/explore` als vollflaechiges, kompaktes SQL-Labor direkt unter Header und Breadcrumb. Die React/Vite-Insel registriert Parquet-Dateien als DuckDB-Wasm-Views, zeigt links visuelle Schema-Karten mit `Geladen`-Status, bietet einen editierbaren Monaco-SQL-Editor mit SQLRooms-Schema-Autocomplete, rotem `Ausfuehren`-Button und rendert Resultate als kompakte Tabelle mit Typ-Badges, Row-Limit-Combobox und Exporten fuer CSV, XLSX und Parquet. Linke Schema-Spalte sowie Editor/Resultat sind auf Desktop resizable und werden pro Datensatz im Browser gespeichert. Diagramm-, Codebeispiel- und Query-Historie-Code bleibt fuer spaetere Wiederaufnahme vorhanden, ist in der primaeren Labor-UI aber nicht sichtbar.
 
 ## Produktidee
 
 Die Seite soll pro Datenthema eine kleine, nuetzliche Explorationsflaeche anbieten:
 
 - Parquet-Dateien des Datenthemas werden lokal im Browser mit DuckDB-Wasm registriert.
-- Nutzerinnen und Nutzer koennen Tabellen, Attribute, SQL-Rezepte und Resultate erkunden.
+- `Geladen` bedeutet, dass die Parquet-Datei als lokaler DuckDB-Wasm-View im Browser verfuegbar ist.
+- Nutzerinnen und Nutzer koennen Tabellen, Attribute, SQL und Resultate in einer dichten Laboroberflaeche erkunden.
 - SQL bleibt sichtbar und reproduzierbar.
-- Resultate koennen als CSV exportiert werden; exportiert wird nur das aktuelle Resultat.
-- Diagramme entstehen aus dem aktuellen SQL-Resultat; bevorzugte Diagrammtypen aus Rezepten werden nur bei unveraendert ausgefuehrtem Rezept verwendet.
-- Statische Codebeispiele fuer DuckDB CLI, Python und R koennen kopiert werden.
-- Erfolgreich ausgefuehrte SQL-Abfragen werden pro Datenthema lokal im Browser gespeichert; Resultatzeilen werden nicht gespeichert.
+- Die Arbeitsbereiche koennen auf Desktop wie im SQLRooms-Beispiel per Griffleisten vergroessert oder verkleinert werden.
+- Die Startabfrage nutzt den registrierten DuckDB-View ohne sichtbares `limit`; das Resultatlimit wird beim Ausfuehren ueber den Query-Guard angewendet.
+- Resultate koennen als CSV, XLSX und Parquet exportiert werden; exportiert wird nur das aktuell gelieferte Query-Resultat. CSV bleibt wegen Semikolon/CRLF clientseitig, XLSX und Parquet werden per DuckDB-Wasm `COPY` erzeugt.
+- Diagramme, Codebeispiele und sichtbare Query-Historie sind aktuell aus der primaeren UI entfernt.
 - Lade-, Parquet- und Query-Fehler werden sichtbar und ohne serverseitige SQL-Ausfuehrung behandelt.
 - Zukunftsfunktionen bleiben standardmaessig deaktiviert und laden keine schweren Runtime-Pakete.
 - Es gibt keine serverseitige SQL-Ausfuehrung und keine gespeicherten Sessions.

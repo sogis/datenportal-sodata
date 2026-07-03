@@ -22,9 +22,12 @@ export class ExploreErrorBoundary extends Component<ExploreErrorBoundaryProps, E
   override render(): ReactNode {
     if (this.state.error) {
       return (
-        <section className="dp-explore-island dp-explore-island--error" aria-labelledby="explore-error-title">
-          <h2 id="explore-error-title">Erkunden konnte nicht geladen werden</h2>
-          <p>Die Datensatzseite und die Downloads bleiben weiterhin verfügbar.</p>
+        <section className="dp-explore-workbench dp-explore-workbench--unavailable" aria-labelledby="explore-error-title">
+          <div className="dp-explore-empty-state">
+            <p className="dp-explore-kicker">Erkunden</p>
+            <h1 id="explore-error-title">Erkunden konnte nicht geladen werden</h1>
+            <p>Die Datensatzseite und die Downloads bleiben weiterhin verfügbar.</p>
+          </div>
         </section>
       );
     }

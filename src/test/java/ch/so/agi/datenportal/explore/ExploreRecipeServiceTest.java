@@ -54,6 +54,14 @@ class ExploreRecipeServiceTest {
                 .isEqualTo(ExploreChartType.BAR);
     }
 
+    @Test
+    void previewRecipeUsesRegisteredViewWithoutVisibleLimit() {
+        var previewRecipe = service.previewRecipe(table());
+
+        assertThat(previewRecipe.sql())
+                .isEqualTo("select *\nfrom \"gemeinden\";");
+    }
+
     private static ExploreTableDto table() {
         return new ExploreTableDto(
                 "gemeinden",

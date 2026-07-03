@@ -15,6 +15,87 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | 6. Code snippets and local query history | DONE | Static DuckDB/Python/R snippets and per-dataset local history implemented. |
 | 7. UX hardening and browser checks | DONE | Loading/error states, accessibility, mobile robustness and browser checks documented. |
 | 8. Future hooks for AI/WebR/Vega/Mosaic | DONE | Disabled AI/WebR/Vega/Mosaic/geospatial flags, hidden extension slot, docs and dependency guard implemented. |
+| SQL-Labor redesign | DONE | Full-width compact SQL workbench with schema cards, Monaco editor, red run button and compact result table. |
+| SQL-Labor UI-Nachschliff | DONE | Editable Monaco editor, resizable panels, `Geladen` status, compact toolbar and removed legacy headers/link. |
+| SQL-Labor UI-Nachschliff 2 | DONE | Stable Monaco layout, row-limit selector, CSV/XLSX/Parquet result export and cleaned splitter/schema/result visuals. |
+| SQL-Labor Feinschliff 3 | DONE | Unified borders, DuckDB-native XLSX/Parquet exports, local Excel extension mirror and SQLRooms schema autocomplete wiring. |
+| SQL-Labor Autocomplete-Fix | DONE | Removed the local duplicate completion provider, bundled Monaco Suggest locally and wired SQLRooms tableSchemas/getLatestSchemas. |
+
+## SQL-Labor Feinschliff 3 Entry
+
+Date: 2026-07-02
+
+Scope:
+
+- Normalized workbench structural borders to the SQLRooms-like `#e2e8f0` color and made resize handles render one continuous thin line.
+- Reworked the export splitbutton so the wrapper owns the outer border and only one internal divider separates the CSV button from the chevron.
+- Replaced JS XLSX/Parquet generation with DuckDB-Wasm `COPY` exports against the successful `executedSql`; CSV remains the client serializer for Semicolon and CRLF behavior.
+- Mirrored the signed official `excel.duckdb_extension.wasm` next to the existing Parquet extension under `/explore-extensions/v1.4.3/wasm_mvp/`.
+- Removed direct `parquet-wasm` and `write-excel-file` dependencies from the Explore package.
+- Wired Monaco autocomplete through SQLRooms `connector`, `tableSchemas` and memoized `getLatestSchemas`; the local duplicate table/column fallback provider has since been removed so the built-in SQLRooms provider owns suggestions.
+- Autocomplete-Fix follow-up: the editor now uses SQLRooms `tableSchemas`/`getLatestSchemas` without a custom provider and bundles Monaco's Suggest contribution locally. The DuckDB connector is not passed into `SqlMonacoEditor` while `@sqlrooms/sql-editor@0.28.0` dynamic function metadata needs CSP-blocked `unsafe-eval`.
+- Extended frontend and Playwright coverage for DuckDB-native exports, splitbutton borders, unified border colors and schema autocomplete wiring.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 70 passed (70)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore assets; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 21s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 24s`; includes same-origin Parquet, local Monaco, CSV/XLSX/Parquet export, border-color checks, resizers and mobile overflow |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 51s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+## SQL-Labor UI-Nachschliff 2 Entry
+
+Date: 2026-07-02
+
+Scope:
+
+- Fixed the Monaco layout path with versioned resizable-panel storage, `ResizeObserver` and explicit editor height constraints.
+- Kept the visible start SQL against the registered DuckDB-Wasm view free of an explicit preview `limit`.
+- Added a Row-Limit-Combobox with `100`, `1'000` and `10'000` rows; the selected value is passed into the existing query guard.
+- Moved SQL actions to the left toolbar area and added a right-aligned export splitbutton for the current query result.
+- Added current-result exports for CSV, XLSX and Parquet; CSV keeps semicolon and CRLF behavior.
+- Removed the result footer CSV button, added compact mono footer text, refined splitters, status badge, schema rows and sticky row index layering.
+- Updated docs and tests for the new compact workbench behavior.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 67 passed (67)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore assets; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 23s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 23s`; includes Monaco editability, old panel-size guard, row-limit and splitbutton export checks |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 50s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+## SQL-Labor UI-Nachschliff Entry
+
+Date: 2026-07-02
+
+Scope:
+
+- Kept header and breadcrumb, but removed the visible Explore dataset backlink from the workbench topbar.
+- Replaced the `Registriert` schema status with `Geladen`; the badge title and accessible label explain that the Parquet file is loaded as a local DuckDB-Wasm view in the browser.
+- Removed visible `Abfrage 1`, `SQL` and `Resultat` chrome from the primary lab.
+- Moved the SQL actions into the compact header row and added an inline Bootstrap `bi-play-fill` icon to `Ausfuehren`.
+- Made `SQL kopieren` a stable-width secondary red button with `SQL kopiert` feedback.
+- Added `react-resizable-panels@3.0.6` for desktop schema/lab and editor/result resizing with per-dataset `localStorage` persistence.
+- Kept mobile stacked and non-resizable to avoid page-level horizontal overflow.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 62 passed (62)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore assets; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 20s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 18s`; includes Monaco editability and resizer checks |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 41s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
 
 ## Phase 0 Entry
 
@@ -336,7 +417,7 @@ Scope:
 - Added accessible runtime status semantics for the Explore island (`role="status"`, alert state, `aria-busy`).
 - Added keyboard navigation for the main Explore tablist with ArrowLeft/ArrowRight/Home/End.
 - Added readable runtime error classification for browser-local DuckDB-Wasm, HTTP/CORS/Range/Parquet and IO loading failures.
-- Kept the dataset detail page reachable through the existing `Zur Datensatzseite` link when the browser-local runtime fails.
+- Kept the dataset detail page reachable through the existing breadcrumb/header navigation when the browser-local runtime fails.
 - Hardened mobile CSS for the SQL toolbar, code tabs, chart controls and page-level horizontal overflow at common narrow widths.
 - Added a broken same-origin Parquet fixture route in Playwright to test failure rendering without depending on external DNS/CORS.
 - No backend SQL execution, persistence, AI/WebR/Vega/Mosaic feature or public DTO change was added.
@@ -400,4 +481,114 @@ Test evidence:
 Known limitations:
 
 - Future flags are extension points only. Enabling one does not implement production AI, WebR, Vega, Mosaic or map behavior.
+- Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.
+
+## DuckDB-Wasm Asset Compression Entry
+
+Date: 2026-07-02
+
+Branch: `main`
+
+Scope:
+
+- Added generated Brotli and Gzip variants for Explore CSS/JS/Wasm assets and the mirrored DuckDB-Wasm Parquet extension.
+- Added Spring `EncodedResourceResolver` handling for `/explore/**` and `/explore-extensions/**`, while preserving the existing cache headers and uncompressed fallback.
+- Re-tested the DuckDB-Wasm EH runtime path in Chromium Playwright. The Explore Parquet ready state timed out when EH was offered, so runtime selection remains pinned to MVP.
+- Kept EH assets available in the bundle output for inspection and compression checks, but did not offer EH or COI through `createLocalDuckDbBundles()`.
+
+Implementation notes:
+
+- `precompressStaticAssets` runs after `npmBuildExplore` and before `processResources`.
+- The generated `.br`/`.gz` resources live under `build/generated-resources/precompressed-static/` and are not committed source assets.
+- Brotli uses quality 9 to keep local Gradle builds fast while reducing `duckdb-eh.wasm` transfer size to about 5.95 MB and `duckdb-mvp.wasm` to about 6.73 MB.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 66 passed (66)`, duration `1.66s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore and DuckDB-Wasm assets under `/explore/assets/`; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.web.StaticAssetCachingMvcTest'` | PASS, `BUILD SUCCESSFUL in 4s`; includes Brotli, Gzip and uncompressed fallback checks |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` with EH offered | FAIL, 6 Explore Parquet tests timed out waiting for `.dp-explore-status--ready`; EH was therefore not enabled for runtime selection |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` with MVP runtime | PASS, `BUILD SUCCESSFUL in 16s`; confirms existing Explore Parquet flows remain stable |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 37s`; included Vitest, TypeScript, Vite build, precompression, backend tests and Playwright |
+
+Known limitations:
+
+- Runtime remains on DuckDB-Wasm MVP until the EH path can pass the Explore Parquet browser smoke.
+- COI/threaded DuckDB-Wasm remains a separate architecture decision because it requires Cross-Origin-Isolation headers.
+
+## Local Monaco Bundle Entry
+
+Date: 2026-07-02
+
+Branch: `main`
+
+Scope:
+
+- Configured SQLRooms Monaco before the Explore React bootstrap so `@monaco-editor/react` uses the locally bundled Monaco runtime.
+- Added direct frontend dependencies on `@sqlrooms/monaco-editor` and `monaco-editor` to make the production loader contract explicit.
+- Bundled the default Monaco editor worker via Vite, keeping worker delivery same-origin under `/explore/assets/`.
+- Kept the CSP closed for external Monaco CDNs; a `cdn.jsdelivr.net` or `unpkg.com` Monaco request is now treated as a browser-smoke regression.
+- Added a Playwright assertion for the SQL laboratory that waits for `.monaco-editor` and records unexpected external Monaco CDN requests.
+
+Implementation notes:
+
+- The hidden textarea remains a non-visual fallback for state and accessibility plumbing, but the production SQL editor is the local Monaco instance.
+- No external `script-src` or `connect-src` allowance was added for Monaco.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 66 passed (66)`, duration `2.44s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore, local Monaco worker assets and DuckDB-Wasm assets under `/explore/assets/`; expected large chunk warning remains |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 17s`; SQL laboratory renders `.monaco-editor`, records no external Monaco CDN request and exports a CSV result |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 41s`; included Vitest, TypeScript, Vite build, precompression, backend tests and Playwright |
+
+Known limitations:
+
+- Only the default Monaco editor worker is explicitly wired through `configureMonacoLoader`; Vite may still emit additional Monaco worker chunks from the ESM editor API.
+
+## SQL-Labor Redesign Entry
+
+Date: 2026-07-02
+
+Branch: `main`
+
+Scope:
+
+- Replaced the previous tabbed Explore UI with a full-width SQL workbench directly below `so-header` and `so-breadcrumb`.
+- Added an Explore-specific JTE layout variant that preserves header, breadcrumb, assets and skip link but removes the normal page container and footer.
+- Added a compact left `DATA` panel with visual schema cards; removed Add-files, grey icon rail and tree-style schema explorer from the primary UI.
+- Kept DuckDB-Wasm registration as registered Views and changed the runnable initial SQL to query the registered table name.
+- Kept Monaco local, with JetBrains Mono at compact editor scale, and styled the workbench with local Explore CSS rather than `@sqlrooms/ui`.
+- Rebuilt the result table with row index, sticky/light headers, type pills, local horizontal scroll, compact footer and CSV export.
+- Removed charts, code snippets, preview tab and visible query history from the primary UI without deleting their code paths.
+- Updated MVC, frontend and Playwright tests for the redesigned shell, schema cards, red run button, missing old tabs, local Monaco, broken Parquet errors and mobile overflow.
+- Updated Erkunden documentation for the new primary UI.
+
+Implementation notes:
+
+- A first `./gradlew clean check` rerun failed because `StaticAssetCachingMvcTest` still looked for the old `.dp-explore-island` CSS marker. The assertion now checks `.dp-explore-workbench`.
+- Playwright caught a real mobile layout issue where Monaco intercepted clicks on the wrapped `Ausfuehren` toolbar. The mobile grid rows now use auto sizing for the toolbar and a stable editor minimum height.
+- The Vite build still reports expected large DuckDB-Wasm chunk warnings.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 61 passed (61)`, duration `2.71s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore, Monaco and DuckDB-Wasm assets under `/explore/assets/`; expected large chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 11s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 24s`; includes same-origin Parquet, local Monaco, SQL result, CSV export, hidden charts and mobile overflow checks |
+| `./gradlew test --tests 'ch.so.agi.datenportal.web.StaticAssetCachingMvcTest'` | PASS, `BUILD SUCCESSFUL in 3s`; confirms updated Explore CSS marker and encoded asset handling |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 39s`; included Vitest, TypeScript, Vite build, precompression, backend tests and Playwright |
+
+Known limitations:
+
+- Diagramm-, Codebeispiel- und Query-Historie-Komponenten bleiben als spaetere Anschlussstellen im Code, sind aber in der aktuellen Labor-UI nicht sichtbar.
 - Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.

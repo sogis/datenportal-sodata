@@ -66,6 +66,7 @@ Secret access key:   0123456789abcdef0123456789abcdef0123456789abcdef0123456789a
 ```
 
 Die Defaults sind direkt in `compose.yaml` hinterlegt. Für lokale Overrides kannst du `.env.example` nach `.env` kopieren.
+Für die Webapp passt dazu `DOWNLOAD_URL=http://localhost:8081/ch.so.datenportal/downloads`.
 
 ## Start
 

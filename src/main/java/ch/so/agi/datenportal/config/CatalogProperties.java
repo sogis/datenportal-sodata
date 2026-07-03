@@ -1,5 +1,6 @@
 package ch.so.agi.datenportal.config;
 
+import ch.so.agi.datenportal.catalog.importxtf.CatalogDownloadUrlPlaceholderResolver;
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -16,16 +17,19 @@ public record CatalogProperties(
         URI httpUrl,
         Duration httpConnectTimeout,
         Duration httpReadTimeout,
-        DataSize maxSize) {
+        DataSize maxSize,
+        String downloadUrl) {
 
     private static final String DEFAULT_CLASSPATH_LOCATION = "published_catalog_full_62_entries.xtf";
     private static final Duration DEFAULT_HTTP_CONNECT_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration DEFAULT_HTTP_READ_TIMEOUT = Duration.ofSeconds(30);
     private static final DataSize DEFAULT_MAX_SIZE = DataSize.ofMegabytes(50);
+    private static final String DEFAULT_DOWNLOAD_URL = "http://localhost:8081/ch.so.datenportal/downloads";
 
     public CatalogProperties {
         source = blankToNull(source);
         classpathLocation = blankToNull(classpathLocation);
+        downloadUrl = normalizeDownloadUrl(downloadUrl);
         if (httpConnectTimeout == null) {
             httpConnectTimeout = DEFAULT_HTTP_CONNECT_TIMEOUT;
         }
@@ -129,6 +133,28 @@ public record CatalogProperties(
             throw new IllegalArgumentException("datenportal.catalog.http-url must use http or https");
         }
         return uri;
+    }
+
+    private static String normalizeDownloadUrl(String value) {
+        String normalized = value == null
+                ? DEFAULT_DOWNLOAD_URL
+                : CatalogDownloadUrlPlaceholderResolver.normalizeDownloadUrl(value);
+        if (normalized == null) {
+            return null;
+        }
+        if (normalized.startsWith("/")) {
+            return normalized;
+        }
+        URI uri = URI.create(normalized);
+        String scheme = uri.getScheme();
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            throw new IllegalArgumentException(
+                    "datenportal.catalog.download-url must be an absolute http(s) URL or a root-relative path");
+        }
+        if (uri.getHost() == null || uri.getHost().isBlank()) {
+            throw new IllegalArgumentException("datenportal.catalog.download-url must contain a host");
+        }
+        return normalized;
     }
 
     private static String blankToNull(String value) {

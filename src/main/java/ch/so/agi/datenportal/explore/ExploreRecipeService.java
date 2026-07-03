@@ -42,7 +42,7 @@ public final class ExploreRecipeService {
                 "Vorschau",
                 "Zeigt die ersten Zeilen der Tabelle.",
                 ExploreRecipeCategory.PREVIEW,
-                "select *\nfrom " + tableName(table) + "\nlimit " + properties.maxPreviewRows() + ";",
+                "select *\nfrom " + tableName(table) + ";",
                 Optional.empty());
     }
 

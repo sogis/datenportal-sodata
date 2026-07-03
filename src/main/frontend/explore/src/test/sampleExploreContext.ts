@@ -43,7 +43,7 @@ export const sampleExploreContext: ExploreContextDto = {
       description: 'Zeigt die ersten Zeilen.',
       tableId: 'ch_so_bauinventar',
       category: 'preview',
-      sql: 'select * from ch_so_bauinventar limit 100;'
+      sql: 'select * from ch_so_bauinventar;'
     }
   ],
   codeSnippets: [
