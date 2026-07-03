@@ -4,7 +4,7 @@ Status: SQL-Labor with result charts implemented
 
 Erkunden ist ein lokales SQL-Labor pro Datenthema. Die Abfragen laufen im Browser mit DuckDB-Wasm direkt auf den Parquet-Dateien.
 
-Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Der aktuelle Stand rendert `/datasets/{datasetId}/explore` als vollflaechiges, kompaktes SQL-Labor direkt unter Header und Breadcrumb. Die React/Vite-Insel registriert Parquet-Dateien als DuckDB-Wasm-Views, liest danach per `DESCRIBE` das echte DuckDB-Schema, zeigt links visuelle Schema-Karten mit `Tabelle geladen`-Status, bietet einen editierbaren Monaco-SQL-Editor mit SQLRooms-Schema-Autocomplete, rotem `Ausfuehren`-Button, kompakter Beispielabfrage-Auswahl und Exporten fuer CSV, XLSX und Parquet. Der Resultatbereich schaltet zwischen Tabelle und Diagramm; Diagramme verwenden `@sqlrooms/recharts` und visualisieren ausschliesslich das aktuelle SQL-Resultat. Ladezustaende erscheinen als weisses, shadowfreies Overlay-Fenster mit abgedunkeltem Hintergrund und rotem indeterminiertem Ladebalken; Fehlerzustaende erscheinen im gleichen Overlay als Alert ohne Ladebalken. Ein globaler `Bereit`-Badge wird im Erfolgsfall nicht mehr gerendert. Linke Schema-Spalte sowie Editor/Resultat sind auf Desktop resizable und werden pro Datensatz im Browser gespeichert. Codebeispiel- und Query-Historie-Code bleibt fuer spaetere Wiederaufnahme vorhanden, ist in der primaeren Labor-UI aber nicht sichtbar.
+Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Der aktuelle Stand rendert `/datasets/{datasetId}/explore` als vollflaechiges, kompaktes SQL-Labor direkt unter Header und Breadcrumb. Die React/Vite-Insel registriert Parquet-Dateien als DuckDB-Wasm-Views, liest danach per `DESCRIBE` das echte DuckDB-Schema sowie per `count(*)` den echten DuckDB-Rowcount, zeigt links visuelle Schema-Karten mit `Tabelle geladen`-Status, bietet einen editierbaren Monaco-SQL-Editor mit SQLRooms-Schema-Autocomplete, rotem `Ausfuehren`-Button, kompakter Beispielabfrage-Auswahl und Exporten fuer CSV, XLSX und Parquet. Der Resultatbereich schaltet zwischen Tabelle und Diagramm; Diagramme verwenden `@sqlrooms/recharts` und visualisieren ausschliesslich das aktuelle SQL-Resultat. Ladezustaende erscheinen als weisses, shadowfreies Overlay-Fenster mit abgedunkeltem Hintergrund und rotem indeterminiertem Ladebalken; Fehlerzustaende erscheinen im gleichen Overlay als Alert ohne Ladebalken. Ein globaler `Bereit`-Badge wird im Erfolgsfall nicht mehr gerendert. Linke Schema-Spalte sowie Editor/Resultat sind auf Desktop resizable und werden pro Datensatz im Browser gespeichert. Codebeispiel- und Query-Historie-Code bleibt fuer spaetere Wiederaufnahme vorhanden, ist in der primaeren Labor-UI aber nicht sichtbar.
 
 ## Produktidee
 
@@ -12,7 +12,7 @@ Die Seite soll pro Datenthema eine kleine, nuetzliche Explorationsflaeche anbiet
 
 - Parquet-Dateien des Datenthemas werden lokal im Browser mit DuckDB-Wasm registriert.
 - `Tabelle geladen` bedeutet, dass die Parquet-Datei als lokaler DuckDB-Wasm-View im Browser verfuegbar ist.
-- Die Katalog-/XTF-Spaltenmetadaten werden nicht als initiales sichtbares Schema angezeigt. Sie dienen nur als Merge-Metadaten fuer passende Runtime-Spalten; nach erfolgreicher Registrierung gewinnt das per DuckDB gelesene Runtime-Schema fuer sichtbare Schema-Karte und SQL-Autocomplete.
+- Die Katalog-/XTF-Spaltenmetadaten und XTF-Objektzahlen werden nicht als initial sichtbare Schema- oder Rowcount-Werte angezeigt. Katalogdaten dienen nur als Merge-Metadaten fuer passende Runtime-Spalten; nach erfolgreicher Registrierung gewinnen DuckDB-Schema und DuckDB-Rowcount fuer sichtbare Schema-Karte und SQL-Autocomplete.
 - Nutzerinnen und Nutzer koennen Tabellen, Attribute, SQL und Resultate in einer dichten Laboroberflaeche erkunden.
 - SQL bleibt sichtbar und reproduzierbar.
 - Die Arbeitsbereiche koennen auf Desktop wie im SQLRooms-Beispiel per Griffleisten vergroessert oder verkleinert werden.
@@ -21,6 +21,7 @@ Die Seite soll pro Datenthema eine kleine, nuetzliche Explorationsflaeche anbiet
 - Resultate koennen als CSV, XLSX und Parquet exportiert werden; exportiert wird nur das aktuell gelieferte Query-Resultat. CSV bleibt wegen Semikolon/CRLF clientseitig, XLSX und Parquet werden per DuckDB-Wasm `COPY` erzeugt.
 - Codebeispiele und sichtbare Query-Historie sind aktuell aus der primaeren UI entfernt.
 - Lade-, Parquet- und Query-Fehler werden sichtbar und ohne serverseitige SQL-Ausfuehrung behandelt.
+- Wenn Runtime-Schema oder Runtime-Rowcount nicht gelesen werden koennen, bleibt der jeweilige sichtbare Wert leer statt auf potenziell veraltete XTF-Werte zurueckzufallen.
 - Zukunftsfunktionen bleiben standardmaessig deaktiviert und laden keine schweren Runtime-Pakete.
 - Es gibt keine serverseitige SQL-Ausfuehrung und keine gespeicherten Sessions.
 

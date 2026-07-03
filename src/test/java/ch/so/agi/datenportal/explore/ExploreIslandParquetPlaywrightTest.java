@@ -210,6 +210,7 @@ class ExploreIslandParquetPlaywrightTest {
             var firstColumn = page.locator(".dp-explore-schema-card__column dt").first().textContent().trim();
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
             assertThat(page.locator(".dp-explore-schema-card__column dt:has-text('wert')").count()).isEqualTo(1);
+            page.waitForSelector(".dp-explore-schema-card__footer:has-text('rows')");
 
             editor.click();
             page.keyboard().press("ControlOrMeta+A");

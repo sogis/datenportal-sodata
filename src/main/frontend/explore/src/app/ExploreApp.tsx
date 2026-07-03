@@ -5,7 +5,7 @@ import type {ExploreColumnDto, ExploreContextDto, ExploreTableDto} from './Explo
 import {classifyExploreRuntimeError, type ExploreRuntimeError} from './ExploreRuntimeError';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
 import {registerParquetTables, type RegisteredTable} from '../duckdb/registerParquetTables';
-import {loadRuntimeSchemas} from '../duckdb/runtimeSchema';
+import {loadRuntimeSchemas, type RuntimeSchemaReadStage} from '../duckdb/runtimeSchema';
 import {SqlLaboratory} from '../sql/SqlLaboratory';
 
 type RuntimePhase = 'idle' | 'initializing' | 'registering' | 'ready' | 'error';
@@ -14,7 +14,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [phase, setPhase] = useState<RuntimePhase>('idle');
   const [runtimeError, setRuntimeError] = useState<ExploreRuntimeError | null>(null);
   const [registeredTables, setRegisteredTables] = useState<RegisteredTable[]>([]);
-  const [runtimeTables, setRuntimeTables] = useState<ExploreTableDto[]>(() => withoutVisibleColumns(context.tables));
+  const [runtimeTables, setRuntimeTables] = useState<ExploreTableDto[]>(() => withoutVisibleRuntimeMetadata(context.tables));
   const [connector, setConnector] = useState<DuckDbConnector | undefined>(undefined);
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
   const room = useMemo(() => createExploreRoomStore(context), [context]);
@@ -35,7 +35,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     async function initializeDuckDb() {
       setPhase('initializing');
       setRuntimeError(null);
-      setRuntimeTables(withoutVisibleColumns(context.tables));
+      setRuntimeTables(withoutVisibleRuntimeMetadata(context.tables));
       setRegisteredTables(context.tables.map((table) => ({table, status: 'pending', sql: ''})));
       setConnector(undefined);
 
@@ -66,8 +66,8 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
           return;
         }
 
-        const nextRuntimeTables = await loadRuntimeSchemas(nextConnector, registrations, (table, error) => {
-          console.warn(`Explore runtime schema could not be read for table ${table.name}. Keeping visible schema empty.`, error);
+        const nextRuntimeTables = await loadRuntimeSchemas(nextConnector, registrations, (table, error, stage) => {
+          console.warn(runtimeMetadataWarning(table, stage), error);
         });
         if (!active) {
           return;
@@ -279,8 +279,15 @@ function schemaColumns(table: ExploreTableDto): Array<{name: string; type: strin
   }));
 }
 
-function withoutVisibleColumns(tables: ExploreTableDto[]): ExploreTableDto[] {
-  return tables.map((table) => ({...table, columns: []}));
+function runtimeMetadataWarning(table: ExploreTableDto, stage: RuntimeSchemaReadStage): string {
+  if (stage === 'rowCount') {
+    return `Explore runtime row count could not be read for table ${table.name}. Keeping visible row count empty.`;
+  }
+  return `Explore runtime schema could not be read for table ${table.name}. Keeping visible schema empty.`;
+}
+
+function withoutVisibleRuntimeMetadata(tables: ExploreTableDto[]): ExploreTableDto[] {
+  return tables.map((table) => ({...table, columns: [], rowCountEstimate: undefined}));
 }
 
 function shortTypeLabel(type: string): string {

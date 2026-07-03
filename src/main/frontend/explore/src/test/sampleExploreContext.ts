@@ -22,6 +22,7 @@ export const sampleExploreContext: ExploreContextDto = {
       title: 'Bauinventar',
       parquetUrl: 'https://data.so.ch/download/ch.so.bauinventar.parquet',
       primary: true,
+      rowCountEstimate: 36176,
       columns: [
         {
           name: 'egid',

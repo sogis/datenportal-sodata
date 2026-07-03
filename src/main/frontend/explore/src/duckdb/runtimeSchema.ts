@@ -8,7 +8,13 @@ export interface RuntimeColumn {
   type: string;
 }
 
-export type RuntimeSchemaErrorHandler = (table: ExploreTableDto, error: unknown) => void;
+export type RuntimeSchemaReadStage = 'schema' | 'rowCount';
+
+export type RuntimeSchemaErrorHandler = (
+  table: ExploreTableDto,
+  error: unknown,
+  stage: RuntimeSchemaReadStage
+) => void;
 
 export async function loadRuntimeSchemas(
   db: DuckDbConnector,
@@ -19,15 +25,25 @@ export async function loadRuntimeSchemas(
 
   for (const registration of registrations) {
     if (registration.status !== 'registered') {
-      tables.push(withoutRuntimeColumns(registration.table));
+      tables.push(withoutRuntimeMetadata(registration.table));
       continue;
     }
 
     try {
-      tables.push(await loadRuntimeSchema(db, registration.table));
+      const tableWithRuntimeSchema = await loadRuntimeSchema(db, registration.table);
+      let rowCountEstimate: number | undefined;
+      try {
+        rowCountEstimate = await loadRuntimeRowCount(db, registration.table);
+      } catch (error) {
+        onError?.(registration.table, error, 'rowCount');
+      }
+      tables.push({
+        ...tableWithRuntimeSchema,
+        rowCountEstimate
+      });
     } catch (error) {
-      onError?.(registration.table, error);
-      tables.push(withoutRuntimeColumns(registration.table));
+      onError?.(registration.table, error, 'schema');
+      tables.push(withoutRuntimeMetadata(registration.table));
     }
   }
 
@@ -42,12 +58,25 @@ export async function loadRuntimeSchema(
   const runtimeColumns = parseDescribeColumns(describeResult as Table);
   return {
     ...table,
-    columns: mergeRuntimeColumns(table.columns, runtimeColumns)
+    columns: mergeRuntimeColumns(table.columns, runtimeColumns),
+    rowCountEstimate: undefined
   };
 }
 
 export function buildDescribeTableSql(table: ExploreTableDto): string {
   return `DESCRIBE ${quoteIdentifier(table.name)};`;
+}
+
+export async function loadRuntimeRowCount(
+  db: DuckDbConnector,
+  table: ExploreTableDto
+): Promise<number | undefined> {
+  const rowCountResult = await db.query(buildCountRowsSql(table));
+  return parseRuntimeRowCount(rowCountResult as Table);
+}
+
+export function buildCountRowsSql(table: ExploreTableDto): string {
+  return `SELECT count(*) AS row_count FROM ${quoteIdentifier(table.name)};`;
 }
 
 export function parseDescribeColumns(table: Table): RuntimeColumn[] {
@@ -97,8 +126,35 @@ export function mergeRuntimeColumns(
   });
 }
 
+export function parseRuntimeRowCount(table: Table): number | undefined {
+  if (table.numRows < 1) {
+    return undefined;
+  }
+
+  const fieldNames = table.schema.fields.map((field) => field.name);
+  const rowCountIndex = findRowCountFieldIndex(fieldNames);
+  if (rowCountIndex < 0) {
+    throw new Error('DuckDB row count result does not contain row_count.');
+  }
+
+  const rowCountValue = table.getChildAt(rowCountIndex)?.get(0);
+  const rowCount = normalizeRowCount(rowCountValue);
+  if (rowCount === undefined) {
+    throw new Error('DuckDB row_count value is not numeric.');
+  }
+  return rowCount;
+}
+
 function findFieldIndex(fieldNames: string[], expectedName: string): number {
   return fieldNames.findIndex((name) => name.toLowerCase() === expectedName);
+}
+
+function findRowCountFieldIndex(fieldNames: string[]): number {
+  const namedIndex = findFieldIndex(fieldNames, 'row_count');
+  if (namedIndex >= 0) {
+    return namedIndex;
+  }
+  return fieldNames.length === 1 ? 0 : -1;
 }
 
 function normalizeCell(value: unknown): string {
@@ -109,9 +165,43 @@ function quoteIdentifier(identifier: string): string {
   return `"${identifier.replace(/"/g, '""')}"`;
 }
 
-function withoutRuntimeColumns(table: ExploreTableDto): ExploreTableDto {
+function normalizeRowCount(value: unknown): number | undefined {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? Math.trunc(value) : undefined;
+  }
+  if (typeof value === 'bigint') {
+    return Number(value);
+  }
+  if (Array.isArray(value) && value.length > 0) {
+    return normalizeRowCount(value[0]);
+  }
+  if (ArrayBuffer.isView(value)) {
+    const arrayLike = value as unknown as {length?: number; [index: number]: unknown};
+    if (typeof arrayLike.length === 'number' && arrayLike.length > 0) {
+      return normalizeRowCount(arrayLike[0]);
+    }
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value.trim());
+    return Number.isFinite(parsed) ? Math.trunc(parsed) : undefined;
+  }
+  if (value && typeof value === 'object') {
+    const primitive = value.valueOf();
+    if (primitive !== value) {
+      return normalizeRowCount(primitive);
+    }
+    const text = value.toString();
+    if (text && text !== '[object Object]') {
+      return normalizeRowCount(text);
+    }
+  }
+  return undefined;
+}
+
+function withoutRuntimeMetadata(table: ExploreTableDto): ExploreTableDto {
   return {
     ...table,
-    columns: []
+    columns: [],
+    rowCountEstimate: undefined
   };
 }

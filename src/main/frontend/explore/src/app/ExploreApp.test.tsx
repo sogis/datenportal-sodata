@@ -73,6 +73,7 @@ describe('ExploreApp', () => {
     expect(screen.queryByRole('tab', {name: 'Diagramm'})).not.toBeInTheDocument();
     expect(screen.queryByRole('tab', {name: 'Code'})).not.toBeInTheDocument();
     expect(screen.queryByRole('link', {name: 'Zur Datensatzseite'})).not.toBeInTheDocument();
+    expect(screen.queryByText("36'176 rows")).not.toBeInTheDocument();
 
     expect(await screen.findByText('Tabelle geladen')).toBeInTheDocument();
     const egidRow = screen.getByText('egid').closest('.dp-explore-schema-card__column');
@@ -81,6 +82,7 @@ describe('ExploreApp', () => {
     expect(screen.getAllByText('VARCHAR').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('schutzstatus')).toBeInTheDocument();
     expect(screen.getByText('3 columns')).toBeInTheDocument();
+    expect(screen.getByText('2 rows')).toBeInTheDocument();
     expect(screen.getByLabelText('SQL bearbeiten')).toHaveAttribute(
       'data-table-columns',
       'egid,gemeindename,schutzstatus'
@@ -92,6 +94,7 @@ describe('ExploreApp', () => {
       'Parquet ist als lokaler DuckDB-View im Browser geladen.'
     );
     expect(mocks.connector.query).toHaveBeenCalledWith('DESCRIBE "ch_so_bauinventar";');
+    expect(mocks.connector.query).toHaveBeenCalledWith('SELECT count(*) AS row_count FROM "ch_so_bauinventar";');
   });
 
   it('shows a centered overlay while Parquet files are being registered', async () => {
@@ -111,6 +114,8 @@ describe('ExploreApp', () => {
     expect(screen.queryByText('egid')).not.toBeInTheDocument();
     expect(screen.queryByText('gemeindename')).not.toBeInTheDocument();
     expect(screen.queryByText('0 columns')).not.toBeInTheDocument();
+    expect(screen.queryByText("36'176 rows")).not.toBeInTheDocument();
+    expect(screen.queryByText('2 rows')).not.toBeInTheDocument();
     expect(screen.getByLabelText('SQL bearbeiten')).toHaveAttribute('data-table-columns', '');
 
     resolveRegistrations!([
@@ -164,7 +169,7 @@ describe('ExploreApp', () => {
     expect(mocks.connector.query).not.toHaveBeenCalled();
   });
 
-  it('falls back to catalog schema when runtime schema loading fails', async () => {
+  it('keeps visible runtime metadata empty when runtime schema loading fails', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     mocks.connector.query.mockRejectedValue(new Error('DESCRIBE unavailable'));
 
@@ -174,6 +179,8 @@ describe('ExploreApp', () => {
       expect(await screen.findByText('Tabelle geladen')).toBeInTheDocument();
       expect(screen.queryByText('2 columns')).not.toBeInTheDocument();
       expect(screen.queryByText('0 columns')).not.toBeInTheDocument();
+      expect(screen.queryByText("36'176 rows")).not.toBeInTheDocument();
+      expect(screen.queryByText('2 rows')).not.toBeInTheDocument();
       expect(screen.queryByText('egid')).not.toBeInTheDocument();
       expect(screen.queryByText('gemeindename')).not.toBeInTheDocument();
       expect(screen.queryByText('schutzstatus')).not.toBeInTheDocument();
@@ -181,6 +188,42 @@ describe('ExploreApp', () => {
       expect(screen.queryByLabelText('Erkunden Status')).not.toBeInTheDocument();
       expect(warn).toHaveBeenCalledWith(
         'Explore runtime schema could not be read for table ch_so_bauinventar. Keeping visible schema empty.',
+        expect.any(Error)
+      );
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('keeps runtime columns visible but hides row count when runtime row-count loading fails', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    mocks.connector.query.mockImplementation((sql: string) => {
+      if (/^DESCRIBE\b/i.test(sql)) {
+        return Promise.resolve(tableFromArrays({
+          column_name: ['egid', 'gemeindename', 'schutzstatus'],
+          column_type: ['INTEGER', 'VARCHAR', 'VARCHAR']
+        }));
+      }
+      if (/^SELECT count\(\*\) AS row_count FROM\b/i.test(sql)) {
+        return Promise.reject(new Error('count unavailable'));
+      }
+      return Promise.resolve(tableFromArrays({
+        egid: [1001, 1002],
+        gemeindename: ['Solothurn', 'Olten']
+      }));
+    });
+
+    try {
+      render(<ExploreApp context={sampleExploreContext} />);
+
+      expect(await screen.findByText('Tabelle geladen')).toBeInTheDocument();
+      expect(screen.getByText('egid')).toBeInTheDocument();
+      expect(screen.getByText('schutzstatus')).toBeInTheDocument();
+      expect(screen.getByText('3 columns')).toBeInTheDocument();
+      expect(screen.queryByText("36'176 rows")).not.toBeInTheDocument();
+      expect(screen.queryByText('2 rows')).not.toBeInTheDocument();
+      expect(warn).toHaveBeenCalledWith(
+        'Explore runtime row count could not be read for table ch_so_bauinventar. Keeping visible row count empty.',
         expect.any(Error)
       );
     } finally {
@@ -204,6 +247,9 @@ function mockRuntimeSchema() {
         column_name: ['egid', 'gemeindename', 'schutzstatus'],
         column_type: ['INTEGER', 'VARCHAR', 'VARCHAR']
       }));
+    }
+    if (/^SELECT count\(\*\) AS row_count FROM\b/i.test(sql)) {
+      return Promise.resolve(tableFromArrays({row_count: [2]}));
     }
     return Promise.resolve(tableFromArrays({
       egid: [1001, 1002],
