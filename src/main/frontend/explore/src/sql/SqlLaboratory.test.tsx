@@ -15,7 +15,7 @@ const contextWithRecipes = {
       description: 'Zeigt die ersten Zeilen.',
       tableId: 'ch_so_bauinventar',
       category: 'preview' as const,
-      sql: 'select * from ch_so_bauinventar;'
+      sql: 'SELECT *\nFROM ch_so_bauinventar;'
     }
   ]
 };
@@ -36,7 +36,7 @@ describe('SqlLaboratory', () => {
     render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
 
     const editor = screen.getByLabelText('SQL bearbeiten');
-    expect(editor).toHaveValue('select * from ch_so_bauinventar;');
+    expect(editor).toHaveValue('SELECT *\nFROM ch_so_bauinventar;');
     expect(editor).toHaveAttribute('data-has-connector', 'false');
     expect(editor).toHaveAttribute('data-table-schemas', 'ch_so_bauinventar');
     expect(editor).toHaveAttribute('data-table-columns', 'egid,gemeindename');
@@ -51,6 +51,12 @@ describe('SqlLaboratory', () => {
     expect(screen.queryByText('Beispielabfragen')).not.toBeInTheDocument();
     expect(screen.queryByText('Lokale Historie')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Diagramm aus Resultat')).not.toBeInTheDocument();
+  });
+
+  it('builds the fallback initial query with uppercase keywords and an unquoted table name', () => {
+    render(<SqlLaboratory context={{...contextWithRecipes, recipes: []}} connector={connector} ready />);
+
+    expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue('SELECT *\nFROM ch_so_bauinventar;');
   });
 
   it('renders a red run button with the Bootstrap play icon', () => {

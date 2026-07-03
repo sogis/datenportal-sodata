@@ -5,6 +5,7 @@ import type {ExploreColumnDto, ExploreContextDto, ExploreTableDto} from './Explo
 import {classifyExploreRuntimeError, type ExploreRuntimeError} from './ExploreRuntimeError';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
 import {registerParquetTables, type RegisteredTable} from '../duckdb/registerParquetTables';
+import {loadRuntimeSchemas} from '../duckdb/runtimeSchema';
 import {SqlLaboratory} from '../sql/SqlLaboratory';
 
 type RuntimePhase = 'idle' | 'initializing' | 'registering' | 'ready' | 'error';
@@ -13,10 +14,15 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [phase, setPhase] = useState<RuntimePhase>('idle');
   const [runtimeError, setRuntimeError] = useState<ExploreRuntimeError | null>(null);
   const [registeredTables, setRegisteredTables] = useState<RegisteredTable[]>([]);
+  const [runtimeTables, setRuntimeTables] = useState<ExploreTableDto[]>(() => withoutVisibleColumns(context.tables));
   const [connector, setConnector] = useState<DuckDbConnector | undefined>(undefined);
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
   const room = useMemo(() => createExploreRoomStore(context), [context]);
   const isNarrowWorkbench = useIsNarrowWorkbench();
+  const runtimeContext = useMemo(() => ({
+    ...context,
+    tables: runtimeTables
+  }), [context, runtimeTables]);
 
   useEffect(() => {
     if (context.tables.length === 0 || !primaryTable) {
@@ -29,6 +35,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     async function initializeDuckDb() {
       setPhase('initializing');
       setRuntimeError(null);
+      setRuntimeTables(withoutVisibleColumns(context.tables));
       setRegisteredTables(context.tables.map((table) => ({table, status: 'pending', sql: ''})));
       setConnector(undefined);
 
@@ -59,6 +66,13 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
           return;
         }
 
+        const nextRuntimeTables = await loadRuntimeSchemas(nextConnector, registrations, (table, error) => {
+          console.warn(`Explore runtime schema could not be read for table ${table.name}. Keeping visible schema empty.`, error);
+        });
+        if (!active) {
+          return;
+        }
+        setRuntimeTables(nextRuntimeTables);
         setPhase('ready');
       } catch (error) {
         if (!active) {
@@ -90,14 +104,9 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     );
   }
 
-  const ready = Boolean(connector && primaryTable && isTableRegistered(primaryTable, registeredTables));
-  const schemaPanel = <SchemaPanel tables={context.tables} registrations={registeredTables} />;
-  const laboratoryPanel = (
-    <>
-      {runtimeError && <RuntimeErrorMessage error={runtimeError} />}
-      <SqlLaboratory context={context} connector={connector} ready={ready} />
-    </>
-  );
+  const ready = phase === 'ready' && Boolean(connector && primaryTable && isTableRegistered(primaryTable, registeredTables));
+  const schemaPanel = <SchemaPanel tables={runtimeTables} registrations={registeredTables} />;
+  const laboratoryPanel = <SqlLaboratory context={runtimeContext} connector={connector} ready={ready} />;
   const workbenchBody = isNarrowWorkbench ? (
     <div className="dp-explore-workbench__body">
       <aside className="dp-explore-data-panel" aria-label="Daten und Schema">
@@ -144,17 +153,8 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
 
   return (
     <section className="dp-explore-workbench" aria-label="Erkunden SQL-Labor">
-      <header className="dp-explore-workbench__topbar">
-        <p
-          className={`dp-explore-status dp-explore-status--${phase}`}
-          role={phase === 'error' ? 'alert' : 'status'}
-          aria-label="Erkunden Status"
-        >
-          {statusText(phase)}
-        </p>
-      </header>
-
       {workbenchBody}
+      {phase !== 'ready' && <ExploreRuntimeOverlay phase={phase} error={runtimeError} />}
     </section>
   );
 }
@@ -179,6 +179,43 @@ function statusText(phase: RuntimePhase): string {
     case 'error':
       return 'DuckDB-Hinweis';
   }
+}
+
+function ExploreRuntimeOverlay({phase, error}: {phase: RuntimePhase; error: ExploreRuntimeError | null}) {
+  const isError = phase === 'error';
+  return (
+    <div className="dp-explore-runtime-overlay">
+      <div
+        className={`dp-explore-runtime-overlay__card${isError ? ' is-error' : ''}`}
+        role={isError ? 'alert' : 'status'}
+        aria-label="Erkunden Status"
+        aria-live={isError ? 'assertive' : 'polite'}
+      >
+        <p className="dp-explore-runtime-overlay__title">
+          {isError ? statusText(phase) : 'Erkunden wird vorbereitet'}
+        </p>
+        {!isError && (
+          <>
+            <div className="dp-explore-runtime-progress" role="progressbar" aria-label="Ladevorgang">
+              <span className="dp-explore-runtime-progress__bar" />
+            </div>
+            <p className="dp-explore-runtime-overlay__message">{statusText(phase)}</p>
+          </>
+        )}
+        {isError && error && (
+          <div className="dp-explore-runtime-overlay__details">
+            <p>{error.summary}</p>
+            {error.detail && error.detail !== error.summary && (
+              <details>
+                <summary>Technische Details</summary>
+                <p>{error.detail}</p>
+              </details>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function SchemaPanel({tables, registrations}: {tables: ExploreTableDto[]; registrations: RegisteredTable[]}) {
@@ -211,12 +248,16 @@ function SchemaPanel({tables, registrations}: {tables: ExploreTableDto[]; regist
                 </div>
               ))}
             </dl>
-            <footer className="dp-explore-schema-card__footer">
-              <span>{table.columns.length === 1 ? '1 column' : `${formatSwissNumber(table.columns.length)} columns`}</span>
-              {typeof table.rowCountEstimate === 'number' && (
-                <span>{formatSwissNumber(table.rowCountEstimate)} rows</span>
-              )}
-            </footer>
+            {(table.columns.length > 0 || typeof table.rowCountEstimate === 'number') && (
+              <footer className="dp-explore-schema-card__footer">
+                {table.columns.length > 0 && (
+                  <span>{table.columns.length === 1 ? '1 column' : `${formatSwissNumber(table.columns.length)} columns`}</span>
+                )}
+                {typeof table.rowCountEstimate === 'number' && (
+                  <span>{formatSwissNumber(table.rowCountEstimate)} rows</span>
+                )}
+              </footer>
+            )}
             {registrationError && (
               <p className="dp-explore-schema-card__error">
                 {registrationError.summary}
@@ -231,14 +272,15 @@ function SchemaPanel({tables, registrations}: {tables: ExploreTableDto[]; regist
 }
 
 function schemaColumns(table: ExploreTableDto): Array<{name: string; type: string; description?: string}> {
-  if (table.columns.length === 0) {
-    return [{name: 'Schema wird von DuckDB gelesen', type: 'INFO'}];
-  }
   return table.columns.map((column: ExploreColumnDto) => ({
     name: column.name,
     type: column.type,
     description: column.description
   }));
+}
+
+function withoutVisibleColumns(tables: ExploreTableDto[]): ExploreTableDto[] {
+  return tables.map((table) => ({...table, columns: []}));
 }
 
 function shortTypeLabel(type: string): string {
@@ -273,7 +315,7 @@ function registrationStatusText(registration: RegisteredTable | undefined): stri
     return 'Wartet';
   }
   if (registration.status === 'registered') {
-    return 'Geladen';
+    return 'Tabelle geladen';
   }
   return registration.status === 'pending' ? 'Wird registriert' : 'Fehler';
 }
@@ -331,20 +373,6 @@ function ExploreResizeHandle({direction, label}: {direction: 'horizontal' | 'ver
     >
       <span className="dp-explore-resize-handle__knob" aria-hidden="true" />
     </PanelResizeHandle>
-  );
-}
-
-function RuntimeErrorMessage({error}: {error: ExploreRuntimeError}) {
-  return (
-    <div className="dp-explore-runtime-error" role="alert">
-      <p>{error.summary}</p>
-      {error.detail && error.detail !== error.summary && (
-        <details>
-          <summary>Technische Details</summary>
-          <p>{error.detail}</p>
-        </details>
-      )}
-    </div>
   );
 }
 

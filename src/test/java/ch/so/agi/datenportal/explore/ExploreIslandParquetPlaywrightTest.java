@@ -82,11 +82,12 @@ class ExploreIslandParquetPlaywrightTest {
             List<String> browserErrors = collectBrowserErrors(page);
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
             page.waitForSelector("[aria-label='SQL Ergebnis']");
 
-            assertThat(page.locator("text=Geladen").count()).isEqualTo(1);
+            assertThat(page.locator("text=Tabelle geladen").count()).isEqualTo(1);
+            assertThat(page.getByText("Bereit", new Page.GetByTextOptions().setExact(true)).count()).isZero();
             assertThat(page.locator("[aria-label='SQL Ergebnis']").count()).isEqualTo(1);
             assertThat(page.locator("text=Solothurn").count()).isGreaterThanOrEqualTo(1);
             assertThat(page.locator("text=Olten").count()).isGreaterThanOrEqualTo(1);
@@ -102,7 +103,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             assertThat(page.locator("button[role='tab']").count()).isZero();
 
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).focus();
@@ -120,9 +121,16 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-broken-parquet/explore"));
 
-            page.waitForSelector(".dp-explore-status--error");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.ALERT,
+                    new Page.GetByRoleOptions().setName("Erkunden Status")).waitFor();
 
-            assertThat(page.locator(".dp-explore-runtime-error").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.locator(".dp-explore-runtime-overlay__card.is-error").count()).isEqualTo(1);
+            assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.PROGRESSBAR,
+                    new Page.GetByRoleOptions().setName("Ladevorgang")).count()).isZero();
+            assertThat(computedStyle(page.locator(".dp-explore-runtime-overlay"), "backgroundColor"))
+                    .isEqualTo("rgba(0, 0, 0, 0.72)");
+            assertThat(computedStyle(page.locator(".dp-explore-runtime-overlay__card"), "boxShadow"))
+                    .isEqualTo("none");
             assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.LINK,
                     new Page.GetByRoleOptions().setName("Zur Datensatzseite")).count()).isZero();
         }
@@ -137,7 +145,7 @@ class ExploreIslandParquetPlaywrightTest {
             List<String> externalMonacoRequests = collectExternalMonacoRequests(page);
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .monaco-editor");
             page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
             assertThat(page.locator("[data-testid='sql-monaco-editor'] .monaco-editor").count()).isEqualTo(1);
@@ -174,7 +182,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
             editor.click();
@@ -196,11 +204,12 @@ class ExploreIslandParquetPlaywrightTest {
             List<String> browserErrors = collectBrowserErrors(page);
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
             var tableName = page.locator(".dp-explore-schema-card h2").first().textContent().trim();
             var firstColumn = page.locator(".dp-explore-schema-card__column dt").first().textContent().trim();
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
+            assertThat(page.locator(".dp-explore-schema-card__column dt:has-text('wert')").count()).isEqualTo(1);
 
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
@@ -216,6 +225,11 @@ class ExploreIslandParquetPlaywrightTest {
             page.keyboard().press("ControlOrMeta+A");
             page.keyboard().type("select " + tableName + ".");
             waitForSuggestion(page, firstColumn, browserErrors);
+
+            page.keyboard().press("Escape");
+            page.keyboard().press("ControlOrMeta+A");
+            page.keyboard().type("select " + tableName + ".we");
+            waitForSuggestion(page, "wert", browserErrors);
         }
     }
 
@@ -231,7 +245,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
 
             BoundingBox editorBox = requireBoundingBox(page.locator("[data-testid='sql-monaco-editor'] .monaco-editor"));
@@ -245,7 +259,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
             editor.click();
@@ -269,7 +283,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
 
             Locator schemaPanel = page.locator(".dp-explore-data-panel");
             BoundingBox schemaHandle = requireBoundingBox(page.locator("[aria-label='Schema und SQL-Labor Grösse anpassen']"));
@@ -298,7 +312,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
             page.waitForSelector("[aria-label='SQL Ergebnis']");
 
@@ -321,8 +335,15 @@ class ExploreIslandParquetPlaywrightTest {
             BoundingBox copyAfter = requireBoundingBox(copiedButton);
             assertThat(Math.abs(copyAfter.width - copyBefore.width)).isLessThan(0.5);
 
-            assertThat(computedStyle(page.locator(".dp-explore-workbench__topbar"), "borderBottomColor"))
+            assertThat(page.locator(".dp-explore-workbench__topbar").count()).isZero();
+            BoundingBox workbenchBox = requireBoundingBox(page.locator(".dp-explore-workbench"));
+            BoundingBox workbenchBodyBox = requireBoundingBox(page.locator(".dp-explore-workbench__body"));
+            assertThat(computedStyle(page.locator(".dp-explore-workbench"), "borderTopWidth")).isEqualTo("1px");
+            assertThat(computedStyle(page.locator(".dp-explore-workbench"), "borderTopColor"))
                     .isEqualTo("rgb(226, 232, 240)");
+            double workbenchBodyTopOffset = workbenchBodyBox.y - workbenchBox.y;
+            assertThat(workbenchBodyTopOffset).isBetween(0.5, 1.5);
+            assertThat(Math.abs((workbenchBodyBox.height + workbenchBodyTopOffset) - workbenchBox.height)).isLessThan(1.0);
             assertThat(computedStyle(page.locator(".dp-explore-query-pane__toolbar-row"), "borderBottomColor"))
                     .isEqualTo("rgb(226, 232, 240)");
             assertThat(computedStyle(page.locator(".dp-explore-result__footer"), "borderTopColor"))
@@ -356,7 +377,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
             page.waitForSelector("[aria-label='SQL Ergebnis']");
 
@@ -379,7 +400,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
             String wideTallQuery = "select range as n, range + 1 as n_01, range + 2 as n_02, "
                     + "range + 3 as n_03, range + 4 as n_04, range + 5 as n_05, "
@@ -436,7 +457,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
 
             page.waitForSelector("[aria-label='SQL Ergebnis']");
@@ -452,7 +473,7 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            page.waitForSelector(".dp-explore-status--ready");
+            waitForExploreReady(page);
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
 
             page.waitForSelector("[aria-label='SQL Ergebnis']");
@@ -474,7 +495,7 @@ class ExploreIslandParquetPlaywrightTest {
                 Page page = context.newPage();
                 page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-                page.waitForSelector(".dp-explore-status--ready");
+                waitForExploreReady(page);
                 page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
                 page.waitForSelector("[aria-label='SQL Ergebnis']");
 
@@ -485,6 +506,11 @@ class ExploreIslandParquetPlaywrightTest {
 
     private String baseUrl(String path) {
         return "http://localhost:" + port + path;
+    }
+
+    private static void waitForExploreReady(Page page) {
+        page.waitForSelector(".dp-explore-table-status:has-text('Tabelle geladen')");
+        page.waitForFunction("() => !document.querySelector('.dp-explore-runtime-overlay')");
     }
 
     private static List<String> collectBrowserErrors(Page page) {
@@ -689,8 +715,7 @@ class ExploreIslandParquetPlaywrightTest {
                     Optional.empty(),
                     List.of(
                             new DatasetAttribute("objekt_id", "VARCHAR", Optional.of("Objekt-ID"), Optional.empty(), true),
-                            new DatasetAttribute("gemeinde", "VARCHAR", Optional.of("Gemeinde"), Optional.empty(), false),
-                            new DatasetAttribute("wert", "DOUBLE", Optional.of("Messwert"), Optional.empty(), false)),
+                            new DatasetAttribute("gemeinde", "VARCHAR", Optional.of("Gemeinde"), Optional.empty(), false)),
                     Optional.empty());
         }
     }

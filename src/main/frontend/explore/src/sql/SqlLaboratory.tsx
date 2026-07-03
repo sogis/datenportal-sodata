@@ -230,8 +230,8 @@ function buildInitialSql(table: ExploreTableDto | undefined): string {
   if (!table) {
     return '';
   }
-  return `select *
-from ${table.name};`;
+  return `SELECT *
+FROM ${table.name};`;
 }
 
 function toSqlRoomsDataTable(table: ExploreTableDto): DataTable {

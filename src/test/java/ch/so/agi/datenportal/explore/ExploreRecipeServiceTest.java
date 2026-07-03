@@ -38,15 +38,15 @@ class ExploreRecipeServiceTest {
     }
 
     @Test
-    void generatedSqlUsesQuotedIdentifiers() {
+    void generatedSqlUsesSafeTableNamesAndQuotedColumnIdentifiers() {
         var categoryRecipe = service.generateRecipes(List.of(table())).stream()
                 .filter(recipe -> recipe.id().equals("gemeinden-category-bezirk"))
                 .findFirst()
                 .orElseThrow();
 
         assertThat(categoryRecipe.sql())
-                .contains("from \"gemeinden\"")
-                .contains("select \"bezirk\", count(*) as anzahl")
+                .contains("FROM gemeinden")
+                .contains("SELECT \"bezirk\", count(*) as anzahl")
                 .contains("group by \"bezirk\"");
         assertThat(categoryRecipe.preferredChart())
                 .get()
@@ -55,11 +55,22 @@ class ExploreRecipeServiceTest {
     }
 
     @Test
+    void generatedSqlWritesSelectAndFromKeywordsUppercase() {
+        var recipes = service.generateRecipes(List.of(table()));
+
+        assertThat(recipes)
+                .extracting(ExploreRecipeDto::sql)
+                .allSatisfy(sql -> assertThat(sql)
+                        .doesNotContain("select")
+                        .doesNotContain("\nfrom "));
+    }
+
+    @Test
     void previewRecipeUsesRegisteredViewWithoutVisibleLimit() {
         var previewRecipe = service.previewRecipe(table());
 
         assertThat(previewRecipe.sql())
-                .isEqualTo("select *\nfrom \"gemeinden\";");
+                .isEqualTo("SELECT *\nFROM gemeinden;");
     }
 
     private static ExploreTableDto table() {

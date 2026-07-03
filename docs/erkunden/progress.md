@@ -20,6 +20,52 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | SQL-Labor UI-Nachschliff 2 | DONE | Stable Monaco layout, row-limit selector, CSV/XLSX/Parquet result export and cleaned splitter/schema/result visuals. |
 | SQL-Labor Feinschliff 3 | DONE | Unified borders, DuckDB-native XLSX/Parquet exports, local Excel extension mirror and SQLRooms schema autocomplete wiring. |
 | SQL-Labor Autocomplete-Fix | DONE | Removed the local duplicate completion provider, bundled Monaco Suggest locally and wired SQLRooms tableSchemas/getLatestSchemas. |
+| SQL-Labor Status-Overlay | DONE | Removed the global ready badge, added centered loading/error overlay and renamed schema status to `Tabelle geladen`. |
+| SQL-Labor Loading-Overlay Styling | DONE | Styled the loading overlay with dark backdrop, white shadowless card, red indeterminate progressbar and restored workbench top border. |
+
+## SQL-Labor Loading-Overlay Styling Entry
+
+Date: 2026-07-03
+
+Scope:
+
+- Styled the runtime loading overlay as a white, shadowless Frutiger card on a darkened backdrop.
+- Added an accessible indeterminate progressbar for DuckDB initialization and Parquet registration; error overlays remain alerts without a progressbar.
+- Restored the top workbench border directly on `.dp-explore-workbench` without reintroducing the removed global status topbar.
+- Updated Vitest and Playwright coverage for the new loading copy, progressbar semantics, error overlay styling and the 1px workbench border.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 71 passed (71)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore assets; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 10s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS after tightening the `Bereit` assertion to exact text, `BUILD SUCCESSFUL in 27s` |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 49s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+## SQL-Labor Status-Overlay Entry
+
+Date: 2026-07-03
+
+Scope:
+
+- Removed the persistent global `Bereit` badge and the workbench topbar so the SQL lab uses the full vertical space after loading.
+- Added a centered non-layouting runtime overlay for DuckDB initialization, Parquet registration and runtime errors.
+- Renamed the per-table schema badge from `Geladen` to `Tabelle geladen` and aligned its radius with the shared small badge radius.
+- Updated Vitest and Playwright coverage to wait for the table-level ready signal, assert that `Bereit` is absent and verify that the workbench body starts at the top without reserved topbar height.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 71 passed (71)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore assets; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 10s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 27s` |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 50s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
 
 ## SQL-Labor Feinschliff 3 Entry
 

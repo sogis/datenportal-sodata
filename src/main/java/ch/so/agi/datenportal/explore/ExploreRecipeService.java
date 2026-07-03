@@ -42,7 +42,7 @@ public final class ExploreRecipeService {
                 "Vorschau",
                 "Zeigt die ersten Zeilen der Tabelle.",
                 ExploreRecipeCategory.PREVIEW,
-                "select *\nfrom " + tableName(table) + ";",
+                "SELECT *\nFROM " + tableName(table) + ";",
                 Optional.empty());
     }
 
@@ -53,7 +53,7 @@ public final class ExploreRecipeService {
                 "Anzahl Datensätze",
                 "Zählt alle Zeilen der Tabelle.",
                 ExploreRecipeCategory.PROFILE,
-                "select count(*) as anzahl\nfrom " + tableName(table) + ";",
+                "SELECT count(*) as anzahl\nFROM " + tableName(table) + ";",
                 Optional.empty());
     }
 
@@ -73,14 +73,14 @@ public final class ExploreRecipeService {
             return Optional.empty();
         }
 
-        StringBuilder sql = new StringBuilder("select\n  count(*) as zeilen");
+        StringBuilder sql = new StringBuilder("SELECT\n  count(*) as zeilen");
         table.columns().stream()
                 .limit(NULL_PROFILE_COLUMN_LIMIT)
                 .forEach(column -> sql.append(",\n  count(*) filter (where ")
                         .append(columnName(column))
                         .append(" is null) as ")
                         .append(sqlNameSanitizer.quoteIdentifier(sqlNameSanitizer.toSafeTableName(column.name()) + "_fehlt")));
-        sql.append("\nfrom ").append(tableName(table)).append(";");
+        sql.append("\nFROM ").append(tableName(table)).append(";");
 
         return Optional.of(recipe(
                 table,
@@ -102,8 +102,8 @@ public final class ExploreRecipeService {
                         "Nach " + column.name() + " gruppieren",
                         "Zählt Datensätze pro Kategorie.",
                         ExploreRecipeCategory.CATEGORY,
-                        "select " + columnName(column) + ", count(*) as anzahl\n"
-                                + "from " + tableName(table) + "\n"
+                        "SELECT " + columnName(column) + ", count(*) as anzahl\n"
+                                + "FROM " + tableName(table) + "\n"
                                 + "where " + columnName(column) + " is not null\n"
                                 + "group by " + columnName(column) + "\n"
                                 + "order by anzahl desc\n"
@@ -127,11 +127,11 @@ public final class ExploreRecipeService {
                         column.name() + " zusammenfassen",
                         "Berechnet Minimum, Durchschnitt und Maximum.",
                         ExploreRecipeCategory.NUMERIC,
-                        "select\n"
+                        "SELECT\n"
                                 + "  min(" + columnName(column) + ") as minimum,\n"
                                 + "  avg(" + columnName(column) + ") as durchschnitt,\n"
                                 + "  max(" + columnName(column) + ") as maximum\n"
-                                + "from " + tableName(table) + "\n"
+                                + "FROM " + tableName(table) + "\n"
                                 + "where " + columnName(column) + " is not null;",
                         Optional.empty()))
                 .toList();
@@ -148,8 +148,8 @@ public final class ExploreRecipeService {
                         "Zeitreihe nach " + column.name(),
                         "Zählt Datensätze pro Zeitwert.",
                         ExploreRecipeCategory.TIME,
-                        "select " + columnName(column) + ", count(*) as anzahl\n"
-                                + "from " + tableName(table) + "\n"
+                        "SELECT " + columnName(column) + ", count(*) as anzahl\n"
+                                + "FROM " + tableName(table) + "\n"
                                 + "where " + columnName(column) + " is not null\n"
                                 + "group by " + columnName(column) + "\n"
                                 + "order by " + columnName(column) + ";",
@@ -182,7 +182,7 @@ public final class ExploreRecipeService {
 
     private String tableName(ExploreTableDto table) {
         sqlNameSanitizer.assertSafeTableName(table.name());
-        return sqlNameSanitizer.quoteIdentifier(table.name());
+        return table.name();
     }
 
     private String columnName(ExploreColumnDto column) {

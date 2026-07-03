@@ -51,16 +51,13 @@ class ExploreIslandPlaywrightTest {
             page.waitForSelector(".dp-explore-workbench");
 
             assertThat(page.locator(".dp-explore-workbench[aria-label='Erkunden SQL-Labor']").count()).isEqualTo(1);
-            assertThat(page.locator(".dp-explore-workbench__topbar .dp-explore-status").count()).isEqualTo(1);
-            assertThat(page.locator(".dp-explore-workbench__topbar:has-text('DATA')").count()).isZero();
+            assertThat(page.locator(".dp-explore-workbench__topbar").count()).isZero();
             assertThat(page.locator(".dp-explore-data-panel[aria-label='Daten und Schema']").count()).isEqualTo(1);
             assertThat(page.locator(".dp-explore-schema-card").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.locator(".dp-explore-table-status").count()).isGreaterThanOrEqualTo(1);
             assertThat(page.locator(".dp-explore-query-pane").count()).isEqualTo(1);
             assertThat(page.locator("[aria-label='Schema und SQL-Labor Grösse anpassen']").count()).isEqualTo(1);
-            assertThat(page.locator("text=DuckDB wird initialisiert").count()
-                    + page.locator("text=Parquet-Dateien werden registriert").count()
-                    + page.locator("text=Bereit").count()
-                    + page.locator("text=DuckDB-Hinweis").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.getByText("Bereit", new Page.GetByTextOptions().setExact(true)).count()).isZero();
             assertThat(page.locator("text=Abfrage 1").count()).isZero();
             assertThat(page.locator("text=Zur Datensatzseite").count()).isZero();
             assertThat(page.locator("button[role='tab']:has-text('Vorschau')").count()).isZero();

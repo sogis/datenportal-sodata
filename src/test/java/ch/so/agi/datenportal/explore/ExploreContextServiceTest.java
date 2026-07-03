@@ -41,7 +41,7 @@ class ExploreContextServiceTest {
         assertThat(context.tables().getFirst().columns()).extracting(ExploreColumnDto::name)
                 .contains("bfs_nr", "gemeindename", "flaeche_ha");
         assertThat(context.recipes()).isNotEmpty();
-        assertThat(context.recipes().getFirst().sql()).isEqualTo("select *\nfrom \"ch_so_gemeinden\";");
+        assertThat(context.recipes().getFirst().sql()).isEqualTo("SELECT *\nFROM ch_so_gemeinden;");
         assertThat(context.codeSnippets()).extracting(ExploreCodeSnippetDto::language)
                 .contains(ExploreSnippetLanguage.SQL, ExploreSnippetLanguage.PYTHON, ExploreSnippetLanguage.R);
         assertThat(context.featureFlags().charts()).isTrue();

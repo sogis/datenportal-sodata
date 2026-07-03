@@ -19,7 +19,8 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit Phase 7 pruefen Vitest und Playwright zusaetzlich Status-/Fehlerzustaende, fehlende Parquet-Dateien, Browser-Konsole und page-level Mobile-Overflow.
 - Seit Phase 8 pruefen Backend-, Frontend- und npm-Guard-Tests deaktivierte Zukunftsflags und verhindern direkte AI/WebR/Vega/Mosaic/Karten-Abhaengigkeiten.
 - Seit dem SQL-Labor-Redesign pruefen MVC, Vitest und Playwright die vollflaechige Explore-Layoutvariante, Schema-Karten, Start-SQL gegen registrierte Views, roten Run-Button, lokale Monaco-Assets, Typ-Badges in Resultat-Headern, fehlende alte Tabs und lokale Tabellen-Scrollflaechen.
-- Seit dem SQL-Labor UI-Nachschliff pruefen Vitest und Playwright zusaetzlich `Geladen` statt `Registriert`, entfernte `Abfrage 1`-/`SQL`-/`Resultat`-Header, den Play-Icon-Run-Button, den stabilen `✓ SQL kopiert`-Button, sichtbares/editierbares Monaco-SQL und pointer-bedienbare Resizer-Handles.
+- Seit dem SQL-Labor UI-Nachschliff pruefen Vitest und Playwright zusaetzlich den Schema-Status `Tabelle geladen` statt `Registriert`, entfernte `Abfrage 1`-/`SQL`-/`Resultat`-Header, den Play-Icon-Run-Button, den stabilen `✓ SQL kopiert`-Button, sichtbares/editierbares Monaco-SQL und pointer-bedienbare Resizer-Handles.
+- Seit dem Status-Overlay-Nachschliff pruefen Vitest und Playwright, dass Lade- und Fehlerzustaende als zentriertes Overlay erscheinen, Ladezustaende eine Progressbar besitzen, Fehlerzustaende keine Progressbar anzeigen, der globale `Bereit`-Badge im Erfolgsfall nicht gerendert wird und die Workbench keine Topbar-Hoehe mehr reserviert, aber den oberen Border direkt am Container behaelt.
 - Seit dem zweiten UI-Nachschliff pruefen Vitest und Playwright zusaetzlich Start-SQL ohne sichtbares `limit`, versionierte Panel-Speicher-IDs, Row-Limit-Ausfuehrung, Export-Splitbutton fuer CSV/XLSX/Parquet, fehlenden Footer-CSV-Button und sticky Zeilennummern.
 - Seit dem Resultat-Scrollbar-Nachschliff pruefen Vitest und Playwright zusaetzlich die fokussierbare Resultattabellen-Scrollregion, echte lokale horizontale/vertikale Overflow-Situationen und sichtbare Custom-Scrollbar-Pixel bei Hover, Klick und Tastaturfokus.
 
@@ -134,7 +135,7 @@ Fixture-/Runtime-Hinweise:
 
 - Die Browser-Fixture liegt unter `src/test/resources/static/explore-fixtures/ch.so.oev_haltestellen.parquet`.
 - Die DuckDB-Wasm Parquet-Erweiterung wird same-origin unter `/explore-extensions/v1.4.3/wasm_mvp/parquet.duckdb_extension.wasm` ausgeliefert.
-- Der Playwright-Test erwartet, dass DuckDB den Status `Bereit` erreicht, die Tabelle als `Geladen` markiert und Preview-Zeilen mit `Solothurn` und `Olten` rendert.
+- Der Playwright-Test erwartet, dass DuckDB die Parquet-Datei registriert, die Tabelle als `Tabelle geladen` markiert, kein globales `Bereit` rendert und Preview-Zeilen mit `Solothurn` und `Olten` zeigt.
 
 Ausgefuehrte Befehle:
 
