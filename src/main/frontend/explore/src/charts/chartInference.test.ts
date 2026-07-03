@@ -91,6 +91,19 @@ describe('chart inference', () => {
       .toMatchObject({type: 'bar', x: 'gemeinde', y: 'anzahl'});
   });
 
+  it('uses valid preferred pie and donut charts', () => {
+    const resultColumns = columns([
+      ['gemeinde', 'string'],
+      ['anzahl', 'number']
+    ]);
+    const rows = [{gemeinde: 'Olten', anzahl: 2}];
+
+    expect(inferChartSuggestion(resultColumns, rows, {type: 'pie', x: 'gemeinde', y: 'anzahl'}))
+      .toMatchObject({type: 'pie', x: 'gemeinde', y: 'anzahl', confidence: 1});
+    expect(inferChartSuggestion(resultColumns, rows, {type: 'donut', x: 'gemeinde', y: 'anzahl'}))
+      .toMatchObject({type: 'donut', x: 'gemeinde', y: 'anzahl', confidence: 1});
+  });
+
   it('builds histogram bins and flags large bar or line results', () => {
     const bins = buildHistogramBins([{wert: 1}, {wert: 2}, {wert: 3}, {wert: 4}], 'wert', 2);
     const rows = Array.from({length: 501}, (_, index) => ({gemeinde: `G${index}`, anzahl: index}));

@@ -16,6 +16,20 @@ const contextWithRecipes = {
       tableId: 'ch_so_bauinventar',
       category: 'preview' as const,
       sql: 'SELECT *\nFROM ch_so_bauinventar;'
+    },
+    {
+      id: 'ch_so_bauinventar-gemeinde-count',
+      title: 'Nach Gemeinde',
+      description: 'Zählt Datensätze pro Gemeinde.',
+      tableId: 'ch_so_bauinventar',
+      category: 'category' as const,
+      sql: 'SELECT gemeindename, count(*) as anzahl\nFROM ch_so_bauinventar\nGROUP BY gemeindename;',
+      preferredChart: {
+        type: 'pie' as const,
+        x: 'gemeindename',
+        y: 'anzahl',
+        title: 'Anzahl nach Gemeinde'
+      }
     }
   ]
 };
@@ -48,9 +62,26 @@ describe('SqlLaboratory', () => {
     expect(screen.getByLabelText('SQL-Editor und Resultattabelle Grösse anpassen')).toBeInTheDocument();
     expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__actions')).toBeInTheDocument();
     expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__export')).toBeInTheDocument();
+    expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__leading')).toBeInTheDocument();
+    expect(screen.getByLabelText('Beispielabfrage auswählen')).toHaveValue('ch_so_bauinventar-preview');
+    expect(screen.getByRole('group', {name: 'Resultatansicht'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Tabelle'})).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', {name: 'Diagramm'})).toHaveAttribute('aria-pressed', 'false');
     expect(screen.queryByText('Beispielabfragen')).not.toBeInTheDocument();
     expect(screen.queryByText('Lokale Historie')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Diagramm aus Resultat')).not.toBeInTheDocument();
+  });
+
+  it('loads a compact recipe selection without executing it', async () => {
+    const user = userEvent.setup();
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.selectOptions(screen.getByLabelText('Beispielabfrage auswählen'), 'ch_so_bauinventar-gemeinde-count');
+
+    expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue(
+      'SELECT gemeindename, count(*) as anzahl\nFROM ch_so_bauinventar\nGROUP BY gemeindename;'
+    );
+    expect(query).not.toHaveBeenCalled();
   });
 
   it('builds the fallback initial query with uppercase keywords and an unquoted table name', () => {
@@ -83,6 +114,35 @@ describe('SqlLaboratory', () => {
       expect.stringContaining('limit 1000'),
       expect.objectContaining({signal: expect.any(AbortSignal)})
     );
+  });
+
+  it('switches from table to chart for the current result without changing the query', async () => {
+    const user = userEvent.setup();
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    expect(await screen.findByLabelText('SQL Ergebnis')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Diagramm aus Resultat')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'Diagramm'}));
+
+    expect(screen.getByRole('button', {name: 'Diagramm'})).toHaveAttribute('aria-pressed', 'true');
+    expect(await screen.findByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
+    expect(document.querySelector('[data-chart-type="bar"]')).toBeInTheDocument();
+    expect(query).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses a preferred chart only for unchanged selected recipe SQL', async () => {
+    const user = userEvent.setup();
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.selectOptions(screen.getByLabelText('Beispielabfrage auswählen'), 'ch_so_bauinventar-gemeinde-count');
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    await screen.findByLabelText('SQL Ergebnis');
+    await user.click(screen.getByRole('button', {name: 'Diagramm'}));
+
+    expect(await screen.findByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
+    expect(document.querySelector('[data-chart-type="pie"]')).toBeInTheDocument();
   });
 
   it('uses the selected row limit in the query guard', async () => {

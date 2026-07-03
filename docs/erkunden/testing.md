@@ -1,6 +1,6 @@
 # Erkunden Tests
 
-Status: SQL-Labor redesign tests
+Status: SQL-Labor result chart tests
 
 Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase-0-Baseline des bestehenden Projekts.
 
@@ -14,7 +14,7 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - `check` haengt zusaetzlich von `npmTestExplore` und `npmTypecheckExplore` ab.
 - Seit Phase 3 prueft Playwright DuckDB-Wasm mit einer same-origin Parquet-Fixture.
 - Seit Phase 4 prueft Playwright SQL-Ausfuehrung, Resultattabelle und CSV-Download mit derselben Fixture.
-- Seit Phase 5 existieren Unit-Tests fuer Diagramm-Inferenz und Diagrammkomponenten; im SQL-Labor-Redesign prueft Playwright, dass Diagramme in der primaeren UI nicht sichtbar sind.
+- Seit Phase 5 existieren Unit-Tests fuer Diagramm-Inferenz und Diagrammkomponenten; nach dem SQL-Labor-Redesign pruefen Vitest und Playwright Diagramme als lokale Resultatansicht statt als alten Haupt-Tab.
 - Seit Phase 6 existieren Tests fuer statische Codebeispiele und lokale Query-Historie; im SQL-Labor-Redesign bleiben diese Bereiche aus der primaeren UI entfernt.
 - Seit Phase 7 pruefen Vitest und Playwright zusaetzlich Status-/Fehlerzustaende, fehlende Parquet-Dateien, Browser-Konsole und page-level Mobile-Overflow.
 - Seit Phase 8 pruefen Backend-, Frontend- und npm-Guard-Tests deaktivierte Zukunftsflags und verhindern direkte AI/WebR/Vega/Mosaic/Karten-Abhaengigkeiten.
@@ -23,6 +23,7 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit dem Status-Overlay-Nachschliff pruefen Vitest und Playwright, dass Lade- und Fehlerzustaende als zentriertes Overlay erscheinen, Ladezustaende eine Progressbar besitzen, Fehlerzustaende keine Progressbar anzeigen, der globale `Bereit`-Badge im Erfolgsfall nicht gerendert wird und die Workbench keine Topbar-Hoehe mehr reserviert, aber den oberen Border direkt am Container behaelt.
 - Seit dem zweiten UI-Nachschliff pruefen Vitest und Playwright zusaetzlich Start-SQL ohne sichtbares `limit`, versionierte Panel-Speicher-IDs, Row-Limit-Ausfuehrung, Export-Splitbutton fuer CSV/XLSX/Parquet, fehlenden Footer-CSV-Button und sticky Zeilennummern.
 - Seit dem Resultat-Scrollbar-Nachschliff pruefen Vitest und Playwright zusaetzlich die fokussierbare Resultattabellen-Scrollregion, echte lokale horizontale/vertikale Overflow-Situationen und sichtbare Custom-Scrollbar-Pixel bei Hover, Klick und Tastaturfokus.
+- Seit der Diagramm-Wiederaufnahme pruefen Vitest und Playwright die kompakte Beispielabfrage-Auswahl, den `Tabelle`/`Diagramm`-Umschalter, Recharts-Balken/Punkte/Linien/Histogramm sowie Pie/Donut mit Segmentfarben und `Farben neu`.
 
 ## Baseline am 2026-07-01
 
@@ -381,7 +382,15 @@ Das Redesign ersetzt die alte Taboberflaeche durch eine vollflaechige SQLRooms-n
 
 - MVC-Tests pruefen Header, Breadcrumb, Explore-spezifische Full-width-Klassen, eingebetteten Kontext, Asset-Links und fehlenden Footer.
 - Frontend-Tests pruefen Schema-Karten, kompakte Workbench, Start-SQL gegen den registrierten View, roten `Ausfuehren`-Button, entfernte Preview-/Diagramm-/Code-Tabs, Fehlerzustaende, Resultattabellen mit Typ-Badges, Row-Limit, SQLRooms-`tableSchemas` fuer Autocomplete und CSV/XLSX/Parquet-Exporthelfer.
-- Playwright prueft same-origin Parquet-Registrierung, lokale Monaco-Assets, initiale SQL-Ausfuehrung, CSV/XLSX/Parquet-Export aus dem Splitbutton, einheitliche Borderfarben, duennere Splitter, fehlende Diagramme, lesbare Broken-Parquet-Fehler, mobile lokale Tabellen-Scrollflaechen, Row-Limit-Wechsel und kein page-level Horizontal-Overflow.
+- Playwright prueft same-origin Parquet-Registrierung, lokale Monaco-Assets, initiale SQL-Ausfuehrung, CSV/XLSX/Parquet-Export aus dem Splitbutton, einheitliche Borderfarben, duennere Splitter, lesbare Broken-Parquet-Fehler, mobile lokale Tabellen-Scrollflaechen, Row-Limit-Wechsel und kein page-level Horizontal-Overflow.
+
+## SQL-Labor Diagramme am 2026-07-03
+
+Die Diagramm-Wiederaufnahme behaelt die vollflaechige Workbench und ersetzt keine alten Haupt-Tabs:
+
+- Frontend-Tests pruefen, dass Beispielabfragen nur SQL laden, der Resultatumschalter zwischen Tabelle und Diagramm wechselt und `preferredChart` nur bei unveraendertem Rezept-SQL greift.
+- Chart-Tests pruefen Balken, Punkte, Histogramm, Pie, Donut, Warnungen fuer viele Segmente und die erneuerbaren pseudo-zufaelligen Segmentfarben.
+- Playwright prueft, dass `button[role='tab']` fuer `Diagramm` weiterhin fehlt, die lokale Diagrammansicht aber nach Query-Ausfuehrung Recharts rendert und Pie/Donut-Farben im Browser sichtbar sind.
 
 Ausgefuehrte Befehle werden in `docs/erkunden/progress.md` mit exakten Ergebnissen dokumentiert.
 

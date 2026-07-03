@@ -6,6 +6,7 @@ import {buildHistogramBins, inferChartSuggestion, inferResultColumns, isCategory
 import {
   CHART_ROW_LIMIT_OPTIONS,
   DEFAULT_CHART_ROW_LIMIT,
+  LARGE_SEGMENT_WARNING_THRESHOLD,
   chartTypeLabels,
   chartTypeRequiresX,
   chartTypeRequiresY,
@@ -14,6 +15,7 @@ import {
 } from './chartTypes';
 import {HistogramResultChart} from './HistogramResultChart';
 import {LineResultChart} from './LineResultChart';
+import {buildPieRows, hasPieValues, PieResultChart} from './PieResultChart';
 import {ScatterResultChart} from './ScatterResultChart';
 
 export function ChartPanel({
@@ -45,13 +47,16 @@ function SuccessfulChartPanel({
   const [x, setX] = useState<string>(suggestion?.x ?? '');
   const [y, setY] = useState<string>(suggestion?.y ?? '');
   const [rowLimit, setRowLimit] = useState<number>(DEFAULT_CHART_ROW_LIMIT);
+  const stableColorSeed = useMemo(() => buildStableColorSeed(columns, rows), [columns, rows]);
+  const [colorSeedVersion, setColorSeedVersion] = useState(0);
 
   useEffect(() => {
     setType(suggestion?.type ?? 'bar');
     setX(suggestion?.x ?? '');
     setY(suggestion?.y ?? '');
     setRowLimit(DEFAULT_CHART_ROW_LIMIT);
-  }, [suggestion?.type, suggestion?.x, suggestion?.y]);
+    setColorSeedVersion(0);
+  }, [stableColorSeed, suggestion?.type, suggestion?.x, suggestion?.y]);
 
   if (!suggestion) {
     return (
@@ -67,6 +72,11 @@ function SuccessfulChartPanel({
   const safeY = selectSafeColumn(y, compatibleYColumns);
   const limitedRows = rows.slice(0, rowLimit);
   const canRender = canRenderChart(type, safeX, safeY, limitedRows);
+  const colorSeed = `${stableColorSeed}:${colorSeedVersion}`;
+  const pieSegmentCount = isPieChartType(type) ? buildPieRows(limitedRows, safeX, safeY, colorSeed).length : 0;
+  const segmentWarning = canRender && isPieChartType(type) && pieSegmentCount > LARGE_SEGMENT_WARNING_THRESHOLD
+    ? 'Viele Segmente. Fuer Pie- und Donut-Diagramme eignet sich ein staerker aggregiertes SQL-Resultat.'
+    : undefined;
 
   return (
     <div className="dp-explore-chart" aria-label="Diagramm aus Resultat">
@@ -75,6 +85,15 @@ function SuccessfulChartPanel({
           <h4>Diagramm aus Resultat</h4>
           <p>{suggestion.reason}</p>
         </div>
+        {isPieChartType(type) && (
+          <button
+            type="button"
+            className="dp-explore-button dp-explore-button--secondary dp-explore-chart__palette-button"
+            onClick={() => setColorSeedVersion((version) => version + 1)}
+          >
+            Farben neu
+          </button>
+        )}
       </div>
 
       <div className="dp-explore-chart__controls" aria-label="Diagrammsteuerung">
@@ -88,7 +107,7 @@ function SuccessfulChartPanel({
         </label>
         {chartTypeRequiresX(type) && (
           <label>
-            <span>X</span>
+            <span>{isPieChartType(type) ? 'Kategorie' : 'X'}</span>
             <select value={safeX} onChange={(event) => setX(event.target.value)}>
               {compatibleXColumns.map((column) => (
                 <option key={column.name} value={column.name}>{column.name}</option>
@@ -98,7 +117,7 @@ function SuccessfulChartPanel({
         )}
         {chartTypeRequiresY(type) && (
           <label>
-            <span>Y</span>
+            <span>{isPieChartType(type) ? 'Wert' : 'Y'}</span>
             <select value={safeY} onChange={(event) => setY(event.target.value)}>
               {compatibleYColumns.map((column) => (
                 <option key={column.name} value={column.name}>{column.name}</option>
@@ -127,13 +146,14 @@ function SuccessfulChartPanel({
       </div>
 
       {suggestion.warning && <p className="dp-explore-chart__warning">{suggestion.warning}</p>}
+      {segmentWarning && <p className="dp-explore-chart__warning">{segmentWarning}</p>}
       {rows.length > rowLimit && (
         <p className="dp-explore-muted">Diagramm zeigt {formatSwissNumber(rowLimit)} von {formatSwissNumber(rows.length)} Resultatzeilen.</p>
       )}
 
       {canRender ? (
         <div className="dp-explore-chart__figure" data-chart-type={type}>
-          {renderChart(type, limitedRows, safeX, safeY, suggestion.title)}
+          {renderChart(type, limitedRows, safeX, safeY, suggestion.title, colorSeed)}
         </div>
       ) : (
         <p className="dp-explore-muted">Die gewählten Spalten passen nicht zu diesem Diagrammtyp.</p>
@@ -170,10 +190,20 @@ function canRenderChart(type: ResultChartType, x: string, y: string, rows: Array
   if (type === 'histogram') {
     return x.length > 0 && buildHistogramBins(rows, x, 12).length > 0;
   }
+  if (isPieChartType(type)) {
+    return x.length > 0 && y.length > 0 && hasPieValues(rows, y);
+  }
   return x.length > 0 && y.length > 0;
 }
 
-function renderChart(type: ResultChartType, rows: Array<Record<string, unknown>>, x: string, y: string, title?: string) {
+function renderChart(
+  type: ResultChartType,
+  rows: Array<Record<string, unknown>>,
+  x: string,
+  y: string,
+  title: string | undefined,
+  colorSeed: string
+) {
   const chartRows = rows.map(normalizeChartRow);
   switch (type) {
     case 'bar':
@@ -184,6 +214,10 @@ function renderChart(type: ResultChartType, rows: Array<Record<string, unknown>>
       return <ScatterResultChart rows={chartRows} x={x} y={y} title={title} />;
     case 'histogram':
       return <HistogramResultChart rows={chartRows} column={x} title={title} />;
+    case 'pie':
+      return <PieResultChart rows={chartRows} x={x} y={y} title={title} variant="pie" colorSeed={colorSeed} />;
+    case 'donut':
+      return <PieResultChart rows={chartRows} x={x} y={y} title={title} variant="donut" colorSeed={colorSeed} />;
   }
 }
 
@@ -206,4 +240,40 @@ function normalizeChartValue(value: unknown): unknown {
 
 function formatSwissNumber(value: number): string {
   return new Intl.NumberFormat('de-CH').format(value);
+}
+
+function isPieChartType(type: ResultChartType): boolean {
+  return type === 'pie' || type === 'donut';
+}
+
+function buildStableColorSeed(columns: string[], rows: Array<Record<string, unknown>>): string {
+  const sample = rows.slice(0, 40)
+    .map((row) => columns.map((column) => normalizeSeedValue(row[column])).join('='))
+    .join('|');
+  return `${columns.join(',')}|${rows.length}|${hashString(sample)}`;
+}
+
+function normalizeSeedValue(value: unknown): string {
+  if (value === null || value === undefined) {
+    return 'null';
+  }
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (value instanceof Uint8Array) {
+    return `bytes:${value.byteLength}`;
+  }
+  return String(value);
+}
+
+function hashString(value: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index++) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
 }

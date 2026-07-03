@@ -12,7 +12,7 @@ export const exploreColumnRoleSchema = z.enum([
   'unknown'
 ]);
 
-export const exploreChartTypeSchema = z.enum(['bar', 'line', 'scatter', 'histogram']);
+export const exploreChartTypeSchema = z.enum(['bar', 'line', 'scatter', 'histogram', 'pie', 'donut']);
 
 export const exploreChartConfigSchema = z.object({
   type: exploreChartTypeSchema,

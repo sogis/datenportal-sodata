@@ -452,17 +452,47 @@ class ExploreIslandParquetPlaywrightTest {
     }
 
     @Test
-    void chartsAreNotVisibleInTheRedesignedWorkbench() {
+    void resultChartViewRendersRechartsAndPieColors() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
+            var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
+            editor.click();
+            page.keyboard().press("ControlOrMeta+A");
+            page.keyboard().type("""
+                    select 'Solothurn' as gemeinde, 3 as anzahl
+                    union all select 'Olten' as gemeinde, 2 as anzahl
+                    union all select 'Grenchen' as gemeinde, 1 as anzahl;
+                    """);
+            page.keyboard().press("Escape");
+
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
 
             page.waitForSelector("[aria-label='SQL Ergebnis']");
             assertThat(page.locator(".dp-explore-chart").count()).isZero();
-            assertThat(page.locator("[aria-label='Diagrammsteuerung']").count()).isZero();
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Diagramm")).click();
+            page.waitForSelector("[aria-label='Diagramm aus Resultat']");
+            page.waitForSelector("[aria-label='Diagrammsteuerung']");
+
+            page.getByLabel("Typ").selectOption("pie");
+            page.waitForSelector("[data-chart-type='pie']");
+            assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Farben neu")).count()).isEqualTo(1);
+            var colorsBefore = legendSwatchColors(page);
+            assertThat(colorsBefore.size()).isGreaterThan(1);
+            assertThat(new java.util.HashSet<>(colorsBefore).size()).isGreaterThan(1);
+
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Farben neu")).click();
+            var colorsAfter = legendSwatchColors(page);
+            assertThat(colorsAfter).isNotEqualTo(colorsBefore);
+
+            page.getByLabel("Typ").selectOption("donut");
+            page.waitForSelector("[data-chart-type='donut']");
             assertThat(page.locator("button[role='tab']:has-text('Diagramm')").count()).isZero();
         }
     }
@@ -572,6 +602,12 @@ class ExploreIslandParquetPlaywrightTest {
 
     private static String computedStyle(Locator locator, String property) {
         return (String) locator.evaluate("(el, property) => getComputedStyle(el)[property]", property);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> legendSwatchColors(Page page) {
+        return (List<String>) page.locator(".dp-explore-chart__legend-swatch")
+                .evaluateAll("els => els.map(el => getComputedStyle(el).backgroundColor)");
     }
 
     private static double cssPixels(String value) {

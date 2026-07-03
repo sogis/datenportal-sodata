@@ -40,6 +40,43 @@ describe('ChartPanel', () => {
     expect(screen.getByDisplayValue('50')).toBeInTheDocument();
   });
 
+  it('renders pie and donut charts with renewable segment colors', async () => {
+    const user = userEvent.setup();
+    render(<ChartPanel result={successResult(['gemeinde', 'anzahl'], [
+      {gemeinde: 'Solothurn', anzahl: 3},
+      {gemeinde: 'Olten', anzahl: 2},
+      {gemeinde: 'Grenchen', anzahl: 1}
+    ])} />);
+
+    await user.selectOptions(screen.getByLabelText('Typ'), 'pie');
+
+    expect(document.querySelector('[data-chart-type="pie"]')).toBeInTheDocument();
+    expect(screen.getByLabelText('Pie Legende')).toBeInTheDocument();
+    const initialColors = screen.getAllByTestId('chart-segment-color')
+      .map((swatch) => swatch.getAttribute('style'));
+    expect(new Set(initialColors).size).toBeGreaterThan(1);
+
+    await user.click(screen.getByRole('button', {name: 'Farben neu'}));
+    const renewedColors = screen.getAllByTestId('chart-segment-color')
+      .map((swatch) => swatch.getAttribute('style'));
+    expect(renewedColors).not.toEqual(initialColors);
+
+    await user.selectOptions(screen.getByLabelText('Typ'), 'donut');
+    expect(document.querySelector('[data-chart-type="donut"]')).toBeInTheDocument();
+    expect(screen.getByLabelText('Donut Legende')).toBeInTheDocument();
+  });
+
+  it('warns when pie and donut charts have many segments', async () => {
+    const user = userEvent.setup();
+    const rows = Array.from({length: 13}, (_, index) => ({gemeinde: `G${index}`, anzahl: index + 1}));
+
+    render(<ChartPanel result={successResult(['gemeinde', 'anzahl'], rows)} />);
+
+    await user.selectOptions(screen.getByLabelText('Typ'), 'pie');
+
+    expect(screen.getByText(/Viele Segmente/)).toBeInTheDocument();
+  });
+
   it('shows a warning for large bar results', () => {
     const rows = Array.from({length: 501}, (_, index) => ({gemeinde: `G${index}`, anzahl: index}));
 

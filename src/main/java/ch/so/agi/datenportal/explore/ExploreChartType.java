@@ -4,7 +4,9 @@ public enum ExploreChartType {
     BAR("bar"),
     LINE("line"),
     SCATTER("scatter"),
-    HISTOGRAM("histogram");
+    HISTOGRAM("histogram"),
+    PIE("pie"),
+    DONUT("donut");
 
     private final String value;
 

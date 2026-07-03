@@ -1,8 +1,8 @@
 # Erkunden Troubleshooting
 
-Status: SQL-Labor redesign
+Status: SQL-Labor with result charts
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und rendert ein vollflaechiges SQL-Labor mit Schema-Karten, Monaco-Editor, rotem `Ausfuehren`-Button, kompakter Resultattabelle, Row-Limit-Combobox und Exporten fuer CSV, XLSX und Parquet. Diagramme, Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags bleiben deaktiviert und laden keine schweren Runtime-Pakete.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und rendert ein vollflaechiges SQL-Labor mit Schema-Karten, Monaco-Editor, rotem `Ausfuehren`-Button, kompakter Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporten fuer CSV, XLSX und Parquet. Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags bleiben deaktiviert und laden keine schweren Runtime-Pakete.
 
 ## Phase-2-Island laedt nicht
 
@@ -131,7 +131,7 @@ Verhalten ab Phase 4:
 - CSV-, XLSX- und Parquet-Export exportieren nur das aktuelle Query-Resultat, nicht die gesamte Quelldatei.
 - CSV bleibt ein clientseitiger Serializer mit Semikolon und CRLF. XLSX und Parquet laufen ueber DuckDB-Wasm `COPY` gegen das bereits row-limitierte `executedSql` und werden danach aus dem virtuellen DuckDB-Dateisystem gelesen.
 - Nutzertexte duerfen keine serverseitige Ausfuehrung versprechen.
-- Diagramme sind aktuell nicht sichtbar; Resultatwerte bleiben fuer Tabelle und Exporte unveraendert.
+- Diagramme visualisieren nur das aktuelle SQL-Resultat. Resultatwerte bleiben fuer Tabelle und Exporte unveraendert; nur die Diagrammzeilen werden fuer Recharts normalisiert.
 
 ## Query-Fehler
 
@@ -190,4 +190,4 @@ Der Produktions-Build verwendet `SqlMonacoEditor` aus `@sqlrooms/sql-editor@0.28
 
 ## SQLRooms Recharts in Tests
 
-`@sqlrooms/recharts@0.28.0` bleibt installiert, weil die Diagrammkomponenten fuer eine spaetere Wiederaufnahme im Code vorhanden sind. Im SQL-Labor-Redesign werden diese Komponenten nicht gerendert; Playwright prueft explizit, dass keine sichtbare Diagrammsteuerung erscheint. Vitest mockt die Recharts-Exports weiterhin, weil `@sqlrooms/recharts` extensionless interne ESM-Imports verwendet, die Vitest in dieser Konfiguration nicht direkt aufloest.
+`@sqlrooms/recharts@0.28.0` rendert die Diagrammansicht fuer aktuelle SQL-Resultate. Playwright prueft den echten Browserpfad inklusive Pie-/Donut-Farben; Vitest mockt die Recharts-Exports weiterhin, weil `@sqlrooms/recharts` extensionless interne ESM-Imports verwendet, die Vitest in dieser Konfiguration nicht direkt aufloest.

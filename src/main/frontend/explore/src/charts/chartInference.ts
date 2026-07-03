@@ -240,7 +240,7 @@ function validatePreferredChart(
 }
 
 function isKnownChartType(type: string): type is ResultChartType {
-  return type === 'bar' || type === 'line' || type === 'scatter' || type === 'histogram';
+  return type === 'bar' || type === 'line' || type === 'scatter' || type === 'histogram' || type === 'pie' || type === 'donut';
 }
 
 function isDateLikeResultColumn(column: ResultColumn, rows: Array<Record<string, unknown>>): boolean {

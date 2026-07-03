@@ -1,7 +1,9 @@
+import type {ReactNode} from 'react';
 import {useState} from 'react';
 import type {ResultExportFormat} from '../results/ResultExport';
 
 export function SqlToolbar({
+  leading,
   running,
   canRun,
   canCancel,
@@ -13,6 +15,7 @@ export function SqlToolbar({
   onExport,
   copied
 }: {
+  leading?: ReactNode;
   running: boolean;
   canRun: boolean;
   canCancel: boolean;
@@ -34,6 +37,7 @@ export function SqlToolbar({
 
   return (
     <div className="dp-explore-sql-toolbar" aria-label="SQL Aktionen">
+      {leading && <div className="dp-explore-sql-toolbar__leading">{leading}</div>}
       <div className="dp-explore-sql-toolbar__actions">
         <button type="button" className="dp-explore-button dp-explore-button--primary" disabled={!canRun || running} onClick={onRun}>
           <svg className="bi bi-play-fill dp-explore-button__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">

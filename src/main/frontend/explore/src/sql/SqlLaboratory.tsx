@@ -3,6 +3,7 @@ import {makeQualifiedTableName, type DataTable, type DuckDbConnector, type Query
 import type {Table} from 'apache-arrow';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
 import type {ExploreContextDto, ExploreRecipeDto, ExploreTableDto} from '../app/ExploreContext';
+import {ChartPanel} from '../charts/ChartPanel';
 import {hasResultLimitApplied, normalizeSqlForExecution, queryTimeoutMessage} from '../duckdb/querySafety';
 import {ResultPanel} from '../results/ResultPanel';
 import {idleQueryResult, type QueryResultState} from '../results/queryResultTypes';
@@ -14,6 +15,7 @@ import {SqlToolbar} from './SqlToolbar';
 
 const DEFAULT_ROW_LIMIT = 1000;
 const ROW_LIMIT_OPTIONS = [100, 1000, 10000] as const;
+type ResultView = 'table' | 'chart';
 
 export function SqlLaboratory({
   context,
@@ -36,19 +38,27 @@ export function SqlLaboratory({
     return options.length > 0 ? options : [context.execution.maxResultRows];
   }, [context.execution.maxResultRows]);
   const [sql, setSql] = useState(initialSql);
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | undefined>(initialRecipe?.id);
   const [result, setResult] = useState<QueryResultState>(idleQueryResult);
+  const [resultView, setResultView] = useState<ResultView>('table');
   const [copied, setCopied] = useState(false);
   const [rowLimit, setRowLimit] = useState(Math.min(DEFAULT_ROW_LIMIT, context.execution.maxResultRows));
   const [exportingFormat, setExportingFormat] = useState<ResultExportFormat | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
   const tableSchemas = useMemo(() => context.tables.map(toSqlRoomsDataTable), [context.tables]);
   const getLatestSchemas = useCallback(() => ({tableSchemas}), [tableSchemas]);
+  const selectedRecipe = useMemo(
+    () => context.recipes.find((recipe) => recipe.id === selectedRecipeId),
+    [context.recipes, selectedRecipeId]
+  );
   const activeQuery = useRef<QueryHandle<Table> | null>(null);
 
   useEffect(() => {
     setSql(initialSql);
+    setSelectedRecipeId(initialRecipe?.id);
     setResult(idleQueryResult);
-  }, [initialSql]);
+    setResultView('table');
+  }, [initialRecipe?.id, initialSql]);
 
   useEffect(() => {
     if (!rowLimitOptions.includes(rowLimit as (typeof rowLimitOptions)[number])) {
@@ -64,7 +74,17 @@ export function SqlLaboratory({
     setSql(value);
   }
 
-  async function runSql(sourceSql = sql, recipeForExecution = initialRecipe) {
+  function selectRecipe(recipeId: string) {
+    const recipe = context.recipes.find((item) => item.id === recipeId);
+    if (!recipe) {
+      return;
+    }
+    setSelectedRecipeId(recipe.id);
+    setSql(recipe.sql);
+    setExportError(null);
+  }
+
+  async function runSql(sourceSql = sql, recipeForExecution = selectedRecipe) {
     if (!connector || !ready) {
       setResult(errorResult(sourceSql, 'DuckDB ist noch nicht bereit.'));
       return;
@@ -156,6 +176,7 @@ export function SqlLaboratory({
 
   const running = result.status === 'running';
   const canExport = result.status === 'success' && result.rows.length > 0;
+  const chartsEnabled = context.featureFlags.charts;
 
   return (
     <PanelGroup
@@ -176,6 +197,16 @@ export function SqlLaboratory({
         <div className="dp-explore-query-pane__header">
           <div className="dp-explore-query-pane__toolbar-row">
             <SqlToolbar
+              leading={
+                context.recipes.length > 0 ? (
+                  <RecipePicker
+                    recipes={context.recipes}
+                    selectedRecipeId={selectedRecipeId}
+                    disabled={running}
+                    onSelect={selectRecipe}
+                  />
+                ) : undefined
+              }
               running={running}
               canRun={ready && sql.trim().length > 0}
               canCancel={running}
@@ -207,7 +238,7 @@ export function SqlLaboratory({
       <ExploreResizeHandle label="SQL-Editor und Resultattabelle Grösse anpassen" />
 
       <Panel
-        className="dp-explore-result-pane"
+        className={chartsEnabled ? 'dp-explore-result-pane' : 'dp-explore-result-pane dp-explore-result-pane--table-only'}
         defaultSize={57}
         id="result"
         minSize={20}
@@ -215,14 +246,88 @@ export function SqlLaboratory({
         tagName="section"
         aria-label="SQL Resultat"
       >
-        <ResultPanel
-          result={result}
-          rowLimit={rowLimit}
-          rowLimitOptions={rowLimitOptions}
-          onRowLimitChange={setRowLimit}
-        />
+        {chartsEnabled && (
+          <ResultViewToggle view={resultView} onChange={setResultView} />
+        )}
+        <div className="dp-explore-result-pane__body">
+          {chartsEnabled && resultView === 'chart' ? (
+            <ChartPanel result={result} preferred={result.preferredChart} />
+          ) : (
+            <ResultPanel
+              result={result}
+              rowLimit={rowLimit}
+              rowLimitOptions={rowLimitOptions}
+              onRowLimitChange={setRowLimit}
+            />
+          )}
+        </div>
       </Panel>
     </PanelGroup>
+  );
+}
+
+function RecipePicker({
+  recipes,
+  selectedRecipeId,
+  disabled,
+  onSelect
+}: {
+  recipes: ExploreRecipeDto[];
+  selectedRecipeId?: string;
+  disabled: boolean;
+  onSelect: (recipeId: string) => void;
+}) {
+  if (recipes.length === 0) {
+    return null;
+  }
+
+  const selectedRecipe = recipes.find((recipe) => recipe.id === selectedRecipeId) ?? recipes[0];
+
+  return (
+    <label className="dp-explore-recipe-picker" title={selectedRecipe.description}>
+      <span>Beispiel</span>
+      <select
+        aria-label="Beispielabfrage auswählen"
+        value={selectedRecipe.id}
+        disabled={disabled}
+        onChange={(event) => onSelect(event.target.value)}
+      >
+        {recipes.map((recipe) => (
+          <option key={recipe.id} value={recipe.id}>{recipe.title}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function ResultViewToggle({
+  view,
+  onChange
+}: {
+  view: ResultView;
+  onChange: (view: ResultView) => void;
+}) {
+  return (
+    <div className="dp-explore-result-pane__header">
+      <div className="dp-explore-result-view-toggle" role="group" aria-label="Resultatansicht">
+        <button
+          type="button"
+          className={view === 'table' ? 'is-active' : undefined}
+          aria-pressed={view === 'table'}
+          onClick={() => onChange('table')}
+        >
+          Tabelle
+        </button>
+        <button
+          type="button"
+          className={view === 'chart' ? 'is-active' : undefined}
+          aria-pressed={view === 'chart'}
+          onClick={() => onChange('chart')}
+        >
+          Diagramm
+        </button>
+      </div>
+    </div>
   );
 }
 

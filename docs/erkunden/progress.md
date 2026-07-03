@@ -638,3 +638,40 @@ Known limitations:
 
 - Diagramm-, Codebeispiel- und Query-Historie-Komponenten bleiben als spaetere Anschlussstellen im Code, sind aber in der aktuellen Labor-UI nicht sichtbar.
 - Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.
+
+## SQL-Labor Diagramme Entry
+
+Date: 2026-07-03
+
+Branch: `main`
+
+Scope:
+
+- Added a compact example-query selector to the SQL toolbar. Selecting a recipe loads SQL into Monaco but does not execute it.
+- Added a local result-view toggle for `Tabelle` and `Diagramm` without restoring the old top-level `Vorschau` / `SQL-Labor` / `Diagramm` / `Code` tabs.
+- Reconnected `ChartPanel` to the current `QueryResultState`, keeping SQL as the source of truth and avoiding server-side SQL execution.
+- Kept `@sqlrooms/recharts@0.28.0` for chart rendering and extended chart types to `Balken`, `Linie`, `Punkte`, `Histogramm`, `Pie` and `Donut`.
+- Added stable pseudo-random segment colors for Pie/Donut plus the compact `Farben neu` action.
+- Updated frontend, backend DTO enum, Playwright coverage and Erkunden documentation.
+
+Implementation notes:
+
+- Pie and Donut are manual category-plus-value chart types. Automatic inference still prefers bar/line/scatter/histogram.
+- Histogram remains the only chart type with data binning in the chart layer; other calculations remain SQL responsibility.
+- The first full `./gradlew clean check` rerun had a timing-sensitive Monaco suggestion failure and the new chart smoke used an unnecessarily fixture-specific SQL query. Focused reruns passed, the chart smoke now uses a constant SQL result, and the final full run passed.
+- The Vite build still reports expected large DuckDB-Wasm chunk warnings.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 16 passed (16)`, `Tests 83 passed (83)`, duration `1.99s` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore, Monaco and DuckDB-Wasm assets under `/explore/assets/`; expected large chunk warning remains |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 11s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 27s`; includes same-origin Parquet, Monaco, SQL result, export, result chart toggle and Pie/Donut color smoke |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 51s`; included Vitest, TypeScript, Vite build, precompression, backend tests and Playwright |
+
+Known limitations:
+
+- Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.
