@@ -60,3 +60,56 @@ Nicht Teil des MVP:
 - `testing.md`: Teststrategie und Baseline-Befehle.
 - `troubleshooting.md`: bekannte technische Risikofelder fuer DuckDB-Wasm und Parquet.
 - `progress.md`: Phasenstatus, Testevidenz und Folgeentscheidungen.
+
+## Opendata DuckDB Catalog
+
+`tools/create_opendata_duckdb.py` erzeugt lokal eine DuckDB-Datei mit einem
+`opendata`-Schema und je einer View pro Parquet-Distribution aus dem
+PublishedCatalog-XTF. Das Artefakt liegt standardmaessig unter
+`build/catalog.duckdb` und wird nicht versioniert.
+
+Die Python-Umgebung braucht `duckdb==1.4.3`, passend zur aktuell gespiegelten
+DuckDB-Wasm-Extension-Version `v1.4.3`. Am einfachsten wird dafuer ein lokales
+Virtual Environment unter `build/` angelegt; dieser Ordner ist ignoriert und
+wird nicht versioniert:
+
+```bash
+python3 -m venv build/duckdb-tools-venv
+source build/duckdb-tools-venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install duckdb==1.4.3
+python3 tools/create_opendata_duckdb.py
+```
+
+Wenn das Virtual Environment bereits existiert, reichen spaeter:
+
+```bash
+source build/duckdb-tools-venv/bin/activate
+python tools/create_opendata_duckdb.py
+```
+
+Ohne Aktivierung kann das Script auch direkt mit dem Python aus dem Virtual
+Environment gestartet werden:
+
+```bash
+build/duckdb-tools-venv/bin/python tools/create_opendata_duckdb.py
+```
+
+Die View-Namen werden aus dem Parquet-Dateinamen gebildet: `.parquet` wird
+entfernt und Punkte werden durch `_` ersetzt. Das Script bricht ab, wenn ein
+Name kein sicherer DuckDB-Identifier ist oder wenn zwei Parquet-Dateien auf den
+gleichen View-Namen fallen.
+
+Die Views koennen ueber das `opendata`-Schema angesprochen werden:
+
+```sql
+DESCRIBE opendata.ch_so_wasserqualitaet_grundwasser;
+```
+
+Alternativ kann der Schema-Kontext gesetzt und danach der einfache View-Name
+verwendet werden:
+
+```sql
+SET schema 'opendata';
+DESCRIBE ch_so_wasserqualitaet_grundwasser;
+```
