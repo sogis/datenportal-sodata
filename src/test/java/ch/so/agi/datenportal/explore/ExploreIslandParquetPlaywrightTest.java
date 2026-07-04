@@ -9,6 +9,8 @@ import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
+import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
+import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
@@ -93,6 +95,25 @@ class ExploreIslandParquetPlaywrightTest {
             assertThat(page.locator("text=Olten").count()).isGreaterThanOrEqualTo(1);
             assertThat(page.locator(".dp-explore-chart").count()).isZero();
             assertThat(page.locator("button[role='tab']:has-text('Diagramm')").count()).isZero();
+            assertThat(browserErrors).isEmpty();
+        }
+    }
+
+    @Test
+    void issueExplorePageRegistersSameOriginParquetAndShowsPreviewRows() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
+            Page page = context.newPage();
+            List<String> browserErrors = collectBrowserErrors(page);
+            page.navigate(baseUrl("/series/explore-series/issues/current/explore"));
+
+            waitForExploreReady(page);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
+            page.waitForSelector("[aria-label='SQL Ergebnis']");
+
+            assertThat(page.locator("text=Tabelle geladen").count()).isEqualTo(1);
+            assertThat(page.locator("[aria-label='SQL Ergebnis']").count()).isEqualTo(1);
+            assertThat(page.locator("text=Solothurn").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.locator("text=Olten").count()).isGreaterThanOrEqualTo(1);
             assertThat(browserErrors).isEmpty();
         }
     }
@@ -478,6 +499,17 @@ class ExploreIslandParquetPlaywrightTest {
                     new Page.GetByRoleOptions().setName("Diagramm")).click();
             page.waitForSelector("[aria-label='Diagramm aus Resultat']");
             page.waitForSelector("[aria-label='Diagrammsteuerung']");
+            page.waitForSelector("[data-chart-type='bar']");
+
+            var defaultBarFills = normalizedFillAttributes(page.locator("[data-chart-type='bar']"));
+            assertThat(defaultBarFills).contains("#104e8b");
+            assertThat(defaultBarFills).doesNotContain("#000", "#000000", "black");
+
+            page.getByLabel("Farbe").selectOption("multi");
+            var multiBarFills = normalizedFillAttributes(page.locator("[data-chart-type='bar']"));
+            assertThat(multiBarFills.stream().filter(fill -> fill.startsWith("#")).distinct().count())
+                    .isGreaterThan(1L);
+            assertThat(multiBarFills).doesNotContain("#000", "#000000", "black");
 
             page.getByLabel("Typ").selectOption("pie");
             page.waitForSelector("[data-chart-type='pie']");
@@ -611,6 +643,15 @@ class ExploreIslandParquetPlaywrightTest {
                 .evaluateAll("els => els.map(el => getComputedStyle(el).backgroundColor)");
     }
 
+    @SuppressWarnings("unchecked")
+    private static List<String> normalizedFillAttributes(Locator root) {
+        return ((List<String>) root.locator("[fill]")
+                .evaluateAll("els => els.map(el => el.getAttribute('fill')).filter(Boolean)"))
+                .stream()
+                .map(value -> value.trim().toLowerCase())
+                .toList();
+    }
+
     private static double cssPixels(String value) {
         return Double.parseDouble(value.replace("px", "").trim());
     }
@@ -695,7 +736,7 @@ class ExploreIslandParquetPlaywrightTest {
         @Primary
         CatalogSnapshot exploreFixtureCatalogSnapshot() {
             return CatalogSnapshot.of(
-                    new Catalog(List.of(fixtureDataset(), brokenParquetDataset()), List.of()),
+                    new Catalog(List.of(fixtureDataset(), brokenParquetDataset()), List.of(fixtureSeries())),
                     Instant.parse("2026-07-01T08:00:00Z"),
                     "explore-parquet-fixture");
         }
@@ -738,6 +779,39 @@ class ExploreIslandParquetPlaywrightTest {
                             URI.create("/datasets/explore-broken-parquet"),
                             URI.create("/explore-fixtures/missing.parquet"),
                             DistributionFormat.PARQUET)));
+        }
+
+        private static DatasetSeriesEntry fixtureSeries() {
+            var office = new Office("agi", "Amt für Geoinformation", Optional.of("AGI"));
+            var theme = new Theme("mobilitaet", "Mobilität");
+            var currentIssue = new DatasetIssueEntry(
+                    "explore-series-2026",
+                    "ÖV-Haltestellen Fixture 2026",
+                    "Kleine Parquet-Fixture als Serienausgabe.",
+                    office,
+                    office,
+                    List.of(theme),
+                    List.of("Parquet"),
+                    LocalDate.parse("2026-06-30"),
+                    AccessLevel.OPEN,
+                    metadata(),
+                    List.of(new DistributionLink(
+                            URI.create("/series/explore-series/issues/current"),
+                            URI.create("/explore-fixtures/ch.so.oev_haltestellen.parquet"),
+                            DistributionFormat.PARQUET)),
+                    "2026",
+                    true);
+            return new DatasetSeriesEntry(
+                    "explore-series",
+                    "ÖV-Haltestellen Serie",
+                    "Kleine Parquet-Fixture für Serienausgaben.",
+                    office,
+                    office,
+                    List.of(theme),
+                    List.of("Parquet"),
+                    AccessLevel.OPEN,
+                    CatalogEntryMetadata.empty(),
+                    List.of(currentIssue));
         }
 
         private static CatalogEntryMetadata metadata() {

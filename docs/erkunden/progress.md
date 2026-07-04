@@ -22,6 +22,55 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | SQL-Labor Autocomplete-Fix | DONE | Removed the local duplicate completion provider, bundled Monaco Suggest locally and wired SQLRooms tableSchemas/getLatestSchemas. |
 | SQL-Labor Status-Overlay | DONE | Removed the global ready badge, added centered loading/error overlay and renamed schema status to `Tabelle geladen`. |
 | SQL-Labor Loading-Overlay Styling | DONE | Styled the loading overlay with dark backdrop, white shadowless card, red indeterminate progressbar and restored workbench top border. |
+| SQL-Labor fuer Serienausgaben | DONE | Issue detail pages link to Explore; shared Explore controller methods resolve datasets and concrete series issues. |
+| SQL-Labor Diagrammfarben | DONE | Charts use configured additional colors, no red option, stable multi-color palette and clearer axis labels. |
+
+## SQL-Labor Diagrammfarben Entry
+
+Date: 2026-07-04
+
+Scope:
+
+- Added a shared chart color helper with the configured additional single colors and a non-red multi-color palette.
+- Replaced indirect Recharts `var(--color-value)` usage with explicit SVG `fill`/`stroke` values for bar, line, scatter and histogram charts.
+- Added a `Farbe` control to `ChartPanel`, honored allowed `preferredChart.color` values and limited `Farben neu` to multi-color chart types.
+- Applied stable multi-color cells to bars, histograms, Pie and Donut while keeping line/scatter single-color.
+- Clarified X/Y labels and allowed numeric X columns for line charts.
+- Documented that charts visualize only the current SQL result and do not synthesize missing categories such as municipalities.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 16 passed (16)`, `Tests 91 passed (91)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore assets; expected large DuckDB-Wasm chunk warning remains |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 37s`; includes non-black bar fills, multi-color bars and Pie/Donut colors |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 58s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+## SQL-Labor fuer Serienausgaben Entry
+
+Date: 2026-07-04
+
+Scope:
+
+- Added Explore URLs, breadcrumbs and page chrome for current and historical series issues.
+- Reused the existing `ExplorePageController` with one page handler, one JSON handler and a shared target resolver for dataset and issue routes.
+- Generalized Explore context/table generation from normal datasets to concrete dataset issues while keeping series root entries non-explorable.
+- Activated the `Erkunden` action on Open-Data issue detail pages; non-open issue pages keep the lock state.
+- Updated MVC, unit and Playwright coverage for issue links, route validation, JSON context shape and browser-local DuckDB execution on an issue route.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 16 passed (16)`, `Tests 88 passed (88)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.ExploreContextServiceTest' --tests 'ch.so.agi.datenportal.web.DetailPageVmFactoryTest' --tests 'ch.so.agi.datenportal.web.CatalogUrlFactoryTest' --tests 'ch.so.agi.datenportal.web.BreadcrumbFactoryTest'` | PASS, `BUILD SUCCESSFUL in 6s` |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.ExplorePageControllerMvcTest' --tests 'ch.so.agi.datenportal.web.CatalogDetailControllerMvcTest'` | PASS, `BUILD SUCCESSFUL in 4s` |
+| `./gradlew test --tests 'ch.so.agi.datenportal.explore.*' --tests 'ch.so.agi.datenportal.web.*'` | PASS, `BUILD SUCCESSFUL in 5s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 29s` |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 54s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
 
 ## SQL-Labor Loading-Overlay Styling Entry
 
@@ -490,6 +539,25 @@ Known limitations:
 
 - Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.
 - Large DuckDB-Wasm bundle warnings remain expected for the MVP.
+
+## SQL-Labor Beispielabfragen Dokumentation
+
+Date: 2026-07-04
+
+Scope:
+
+- Documented the generated SQL-Labor recipe categories, including `preview`, `profile`, `quality`, `category`, `numeric`, `time` and the currently unused `custom` category.
+- Documented recipe limits for null profiles, category grouping, numeric summaries and time-series recipes.
+- Documented the role-detection rules for category, measure, year and date columns.
+- Documented how recipe `preferredChart` interacts with chart inference for changed or manual SQL.
+- Added the concrete `ch_so_wasserqualitaet_grundwasser` dropdown state with category, numeric and time SQL examples.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| Markdown/diff review | PASS, documentation-only change; no code or runtime behavior changed |
+| `git diff --check` | PASS |
 
 ## Phase 8 Entry
 

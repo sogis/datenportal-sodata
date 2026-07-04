@@ -131,7 +131,7 @@ Verhalten ab Phase 4:
 - CSV-, XLSX- und Parquet-Export exportieren nur das aktuelle Query-Resultat, nicht die gesamte Quelldatei.
 - CSV bleibt ein clientseitiger Serializer mit Semikolon und CRLF. XLSX und Parquet laufen ueber DuckDB-Wasm `COPY` gegen das bereits row-limitierte `executedSql` und werden danach aus dem virtuellen DuckDB-Dateisystem gelesen.
 - Nutzertexte duerfen keine serverseitige Ausfuehrung versprechen.
-- Diagramme visualisieren nur das aktuelle SQL-Resultat. Resultatwerte bleiben fuer Tabelle und Exporte unveraendert; nur die Diagrammzeilen werden fuer Recharts normalisiert.
+- Diagramme visualisieren nur das aktuelle SQL-Resultat. Fehlende Kategorien wie Gemeinden werden nicht kuenstlich mit `0` ergaenzt; die SQL-Abfrage muss solche Zeilen selbst liefern, falls sie angezeigt werden sollen. Resultatwerte bleiben fuer Tabelle und Exporte unveraendert; nur die Diagrammzeilen werden fuer Recharts normalisiert.
 
 ## Query-Fehler
 
@@ -190,4 +190,4 @@ Der Produktions-Build verwendet `SqlMonacoEditor` aus `@sqlrooms/sql-editor@0.28
 
 ## SQLRooms Recharts in Tests
 
-`@sqlrooms/recharts@0.28.0` rendert die Diagrammansicht fuer aktuelle SQL-Resultate. Playwright prueft den echten Browserpfad inklusive Pie-/Donut-Farben; Vitest mockt die Recharts-Exports weiterhin, weil `@sqlrooms/recharts` extensionless interne ESM-Imports verwendet, die Vitest in dieser Konfiguration nicht direkt aufloest.
+`@sqlrooms/recharts@0.28.0` rendert die Diagrammansicht fuer aktuelle SQL-Resultate. Playwright prueft den echten Browserpfad inklusive nicht-schwarzer Balkenfarben, mehrfarbiger Balken sowie Pie-/Donut-Farben; Vitest mockt die Recharts-Exports weiterhin, weil `@sqlrooms/recharts` extensionless interne ESM-Imports verwendet, die Vitest in dieser Konfiguration nicht direkt aufloest.

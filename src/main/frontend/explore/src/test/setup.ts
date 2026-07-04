@@ -95,7 +95,8 @@ const chartComponent = (tag: string) => ({children}: {children?: React.ReactNode
   React.createElement(tag, {}, children);
 
 vi.mock('@sqlrooms/recharts', () => ({
-  Bar: chartComponent('div'),
+  Bar: ({children, fill}: {children?: React.ReactNode; fill?: string}) =>
+    React.createElement('div', {'data-testid': 'chart-bar', 'data-fill': fill}, children),
   BarChart: chartComponent('div'),
   CartesianGrid: chartComponent('div'),
   Cell: ({fill}: {fill?: string}) => React.createElement('span', {'data-testid': 'chart-cell', 'data-fill': fill}),
@@ -103,11 +104,11 @@ vi.mock('@sqlrooms/recharts', () => ({
     React.createElement('div', {className, 'data-testid': 'chart-container'}, children),
   ChartTooltip: chartComponent('div'),
   ChartTooltipContent: chartComponent('div'),
-  Line: chartComponent('div'),
+  Line: ({stroke}: {stroke?: string}) => React.createElement('div', {'data-testid': 'chart-line', 'data-stroke': stroke}),
   LineChart: chartComponent('div'),
   Pie: chartComponent('div'),
   PieChart: chartComponent('div'),
-  Scatter: chartComponent('div'),
+  Scatter: ({fill}: {fill?: string}) => React.createElement('div', {'data-testid': 'chart-scatter', 'data-fill': fill}),
   ScatterChart: chartComponent('div'),
   XAxis: chartComponent('div'),
   YAxis: chartComponent('div')

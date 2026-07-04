@@ -58,7 +58,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datensatz-Zeitliche Abdeckung | `components/metadataSection.jte` | `DatasetDetailPageVm.temporalCoverage` | unframed Metadatenbereich mit Stichtag oder Zeitraum |
 | Datensatz-Themen und Schlagworte | `components/metadataSection.jte` | `DatasetDetailPageVm.topics` | unframed Metadatenbereich, Themen und Schlagworte komma-separiert |
 | Datensatz-Zuständigkeiten und Kontakt | `components/contactMetadataSection.jte` | `DatasetDetailPageVm.responsibilitiesContact` | unframed Metadatenbereich, Datenproduzent, Kontakt und Herausgeber mehrzeilig mit Links |
-| Datensatz-Seitenpanel `Daten nutzen` | `components/detailActionPanel.jte` | `DatasetDetailPageVm.structureQualityOriginHref`, `IssueDetailPageVm.structureQualityOriginHref` | unframed Seitenpanel mit vertikalen Nutzungshinweisen und sekundären Textlinks |
+| Datensatz-Seitenpanel `Daten nutzen` | `components/detailActionPanel.jte` | `DatasetDetailPageVm.structureQualityOriginHref`, `DatasetDetailPageVm.exploreHref`, `IssueDetailPageVm.structureQualityOriginHref`, `IssueDetailPageVm.exploreHref` | unframed Seitenpanel mit vertikalen Nutzungshinweisen und sekundären Textlinks |
 | Downloadbereich | `components/detailDownloadPanel.jte` | `DownloadLinkVm` | CSV/XLSX/Parquet oder Schloss fuer nicht offene Eintraege |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
 | Serien-Ausgabenliste | `components/seriesIssues.jte` | `SeriesIssuesVm` | unframed aktuelle/ältere Ausgaben auf der Serienübersicht mit Trennlinien |

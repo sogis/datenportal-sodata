@@ -12,6 +12,7 @@ export interface ChartSuggestion {
   type: ResultChartType;
   x?: string;
   y?: string;
+  color?: string;
   title?: string;
   reason: string;
   confidence: number;

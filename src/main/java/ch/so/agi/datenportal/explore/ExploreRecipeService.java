@@ -53,7 +53,7 @@ public final class ExploreRecipeService {
                 "Anzahl Datensätze",
                 "Zählt alle Zeilen der Tabelle.",
                 ExploreRecipeCategory.PROFILE,
-                "SELECT count(*) as anzahl\nFROM " + tableName(table) + ";",
+                "SELECT count(*) AS anzahl\nFROM " + tableName(table) + ";",
                 Optional.empty());
     }
 
@@ -64,7 +64,7 @@ public final class ExploreRecipeService {
                 "Tabellenstruktur",
                 "Beschreibt die Spalten der Tabelle.",
                 ExploreRecipeCategory.PROFILE,
-                "describe " + tableName(table) + ";",
+                "DESCRIBE " + tableName(table) + ";",
                 Optional.empty());
     }
 
@@ -73,12 +73,12 @@ public final class ExploreRecipeService {
             return Optional.empty();
         }
 
-        StringBuilder sql = new StringBuilder("SELECT\n  count(*) as zeilen");
+        StringBuilder sql = new StringBuilder("SELECT\n  count(*) AS zeilen");
         table.columns().stream()
                 .limit(NULL_PROFILE_COLUMN_LIMIT)
-                .forEach(column -> sql.append(",\n  count(*) filter (where ")
+                .forEach(column -> sql.append(",\n  count(*) FILTER (WHERE ")
                         .append(columnName(column))
-                        .append(" is null) as ")
+                        .append(" IS NULL) AS ")
                         .append(sqlNameSanitizer.quoteIdentifier(sqlNameSanitizer.toSafeTableName(column.name()) + "_fehlt")));
         sql.append("\nFROM ").append(tableName(table)).append(";");
 
@@ -99,15 +99,15 @@ public final class ExploreRecipeService {
                 .map(column -> recipe(
                         table,
                         "category-" + sqlNameSanitizer.toSafeTableName(column.name()),
-                        "Nach " + column.name() + " gruppieren",
+                        "Nach " + highlightedColumnName(column) + " gruppieren",
                         "Zählt Datensätze pro Kategorie.",
                         ExploreRecipeCategory.CATEGORY,
-                        "SELECT " + columnName(column) + ", count(*) as anzahl\n"
+                        "SELECT " + columnName(column) + ", count(*) AS anzahl\n"
                                 + "FROM " + tableName(table) + "\n"
-                                + "where " + columnName(column) + " is not null\n"
-                                + "group by " + columnName(column) + "\n"
-                                + "order by anzahl desc\n"
-                                + "limit 50;",
+                                + "WHERE " + columnName(column) + " IS NOT NULL\n"
+                                + "GROUP BY " + columnName(column) + "\n"
+                                + "ORDER BY anzahl DESC\n"
+                                + "LIMIT 50;",
                         Optional.of(new ExploreChartConfigDto(
                                 ExploreChartType.BAR,
                                 Optional.of(column.name()),
@@ -124,15 +124,15 @@ public final class ExploreRecipeService {
                 .map(column -> recipe(
                         table,
                         "numeric-" + sqlNameSanitizer.toSafeTableName(column.name()),
-                        column.name() + " zusammenfassen",
+                        highlightedColumnName(column) + " zusammenfassen",
                         "Berechnet Minimum, Durchschnitt und Maximum.",
                         ExploreRecipeCategory.NUMERIC,
                         "SELECT\n"
-                                + "  min(" + columnName(column) + ") as minimum,\n"
-                                + "  avg(" + columnName(column) + ") as durchschnitt,\n"
-                                + "  max(" + columnName(column) + ") as maximum\n"
+                                + "  min(" + columnName(column) + ") AS minimum,\n"
+                                + "  avg(" + columnName(column) + ") AS durchschnitt,\n"
+                                + "  max(" + columnName(column) + ") AS maximum\n"
                                 + "FROM " + tableName(table) + "\n"
-                                + "where " + columnName(column) + " is not null;",
+                                + "WHERE " + columnName(column) + " IS NOT NULL;",
                         Optional.empty()))
                 .toList();
     }
@@ -145,14 +145,14 @@ public final class ExploreRecipeService {
                 .map(column -> recipe(
                         table,
                         "time-" + sqlNameSanitizer.toSafeTableName(column.name()),
-                        "Zeitreihe nach " + column.name(),
+                        "Zeitreihe nach " + highlightedColumnName(column),
                         "Zählt Datensätze pro Zeitwert.",
                         ExploreRecipeCategory.TIME,
-                        "SELECT " + columnName(column) + ", count(*) as anzahl\n"
+                        "SELECT " + columnName(column) + ", count(*) AS anzahl\n"
                                 + "FROM " + tableName(table) + "\n"
-                                + "where " + columnName(column) + " is not null\n"
-                                + "group by " + columnName(column) + "\n"
-                                + "order by " + columnName(column) + ";",
+                                + "WHERE " + columnName(column) + " IS NOT NULL\n"
+                                + "GROUP BY " + columnName(column) + "\n"
+                                + "ORDER BY " + columnName(column) + ";",
                         Optional.of(new ExploreChartConfigDto(
                                 ExploreChartType.LINE,
                                 Optional.of(column.name()),
@@ -187,5 +187,9 @@ public final class ExploreRecipeService {
 
     private String columnName(ExploreColumnDto column) {
         return sqlNameSanitizer.quoteIdentifier(column.name());
+    }
+
+    private static String highlightedColumnName(ExploreColumnDto column) {
+        return "«" + column.name() + "»";
     }
 }

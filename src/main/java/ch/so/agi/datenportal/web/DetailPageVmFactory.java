@@ -126,6 +126,9 @@ public final class DetailPageVmFactory {
                         ? urlFactory.currentIssueStructureQualityOrigin(series.identifier())
                         : urlFactory.issueStructureQualityOrigin(series.identifier(), issue.identifier()),
                 currentIssue
+                        ? urlFactory.currentIssueExplore(series.identifier())
+                        : urlFactory.issueExplore(series.identifier(), issue.identifier()),
+                currentIssue
                         ? urlFactory.currentIssueUsage(series.identifier())
                         : urlFactory.issueUsage(series.identifier(), issue.identifier()),
                 currentIssue,

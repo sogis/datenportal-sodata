@@ -106,6 +106,15 @@ public class PageChromeFactory {
                 footerViewModelFactory.create());
     }
 
+    public PageChromeVm issueExplorePage(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        return new PageChromeVm(
+                "Erkunden | " + issue.title() + " | Datenportal",
+                headerViewModelFactory.forDetailPage(),
+                breadcrumbFactory.issueExplore(series, issue),
+                webAssetsVmFactory.create(),
+                footerViewModelFactory.create());
+    }
+
     public PageChromeVm notFoundPage() {
         return errorPage("Seite nicht gefunden | Datenportal", "Seite nicht gefunden");
     }

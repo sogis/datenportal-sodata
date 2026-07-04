@@ -20,12 +20,14 @@ export function LineResultChart({
   rows,
   x,
   y,
-  title
+  title,
+  color
 }: {
   rows: Array<Record<string, unknown>>;
   x: string;
   y: string;
   title?: string;
+  color: string;
 }) {
   return (
     <ChartContainer className="dp-explore-chart__canvas" config={chartConfig}>
@@ -38,7 +40,7 @@ export function LineResultChart({
           type="monotone"
           dataKey={y}
           name={title ?? y}
-          stroke="var(--color-value)"
+          stroke={color}
           strokeWidth={2}
           dot={{r: 2}}
           isAnimationActive={false}

@@ -7,6 +7,7 @@ import {
   Pie,
   PieChart
 } from '@sqlrooms/recharts';
+import {stablePaletteColor} from './chartColors';
 
 const chartConfig = {
   value: {
@@ -28,6 +29,7 @@ export function PieResultChart({
   y,
   title,
   variant,
+  color,
   colorSeed
 }: {
   rows: Array<Record<string, unknown>>;
@@ -35,9 +37,10 @@ export function PieResultChart({
   y: string;
   title?: string;
   variant: 'pie' | 'donut';
-  colorSeed: string;
+  color: string;
+  colorSeed?: string;
 }) {
-  const chartRows = buildPieRows(rows, x, y, colorSeed);
+  const chartRows = buildPieRows(rows, x, y, color, colorSeed);
   const innerRadius = variant === 'donut' ? '56%' : 0;
 
   return (
@@ -84,7 +87,8 @@ export function buildPieRows(
   rows: Array<Record<string, unknown>>,
   x: string,
   y: string,
-  colorSeed: string
+  color: string,
+  colorSeed?: string
 ): PieChartRow[] {
   return rows
     .map((row, index) => {
@@ -97,7 +101,7 @@ export function buildPieRows(
         __dpKey: `${index}:${label}`,
         __dpLabel: label,
         __dpValue: value,
-        __dpFill: segmentColor(label, index, colorSeed)
+        __dpFill: colorSeed ? stablePaletteColor(index, colorSeed) : color
       };
     })
     .filter((row): row is PieChartRow => row !== null);
@@ -129,22 +133,6 @@ function formatSegmentLabel(value: unknown, index: number): string {
     return value.toISOString().slice(0, 10);
   }
   return String(value);
-}
-
-function segmentColor(label: string, index: number, colorSeed: string): string {
-  const offset = hashString(colorSeed) % 360;
-  const jitter = hashString(`${colorSeed}:${label}`) % 43;
-  const hue = (offset + index * 137 + jitter) % 360;
-  return `hsl(${hue}, 64%, 47%)`;
-}
-
-function hashString(value: string): number {
-  let hash = 2166136261;
-  for (let index = 0; index < value.length; index++) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
 }
 
 function formatSwissNumber(value: number): string {

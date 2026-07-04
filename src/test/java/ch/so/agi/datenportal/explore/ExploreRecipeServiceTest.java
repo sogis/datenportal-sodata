@@ -8,6 +8,20 @@ import org.junit.jupiter.api.Test;
 
 class ExploreRecipeServiceTest {
 
+    private static final List<String> LOWERCASE_KEYWORD_PATTERNS = List.of(
+            "\\bselect\\b",
+            "\\bfrom\\b",
+            "\\bdescribe\\b",
+            "\\bas\\b",
+            "\\bfilter\\b",
+            "\\bwhere\\b",
+            "\\bis\\b",
+            "\\bnull\\b",
+            "\\bgroup\\s+by\\b",
+            "\\border\\s+by\\b",
+            "\\bdesc\\b",
+            "\\blimit\\b");
+
     private final ExploreRecipeService service = new ExploreRecipeService(
             new ExploreSqlNameSanitizer(),
             properties());
@@ -46,8 +60,8 @@ class ExploreRecipeServiceTest {
 
         assertThat(categoryRecipe.sql())
                 .contains("FROM gemeinden")
-                .contains("SELECT \"bezirk\", count(*) as anzahl")
-                .contains("group by \"bezirk\"");
+                .contains("SELECT \"bezirk\", count(*) AS anzahl")
+                .contains("GROUP BY \"bezirk\"");
         assertThat(categoryRecipe.preferredChart())
                 .get()
                 .extracting(ExploreChartConfigDto::type)
@@ -55,14 +69,66 @@ class ExploreRecipeServiceTest {
     }
 
     @Test
-    void generatedSqlWritesSelectAndFromKeywordsUppercase() {
+    void generatedSqlWritesKeywordsUppercase() {
         var recipes = service.generateRecipes(List.of(table()));
 
         assertThat(recipes)
                 .extracting(ExploreRecipeDto::sql)
-                .allSatisfy(sql -> assertThat(sql)
-                        .doesNotContain("select")
-                        .doesNotContain("\nfrom "));
+                .allSatisfy(sql -> LOWERCASE_KEYWORD_PATTERNS.forEach(pattern ->
+                        assertThat(sql).doesNotContainPattern(pattern)));
+    }
+
+    @Test
+    void generatedSqlUsesUppercaseKeywordsInAllRecipeTypes() {
+        var recipes = service.generateRecipes(List.of(table()));
+
+        assertThat(sqlFor(recipes, "gemeinden-count"))
+                .isEqualTo("SELECT count(*) AS anzahl\nFROM gemeinden;");
+        assertThat(sqlFor(recipes, "gemeinden-describe"))
+                .isEqualTo("DESCRIBE gemeinden;");
+        assertThat(sqlFor(recipes, "gemeinden-null-profile"))
+                .isEqualTo("""
+                        SELECT
+                          count(*) AS zeilen,
+                          count(*) FILTER (WHERE "bezirk" IS NULL) AS "bezirk_fehlt",
+                          count(*) FILTER (WHERE "flaeche_ha" IS NULL) AS "flaeche_ha_fehlt",
+                          count(*) FILTER (WHERE "jahr" IS NULL) AS "jahr_fehlt"
+                        FROM gemeinden;""");
+        assertThat(sqlFor(recipes, "gemeinden-category-bezirk"))
+                .isEqualTo("""
+                        SELECT "bezirk", count(*) AS anzahl
+                        FROM gemeinden
+                        WHERE "bezirk" IS NOT NULL
+                        GROUP BY "bezirk"
+                        ORDER BY anzahl DESC
+                        LIMIT 50;""");
+        assertThat(sqlFor(recipes, "gemeinden-numeric-flaeche_ha"))
+                .isEqualTo("""
+                        SELECT
+                          min("flaeche_ha") AS minimum,
+                          avg("flaeche_ha") AS durchschnitt,
+                          max("flaeche_ha") AS maximum
+                        FROM gemeinden
+                        WHERE "flaeche_ha" IS NOT NULL;""");
+        assertThat(sqlFor(recipes, "gemeinden-time-jahr"))
+                .isEqualTo("""
+                        SELECT "jahr", count(*) AS anzahl
+                        FROM gemeinden
+                        WHERE "jahr" IS NOT NULL
+                        GROUP BY "jahr"
+                        ORDER BY "jahr";""");
+    }
+
+    @Test
+    void generatedRecipeTitlesHighlightColumnNames() {
+        var recipes = service.generateRecipes(List.of(table()));
+
+        assertThat(titleFor(recipes, "gemeinden-category-bezirk"))
+                .isEqualTo("Nach «bezirk» gruppieren");
+        assertThat(titleFor(recipes, "gemeinden-numeric-flaeche_ha"))
+                .isEqualTo("«flaeche_ha» zusammenfassen");
+        assertThat(titleFor(recipes, "gemeinden-time-jahr"))
+                .isEqualTo("Zeitreihe nach «jahr»");
     }
 
     @Test
@@ -98,6 +164,22 @@ class ExploreRecipeServiceTest {
                 Optional.empty(),
                 Optional.empty(),
                 List.of(role));
+    }
+
+    private static String sqlFor(List<ExploreRecipeDto> recipes, String id) {
+        return recipes.stream()
+                .filter(recipe -> recipe.id().equals(id))
+                .findFirst()
+                .orElseThrow()
+                .sql();
+    }
+
+    private static String titleFor(List<ExploreRecipeDto> recipes, String id) {
+        return recipes.stream()
+                .filter(recipe -> recipe.id().equals(id))
+                .findFirst()
+                .orElseThrow()
+                .title();
     }
 
     private static ExploreProperties properties() {

@@ -33,6 +33,7 @@ export function inferChartSuggestion(
       type: validPreferred.type,
       x: validPreferred.x,
       y: validPreferred.y,
+      color: validPreferred.color,
       title: validPreferred.title,
       reason: 'Vorgabe der Beispielabfrage',
       confidence: 1
@@ -243,7 +244,7 @@ function isKnownChartType(type: string): type is ResultChartType {
   return type === 'bar' || type === 'line' || type === 'scatter' || type === 'histogram' || type === 'pie' || type === 'donut';
 }
 
-function isDateLikeResultColumn(column: ResultColumn, rows: Array<Record<string, unknown>>): boolean {
+export function isDateLikeResultColumn(column: ResultColumn, rows: Array<Record<string, unknown>>): boolean {
   return column.typeCategory === 'date' || isYearLikeColumn(column.name, rows) || isDateLikeColumn(column.name, rows);
 }
 

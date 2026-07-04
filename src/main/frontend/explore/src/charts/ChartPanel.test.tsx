@@ -2,6 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {describe, expect, it} from 'vitest';
 import {ChartPanel} from './ChartPanel';
+import {CHART_SINGLE_COLOR_OPTIONS, MULTI_CHART_COLOR_OPTION, MULTI_CHART_COLOR_PALETTE} from './chartColors';
 import type {QueryResultState} from '../results/queryResultTypes';
 
 describe('ChartPanel', () => {
@@ -23,7 +24,64 @@ describe('ChartPanel', () => {
     expect(screen.getByDisplayValue('Balken')).toBeInTheDocument();
     expect(screen.getByDisplayValue('gemeinde')).toBeInTheDocument();
     expect(screen.getByDisplayValue('anzahl')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Dunkelblau')).toBeInTheDocument();
+    expect(screen.getByTestId('chart-bar')).toHaveAttribute('data-fill', '#104E8B');
     expect(document.querySelector('[data-chart-type="bar"]')).toBeInTheDocument();
+  });
+
+  it('offers only the configured additional colors as single colors', async () => {
+    const user = userEvent.setup();
+    render(<ChartPanel result={successResult(['gemeinde', 'anzahl'], [
+      {gemeinde: 'Solothurn', anzahl: 3},
+      {gemeinde: 'Olten', anzahl: 2},
+      {gemeinde: 'Grenchen', anzahl: 1}
+    ])} />);
+
+    const colorSelect = screen.getByLabelText('Farbe') as HTMLSelectElement;
+    const labels = Array.from(colorSelect.options).map((option) => option.text);
+
+    expect(labels).toEqual([
+      ...CHART_SINGLE_COLOR_OPTIONS.map((option) => option.label),
+      MULTI_CHART_COLOR_OPTION.label
+    ]);
+    expect(labels.join(' ')).not.toMatch(/rot|red/i);
+
+    await user.selectOptions(colorSelect, 'deepSkyBlue2');
+    expect(screen.getByTestId('chart-bar')).toHaveAttribute('data-fill', '#00B2EE');
+
+    await user.selectOptions(colorSelect, MULTI_CHART_COLOR_OPTION.value);
+    const barColors = screen.getAllByTestId('chart-cell')
+      .map((cell) => cell.getAttribute('data-fill'))
+      .filter((color): color is string => color !== null);
+    expect(new Set(barColors).size).toBeGreaterThan(1);
+    barColors.forEach((color) => expect(MULTI_CHART_COLOR_PALETTE).toContain(color));
+    expect(barColors).not.toContain('#000000');
+  });
+
+  it('uses an allowed preferred chart color', () => {
+    render(<ChartPanel
+      result={successResult(['gemeinde', 'anzahl'], [
+        {gemeinde: 'Solothurn', anzahl: 1},
+        {gemeinde: 'Olten', anzahl: 2}
+      ])}
+      preferred={{type: 'bar', x: 'gemeinde', y: 'anzahl', color: '#E1D700'}}
+    />);
+
+    expect(screen.getByDisplayValue('Gold')).toBeInTheDocument();
+    expect(screen.getByTestId('chart-bar')).toHaveAttribute('data-fill', '#E1D700');
+  });
+
+  it('accepts legacy preferred chart color labels', () => {
+    render(<ChartPanel
+      result={successResult(['gemeinde', 'anzahl'], [
+        {gemeinde: 'Solothurn', anzahl: 1},
+        {gemeinde: 'Olten', anzahl: 2}
+      ])}
+      preferred={{type: 'bar', x: 'gemeinde', y: 'anzahl', color: 'DeepSkyBlue 2'}}
+    />);
+
+    expect(screen.getByDisplayValue('Hellblau')).toBeInTheDocument();
+    expect(screen.getByTestId('chart-bar')).toHaveAttribute('data-fill', '#00B2EE');
   });
 
   it('changes chart type, axis fields and row limit', async () => {
@@ -35,6 +93,12 @@ describe('ChartPanel', () => {
 
     await user.selectOptions(screen.getByDisplayValue('Balken'), 'scatter');
     expect(document.querySelector('[data-chart-type="scatter"]')).toBeInTheDocument();
+    expect(screen.getByLabelText('X (Zahl)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Y (Zahl)')).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByDisplayValue('Punkte'), 'line');
+    expect(document.querySelector('[data-chart-type="line"]')).toBeInTheDocument();
+    expect(screen.getByLabelText('X (Zeit/Zahl)')).toBeInTheDocument();
 
     await user.selectOptions(screen.getByLabelText('Zeilen'), '50');
     expect(screen.getByDisplayValue('50')).toBeInTheDocument();
@@ -48,6 +112,7 @@ describe('ChartPanel', () => {
       {gemeinde: 'Grenchen', anzahl: 1}
     ])} />);
 
+    await user.selectOptions(screen.getByLabelText('Farbe'), MULTI_CHART_COLOR_OPTION.value);
     await user.selectOptions(screen.getByLabelText('Typ'), 'pie');
 
     expect(document.querySelector('[data-chart-type="pie"]')).toBeInTheDocument();

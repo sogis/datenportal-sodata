@@ -19,11 +19,11 @@ const contextWithRecipes = {
     },
     {
       id: 'ch_so_bauinventar-gemeinde-count',
-      title: 'Nach Gemeinde',
+      title: 'Nach «gemeindename» gruppieren',
       description: 'Zählt Datensätze pro Gemeinde.',
       tableId: 'ch_so_bauinventar',
       category: 'category' as const,
-      sql: 'SELECT gemeindename, count(*) as anzahl\nFROM ch_so_bauinventar\nGROUP BY gemeindename;',
+      sql: 'SELECT gemeindename, count(*) AS anzahl\nFROM ch_so_bauinventar\nGROUP BY gemeindename;',
       preferredChart: {
         type: 'pie' as const,
         x: 'gemeindename',
@@ -64,6 +64,7 @@ describe('SqlLaboratory', () => {
     expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__export')).toBeInTheDocument();
     expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__leading')).toBeInTheDocument();
     expect(screen.getByLabelText('Beispielabfrage auswählen')).toHaveValue('ch_so_bauinventar-preview');
+    expect(screen.getByRole('option', {name: 'Nach «gemeindename» gruppieren'})).toBeInTheDocument();
     expect(screen.getByRole('group', {name: 'Resultatansicht'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Tabelle'})).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', {name: 'Diagramm'})).toHaveAttribute('aria-pressed', 'false');
@@ -79,7 +80,7 @@ describe('SqlLaboratory', () => {
     await user.selectOptions(screen.getByLabelText('Beispielabfrage auswählen'), 'ch_so_bauinventar-gemeinde-count');
 
     expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue(
-      'SELECT gemeindename, count(*) as anzahl\nFROM ch_so_bauinventar\nGROUP BY gemeindename;'
+      'SELECT gemeindename, count(*) AS anzahl\nFROM ch_so_bauinventar\nGROUP BY gemeindename;'
     );
     expect(query).not.toHaveBeenCalled();
   });

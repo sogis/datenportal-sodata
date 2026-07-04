@@ -8,6 +8,8 @@ import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
+import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
+import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
@@ -65,6 +67,50 @@ class ExploreContextServiceTest {
     }
 
     @Test
+    void contextCanUseConcreteSeriesIssue() {
+        DatasetIssueEntry currentIssue = issue(
+                "ch.so.gemeinden_2026",
+                "Gemeinden 2026",
+                "2026",
+                true,
+                List.of(distribution("ch.so.gemeinden_2026", DistributionFormat.PARQUET)),
+                metadataWithAttributes());
+        DatasetIssueEntry historicalIssue = issue(
+                "ch.so.gemeinden_2025",
+                "Gemeinden 2025",
+                "2025",
+                false,
+                List.of(distribution("ch.so.gemeinden_2025", DistributionFormat.PARQUET)),
+                CatalogEntryMetadata.empty());
+        DatasetSeriesEntry series = new DatasetSeriesEntry(
+                "ch.so.gemeinden",
+                "Gemeinden",
+                "Gemeinden nach Ausgabe.",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of("Keyword"),
+                AccessLevel.OPEN,
+                CatalogEntryMetadata.empty(),
+                List.of(currentIssue, historicalIssue));
+        var service = service(new Catalog(List.of(), List.of(series)));
+
+        ExploreContextDto context = service.buildContext(
+                currentIssue,
+                "/series/ch.so.gemeinden/issues/current");
+
+        assertThat(context.datasetId()).isEqualTo("ch.so.gemeinden_2026");
+        assertThat(context.title()).isEqualTo("Gemeinden 2026");
+        assertThat(context.canonicalUrl()).isEqualTo("/series/ch.so.gemeinden/issues/current");
+        assertThat(context.tables()).hasSize(1);
+        assertThat(context.tables().getFirst().name()).isEqualTo("ch_so_gemeinden_2026");
+        assertThat(context.tables().getFirst().parquetUrl())
+                .isEqualTo("https://data.so.ch/download/ch.so.gemeinden_2026.parquet");
+        assertThat(context.recipes()).isNotEmpty();
+        assertThat(context.recipes().getFirst().sql()).isEqualTo("SELECT *\nFROM ch_so_gemeinden_2026;");
+    }
+
+    @Test
     void embeddedJsonEscapesScriptBreakingSequences() {
         var service = service(dataset(
                 "script",
@@ -81,8 +127,12 @@ class ExploreContextServiceTest {
     }
 
     private static ExploreContextService service(DatasetEntry dataset) {
+        return service(new Catalog(List.of(dataset), List.of()));
+    }
+
+    private static ExploreContextService service(Catalog catalog) {
         var catalogService = new CatalogService(CatalogSnapshot.of(
-                new Catalog(List.of(dataset), List.of()),
+                catalog,
                 Instant.parse("2026-07-01T08:00:00Z"),
                 "test"));
         var sanitizer = new ExploreSqlNameSanitizer();
@@ -135,10 +185,37 @@ class ExploreContextServiceTest {
     }
 
     private static DistributionLink distribution(DistributionFormat format) {
+        return distribution("ch.so.gemeinden", format);
+    }
+
+    private static DistributionLink distribution(String identifier, DistributionFormat format) {
         return new DistributionLink(
-                URI.create("https://data.so.ch/dataset/ch.so.gemeinden"),
-                URI.create("https://data.so.ch/download/ch.so.gemeinden." + format.label().toLowerCase()),
+                URI.create("https://data.so.ch/dataset/" + identifier),
+                URI.create("https://data.so.ch/download/" + identifier + "." + format.label().toLowerCase()),
                 format);
+    }
+
+    private static DatasetIssueEntry issue(
+            String identifier,
+            String title,
+            String issueLabel,
+            boolean currentIssue,
+            List<DistributionLink> distributions,
+            CatalogEntryMetadata metadata) {
+        return new DatasetIssueEntry(
+                identifier,
+                title,
+                "Beschreibung",
+                office(),
+                office(),
+                List.of(theme()),
+                List.of("Keyword"),
+                LocalDate.parse("2026-06-30"),
+                AccessLevel.OPEN,
+                metadata,
+                distributions,
+                issueLabel,
+                currentIssue);
     }
 
     private static Office office() {

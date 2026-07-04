@@ -20,12 +20,14 @@ export function ScatterResultChart({
   rows,
   x,
   y,
-  title
+  title,
+  color
 }: {
   rows: Array<Record<string, unknown>>;
   x: string;
   y: string;
   title?: string;
+  color: string;
 }) {
   return (
     <ChartContainer className="dp-explore-chart__canvas" config={chartConfig}>
@@ -34,7 +36,7 @@ export function ScatterResultChart({
         <XAxis dataKey={x} name={x} type="number" tickLine={false} axisLine={false} />
         <YAxis dataKey={y} name={y} type="number" tickLine={false} axisLine={false} width={52} />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <Scatter name={title ?? y} data={rows} fill="var(--color-value)" isAnimationActive={false} />
+        <Scatter name={title ?? y} data={rows} fill={color} isAnimationActive={false} />
       </ScatterChart>
     </ChartContainer>
   );

@@ -1,6 +1,8 @@
 package ch.so.agi.datenportal.explore;
 
+import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
+import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.service.CatalogService;
 import ch.so.agi.datenportal.web.CatalogNotFoundException;
 import ch.so.agi.datenportal.web.CatalogUrlFactory;
@@ -43,12 +45,23 @@ public final class ExploreContextService {
             if (!(entry instanceof DatasetEntry dataset)) {
                 throw notFound(datasetId);
             }
-            return buildContext(dataset);
+            return buildContext(dataset, urlFactory.datasetDetail(dataset.identifier()));
         });
     }
 
     public String buildContextJson(String datasetId) {
         return toEmbeddableJson(buildContext(datasetId));
+    }
+
+    public ExploreContextDto buildContext(CatalogEntry entry, String canonicalUrl) {
+        if (!(entry instanceof DatasetEntry || entry instanceof DatasetIssueEntry)) {
+            throw notFound(entry.identifier());
+        }
+        return buildExplorableContext(entry, canonicalUrl);
+    }
+
+    public String buildContextJson(CatalogEntry entry, String canonicalUrl) {
+        return toEmbeddableJson(buildContext(entry, canonicalUrl));
     }
 
     public String toEmbeddableJson(ExploreContextDto context) {
@@ -58,20 +71,20 @@ public final class ExploreContextService {
                 .replace("-->", "--\\u003E");
     }
 
-    private ExploreContextDto buildContext(DatasetEntry dataset) {
-        List<ExploreTableDto> tables = properties.enabled() ? tableService.buildTables(dataset) : List.of();
+    private ExploreContextDto buildExplorableContext(CatalogEntry entry, String canonicalUrl) {
+        List<ExploreTableDto> tables = properties.enabled() ? tableService.buildTables(entry) : List.of();
         var source = new ExploreContextSource(
-                dataset.identifier(),
-                dataset.title(),
-                urlFactory.datasetDetail(dataset.identifier()));
+                entry.identifier(),
+                entry.title(),
+                canonicalUrl);
         return new ExploreContextDto(
                 1,
-                dataset.identifier(),
-                dataset.title(),
-                Optional.of(dataset.description()),
+                entry.identifier(),
+                entry.title(),
+                Optional.of(entry.description()),
                 source.canonicalUrl(),
-                Optional.of(dataset.modified().toString()),
-                dataset.metadata().licenseUri().map(Object::toString),
+                Optional.of(entry.modified().toString()),
+                entry.metadata().licenseUri().map(Object::toString),
                 properties.execution(),
                 tables,
                 recipeService.generateRecipes(tables),

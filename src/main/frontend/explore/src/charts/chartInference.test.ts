@@ -91,6 +91,20 @@ describe('chart inference', () => {
       .toMatchObject({type: 'bar', x: 'gemeinde', y: 'anzahl'});
   });
 
+  it('passes a preferred chart color through when the preferred chart is valid', () => {
+    const resultColumns = columns([
+      ['gemeinde', 'string'],
+      ['anzahl', 'number']
+    ]);
+
+    expect(inferChartSuggestion(resultColumns, [{gemeinde: 'Olten', anzahl: 2}], {
+      type: 'bar',
+      x: 'gemeinde',
+      y: 'anzahl',
+      color: '#E1D700'
+    })).toMatchObject({type: 'bar', x: 'gemeinde', y: 'anzahl', color: '#E1D700'});
+  });
+
   it('uses valid preferred pie and donut charts', () => {
     const resultColumns = columns([
       ['gemeinde', 'string'],

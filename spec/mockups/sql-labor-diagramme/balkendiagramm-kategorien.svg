@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Balkendiagramm: Kategorien vergleichen</title>
+  <desc id="desc">Unterrichtsfolien-Mockup fuer ein SQL-Labor. Das Balkendiagramm vergleicht Bestellungen nach Status mit getrennten Balken fuer Kategorien.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f6f8fb; }
+      .panel { fill: #ffffff; stroke: #d8dee8; stroke-width: 2; }
+      .title { fill: #172033; font: 700 54px Arial, sans-serif; }
+      .subtitle { fill: #4f5d73; font: 400 26px Arial, sans-serif; }
+      .axis { stroke: #5d6980; stroke-width: 3; }
+      .grid { stroke: #e5eaf2; stroke-width: 2; }
+      .tick { fill: #5a667a; font: 400 22px Arial, sans-serif; }
+      .axis-label { fill: #30394d; font: 700 24px Arial, sans-serif; }
+      .bar { fill: #2f80ed; }
+      .bar-label { fill: #172033; font: 700 22px Arial, sans-serif; text-anchor: middle; }
+      .sql-box { fill: #182235; }
+      .sql-text { fill: #e8eef8; font: 400 24px "SFMono-Regular", Consolas, monospace; }
+      .hint { fill: #fff7e6; stroke: #f0c36a; stroke-width: 2; }
+      .hint-text { fill: #5c4300; font: 700 26px Arial, sans-serif; }
+      .badge { fill: #e8f1fe; stroke: #a9cffb; stroke-width: 2; }
+      .badge-text { fill: #174a8b; font: 700 22px Arial, sans-serif; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="900"/>
+  <rect class="panel" x="64" y="54" width="1472" height="792" rx="8"/>
+
+  <text class="title" x="112" y="132">Balkendiagramm: Kategorien vergleichen</text>
+  <text class="subtitle" x="112" y="178">Beispiel: Wie viele Bestellungen gibt es pro Status?</text>
+  <rect class="badge" x="1210" y="92" width="238" height="48" rx="6"/>
+  <text class="badge-text" x="1329" y="124" text-anchor="middle">Kategorien</text>
+
+  <g transform="translate(142 242)">
+    <line class="grid" x1="100" y1="360" x2="760" y2="360"/>
+    <line class="grid" x1="100" y1="270" x2="760" y2="270"/>
+    <line class="grid" x1="100" y1="180" x2="760" y2="180"/>
+    <line class="grid" x1="100" y1="90" x2="760" y2="90"/>
+    <line class="grid" x1="100" y1="0" x2="760" y2="0"/>
+
+    <line class="axis" x1="100" y1="360" x2="760" y2="360"/>
+    <line class="axis" x1="100" y1="360" x2="100" y2="0"/>
+
+    <text class="tick" x="70" y="368" text-anchor="end">0</text>
+    <text class="tick" x="70" y="278" text-anchor="end">25</text>
+    <text class="tick" x="70" y="188" text-anchor="end">50</text>
+    <text class="tick" x="70" y="98" text-anchor="end">75</text>
+    <text class="tick" x="70" y="8" text-anchor="end">100</text>
+
+    <rect class="bar" x="145" y="144" width="100" height="216" rx="4"/>
+    <rect class="bar" x="305" y="54" width="100" height="306" rx="4"/>
+    <rect class="bar" x="465" y="252" width="100" height="108" rx="4"/>
+    <rect class="bar" x="625" y="108" width="100" height="252" rx="4"/>
+
+    <text class="bar-label" x="195" y="132">60</text>
+    <text class="bar-label" x="355" y="42">85</text>
+    <text class="bar-label" x="515" y="240">30</text>
+    <text class="bar-label" x="675" y="96">70</text>
+
+    <text class="tick" x="195" y="405" text-anchor="middle">offen</text>
+    <text class="tick" x="355" y="405" text-anchor="middle">bezahlt</text>
+    <text class="tick" x="515" y="405" text-anchor="middle">storniert</text>
+    <text class="tick" x="675" y="405" text-anchor="middle">versendet</text>
+
+    <text class="axis-label" x="430" y="466" text-anchor="middle">Status</text>
+    <text class="axis-label" transform="translate(0 180) rotate(-90)" text-anchor="middle">Anzahl Bestellungen</text>
+  </g>
+
+  <rect class="hint" x="108" y="720" width="700" height="70" rx="8"/>
+  <text class="hint-text" x="138" y="764">Kategorien haben keine natürliche Zahlenreihenfolge.</text>
+
+  <rect class="sql-box" x="910" y="520" width="538" height="258" rx="8"/>
+  <text class="sql-text" x="942" y="590">SELECT status, COUNT(*) AS anzahl</text>
+  <text class="sql-text" x="942" y="634">FROM bestellungen</text>
+  <text class="sql-text" x="942" y="678">GROUP BY status;</text>
+</svg>

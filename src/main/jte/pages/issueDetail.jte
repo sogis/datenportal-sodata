@@ -35,7 +35,7 @@
           @template.components.detailActionPanel(
             structureQualityOriginHref = page.structureQualityOriginHref(),
             structureQualityOriginLabel = "Struktur, Qualität und Herkunft",
-            exploreHref = "",
+            exploreHref = page.exploreHref(),
             usageHref = page.usageHref(),
             openData = page.accessState().openData()
           )

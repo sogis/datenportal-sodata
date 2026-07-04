@@ -79,6 +79,14 @@ public class BreadcrumbFactory {
         return new BreadcrumbVm(items);
     }
 
+    public BreadcrumbVm issueExplore(DatasetSeriesEntry series, DatasetIssueEntry issue) {
+        var items = catalogItems();
+        items.add(new BreadcrumbItemVm(series.title(), Optional.of("/series/" + encode(series.identifier())), false));
+        items.add(new BreadcrumbItemVm(issue.title(), Optional.of(issueHref(series, issue)), false));
+        items.add(new BreadcrumbItemVm("Erkunden", Optional.empty(), true));
+        return new BreadcrumbVm(items);
+    }
+
     public BreadcrumbVm notFound() {
         return error("Seite nicht gefunden");
     }

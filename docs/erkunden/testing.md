@@ -23,7 +23,8 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit dem Status-Overlay-Nachschliff pruefen Vitest und Playwright, dass Lade- und Fehlerzustaende als zentriertes Overlay erscheinen, Ladezustaende eine Progressbar besitzen, Fehlerzustaende keine Progressbar anzeigen, der globale `Bereit`-Badge im Erfolgsfall nicht gerendert wird und die Workbench keine Topbar-Hoehe mehr reserviert, aber den oberen Border direkt am Container behaelt.
 - Seit dem zweiten UI-Nachschliff pruefen Vitest und Playwright zusaetzlich Start-SQL ohne sichtbares `limit`, versionierte Panel-Speicher-IDs, Row-Limit-Ausfuehrung, Export-Splitbutton fuer CSV/XLSX/Parquet, fehlenden Footer-CSV-Button und sticky Zeilennummern.
 - Seit dem Resultat-Scrollbar-Nachschliff pruefen Vitest und Playwright zusaetzlich die fokussierbare Resultattabellen-Scrollregion, echte lokale horizontale/vertikale Overflow-Situationen und sichtbare Custom-Scrollbar-Pixel bei Hover, Klick und Tastaturfokus.
-- Seit der Diagramm-Wiederaufnahme pruefen Vitest und Playwright die kompakte Beispielabfrage-Auswahl, den `Tabelle`/`Diagramm`-Umschalter, Recharts-Balken/Punkte/Linien/Histogramm sowie Pie/Donut mit Segmentfarben und `Farben neu`.
+- Seit der Diagramm-Wiederaufnahme pruefen Vitest und Playwright die kompakte Beispielabfrage-Auswahl, den `Tabelle`/`Diagramm`-Umschalter, Recharts-Balken/Punkte/Linien/Histogramm, die erlaubten Zusatzfarben ohne Rot, mehrfarbige Balken sowie Pie/Donut mit Segmentfarben und `Farben neu`.
+- Seit der Serienausgaben-Erweiterung pruefen MVC- und Playwright-Tests, dass Open-Data-Ausgaben einen aktiven Explore-Link zeigen, aktuelle und historische Ausgaben eigene Explore-Kontexte liefern, falsche Dataset-/Serienrouten 404 bleiben und das SQL-Labor auf einer Ausgabe echte Parquet-Daten laden und abfragen kann.
 
 ## Baseline am 2026-07-01
 

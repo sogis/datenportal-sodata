@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Histogramm: Verteilung numerischer Werte</title>
+  <desc id="desc">Unterrichtsfolien-Mockup fuer ein SQL-Labor. Das Histogramm zeigt Personen nach Altersklassen mit direkt angrenzenden Balken fuer zusammenhaengende Wertebereiche.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f6f8fb; }
+      .panel { fill: #ffffff; stroke: #d8dee8; stroke-width: 2; }
+      .title { fill: #172033; font: 700 54px Arial, sans-serif; }
+      .subtitle { fill: #4f5d73; font: 400 26px Arial, sans-serif; }
+      .axis { stroke: #5d6980; stroke-width: 3; }
+      .grid { stroke: #e5eaf2; stroke-width: 2; }
+      .tick { fill: #5a667a; font: 400 22px Arial, sans-serif; }
+      .axis-label { fill: #30394d; font: 700 24px Arial, sans-serif; }
+      .bar { fill: #1f9d7a; stroke: #ffffff; stroke-width: 2; }
+      .bar-label { fill: #172033; font: 700 22px Arial, sans-serif; text-anchor: middle; }
+      .sql-box { fill: #182235; }
+      .sql-text { fill: #e8eef8; font: 400 24px "SFMono-Regular", Consolas, monospace; }
+      .hint { fill: #eefaf5; stroke: #76c7aa; stroke-width: 2; }
+      .hint-text { fill: #0f5945; font: 700 26px Arial, sans-serif; }
+      .badge { fill: #e5f7f1; stroke: #8fd6bf; stroke-width: 2; }
+      .badge-text { fill: #0f5945; font: 700 22px Arial, sans-serif; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="900"/>
+  <rect class="panel" x="64" y="54" width="1472" height="792" rx="8"/>
+
+  <text class="title" x="112" y="132">Histogramm: Verteilung numerischer Werte</text>
+  <text class="subtitle" x="112" y="178">Beispiel: Wie verteilen sich Personen auf Altersklassen?</text>
+  <rect class="badge" x="1192" y="146" width="256" height="48" rx="6"/>
+  <text class="badge-text" x="1320" y="178" text-anchor="middle">Wertebereiche</text>
+
+  <g transform="translate(142 242)">
+    <line class="grid" x1="100" y1="360" x2="760" y2="360"/>
+    <line class="grid" x1="100" y1="270" x2="760" y2="270"/>
+    <line class="grid" x1="100" y1="180" x2="760" y2="180"/>
+    <line class="grid" x1="100" y1="90" x2="760" y2="90"/>
+    <line class="grid" x1="100" y1="0" x2="760" y2="0"/>
+
+    <line class="axis" x1="100" y1="360" x2="760" y2="360"/>
+    <line class="axis" x1="100" y1="360" x2="100" y2="0"/>
+
+    <text class="tick" x="70" y="368" text-anchor="end">0</text>
+    <text class="tick" x="70" y="278" text-anchor="end">10</text>
+    <text class="tick" x="70" y="188" text-anchor="end">20</text>
+    <text class="tick" x="70" y="98" text-anchor="end">30</text>
+    <text class="tick" x="70" y="8" text-anchor="end">40</text>
+
+    <rect class="bar" x="125" y="252" width="125" height="108"/>
+    <rect class="bar" x="250" y="126" width="125" height="234"/>
+    <rect class="bar" x="375" y="72" width="125" height="288"/>
+    <rect class="bar" x="500" y="162" width="125" height="198"/>
+    <rect class="bar" x="625" y="216" width="125" height="144"/>
+
+    <text class="bar-label" x="187.5" y="240">12</text>
+    <text class="bar-label" x="312.5" y="114">26</text>
+    <text class="bar-label" x="437.5" y="60">32</text>
+    <text class="bar-label" x="562.5" y="150">22</text>
+    <text class="bar-label" x="687.5" y="204">16</text>
+
+    <text class="tick" x="187.5" y="405" text-anchor="middle">0-9</text>
+    <text class="tick" x="312.5" y="405" text-anchor="middle">10-19</text>
+    <text class="tick" x="437.5" y="405" text-anchor="middle">20-29</text>
+    <text class="tick" x="562.5" y="405" text-anchor="middle">30-39</text>
+    <text class="tick" x="687.5" y="405" text-anchor="middle">40-49</text>
+
+    <text class="axis-label" x="430" y="466" text-anchor="middle">Altersklasse</text>
+    <text class="axis-label" transform="translate(0 180) rotate(-90)" text-anchor="middle">Anzahl Personen</text>
+  </g>
+
+  <rect class="hint" x="108" y="720" width="700" height="70" rx="8"/>
+  <text class="hint-text" x="138" y="764">Werte werden in zusammenhängende Klassen eingeteilt.</text>
+
+  <rect class="sql-box" x="910" y="492" width="538" height="298" rx="8"/>
+  <text class="sql-text" x="942" y="548">SELECT FLOOR(alter / 10) * 10</text>
+  <text class="sql-text" x="942" y="592">       AS altersklasse,</text>
+  <text class="sql-text" x="942" y="636">       COUNT(*) AS anzahl</text>
+  <text class="sql-text" x="942" y="680">FROM personen</text>
+  <text class="sql-text" x="942" y="724">GROUP BY FLOOR(alter / 10) * 10</text>
+  <text class="sql-text" x="942" y="768">ORDER BY altersklasse;</text>
+</svg>

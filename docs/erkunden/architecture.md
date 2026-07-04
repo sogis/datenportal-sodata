@@ -27,11 +27,15 @@ Aktuelle Katalog- und Detailrouten:
 - `/series/{seriesIdentifier}/issues/current`: aktuelle Ausgabe.
 - `/series/{seriesIdentifier}/issues/{issueIdentifier}`: spezifische Ausgabe.
 
-Folgerung fuer Phase 1: Die neue Explore-Route muss mit der bestehenden Detailroute `/datasets/{identifier}` sauber zusammenarbeiten. Die Zielroute ist:
+Folgerung fuer die Explore-Routen: Die Explore-Seite muss mit der bestehenden Detailroute fuer normale Datensaetze und mit den bestehenden Ausgaben-Detailrouten sauber zusammenarbeiten. Die technischen Routen sind:
 
 ```text
 GET /datasets/{datasetId}/explore
 GET /datasets/{datasetId}/explore/context.json
+GET /series/{seriesIdentifier}/issues/current/explore
+GET /series/{seriesIdentifier}/issues/current/explore/context.json
+GET /series/{seriesIdentifier}/issues/{issueIdentifier}/explore
+GET /series/{seriesIdentifier}/issues/{issueIdentifier}/explore/context.json
 ```
 
 Die Route verwendet `explore`, nicht `erkunden`. UI-Texte bleiben deutsch.
@@ -53,14 +57,18 @@ ch.so.agi.datenportal.explore
 
 Controller bleiben duenn und lesen Daten ueber den bestehenden `CatalogService`. Templates erhalten vorbereitete ViewModels und keine Domain- oder Parserlogik.
 
-Die oeffentlichen Phase-1-Routen sind:
+Die oeffentlichen Explore-Routen sind:
 
 ```text
 GET /datasets/{datasetId}/explore
 GET /datasets/{datasetId}/explore/context.json
+GET /series/{seriesIdentifier}/issues/current/explore
+GET /series/{seriesIdentifier}/issues/current/explore/context.json
+GET /series/{seriesIdentifier}/issues/{issueIdentifier}/explore
+GET /series/{seriesIdentifier}/issues/{issueIdentifier}/explore/context.json
 ```
 
-Nur normale `DatasetEntry`-Identifier sind gueltig. Datenreihen, Ausgaben und unbekannte Identifier laufen ueber das bestehende 404-Verhalten.
+Normale `DatasetEntry`-Identifier sind nur unter `/datasets/.../explore` gueltig. Konkrete `DatasetIssueEntry`-Identifier sind nur unter der zugehoerigen `/series/{seriesIdentifier}/issues/.../explore`-Route gueltig. Datenreihen-Root-Eintraege, Ausgaben auf der falschen Serie und unbekannte Identifier laufen ueber das bestehende 404-Verhalten.
 
 ## Phase-1-Kontext
 
@@ -86,7 +94,7 @@ Die interaktive Erkunden-Oberflaeche ist als isolierte React/Vite-Insel unter fo
 src/main/frontend/explore/
 ```
 
-Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Sie initialisiert DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und zeigt danach ein vollflaechiges SQL-Labor. Die Startabfrage verwendet den registrierten View-Namen ohne sichtbares Preview-Limit, zum Beispiel `SELECT * FROM ch_so_bauinventar;` im Editor auf zwei Zeilen. Die aktuelle UI besteht aus linker Schema-Spalte mit `Tabelle geladen`-Badge fuer lokal verfuegbare DuckDB-Wasm-Views, editierbarem Monaco-SQL-Editor mit SQLRooms-Completion ueber `tableSchemas` und memoisiertes `getLatestSchemas`, kompakter Beispielabfrage-Auswahl, rotem Run-Button mit Play-Icon, SQL-Copy-Button und Export-Splitbutton fuer CSV, XLSX und Parquet. Vor dem Runtime-Metadaten-Read zeigt die Schema-Karte keine Katalog-/XTF-Spalten, keinen Spaltenzaehler und keinen XTF-Rowcount. Nach erfolgreicher View-Registrierung liest `runtimeSchema.ts` per `DESCRIBE "<table>"` das echte DuckDB-Schema und per `SELECT count(*) AS row_count FROM "<table>"` den echten DuckDB-Rowcount. Diese Runtime-Metadaten ersetzen die sichtbaren Tabellen-Spalten, die Autocomplete-Spalten und den sichtbaren Rowcount. Die backendseitigen Katalog-/XTF-Spalten liefern nur noch bei namensgleichen Runtime-Spalten Beschreibungen, Pflichtfeld-Flags, Beispiele und Rollen; Runtime-only-Spalten erhalten `unknown`, und katalog-only-Spalten werden im Labor nicht angezeigt. Backendseitige XTF-Objektzahlen bleiben im JSON-Kontext, werden in der sichtbaren Explore-Schema-Karte aber nicht als Fallback genutzt. Schlaegt der Runtime-Schema-Read fehl, bleibt die Workbench nutzbar, aber die sichtbare Spaltenliste bleibt leer statt auf potenziell falsche Katalogspalten zurueckzufallen. Schlaegt nur der Runtime-Rowcount fehl, bleiben Runtime-Spalten sichtbar und nur die Zeilenzahl leer. Beide Fehler werden nur in der Browser-Konsole gewarnt. Lade- und Fehlerzustaende liegen als zentriertes Overlay absolut ueber der Workbench; Ladezustaende nutzen eine weisse shadowfreie Karte auf dunklem Backdrop mit rotem indeterminiertem Progressbar, Fehler bleiben Alerts ohne Progressbar. Sobald die Runtime bereit ist, verschwindet das Overlay ohne Layout-Sprung und ohne globalen `Bereit`-Badge; der obere Workbench-Border bleibt direkt am Workbench-Container erhalten. Der DuckDB-Connector wird fuer Query-Ausfuehrung, Runtime-Metadaten-Read und Exporte verwendet, aber nicht an `SqlMonacoEditor` uebergeben, weil SQLRooms `0.28.0` fuer dynamische `duckdb_functions()`-Metadaten einen CSP-blockierten `Function(...)`-Pfad nutzt. Auf Desktop nutzt sie `react-resizable-panels`, um Schema/Labor horizontal sowie Editor/Resultat vertikal pro Datensatz in `localStorage` zu speichern; versionierte Auto-Save-IDs ignorieren alte defekte Panelgroessen. Auf Mobile bleibt die Ansicht gestapelt und nicht resizable. Der Resultatbereich hat eine lokale Umschaltung zwischen Tabelle und Diagramm; es gibt weiterhin keine alten Haupt-Tabs `Vorschau`, `SQL-Labor`, `Diagramm` und `Code`. Codebeispiel- und lokale History-Komponenten bleiben im Code fuer spaetere Wiederaufnahme, werden im Primaerpfad aber nicht gerendert. Seit Phase 8 enthaelt die Insel ausserdem einen stillen Erweiterungspunkt fuer spaetere AI-, WebR-, Vega-, Mosaic- und Geodaten-Funktionen.
+Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Sie initialisiert DuckDB-Wasm im Browser, registriert Parquet-Distributionen als Views und zeigt danach ein vollflaechiges SQL-Labor. Die Startabfrage verwendet den registrierten View-Namen ohne sichtbares Preview-Limit, zum Beispiel `SELECT * FROM ch_so_bauinventar;` im Editor auf zwei Zeilen. Die aktuelle UI besteht aus linker Schema-Spalte mit `Tabelle geladen`-Badge fuer lokal verfuegbare DuckDB-Wasm-Views, editierbarem Monaco-SQL-Editor mit SQLRooms-Completion ueber `tableSchemas` und memoisiertes `getLatestSchemas`, kompakter Beispielabfrage-Auswahl, rotem Run-Button mit Play-Icon, SQL-Copy-Button und Export-Splitbutton fuer CSV, XLSX und Parquet. Der Backend-Kontext kann normale Datensaetze und konkrete Serienausgaben liefern; das Labor selbst zeigt dafuer keine separate Serien-UI. Vor dem Runtime-Metadaten-Read zeigt die Schema-Karte keine Katalog-/XTF-Spalten, keinen Spaltenzaehler und keinen XTF-Rowcount. Nach erfolgreicher View-Registrierung liest `runtimeSchema.ts` per `DESCRIBE "<table>"` das echte DuckDB-Schema und per `SELECT count(*) AS row_count FROM "<table>"` den echten DuckDB-Rowcount. Diese Runtime-Metadaten ersetzen die sichtbaren Tabellen-Spalten, die Autocomplete-Spalten und den sichtbaren Rowcount. Die backendseitigen Katalog-/XTF-Spalten liefern nur noch bei namensgleichen Runtime-Spalten Beschreibungen, Pflichtfeld-Flags, Beispiele und Rollen; Runtime-only-Spalten erhalten `unknown`, und katalog-only-Spalten werden im Labor nicht angezeigt. Backendseitige XTF-Objektzahlen bleiben im JSON-Kontext, werden in der sichtbaren Explore-Schema-Karte aber nicht als Fallback genutzt. Schlaegt der Runtime-Schema-Read fehl, bleibt die Workbench nutzbar, aber die sichtbare Spaltenliste bleibt leer statt auf potenziell falsche Katalogspalten zurueckzufallen. Schlaegt nur der Runtime-Rowcount fehl, bleiben Runtime-Spalten sichtbar und nur die Zeilenzahl leer. Beide Fehler werden nur in der Browser-Konsole gewarnt. Lade- und Fehlerzustaende liegen als zentriertes Overlay absolut ueber der Workbench; Ladezustaende nutzen eine weisse shadowfreie Karte auf dunklem Backdrop mit rotem indeterminiertem Progressbar, Fehler bleiben Alerts ohne Progressbar. Sobald die Runtime bereit ist, verschwindet das Overlay ohne Layout-Sprung und ohne globalen `Bereit`-Badge; der obere Workbench-Border bleibt direkt am Workbench-Container erhalten. Der DuckDB-Connector wird fuer Query-Ausfuehrung, Runtime-Metadaten-Read und Exporte verwendet, aber nicht an `SqlMonacoEditor` uebergeben, weil SQLRooms `0.28.0` fuer dynamische `duckdb_functions()`-Metadaten einen CSP-blockierten `Function(...)`-Pfad nutzt. Auf Desktop nutzt sie `react-resizable-panels`, um Schema/Labor horizontal sowie Editor/Resultat vertikal pro Kontext-Identifier in `localStorage` zu speichern; versionierte Auto-Save-IDs ignorieren alte defekte Panelgroessen. Auf Mobile bleibt die Ansicht gestapelt und nicht resizable. Der Resultatbereich hat eine lokale Umschaltung zwischen Tabelle und Diagramm; es gibt weiterhin keine alten Haupt-Tabs `Vorschau`, `SQL-Labor`, `Diagramm` und `Code`. Codebeispiel- und lokale History-Komponenten bleiben im Code fuer spaetere Wiederaufnahme, werden im Primaerpfad aber nicht gerendert. Seit Phase 8 enthaelt die Insel ausserdem einen stillen Erweiterungspunkt fuer spaetere AI-, WebR-, Vega-, Mosaic- und Geodaten-Funktionen.
 
 Wichtige Dateien:
 
@@ -118,13 +126,98 @@ Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library
 - Resultate werden standardmaessig als kompakte HTML-Tabelle im SQLRooms-Stil gerendert: sticky Header, Zeilenindex, Typ-Badges im Header, Radix-ScrollArea mit Datenportal-eigenen Hover-/Fokus-Scrollbars und Footerzeile mit Row-Limit-Combobox.
 - CSV-Export erzeugt clientseitig eine Semikolon-getrennte CSV-Datei mit CRLF-Zeilenenden. XLSX und Parquet werden in DuckDB-Wasm per `COPY (<executedSql>) TO '<tmp>' WITH (...)` erzeugt und anschliessend aus dem virtuellen DuckDB-Dateisystem heruntergeladen. Alle Exportformate enthalten nur das aktuell gelieferte Query-Resultat, nicht die originalen Quelldateien.
 
+### Generierte Beispielabfragen
+
+Die Beispielabfragen im Dropdown sind kein manuell gepflegter Query-Katalog. `ExploreRecipeService` generiert sie pro `ExploreTableDto` aus den Parquet-Distributionen und den backendseitig bekannten Katalog-/XTF-Attributen samt Spaltenrollen. Das spaeter im Browser gelesene DuckDB-Runtime-Schema bestimmt die sichtbare Schema-Karte und Autocomplete-Spalten, erzeugt aber keine zusaetzlichen Beispielabfragen. Attributnamen werden in Rezepttiteln mit Schweizer Anfuehrungszeichen hervorgehoben, zum Beispiel `Nach «gemeinde» gruppieren`.
+
+| Kategorie | Sichtbarer Typ | Wann entsteht sie? | Anzahl pro Tabelle | Limit | Diagramm-Vorgabe | SQL-Muster |
+|---|---|---|---:|---|---|---|
+| `preview` | `Vorschau` | immer | 1 | keines | keine | `SELECT * FROM <tabelle>;` |
+| `profile` | `Anzahl Datensaetze` | immer | 1 | keines | keine | `SELECT count(*) AS anzahl FROM <tabelle>;` |
+| `profile` | `Tabellenstruktur` | immer | 1 | keines | keine | `DESCRIBE <tabelle>;` |
+| `quality` | `Fehlende Werte` | wenn die Tabelle Spalten hat | 0 oder 1 | maximal 8 gepruefte Spalten | keine | `count(*) FILTER (WHERE <spalte> IS NULL)` pro Spalte |
+| `category` | `Nach «<spalte>» gruppieren` | fuer Textspalten, die keine Identifier sind | 0 bis 3 | `CATEGORY_RECIPE_LIMIT = 3` | `bar` | `GROUP BY <spalte> ORDER BY anzahl DESC LIMIT 50` |
+| `numeric` | `«<spalte>» zusammenfassen` | fuer numerische Messwertspalten | 0 bis 3 | `NUMERIC_RECIPE_LIMIT = 3` | keine | `min`, `avg`, `max` fuer eine Spalte |
+| `time` | `Zeitreihe nach «<spalte>»` | fuer Datum- oder Jahrspalten | 0 bis 2 | `TIME_RECIPE_LIMIT = 2` | `line` | `GROUP BY <zeitspalte> ORDER BY <zeitspalte>` |
+| `custom` | aktuell keines | DTO/Enum ist vorbereitet | 0 | aktuell nicht erzeugt | moeglich | aktuell kein Generatorpfad |
+
+Die Limits greifen unabhaengig voneinander:
+
+| Konstante | Wert | Gilt fuer | Wirkung |
+|---|---:|---|---|
+| `NULL_PROFILE_COLUMN_LIMIT` | 8 | `Fehlende Werte` | Das Null-Profil zaehlt hoechstens die ersten 8 beschriebenen Spalten. |
+| `CATEGORY_RECIPE_LIMIT` | 3 | Gruppierungsqueries | Es werden hoechstens 3 Kategorie-Spalten als `Nach ... gruppieren` angeboten. |
+| `NUMERIC_RECIPE_LIMIT` | 3 | Numerikqueries | Es werden hoechstens 3 Messwertspalten als Zusammenfassung angeboten. |
+| `TIME_RECIPE_LIMIT` | 2 | Zeitqueries | Es werden hoechstens 2 Datum-/Jahrspalten als Zeitreihe angeboten. |
+
+Die Spaltenrollen entstehen heuristisch in `ExploreColumnRoleDetector`:
+
+- `CATEGORY`: Textspalte (`char`, `text`, `string`, `varchar`), sofern sie nicht als Identifier erkannt wird.
+- `MEASURE`: numerischer Typ (`int`, `double`, `float`, `decimal`, `numeric`, `number`, `real`), sofern die Spalte kein Identifier und keine Jahrspalte ist.
+- `YEAR`: Spaltennamen `jahr`, `year`, `periode` oder `berichtsjahr`.
+- `DATE`: Datentyp mit `date`/`time` oder Spaltennamen `datum`, `date`, `stand`, `stichtag`, `gueltig_ab`, `gueltig_bis`, `updated_at`.
+
+Fuer Diagramme liefern Kategorie- und Zeitrezepte eine `preferredChart`-Vorgabe. Diese Vorgabe wird im Frontend nur verwendet, wenn genau das unveraenderte Rezept-SQL ausgefuehrt wurde. Sobald Nutzerinnen oder Nutzer das SQL aendern oder freies SQL ausfuehren, klassifiziert `chartInference` die Resultatspalten und die angezeigten Werte neu: Jahr-/Datum plus Zahl ergibt eine Linie, Kategorie plus Zahl einen Balken, zwei Zahlenwerte Punkte und ein einzelner Zahlenwert ein Histogramm.
+
+Balken- und Histogramm-Diagramme duerfen nicht gleich behandelt werden:
+
+- Ein Balkendiagramm vergleicht diskrete Kategorien. Die X-Achse enthaelt Textwerte oder benannte Gruppen wie Gemeinden, Parameter oder Statuswerte; die Reihenfolge kommt aus SQL, zum Beispiel `ORDER BY anzahl DESC`. Deshalb geben `category`-Rezepte mit `GROUP BY <spalte>` bewusst `preferredChart = bar` vor.
+- Ein Histogramm zeigt die Verteilung numerischer Einzelwerte ueber Wertebereiche. Die X-Achse enthaelt zusammenhaengende Klassen/Bins, nicht die urspruenglichen Kategorien. Es ist passend, wenn das Resultat eine numerische Wertspalte wie `messwert` enthaelt und die Frage lautet, wie haeufig Werte in bestimmten Bereichen vorkommen.
+- SQL bleibt die Quelle der Daten. Beim Balkendiagramm liefert SQL die Kategorien und Kennzahlen direkt. Beim Histogramm darf das Frontend nur die Diagramm-Bins fuer die Anzeige bilden; Tabelle und Exporte behalten das unveraenderte Query-Resultat.
+
+Ist-Situation fuer `ch_so_wasserqualitaet_grundwasser`:
+
+| Reihenfolge | Dropdown-Query | Kategorie | Warum vorhanden? |
+|---:|---|---|---|
+| 1 | `Vorschau` | `preview` | Basisrezept pro Tabelle. |
+| 2 | `Anzahl Datensaetze` | `profile` | Basisrezept pro Tabelle. |
+| 3 | `Tabellenstruktur` | `profile` | Basisrezept pro Tabelle. |
+| 4 | `Fehlende Werte` | `quality` | Die Tabelle hat beschriebene Spalten. |
+| 5 | `Nach «messstelle_code» gruppieren` | `category` | Erste als Kategorie erkannte Textspalte. |
+| 6 | `Nach «gemeinde» gruppieren` | `category` | Zweite als Kategorie erkannte Textspalte. |
+| 7 | `Nach «parameter» gruppieren` | `category` | Dritte als Kategorie erkannte Textspalte; danach stoppt `CATEGORY_RECIPE_LIMIT`. |
+| 8 | `«messwert» zusammenfassen` | `numeric` | `messwert` ist eine numerische Messwertspalte. |
+| 9 | `Zeitreihe nach «jahr»` | `time` | `jahr` wird anhand des Namens als `YEAR` erkannt. |
+
+Beispiel fuer eine Gruppierungsquery:
+
+```sql
+SELECT "gemeinde", count(*) AS anzahl
+FROM ch_so_wasserqualitaet_grundwasser
+WHERE "gemeinde" IS NOT NULL
+GROUP BY "gemeinde"
+ORDER BY anzahl DESC
+LIMIT 50;
+```
+
+Beispiel fuer eine Numerikquery:
+
+```sql
+SELECT
+  min("messwert") AS minimum,
+  avg("messwert") AS durchschnitt,
+  max("messwert") AS maximum
+FROM ch_so_wasserqualitaet_grundwasser
+WHERE "messwert" IS NOT NULL;
+```
+
+Beispiel fuer eine Zeitquery:
+
+```sql
+SELECT "jahr", count(*) AS anzahl
+FROM ch_so_wasserqualitaet_grundwasser
+WHERE "jahr" IS NOT NULL
+GROUP BY "jahr"
+ORDER BY "jahr";
+```
+
 ## Diagramme
 
 - `ChartPanel` erhaelt ausschliesslich das aktuelle `QueryResultState`; es fuehrt keine eigene SQL-Abfrage aus.
 - `chartInference` klassifiziert Resultatspalten aus den angezeigten Zeilen und schlaegt Balken-, Linien-, Punkt- oder Histogramm-Diagramme vor; Pie und Donut stehen als manuelle Kategorie-plus-Wert-Diagrammtypen zur Verfuegung.
 - Rezept-`preferredChart` wird nur verwendet, wenn das unveraenderte Rezept-SQL ausgefuehrt wurde. Geaendertes oder manuelles SQL verwendet immer Inferenz aus dem Resultat.
 - `ChartPanel` wird ueber die lokale Resultatansicht `Diagramm` angezeigt. Es gibt keinen alten Haupt-`Diagramm`-Tab, keinen Dashboard-Builder und keinen Spec-Editor.
-- Pie- und Donut-Diagramme verwenden stabile pseudo-zufaellige Segmentfarben pro Resultat; `Farben neu` erzeugt bewusst eine neue Palette. Bei vielen Segmenten wird ein Hinweis angezeigt.
+- Diagrammfarben kommen aus den definierten Zusatzfarben `Dunkelblau`, `Hellblau`, `Orange`, `Gold`, `Dunkelgrün` und `Hellgrün`; Rot wird nicht angeboten. `Mehrfarbig` verwendet diese Farben plus passende Blau-, Gruen-, Gelb- und Orange-Ergaenzungen stabil pro Resultat. `Farben neu` mischt die stabile Palette fuer mehrfarbige Balken, Histogramme, Pie und Donut neu. Bei vielen Pie-/Donut-Segmenten wird ein Hinweis angezeigt.
 - DuckDB `count(*)` liefert im Browser BigInt-Werte. Fuer Recharts werden nur die Diagrammzeilen in plain JavaScript-Zahlen/Strings normalisiert; Resultattabelle und CSV-Export behalten die originalen Resultatwerte.
 - Vitest mockt `@sqlrooms/recharts`, weil das Paket wie `@sqlrooms/sql-editor` extensionless interne ESM-Imports enthaelt, die der Test-Runner nicht direkt aufloest. Typecheck, Vite-Build und Playwright pruefen den echten Produktionspfad.
 

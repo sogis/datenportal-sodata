@@ -84,4 +84,20 @@ class CatalogUrlFactoryTest {
         assertThat(urlFactory.issueStructureQualityOrigin("series", "issue 2025"))
                 .isEqualTo("/series/series/issues/issue%202025/structure-quality-origin");
     }
+
+    @Test
+    void exploreUrlsUseEncodedDetailRoutes() {
+        assertThat(urlFactory.datasetExplore("ch.so.bau inventar"))
+                .isEqualTo("/datasets/ch.so.bau%20inventar/explore");
+        assertThat(urlFactory.datasetExploreContext("ch.so.bau inventar"))
+                .isEqualTo("/datasets/ch.so.bau%20inventar/explore/context.json");
+        assertThat(urlFactory.currentIssueExplore("ch.so.gemeinde grenzen"))
+                .isEqualTo("/series/ch.so.gemeinde%20grenzen/issues/current/explore");
+        assertThat(urlFactory.currentIssueExploreContext("ch.so.gemeinde grenzen"))
+                .isEqualTo("/series/ch.so.gemeinde%20grenzen/issues/current/explore/context.json");
+        assertThat(urlFactory.issueExplore("series", "issue 2025"))
+                .isEqualTo("/series/series/issues/issue%202025/explore");
+        assertThat(urlFactory.issueExploreContext("series", "issue 2025"))
+                .isEqualTo("/series/series/issues/issue%202025/explore/context.json");
+    }
 }
