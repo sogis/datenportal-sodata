@@ -19,6 +19,7 @@ Enthalten:
 - Listenansicht, Kartenansicht und Datenreihen-Expansion
 - Detailseiten für Datensätze, Datenreihen und Ausgaben
 - Classpath-, Datei- und HTTP-Katalogquelle
+- Explore-Schema-Explorer mit DuckDB-Catalog-Artefakt
 - geschützter Runtime-Reload unter `/admin/catalog/reload`
 - Status unter `/admin/catalog/status`
 - kontrollierte 404- und Fehlerseiten
@@ -83,7 +84,11 @@ Standardkonfiguration in `src/main/resources/application.yml`:
 datenportal:
   catalog:
     source-type: classpath
-    classpath-location: published_catalog_full_54_entries.xtf
+    classpath-location: published_catalog_full_62_entries.xtf
+    duckdb:
+      source-type: classpath
+      classpath-location: catalog.duckdb
+      schema: opendata
   admin:
     reload-token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN:}
   search:
@@ -97,7 +102,7 @@ datenportal:
     use-cdn: false
 ```
 
-Die Datei `spec/fixtures/published_catalog_full_54_entries.xtf` ist als Main-Resource auf dem Classpath eingebunden.
+Die Dateien `spec/fixtures/published_catalog_full_62_entries.xtf` und `spec/fixtures/catalog.duckdb` sind als Main-Resources auf dem Classpath eingebunden.
 
 Weitere Details:
 

@@ -23,6 +23,8 @@ public final class ExploreContextJsonWriter {
         comma(json);
         execution(json, context.execution());
         comma(json);
+        catalogDatabase(json, context.catalogDatabase());
+        comma(json);
         tables(json, context.tables());
         comma(json);
         recipes(json, context.recipes());
@@ -45,6 +47,16 @@ public final class ExploreContextJsonWriter {
         field(json, "maxResultRows", execution.maxResultRows());
         comma(json);
         field(json, "queryTimeoutMs", execution.queryTimeoutMs());
+        json.append('}');
+    }
+
+    private static void catalogDatabase(StringBuilder json, ExploreCatalogDatabaseDto catalogDatabase) {
+        name(json, "catalogDatabase").append('{');
+        field(json, "url", catalogDatabase.url());
+        comma(json);
+        field(json, "database", catalogDatabase.database());
+        comma(json);
+        field(json, "schema", catalogDatabase.schema());
         json.append('}');
     }
 

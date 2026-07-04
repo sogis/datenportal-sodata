@@ -43,7 +43,7 @@ class StaticAssetCachingMvcTest {
 
     @Test
     void exploreDuckDbExtensionsUseLongCacheHeader() throws Exception {
-        mockMvc.perform(get("/explore-extensions/v1.4.3/wasm_mvp/parquet.duckdb_extension.wasm"))
+        mockMvc.perform(get("/explore-extensions/v1.5.4/wasm_mvp/parquet.duckdb_extension.wasm"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))));
     }
@@ -73,7 +73,7 @@ class StaticAssetCachingMvcTest {
 
     @Test
     void exploreDuckDbExtensionUsesBrotliWhenAccepted() throws Exception {
-        mockMvc.perform(get("/explore-extensions/v1.4.3/wasm_mvp/parquet.duckdb_extension.wasm")
+        mockMvc.perform(get("/explore-extensions/v1.5.4/wasm_mvp/parquet.duckdb_extension.wasm")
                         .header("Accept-Encoding", "br, gzip"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Encoding", "br"))

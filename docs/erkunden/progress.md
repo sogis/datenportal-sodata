@@ -24,6 +24,28 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | SQL-Labor Loading-Overlay Styling | DONE | Styled the loading overlay with dark backdrop, white shadowless card, red indeterminate progressbar and restored workbench top border. |
 | SQL-Labor fuer Serienausgaben | DONE | Issue detail pages link to Explore; shared Explore controller methods resolve datasets and concrete series issues. |
 | SQL-Labor Diagrammfarben | DONE | Charts use configured additional colors, no red option, stable multi-color palette and clearer axis labels. |
+| DuckDB Catalog Direct Query | DONE | DuckDB-Wasm package upgraded, mirrored extensions moved to `v1.5.4`, catalog files regenerated with DuckDB 1.5.4 and query-side `memory.opendata` mirror removed. |
+
+## DuckDB Catalog Direct Query Entry
+
+Date: 2026-07-04
+
+Scope:
+
+- Upgraded the Explore DuckDB-Wasm dependency resolution to the latest published `@duckdb/duckdb-wasm` package and mirrored official `v1.5.4/wasm_mvp` HTTPFS, Parquet and Excel extensions.
+- Updated `tools/create_opendata_duckdb.py` to require `duckdb==1.5.4` and Python 3.10+.
+- Regenerated `spec/fixtures/catalog.duckdb`, the dev seed `catalog.duckdb` and the small Playwright `explore_fixture_catalog.duckdb` with DuckDB 1.5.4.
+- Removed the query-side `memory.opendata` mirror and old per-table Parquet registration helpers. Browser SQL now runs directly after `ATTACH 'catalog.duckdb' AS "catalog" (READ_ONLY)` and `USE "catalog"."opendata"`.
+- Updated configuration, architecture, troubleshooting and testing documentation for direct Catalog queries and cross-Parquet joins.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 83 passed (83)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.ExploreIslandParquetPlaywrightTest'` | PASS, direct `catalog.duckdb` queries, exports and charts covered |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 53s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
 
 ## SQL-Labor Diagrammfarben Entry
 
@@ -376,7 +398,7 @@ Known limitations:
 
 - External `https://data.so.ch` Parquet smoke remains manual because DNS resolution for `data.so.ch` failed from the implementation/planning environment.
 - Production Parquet URLs still require browser-visible CORS and byte Range support.
-- The mirrored Parquet extension is tied to DuckDB-Wasm `v1.4.3/wasm_mvp`; upgrading `@duckdb/duckdb-wasm` requires refreshing the extension path and binary.
+- Superseded by the 2026-07-04 DuckDB Catalog Direct Query entry: the current mirror is `v1.5.4/wasm_mvp`.
 - Large DuckDB-Wasm assets are expected in Phase 3; code-splitting is deferred until broader UX hardening unless load time becomes a measured problem.
 
 ## Phase 4 Entry

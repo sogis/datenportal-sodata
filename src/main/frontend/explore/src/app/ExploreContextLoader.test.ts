@@ -8,9 +8,14 @@ describe('loadEmbeddedExploreContext', () => {
     documentRef.body.innerHTML = `<script id="datenportal-explore-context" type="application/json">${JSON.stringify(sampleExploreContext)}</script>`;
 
     expect(loadEmbeddedExploreContext(documentRef)).toMatchObject({
-      version: 1,
+      version: 2,
       datasetId: 'ch.so.bauinventar',
       title: 'Bauinventar',
+      catalogDatabase: {
+        url: '/catalog/catalog.duckdb',
+        database: 'catalog',
+        schema: 'opendata'
+      },
       featureFlags: {
         aiAssistant: false,
         webR: false,

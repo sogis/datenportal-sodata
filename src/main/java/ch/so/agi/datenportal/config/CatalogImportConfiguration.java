@@ -15,11 +15,13 @@ import java.time.Clock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ResourceLoader;
 
 @Configuration
 @EnableConfigurationProperties({
         AdminProperties.class,
+        CatalogDuckDbProperties.class,
         CatalogProperties.class,
         ExploreProperties.class,
         SearchProperties.class,
@@ -33,6 +35,7 @@ public class CatalogImportConfiguration {
     }
 
     @Bean
+    @Primary
     CatalogSource catalogSource(CatalogProperties properties, ResourceLoader resourceLoader, Clock clock) {
         CatalogSource source;
         if (properties.isClasspathSource()) {
@@ -53,6 +56,25 @@ public class CatalogImportConfiguration {
                 source,
                 new CatalogDownloadUrlPlaceholderResolver(),
                 properties.downloadUrl());
+    }
+
+    @Bean
+    CatalogSource catalogDuckDbSource(CatalogDuckDbProperties properties, ResourceLoader resourceLoader, Clock clock) {
+        if (properties.isClasspathSource()) {
+            return new ClasspathCatalogSource(resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
+        }
+        if (properties.isFileSource()) {
+            return new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
+        }
+        if (properties.isHttpSource()) {
+            return new HttpCatalogSource(
+                    properties.httpUrl(),
+                    properties.httpConnectTimeout(),
+                    properties.httpReadTimeout(),
+                    properties.maxSize(),
+                    clock);
+        }
+        throw new IllegalStateException("Unsupported DuckDB catalog source: " + properties.effectiveSourceType());
     }
 
     @Bean

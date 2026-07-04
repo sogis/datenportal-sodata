@@ -47,8 +47,10 @@ public final class ExploreTableService {
             DistributionLink distribution,
             boolean primary,
             LinkedHashSet<String> usedNames) {
-        String rawName = fileBaseName(distribution.preferredHref()).orElse(entry.identifier());
-        String safeName = uniqueSafeName(rawName, usedNames);
+        String safeName = viewName(distribution.preferredHref(), entry.identifier());
+        if (!usedNames.add(safeName)) {
+            throw new IllegalArgumentException("Duplicate Explore table name: " + safeName);
+        }
         return new ExploreTableDto(
                 safeName,
                 safeName,
@@ -90,18 +92,17 @@ public final class ExploreTableService {
                 .toList();
     }
 
-    private String uniqueSafeName(String rawName, LinkedHashSet<String> usedNames) {
-        String base = sqlNameSanitizer.toSafeTableName(rawName);
-        String candidate = base;
-        int suffix = 2;
-        while (!usedNames.add(candidate)) {
-            candidate = base + "_" + suffix;
-            suffix++;
-        }
-        return candidate;
+    private String viewName(URI uri, String fallbackIdentifier) {
+        String fileName = fileName(uri).orElse(fallbackIdentifier + ".parquet");
+        String baseName = fileName.endsWith(".parquet")
+                ? fileName.substring(0, fileName.length() - ".parquet".length())
+                : fileName;
+        String viewName = baseName.replace('.', '_');
+        sqlNameSanitizer.assertSafeTableName(viewName);
+        return viewName;
     }
 
-    private static Optional<String> fileBaseName(URI uri) {
+    private static Optional<String> fileName(URI uri) {
         String path = uri.getPath();
         if (path == null || path.isBlank()) {
             return Optional.empty();
@@ -111,7 +112,6 @@ public final class ExploreTableService {
         if (fileName.isBlank()) {
             return Optional.empty();
         }
-        int dot = fileName.lastIndexOf('.');
-        return Optional.of(dot > 0 ? fileName.substring(0, dot) : fileName);
+        return Optional.of(fileName);
     }
 }

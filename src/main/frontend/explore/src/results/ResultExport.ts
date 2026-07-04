@@ -64,11 +64,12 @@ export async function exportQueryResultWithDuckDbCopy(
   const exportFilename = sanitizeResultFilename(filename, format);
   const duckDbFilename = temporaryDuckDbFilename(format);
   const db = connector.getDb();
+  const connection = connector.getConnection();
 
   try {
-    await connector.execute(`install ${duckDbExtensionForFormat(format)};`);
-    await connector.execute(`load ${duckDbExtensionForFormat(format)};`);
-    await connector.execute(copySqlForResult(executedSql, duckDbFilename, format));
+    await connection.query(`install ${duckDbExtensionForFormat(format)};`);
+    await connection.query(`load ${duckDbExtensionForFormat(format)};`);
+    await connection.query(copySqlForResult(executedSql, duckDbFilename, format));
     await db.flushFiles();
     const bytes = await db.copyFileToBuffer(duckDbFilename);
     downloadBlob(new Blob([uint8ArrayToArrayBuffer(bytes)], {type: contentTypeForFormat(format)}), exportFilename, documentRef);

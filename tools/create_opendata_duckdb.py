@@ -20,7 +20,8 @@ DEFAULT_DOWNLOAD_URL = "http://localhost:8081/ch.so.datenportal/downloads"
 DEFAULT_SCHEMA = "opendata"
 DOWNLOAD_URL_PLACEHOLDER = "${DOWNLOAD_URL}"
 SAFE_IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-EXPECTED_DUCKDB_VERSION = "1.4.3"
+EXPECTED_DUCKDB_VERSION = "1.5.4"
+MINIMUM_PYTHON_VERSION = (3, 10)
 
 
 @dataclass(frozen=True)
@@ -77,6 +78,13 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
 
 
 def import_duckdb():
+    if sys.version_info < MINIMUM_PYTHON_VERSION:
+        required = ".".join(str(part) for part in MINIMUM_PYTHON_VERSION)
+        current = ".".join(str(part) for part in sys.version_info[:3])
+        raise RuntimeError(
+            f"Python {required}+ is required for duckdb=={EXPECTED_DUCKDB_VERSION}, "
+            f"but this interpreter is Python {current}"
+        )
     try:
         import duckdb  # type: ignore
     except ModuleNotFoundError as error:

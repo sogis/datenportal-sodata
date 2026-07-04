@@ -76,9 +76,9 @@ select * from ch_so_bauinventar limit 1000
       documentRef
     );
 
-    expect(connectorHarness.execute).toHaveBeenNthCalledWith(1, 'install parquet;');
-    expect(connectorHarness.execute).toHaveBeenNthCalledWith(2, 'load parquet;');
-    expect(connectorHarness.execute).toHaveBeenNthCalledWith(3, expect.stringContaining('with (format parquet);'));
+    expect(connectorHarness.query).toHaveBeenNthCalledWith(1, 'install parquet;');
+    expect(connectorHarness.query).toHaveBeenNthCalledWith(2, 'load parquet;');
+    expect(connectorHarness.query).toHaveBeenNthCalledWith(3, expect.stringContaining('with (format parquet);'));
     expect(connectorHarness.copyFileToBuffer).toHaveBeenCalledWith(expect.stringMatching(/\.parquet$/));
     expect(connectorHarness.dropFile).toHaveBeenCalledWith(expect.stringMatching(/\.parquet$/));
     expect(createObjectURL).toHaveBeenCalledWith(expect.objectContaining({
@@ -99,9 +99,9 @@ select * from ch_so_bauinventar limit 1000
       documentRef
     );
 
-    expect(connectorHarness.execute).toHaveBeenNthCalledWith(1, 'install excel;');
-    expect(connectorHarness.execute).toHaveBeenNthCalledWith(2, 'load excel;');
-    expect(connectorHarness.execute).toHaveBeenNthCalledWith(3, expect.stringContaining('format xlsx, header true'));
+    expect(connectorHarness.query).toHaveBeenNthCalledWith(1, 'install excel;');
+    expect(connectorHarness.query).toHaveBeenNthCalledWith(2, 'load excel;');
+    expect(connectorHarness.query).toHaveBeenNthCalledWith(3, expect.stringContaining('format xlsx, header true'));
     expect(connectorHarness.copyFileToBuffer).toHaveBeenCalledWith(expect.stringMatching(/\.xlsx$/));
     expect(connectorHarness.dropFile).toHaveBeenCalledWith(expect.stringMatching(/\.xlsx$/));
     expect(createObjectURL).toHaveBeenCalledWith(expect.objectContaining({
@@ -129,7 +129,7 @@ select * from ch_so_bauinventar limit 1000
       'datenportal-ch.so.bauinventar-result.csv',
       'datenportal-ch.so.bauinventar-result.parquet'
     ]);
-    expect(connectorHarness.execute).toHaveBeenLastCalledWith(expect.stringContaining('select * from ch_so_bauinventar limit 1000'));
+    expect(connectorHarness.query).toHaveBeenLastCalledWith(expect.stringContaining('select * from ch_so_bauinventar limit 1000'));
   });
 });
 
@@ -153,18 +153,20 @@ function createDownloadHarness() {
 }
 
 function createWasmConnectorHarness(bytes: Uint8Array) {
-  const execute = vi.fn().mockResolvedValue(undefined);
+  const query = vi.fn().mockResolvedValue(undefined);
   const flushFiles = vi.fn().mockResolvedValue(null);
   const copyFileToBuffer = vi.fn().mockResolvedValue(bytes);
   const dropFile = vi.fn().mockResolvedValue(null);
   const connector = {
     type: 'wasm',
-    execute,
+    getConnection: () => ({
+      query
+    }),
     getDb: () => ({
       flushFiles,
       copyFileToBuffer,
       dropFile
     })
   } as unknown as DuckDbConnector;
-  return {connector, execute, flushFiles, copyFileToBuffer, dropFile};
+  return {connector, query, flushFiles, copyFileToBuffer, dropFile};
 }

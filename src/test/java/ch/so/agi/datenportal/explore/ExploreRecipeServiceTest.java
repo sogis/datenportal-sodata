@@ -2,6 +2,7 @@ package ch.so.agi.datenportal.explore;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.so.agi.datenportal.config.CatalogDuckDbProperties;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,8 @@ class ExploreRecipeServiceTest {
 
     private final ExploreRecipeService service = new ExploreRecipeService(
             new ExploreSqlNameSanitizer(),
-            properties());
+            properties(),
+            duckDbProperties());
 
     @Test
     void generatesBaselineAndColumnDrivenRecipes() {
@@ -59,7 +61,7 @@ class ExploreRecipeServiceTest {
                 .orElseThrow();
 
         assertThat(categoryRecipe.sql())
-                .contains("FROM gemeinden")
+                .contains("FROM opendata.gemeinden")
                 .contains("SELECT \"bezirk\", count(*) AS anzahl")
                 .contains("GROUP BY \"bezirk\"");
         assertThat(categoryRecipe.preferredChart())
@@ -83,9 +85,9 @@ class ExploreRecipeServiceTest {
         var recipes = service.generateRecipes(List.of(table()));
 
         assertThat(sqlFor(recipes, "gemeinden-count"))
-                .isEqualTo("SELECT count(*) AS anzahl\nFROM gemeinden;");
+                .isEqualTo("SELECT count(*) AS anzahl\nFROM opendata.gemeinden;");
         assertThat(sqlFor(recipes, "gemeinden-describe"))
-                .isEqualTo("DESCRIBE gemeinden;");
+                .isEqualTo("DESCRIBE opendata.gemeinden;");
         assertThat(sqlFor(recipes, "gemeinden-null-profile"))
                 .isEqualTo("""
                         SELECT
@@ -93,11 +95,11 @@ class ExploreRecipeServiceTest {
                           count(*) FILTER (WHERE "bezirk" IS NULL) AS "bezirk_fehlt",
                           count(*) FILTER (WHERE "flaeche_ha" IS NULL) AS "flaeche_ha_fehlt",
                           count(*) FILTER (WHERE "jahr" IS NULL) AS "jahr_fehlt"
-                        FROM gemeinden;""");
+                        FROM opendata.gemeinden;""");
         assertThat(sqlFor(recipes, "gemeinden-category-bezirk"))
                 .isEqualTo("""
                         SELECT "bezirk", count(*) AS anzahl
-                        FROM gemeinden
+                        FROM opendata.gemeinden
                         WHERE "bezirk" IS NOT NULL
                         GROUP BY "bezirk"
                         ORDER BY anzahl DESC
@@ -108,12 +110,12 @@ class ExploreRecipeServiceTest {
                           min("flaeche_ha") AS minimum,
                           avg("flaeche_ha") AS durchschnitt,
                           max("flaeche_ha") AS maximum
-                        FROM gemeinden
+                        FROM opendata.gemeinden
                         WHERE "flaeche_ha" IS NOT NULL;""");
         assertThat(sqlFor(recipes, "gemeinden-time-jahr"))
                 .isEqualTo("""
                         SELECT "jahr", count(*) AS anzahl
-                        FROM gemeinden
+                        FROM opendata.gemeinden
                         WHERE "jahr" IS NOT NULL
                         GROUP BY "jahr"
                         ORDER BY "jahr";""");
@@ -136,7 +138,7 @@ class ExploreRecipeServiceTest {
         var previewRecipe = service.previewRecipe(table());
 
         assertThat(previewRecipe.sql())
-                .isEqualTo("SELECT *\nFROM gemeinden;");
+                .isEqualTo("SELECT *\nFROM opendata.gemeinden;");
     }
 
     private static ExploreTableDto table() {
@@ -184,5 +186,9 @@ class ExploreRecipeServiceTest {
 
     private static ExploreProperties properties() {
         return new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, false, false, false, false);
+    }
+
+    private static CatalogDuckDbProperties duckDbProperties() {
+        return new CatalogDuckDbProperties(null, null, null, null, null, null, null, null);
     }
 }

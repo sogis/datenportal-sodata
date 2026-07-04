@@ -127,17 +127,18 @@ Hinweis: `npm ci` meldet SQLRooms-transitive Peer-Warnings mit React 19 und `npm
 
 Phase 3 ergaenzt:
 
-- Frontend-Unit-Tests fuer `buildCreateViewSql`, Tabellenname-/URL-Validierung und per-table Registrierungsergebnisse.
+- Frontend-Unit-Tests fuer DuckDB-Catalog-Attach, Schema-Explorer-Rendering, Tabellenname-/URL-Validierung und alte per-table Registrierungsergebnisse.
 - Frontend-Unit-Tests fuer den Phase-3 Query Guard: read-only Statements, blockierte Mutations-/Systembefehle, Single-Statement-Verhalten und Limit-Wrapping.
-- React-Komponententests fuer DuckDB-Initialisierung, Registrierungsstatus, Fehleranzeige, Tabellenkatalog und Preview-Tabelle.
+- React-Komponententests fuer DuckDB-Initialisierung, Catalog-Attach, Fehleranzeige, Schema Explorer und Preview-Tabelle.
 - MVC-/Header-Test fuer CSP `worker-src`, `wasm-unsafe-eval` und `connect-src`.
 - Java-Playwright-Test mit `/explore-fixtures/ch.so.oev_haltestellen.parquet`.
 
 Fixture-/Runtime-Hinweise:
 
 - Die Browser-Fixture liegt unter `src/test/resources/static/explore-fixtures/ch.so.oev_haltestellen.parquet`.
-- Die DuckDB-Wasm Parquet-Erweiterung wird same-origin unter `/explore-extensions/v1.4.3/wasm_mvp/parquet.duckdb_extension.wasm` ausgeliefert.
-- Der Playwright-Test erwartet, dass DuckDB die Parquet-Datei registriert, die Tabelle als `Tabelle geladen` markiert, kein globales `Bereit` rendert und Preview-Zeilen mit `Solothurn` und `Olten` zeigt.
+- Die Playwright-Suite nutzt `spec/fixtures/explore_fixture_catalog.duckdb`, eine kleine test-spezifische DuckDB-Datei mit `opendata.ch_so_oev_haltestellen`.
+- Die DuckDB-Wasm Parquet-Erweiterung wird same-origin unter `/explore-extensions/v1.5.4/wasm_mvp/parquet.duckdb_extension.wasm` ausgeliefert.
+- Der Playwright-Test erwartet, dass DuckDB den Catalog attached, den aktuellen View im Schema Explorer markiert, direkt gegen die attached Catalog-View queried, kein globales `Bereit` rendert und Preview-Zeilen mit `Solothurn` und `Olten` zeigt.
 
 Ausgefuehrte Befehle:
 

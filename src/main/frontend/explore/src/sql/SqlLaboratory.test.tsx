@@ -15,7 +15,7 @@ const contextWithRecipes = {
       description: 'Zeigt die ersten Zeilen.',
       tableId: 'ch_so_bauinventar',
       category: 'preview' as const,
-      sql: 'SELECT *\nFROM ch_so_bauinventar;'
+      sql: 'SELECT *\nFROM opendata.ch_so_bauinventar;'
     },
     {
       id: 'ch_so_bauinventar-gemeinde-count',
@@ -23,7 +23,7 @@ const contextWithRecipes = {
       description: 'Zählt Datensätze pro Gemeinde.',
       tableId: 'ch_so_bauinventar',
       category: 'category' as const,
-      sql: 'SELECT gemeindename, count(*) AS anzahl\nFROM ch_so_bauinventar\nGROUP BY gemeindename;',
+      sql: 'SELECT gemeindename, count(*) AS anzahl\nFROM opendata.ch_so_bauinventar\nGROUP BY gemeindename;',
       preferredChart: {
         type: 'pie' as const,
         x: 'gemeindename',
@@ -50,7 +50,7 @@ describe('SqlLaboratory', () => {
     render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
 
     const editor = screen.getByLabelText('SQL bearbeiten');
-    expect(editor).toHaveValue('SELECT *\nFROM ch_so_bauinventar;');
+    expect(editor).toHaveValue('SELECT *\nFROM opendata.ch_so_bauinventar;');
     expect(editor).toHaveAttribute('data-has-connector', 'false');
     expect(editor).toHaveAttribute('data-table-schemas', 'ch_so_bauinventar');
     expect(editor).toHaveAttribute('data-table-columns', 'egid,gemeindename');
@@ -80,7 +80,7 @@ describe('SqlLaboratory', () => {
     await user.selectOptions(screen.getByLabelText('Beispielabfrage auswählen'), 'ch_so_bauinventar-gemeinde-count');
 
     expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue(
-      'SELECT gemeindename, count(*) AS anzahl\nFROM ch_so_bauinventar\nGROUP BY gemeindename;'
+      'SELECT gemeindename, count(*) AS anzahl\nFROM opendata.ch_so_bauinventar\nGROUP BY gemeindename;'
     );
     expect(query).not.toHaveBeenCalled();
   });
@@ -88,7 +88,7 @@ describe('SqlLaboratory', () => {
   it('builds the fallback initial query with uppercase keywords and an unquoted table name', () => {
     render(<SqlLaboratory context={{...contextWithRecipes, recipes: []}} connector={connector} ready />);
 
-    expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue('SELECT *\nFROM ch_so_bauinventar;');
+    expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue('SELECT *\nFROM opendata.ch_so_bauinventar;');
   });
 
   it('renders a red run button with the Bootstrap play icon', () => {

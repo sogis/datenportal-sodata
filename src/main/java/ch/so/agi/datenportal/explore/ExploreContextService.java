@@ -4,6 +4,7 @@ import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.service.CatalogService;
+import ch.so.agi.datenportal.config.CatalogDuckDbProperties;
 import ch.so.agi.datenportal.web.CatalogNotFoundException;
 import ch.so.agi.datenportal.web.CatalogUrlFactory;
 import java.util.List;
@@ -18,6 +19,7 @@ public final class ExploreContextService {
     private final ExploreRecipeService recipeService;
     private final ExploreCodeSnippetService codeSnippetService;
     private final ExploreProperties properties;
+    private final CatalogDuckDbProperties catalogDuckDbProperties;
     private final CatalogUrlFactory urlFactory;
     private final ExploreContextJsonWriter jsonWriter;
 
@@ -27,6 +29,7 @@ public final class ExploreContextService {
             ExploreRecipeService recipeService,
             ExploreCodeSnippetService codeSnippetService,
             ExploreProperties properties,
+            CatalogDuckDbProperties catalogDuckDbProperties,
             CatalogUrlFactory urlFactory,
             ExploreContextJsonWriter jsonWriter) {
         this.catalogService = catalogService;
@@ -34,6 +37,7 @@ public final class ExploreContextService {
         this.recipeService = recipeService;
         this.codeSnippetService = codeSnippetService;
         this.properties = properties;
+        this.catalogDuckDbProperties = catalogDuckDbProperties;
         this.urlFactory = urlFactory;
         this.jsonWriter = jsonWriter;
     }
@@ -78,7 +82,7 @@ public final class ExploreContextService {
                 entry.title(),
                 canonicalUrl);
         return new ExploreContextDto(
-                1,
+                2,
                 entry.identifier(),
                 entry.title(),
                 Optional.of(entry.description()),
@@ -86,6 +90,10 @@ public final class ExploreContextService {
                 Optional.of(entry.modified().toString()),
                 entry.metadata().licenseUri().map(Object::toString),
                 properties.execution(),
+                new ExploreCatalogDatabaseDto(
+                        "/catalog/catalog.duckdb",
+                        "catalog",
+                        catalogDuckDbProperties.schema()),
                 tables,
                 recipeService.generateRecipes(tables),
                 codeSnippetService.generateSnippets(source, tables),

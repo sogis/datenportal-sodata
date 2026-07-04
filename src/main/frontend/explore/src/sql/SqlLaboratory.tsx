@@ -2,8 +2,9 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {makeQualifiedTableName, type DataTable, type DuckDbConnector, type QueryHandle} from '@sqlrooms/duckdb';
 import type {Table} from 'apache-arrow';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
-import type {ExploreContextDto, ExploreRecipeDto, ExploreTableDto} from '../app/ExploreContext';
+import type {ExploreCatalogDatabaseDto, ExploreContextDto, ExploreRecipeDto, ExploreTableDto} from '../app/ExploreContext';
 import {ChartPanel} from '../charts/ChartPanel';
+import {executeDuckDbQuery} from '../duckdb/executeDuckDbQuery';
 import {hasResultLimitApplied, normalizeSqlForExecution, queryTimeoutMessage} from '../duckdb/querySafety';
 import {ResultPanel} from '../results/ResultPanel';
 import {idleQueryResult, type QueryResultState} from '../results/queryResultTypes';
@@ -29,7 +30,8 @@ export function SqlLaboratory({
   onResultChange?: (result: QueryResultState) => void;
 }) {
   const initialRecipe = useMemo(() => context.recipes[0], [context.recipes]);
-  const initialSql = useMemo(() => initialRecipe?.sql ?? buildInitialSql(context.tables[0]), [
+  const initialSql = useMemo(() => initialRecipe?.sql ?? buildInitialSql(context.tables[0], context.catalogDatabase), [
+    context.catalogDatabase,
     context.tables,
     initialRecipe
   ]);
@@ -45,7 +47,10 @@ export function SqlLaboratory({
   const [rowLimit, setRowLimit] = useState(Math.min(DEFAULT_ROW_LIMIT, context.execution.maxResultRows));
   const [exportingFormat, setExportingFormat] = useState<ResultExportFormat | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
-  const tableSchemas = useMemo(() => context.tables.map(toSqlRoomsDataTable), [context.tables]);
+  const tableSchemas = useMemo(
+    () => context.tables.map((table) => toSqlRoomsDataTable(table, context.catalogDatabase)),
+    [context.catalogDatabase, context.tables]
+  );
   const getLatestSchemas = useCallback(() => ({tableSchemas}), [tableSchemas]);
   const selectedRecipe = useMemo(
     () => context.recipes.find((recipe) => recipe.id === selectedRecipeId),
@@ -115,7 +120,7 @@ export function SqlLaboratory({
     setResult(runningResult);
 
     try {
-      const handle = connector.query(executedSql, {signal: timeoutController.signal});
+      const handle = executeDuckDbQuery(connector, executedSql, {signal: timeoutController.signal});
       activeQuery.current = handle;
       const table = await handle;
       const durationMs = performance.now() - startedAt;
@@ -331,20 +336,25 @@ function ResultViewToggle({
   );
 }
 
-function buildInitialSql(table: ExploreTableDto | undefined): string {
+function buildInitialSql(table: ExploreTableDto | undefined, catalogDatabase: ExploreCatalogDatabaseDto): string {
   if (!table) {
     return '';
   }
   return `SELECT *
-FROM ${table.name};`;
+FROM ${catalogDatabase.schema}.${table.name};`;
 }
 
-function toSqlRoomsDataTable(table: ExploreTableDto): DataTable {
-  const qualifiedName = makeQualifiedTableName({schema: 'main', table: table.name});
+function toSqlRoomsDataTable(table: ExploreTableDto, catalogDatabase: ExploreCatalogDatabaseDto): DataTable {
+  const qualifiedName = makeQualifiedTableName({
+    database: catalogDatabase.database,
+    schema: catalogDatabase.schema,
+    table: table.name
+  });
   return {
     table: qualifiedName,
     isView: true,
-    schema: qualifiedName.schema ?? 'main',
+    database: catalogDatabase.database,
+    schema: qualifiedName.schema ?? catalogDatabase.schema,
     tableName: table.name,
     columns: table.columns.map((column) => ({name: column.name, type: column.type})),
     rowCount: table.rowCountEstimate,

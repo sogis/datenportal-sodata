@@ -7,6 +7,13 @@ export function classifyExploreRuntimeError(error: unknown): ExploreRuntimeError
   const detail = toErrorMessage(error);
   const normalized = detail.toLowerCase();
 
+  if (normalized.includes('catalog')) {
+    return {
+      summary: 'DuckDB-Catalog konnte im Browser nicht geladen werden.',
+      detail
+    };
+  }
+
   if (normalized.includes('cors') || normalized.includes('cross-origin')) {
     return {
       summary: 'Parquet-Datei konnte wegen CORS nicht im Browser geladen werden.',

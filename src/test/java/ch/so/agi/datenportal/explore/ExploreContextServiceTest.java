@@ -15,6 +15,7 @@ import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.catalog.service.CatalogService;
+import ch.so.agi.datenportal.config.CatalogDuckDbProperties;
 import ch.so.agi.datenportal.web.CatalogUrlFactory;
 import java.net.URI;
 import java.time.Instant;
@@ -35,15 +36,18 @@ class ExploreContextServiceTest {
 
         ExploreContextDto context = service.buildContext("ch.so.gemeinden");
 
-        assertThat(context.version()).isEqualTo(1);
+        assertThat(context.version()).isEqualTo(2);
         assertThat(context.datasetId()).isEqualTo("ch.so.gemeinden");
         assertThat(context.canonicalUrl()).isEqualTo("/datasets/ch.so.gemeinden");
+        assertThat(context.catalogDatabase().url()).isEqualTo("/catalog/catalog.duckdb");
+        assertThat(context.catalogDatabase().database()).isEqualTo("catalog");
+        assertThat(context.catalogDatabase().schema()).isEqualTo("opendata");
         assertThat(context.tables()).hasSize(1);
         assertThat(context.tables().getFirst().name()).isEqualTo("ch_so_gemeinden");
         assertThat(context.tables().getFirst().columns()).extracting(ExploreColumnDto::name)
                 .contains("bfs_nr", "gemeindename", "flaeche_ha");
         assertThat(context.recipes()).isNotEmpty();
-        assertThat(context.recipes().getFirst().sql()).isEqualTo("SELECT *\nFROM ch_so_gemeinden;");
+        assertThat(context.recipes().getFirst().sql()).isEqualTo("SELECT *\nFROM opendata.ch_so_gemeinden;");
         assertThat(context.codeSnippets()).extracting(ExploreCodeSnippetDto::language)
                 .contains(ExploreSnippetLanguage.SQL, ExploreSnippetLanguage.PYTHON, ExploreSnippetLanguage.R);
         assertThat(context.featureFlags().charts()).isTrue();
@@ -107,7 +111,7 @@ class ExploreContextServiceTest {
         assertThat(context.tables().getFirst().parquetUrl())
                 .isEqualTo("https://data.so.ch/download/ch.so.gemeinden_2026.parquet");
         assertThat(context.recipes()).isNotEmpty();
-        assertThat(context.recipes().getFirst().sql()).isEqualTo("SELECT *\nFROM ch_so_gemeinden_2026;");
+        assertThat(context.recipes().getFirst().sql()).isEqualTo("SELECT *\nFROM opendata.ch_so_gemeinden_2026;");
     }
 
     @Test
@@ -138,14 +142,20 @@ class ExploreContextServiceTest {
         var sanitizer = new ExploreSqlNameSanitizer();
         var roleDetector = new ExploreColumnRoleDetector();
         var properties = new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, false, false, false, false);
+        var duckDbProperties = duckDbProperties();
         return new ExploreContextService(
                 catalogService,
                 new ExploreTableService(sanitizer, roleDetector),
-                new ExploreRecipeService(sanitizer, properties),
+                new ExploreRecipeService(sanitizer, properties, duckDbProperties),
                 new ExploreCodeSnippetService(),
                 properties,
+                duckDbProperties,
                 new CatalogUrlFactory(),
                 new ExploreContextJsonWriter());
+    }
+
+    private static CatalogDuckDbProperties duckDbProperties() {
+        return new CatalogDuckDbProperties(null, null, null, null, null, null, null, null);
     }
 
     private static DatasetEntry dataset(

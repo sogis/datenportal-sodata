@@ -1,23 +1,32 @@
 import {useEffect, useMemo, useState} from 'react';
-import type {DuckDbConnector} from '@sqlrooms/duckdb';
+import type {DataTable, DbSchemaNode, DuckDbConnector} from '@sqlrooms/duckdb';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
-import type {ExploreColumnDto, ExploreContextDto, ExploreTableDto} from './ExploreContext';
+import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
 import {classifyExploreRuntimeError, type ExploreRuntimeError} from './ExploreRuntimeError';
+import {SchemaExplorerPanel} from './SchemaExplorerPanel';
+import {attachCatalogDatabase, type CatalogDatabaseRegistration} from '../duckdb/attachCatalogDatabase';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
-import {registerParquetTables, type RegisteredTable} from '../duckdb/registerParquetTables';
-import {loadRuntimeSchemas, type RuntimeSchemaReadStage} from '../duckdb/runtimeSchema';
+import {mergeRuntimeColumns} from '../duckdb/runtimeSchema';
 import {SqlLaboratory} from '../sql/SqlLaboratory';
 
 type RuntimePhase = 'idle' | 'initializing' | 'registering' | 'ready' | 'error';
 
+const EMPTY_SCHEMA_TREES: DbSchemaNode[] = [];
+
 export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [phase, setPhase] = useState<RuntimePhase>('idle');
   const [runtimeError, setRuntimeError] = useState<ExploreRuntimeError | null>(null);
-  const [registeredTables, setRegisteredTables] = useState<RegisteredTable[]>([]);
+  const [catalogRegistration, setCatalogRegistration] = useState<CatalogDatabaseRegistration | undefined>(undefined);
   const [runtimeTables, setRuntimeTables] = useState<ExploreTableDto[]>(() => withoutVisibleRuntimeMetadata(context.tables));
   const [connector, setConnector] = useState<DuckDbConnector | undefined>(undefined);
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
   const room = useMemo(() => createExploreRoomStore(context), [context]);
+  const schemaTrees = room.useRoomStore((state) => state.db.schemaTrees) ?? EMPTY_SCHEMA_TREES;
+  const catalogSchemaTrees = useMemo(
+    () => schemaTrees.filter((node) => node.object.type !== 'database' || node.object.name === context.catalogDatabase.database),
+    [context.catalogDatabase.database, schemaTrees]
+  );
+  const refreshingSchemas = room.useRoomStore((state) => state.db.isRefreshingTableSchemas);
   const isNarrowWorkbench = useIsNarrowWorkbench();
   const runtimeContext = useMemo(() => ({
     ...context,
@@ -30,13 +39,18 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     }
 
     let active = true;
-    const primary = primaryTable;
+    const primaryTableName = primaryTable.name;
 
     async function initializeDuckDb() {
       setPhase('initializing');
       setRuntimeError(null);
       setRuntimeTables(withoutVisibleRuntimeMetadata(context.tables));
-      setRegisteredTables(context.tables.map((table) => ({table, status: 'pending', sql: ''})));
+      setCatalogRegistration({
+        status: 'pending',
+        url: context.catalogDatabase.url,
+        database: context.catalogDatabase.database,
+        schema: context.catalogDatabase.schema
+      });
       setConnector(undefined);
 
       try {
@@ -48,30 +62,29 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         const nextConnector = await room.roomStore.getState().db.getConnector();
         setConnector(nextConnector);
         setPhase('registering');
-        const registrations = await registerParquetTables(nextConnector, context.tables);
+
+        const registration = await attachCatalogDatabase(nextConnector, context.catalogDatabase);
         if (!active) {
           return;
         }
-        setRegisteredTables(registrations);
-
-        const primaryRegistration = registrations.find((registration) => registration.table.id === primary.id);
-        if (!primaryRegistration || primaryRegistration.status === 'failed') {
-          throw new Error(primaryRegistration?.error ?? 'Die primäre Parquet-Datei konnte nicht registriert werden.');
-        }
-
-        const failedRegistration = registrations.find((registration) => registration.status === 'failed');
-        if (failedRegistration) {
-          setRuntimeError(classifyExploreRuntimeError(failedRegistration.error ?? 'Mindestens eine Parquet-Datei konnte nicht registriert werden.'));
+        setCatalogRegistration(registration);
+        if (registration.status === 'failed') {
+          setRuntimeError(classifyExploreRuntimeError(registration.error ?? 'Der DuckDB-Catalog konnte nicht geladen werden.'));
           setPhase('error');
           return;
         }
 
-        const nextRuntimeTables = await loadRuntimeSchemas(nextConnector, registrations, (table, error, stage) => {
-          console.warn(runtimeMetadataWarning(table, stage), error);
-        });
+        const catalogTables = await room.roomStore.getState().db.refreshTableSchemas();
         if (!active) {
           return;
         }
+
+        const nextRuntimeTables = mergeCatalogRuntimeTables(context.tables, catalogTables, context.catalogDatabase);
+        const nextPrimaryTable = selectPrimaryTable(nextRuntimeTables);
+        if (!nextPrimaryTable || nextPrimaryTable.columns.length === 0) {
+          throw new Error(`Die View ${primaryTableName} wurde im DuckDB-Catalog nicht gefunden.`);
+        }
+
         setRuntimeTables(nextRuntimeTables);
         setPhase('ready');
       } catch (error) {
@@ -91,6 +104,11 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     };
   }, [context, primaryTable, room]);
 
+  async function refreshSchemas() {
+    const catalogTables = await room.roomStore.getState().db.refreshTableSchemas();
+    setRuntimeTables(mergeCatalogRuntimeTables(context.tables, catalogTables, context.catalogDatabase));
+  }
+
   if (context.tables.length === 0) {
     return (
       <section className="dp-explore-workbench dp-explore-workbench--unavailable" aria-labelledby="explore-unavailable-title">
@@ -104,8 +122,17 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     );
   }
 
-  const ready = phase === 'ready' && Boolean(connector && primaryTable && isTableRegistered(primaryTable, registeredTables));
-  const schemaPanel = <SchemaPanel tables={runtimeTables} registrations={registeredTables} />;
+  const ready = phase === 'ready' && Boolean(connector && catalogRegistration?.status === 'registered');
+  const activeTable = selectPrimaryTable(runtimeTables);
+  const schemaPanel = (
+    <SchemaExplorerPanel
+      schemaTrees={catalogSchemaTrees}
+      catalogDatabase={context.catalogDatabase}
+      activeTable={activeTable}
+      refreshing={refreshingSchemas}
+      onRefresh={refreshSchemas}
+    />
+  );
   const laboratoryPanel = <SqlLaboratory context={runtimeContext} connector={connector} ready={ready} />;
   const workbenchBody = isNarrowWorkbench ? (
     <div className="dp-explore-workbench__body">
@@ -119,16 +146,16 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     </div>
   ) : (
     <PanelGroup
-      autoSaveId={`datenportal.explore.${context.datasetId}.workbench.v2`}
+      autoSaveId={`datenportal.explore.${context.datasetId}.workbench.v3`}
       className="dp-explore-workbench__body dp-explore-resizable-group dp-explore-resizable-group--horizontal"
       direction="horizontal"
     >
       <Panel
         className="dp-explore-data-panel"
-        defaultSize={22}
+        defaultSize={25}
         id="schema"
-        maxSize={40}
-        minSize={14}
+        maxSize={42}
+        minSize={16}
         order={1}
         tagName="aside"
         aria-label="Daten und Schema"
@@ -138,7 +165,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
       <ExploreResizeHandle direction="vertical" label="Schema und SQL-Labor Grösse anpassen" />
       <Panel
         className="dp-explore-workbench__main"
-        defaultSize={78}
+        defaultSize={75}
         id="laboratory"
         minSize={45}
         order={2}
@@ -173,7 +200,7 @@ function statusText(phase: RuntimePhase): string {
     case 'initializing':
       return 'DuckDB wird initialisiert';
     case 'registering':
-      return 'Parquet-Dateien werden registriert';
+      return 'DuckDB-Catalog wird geladen';
     case 'ready':
       return 'Bereit';
     case 'error':
@@ -218,139 +245,30 @@ function ExploreRuntimeOverlay({phase, error}: {phase: RuntimePhase; error: Expl
   );
 }
 
-function SchemaPanel({tables, registrations}: {tables: ExploreTableDto[]; registrations: RegisteredTable[]}) {
-  return (
-    <div className="dp-explore-schema-panel">
-      {tables.map((table) => {
-        const registration = registrations.find((item) => item.table.id === table.id);
-        const registrationError = registration?.status === 'failed' && registration.error
-          ? classifyExploreRuntimeError(registration.error)
-          : undefined;
-        return (
-          <article className="dp-explore-schema-card" key={table.id} aria-labelledby={`schema-card-${table.id}`}>
-            <header className="dp-explore-schema-card__header">
-              <h2 id={`schema-card-${table.id}`}>{table.name}</h2>
-              <span
-                aria-label={registrationStatusAriaLabel(table, registration)}
-                className={registrationStatusClassName(registration)}
-                title={registrationStatusDescription(registration)}
-              >
-                {registrationStatusText(registration)}
-              </span>
-            </header>
-            <dl className="dp-explore-schema-card__columns" aria-label={`Schema ${table.name}`}>
-              {schemaColumns(table).map((column) => (
-                <div className="dp-explore-schema-card__column" key={column.name}>
-                  <dt title={column.description ?? column.name}>{column.name}</dt>
-                  <dd title={column.type}>
-                    {shortTypeLabel(column.type)}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            {(table.columns.length > 0 || typeof table.rowCountEstimate === 'number') && (
-              <footer className="dp-explore-schema-card__footer">
-                {table.columns.length > 0 && (
-                  <span>{table.columns.length === 1 ? '1 column' : `${formatSwissNumber(table.columns.length)} columns`}</span>
-                )}
-                {typeof table.rowCountEstimate === 'number' && (
-                  <span>{formatSwissNumber(table.rowCountEstimate)} rows</span>
-                )}
-              </footer>
-            )}
-            {registrationError && (
-              <p className="dp-explore-schema-card__error">
-                {registrationError.summary}
-                {registrationError.detail && registrationError.detail !== registrationError.summary ? ` ${registrationError.detail}` : ''}
-              </p>
-            )}
-          </article>
-        );
-      })}
-    </div>
-  );
-}
-
-function schemaColumns(table: ExploreTableDto): Array<{name: string; type: string; description?: string}> {
-  return table.columns.map((column: ExploreColumnDto) => ({
-    name: column.name,
-    type: column.type,
-    description: column.description
-  }));
-}
-
-function runtimeMetadataWarning(table: ExploreTableDto, stage: RuntimeSchemaReadStage): string {
-  if (stage === 'rowCount') {
-    return `Explore runtime row count could not be read for table ${table.name}. Keeping visible row count empty.`;
-  }
-  return `Explore runtime schema could not be read for table ${table.name}. Keeping visible schema empty.`;
+function mergeCatalogRuntimeTables(
+  contextTables: ExploreTableDto[],
+  catalogTables: DataTable[],
+  catalogDatabase: ExploreContextDto['catalogDatabase']
+): ExploreTableDto[] {
+  return contextTables.map((table) => {
+    const catalogTable = catalogTables.find((candidate) =>
+      candidate.tableName === table.name
+      && candidate.schema === catalogDatabase.schema
+      && (candidate.database ?? candidate.table.database) === catalogDatabase.database
+    );
+    if (!catalogTable) {
+      return withoutVisibleRuntimeMetadata([table])[0];
+    }
+    return {
+      ...table,
+      columns: mergeRuntimeColumns(table.columns, catalogTable.columns),
+      rowCountEstimate: table.rowCountEstimate
+    };
+  });
 }
 
 function withoutVisibleRuntimeMetadata(tables: ExploreTableDto[]): ExploreTableDto[] {
   return tables.map((table) => ({...table, columns: [], rowCountEstimate: undefined}));
-}
-
-function shortTypeLabel(type: string): string {
-  const normalized = type.toUpperCase();
-  if (normalized.includes('TIMESTAMP') || normalized.includes('DATE')) {
-    return normalized.includes('TIMESTAMP') ? 'TIMESTAMP' : 'DATE';
-  }
-  if (normalized.includes('DOUBLE') || normalized.includes('FLOAT') || normalized.includes('DECIMAL')) {
-    return 'DOUBLE';
-  }
-  if (normalized.includes('BIGINT') || normalized.includes('LONG')) {
-    return 'BIGINT';
-  }
-  if (normalized.includes('INT')) {
-    return 'INT';
-  }
-  if (normalized.includes('BOOL')) {
-    return 'BOOLEAN';
-  }
-  if (normalized.includes('CHAR') || normalized.includes('TEXT') || normalized.includes('STRING')) {
-    return 'VARCHAR';
-  }
-  return normalized.length > 12 ? normalized.slice(0, 12) : normalized;
-}
-
-function isTableRegistered(table: ExploreTableDto, registrations: RegisteredTable[]): boolean {
-  return registrations.some((registration) => registration.table.id === table.id && registration.status === 'registered');
-}
-
-function registrationStatusText(registration: RegisteredTable | undefined): string {
-  if (!registration) {
-    return 'Wartet';
-  }
-  if (registration.status === 'registered') {
-    return 'Tabelle geladen';
-  }
-  return registration.status === 'pending' ? 'Wird registriert' : 'Fehler';
-}
-
-function registrationStatusClassName(registration: RegisteredTable | undefined): string {
-  if (registration?.status === 'registered') {
-    return 'dp-explore-table-status is-ok';
-  }
-  if (registration?.status === 'failed') {
-    return 'dp-explore-table-status is-error';
-  }
-  return 'dp-explore-table-status';
-}
-
-function registrationStatusDescription(registration: RegisteredTable | undefined): string {
-  if (!registration) {
-    return 'Die Parquet-Datei wartet auf die lokale DuckDB-Wasm-Registrierung.';
-  }
-  if (registration.status === 'registered') {
-    return 'Parquet ist als lokaler DuckDB-View im Browser geladen.';
-  }
-  return registration.status === 'pending'
-    ? 'Die Parquet-Datei wird gerade als lokaler DuckDB-View im Browser geladen.'
-    : 'Die Parquet-Datei konnte nicht als lokaler DuckDB-View im Browser geladen werden.';
-}
-
-function registrationStatusAriaLabel(table: ExploreTableDto, registration: RegisteredTable | undefined): string {
-  return `Tabelle ${table.name}: ${registrationStatusText(registration)}. ${registrationStatusDescription(registration)}`;
 }
 
 function useIsNarrowWorkbench(): boolean {
@@ -381,8 +299,4 @@ function ExploreResizeHandle({direction, label}: {direction: 'horizontal' | 'ver
       <span className="dp-explore-resize-handle__knob" aria-hidden="true" />
     </PanelResizeHandle>
   );
-}
-
-function formatSwissNumber(value: number): string {
-  return new Intl.NumberFormat('de-CH').format(value);
 }

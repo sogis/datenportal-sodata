@@ -79,8 +79,14 @@ export const exploreExecutionSchema = z.object({
   queryTimeoutMs: z.number()
 });
 
+export const exploreCatalogDatabaseSchema = z.object({
+  url: z.string(),
+  database: z.string(),
+  schema: z.string()
+});
+
 export const exploreContextSchema = z.object({
-  version: z.literal(1),
+  version: z.literal(2),
   datasetId: z.string(),
   title: z.string(),
   description: z.string().optional(),
@@ -88,6 +94,7 @@ export const exploreContextSchema = z.object({
   updatedAt: z.string().optional(),
   license: z.string().optional(),
   execution: exploreExecutionSchema,
+  catalogDatabase: exploreCatalogDatabaseSchema,
   tables: z.array(exploreTableSchema),
   recipes: z.array(exploreRecipeSchema),
   codeSnippets: z.array(exploreCodeSnippetSchema),
@@ -102,6 +109,7 @@ export type ExploreRecipeDto = z.infer<typeof exploreRecipeSchema>;
 export type ExploreCodeSnippetDto = z.infer<typeof exploreCodeSnippetSchema>;
 export type ExploreFeatureFlagsDto = z.infer<typeof exploreFeatureFlagsSchema>;
 export type ExploreExecutionDto = z.infer<typeof exploreExecutionSchema>;
+export type ExploreCatalogDatabaseDto = z.infer<typeof exploreCatalogDatabaseSchema>;
 export type ExploreContextDto = z.infer<typeof exploreContextSchema>;
 
 export function parseExploreContext(rawJson: string): ExploreContextDto {

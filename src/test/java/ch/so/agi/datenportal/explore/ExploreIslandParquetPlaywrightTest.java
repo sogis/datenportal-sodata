@@ -51,6 +51,7 @@ import org.springframework.context.annotation.Primary;
 @Tag("playwright")
 @SpringBootTest(
         classes = {DatenportalApplication.class, ExploreIslandParquetPlaywrightTest.ExploreFixtureCatalogConfiguration.class},
+        properties = "datenportal.catalog.duckdb.classpath-location=explore_fixture_catalog.duckdb",
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExploreIslandParquetPlaywrightTest {
@@ -84,11 +85,11 @@ class ExploreIslandParquetPlaywrightTest {
             List<String> browserErrors = collectBrowserErrors(page);
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
-            waitForExploreReady(page);
+            waitForExploreReady(page, browserErrors);
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
-            page.waitForSelector("[aria-label='SQL Ergebnis']");
+            waitForSqlResult(page, browserErrors);
 
-            assertThat(page.locator("text=Tabelle geladen").count()).isEqualTo(1);
+            assertThat(page.locator(".dp-schema-explorer__node.is-active:has-text('ch_so_oev_haltestellen')").count()).isEqualTo(1);
             assertThat(page.getByText("Bereit", new Page.GetByTextOptions().setExact(true)).count()).isZero();
             assertThat(page.locator("[aria-label='SQL Ergebnis']").count()).isEqualTo(1);
             assertThat(page.locator("text=Solothurn").count()).isGreaterThanOrEqualTo(1);
@@ -110,7 +111,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
             page.waitForSelector("[aria-label='SQL Ergebnis']");
 
-            assertThat(page.locator("text=Tabelle geladen").count()).isEqualTo(1);
+            assertThat(page.locator(".dp-schema-explorer__node.is-active:has-text('ch_so_oev_haltestellen')").count()).isEqualTo(1);
             assertThat(page.locator("[aria-label='SQL Ergebnis']").count()).isEqualTo(1);
             assertThat(page.locator("text=Solothurn").count()).isGreaterThanOrEqualTo(1);
             assertThat(page.locator("text=Olten").count()).isGreaterThanOrEqualTo(1);
@@ -168,7 +169,7 @@ class ExploreIslandParquetPlaywrightTest {
 
             waitForExploreReady(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .monaco-editor");
-            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
             assertThat(page.locator("[data-testid='sql-monaco-editor'] .monaco-editor").count()).isEqualTo(1);
             assertThat(page.locator("[data-testid='sql-monaco-editor'] .view-line:has-text('limit 100')").count()).isZero();
             assertThat(externalMonacoRequests).isEmpty();
@@ -204,7 +205,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
-            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
@@ -226,12 +227,11 @@ class ExploreIslandParquetPlaywrightTest {
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
-            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
-            var tableName = page.locator(".dp-explore-schema-card h2").first().textContent().trim();
-            var firstColumn = page.locator(".dp-explore-schema-card__column dt").first().textContent().trim();
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
+            var tableName = page.locator(".dp-schema-explorer__node.is-active .dp-schema-explorer__name").first().textContent().trim();
+            var firstColumn = page.locator(".dp-schema-explorer__column .dp-schema-explorer__name").first().textContent().trim();
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
-            assertThat(page.locator(".dp-explore-schema-card__column dt:has-text('wert')").count()).isEqualTo(1);
-            page.waitForSelector(".dp-explore-schema-card__footer:has-text('rows')");
+            assertThat(page.locator(".dp-schema-explorer__column .dp-schema-explorer__name:has-text('wert')").count()).isEqualTo(1);
 
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
@@ -268,7 +268,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
-            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
 
             BoundingBox editorBox = requireBoundingBox(page.locator("[data-testid='sql-monaco-editor'] .monaco-editor"));
             assertThat(editorBox.height).isGreaterThan(120);
@@ -282,7 +282,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
-            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
@@ -423,7 +423,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
-            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
             String wideTallQuery = "select range as n, range + 1 as n_01, range + 2 as n_02, "
                     + "range + 3 as n_03, range + 4 as n_04, range + 5 as n_05, "
                     + "range + 6 as n_06, range + 7 as n_07, range + 8 as n_08, "
@@ -477,23 +477,25 @@ class ExploreIslandParquetPlaywrightTest {
     void resultChartViewRendersRechartsAndPieColors() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
             Page page = context.newPage();
+            List<String> browserErrors = collectBrowserErrors(page);
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
-            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('select')");
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
-            page.keyboard().type("""
+            page.keyboard().insertText("""
                     select 'Solothurn' as gemeinde, 3 as anzahl
                     union all select 'Olten' as gemeinde, 2 as anzahl
                     union all select 'Grenchen' as gemeinde, 1 as anzahl;
                     """);
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('Grenchen')");
             page.keyboard().press("Escape");
 
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
 
-            page.waitForSelector("[aria-label='SQL Ergebnis']");
+            waitForSqlResult(page, browserErrors);
             assertThat(page.locator(".dp-explore-chart").count()).isZero();
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
                     new Page.GetByRoleOptions().setName("Diagramm")).click();
@@ -572,8 +574,39 @@ class ExploreIslandParquetPlaywrightTest {
     }
 
     private static void waitForExploreReady(Page page) {
-        page.waitForSelector(".dp-explore-table-status:has-text('Tabelle geladen')");
-        page.waitForFunction("() => !document.querySelector('.dp-explore-runtime-overlay')");
+        waitForExploreReady(page, List.of());
+    }
+
+    private static void waitForSqlResult(Page page, List<String> browserErrors) {
+        try {
+            page.waitForSelector("[aria-label='SQL Ergebnis']");
+        } catch (TimeoutError error) {
+            String bodyText = page.locator("body").innerText(new Locator.InnerTextOptions().setTimeout(1_000));
+            throw new AssertionError("SQL result did not appear. Browser errors: " + browserErrors
+                    + ". Body: " + bodyText, error);
+        }
+    }
+
+    private static void waitForExploreReady(Page page, List<String> browserErrors) {
+        try {
+            page.waitForSelector(".dp-schema-explorer__node.is-active");
+            page.waitForFunction("() => !document.querySelector('.dp-explore-runtime-overlay')");
+        } catch (TimeoutError error) {
+            String bodyText = page.locator("body").innerText(new Locator.InnerTextOptions().setTimeout(1_000));
+            String overlayText = String.join(" | ", page.locator(".dp-explore-runtime-overlay").allTextContents());
+            String contextText = page.locator("#datenportal-explore-context").textContent(new Locator.TextContentOptions().setTimeout(1_000));
+            throw new AssertionError("Explore did not reach ready state. Overlay: " + overlayText
+                    + ". Context: " + truncate(contextText)
+                    + ". Browser errors: " + browserErrors
+                    + ". Body: " + bodyText, error);
+        }
+    }
+
+    private static String truncate(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.length() <= 4_000 ? text : text.substring(0, 4_000) + "...";
     }
 
     private static List<String> collectBrowserErrors(Page page) {

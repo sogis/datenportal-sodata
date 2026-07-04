@@ -1,5 +1,6 @@
 package ch.so.agi.datenportal.explore;
 
+import ch.so.agi.datenportal.config.CatalogDuckDbProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,10 +16,15 @@ public final class ExploreRecipeService {
 
     private final ExploreSqlNameSanitizer sqlNameSanitizer;
     private final ExploreProperties properties;
+    private final CatalogDuckDbProperties catalogDuckDbProperties;
 
-    public ExploreRecipeService(ExploreSqlNameSanitizer sqlNameSanitizer, ExploreProperties properties) {
+    public ExploreRecipeService(
+            ExploreSqlNameSanitizer sqlNameSanitizer,
+            ExploreProperties properties,
+            CatalogDuckDbProperties catalogDuckDbProperties) {
         this.sqlNameSanitizer = sqlNameSanitizer;
         this.properties = properties;
+        this.catalogDuckDbProperties = catalogDuckDbProperties;
     }
 
     public List<ExploreRecipeDto> generateRecipes(List<ExploreTableDto> tables) {
@@ -182,7 +188,8 @@ public final class ExploreRecipeService {
 
     private String tableName(ExploreTableDto table) {
         sqlNameSanitizer.assertSafeTableName(table.name());
-        return table.name();
+        sqlNameSanitizer.assertSafeTableName(catalogDuckDbProperties.schema());
+        return catalogDuckDbProperties.schema() + "." + table.name();
     }
 
     private String columnName(ExploreColumnDto column) {

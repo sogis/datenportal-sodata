@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@duckdb/duckdb-wasm": "1.33.1-dev57.0",
     "@radix-ui/react-scroll-area": "1.2.13",
     "@sqlrooms/data-table": "0.28.0",
     "@sqlrooms/duckdb": "0.28.0",
@@ -26,6 +27,9 @@
     "react-hook-form": "7.80.0",
     "react-resizable-panels": "3.0.6",
     "zod": "4.4.3"
+  },
+  "overrides": {
+    "@duckdb/duckdb-wasm": "1.33.1-dev57.0"
   },
   "devDependencies": {
     "@testing-library/dom": "10.4.1",

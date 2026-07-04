@@ -1,7 +1,7 @@
 import type {ExploreContextDto} from '../app/ExploreContext';
 
 export const sampleExploreContext: ExploreContextDto = {
-  version: 1,
+  version: 2,
   datasetId: 'ch.so.bauinventar',
   title: 'Bauinventar',
   description: 'Schützenswerte und geschützte Gebäude.',
@@ -14,6 +14,11 @@ export const sampleExploreContext: ExploreContextDto = {
     maxPreviewRows: 100,
     maxResultRows: 10000,
     queryTimeoutMs: 30000
+  },
+  catalogDatabase: {
+    url: '/catalog/catalog.duckdb',
+    database: 'catalog',
+    schema: 'opendata'
   },
   tables: [
     {
@@ -44,7 +49,7 @@ export const sampleExploreContext: ExploreContextDto = {
       description: 'Zeigt die ersten Zeilen.',
       tableId: 'ch_so_bauinventar',
       category: 'preview',
-      sql: 'SELECT *\nFROM ch_so_bauinventar;'
+      sql: 'SELECT *\nFROM opendata.ch_so_bauinventar;'
     }
   ],
   codeSnippets: [

@@ -2,7 +2,7 @@
 
 Status: SQL-Labor with result charts
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, registriert backendseitig gelieferte Parquet-Dateien als Views und rendert ein vollflaechiges SQL-Labor mit Schema-Karten, Monaco-Editor, rotem `Ausfuehren`-Button, kompakter Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporten fuer CSV, XLSX und Parquet. Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags bleiben deaktiviert und laden keine schweren Runtime-Pakete.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, laedt `catalog.duckdb`, attached sie read-only als `catalog`, setzt `USE "catalog"."opendata"` und rendert daraus den Schema Explorer. SQL wird direkt gegen die attached Catalog-Views ausgefuehrt, damit auch Joins zwischen mehreren Parquet-Dateien moeglich sind. Das SQL-Labor enthaelt Monaco-Editor, roten `Ausfuehren`-Button, kompakte Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporte fuer CSV, XLSX und Parquet. Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags bleiben deaktiviert und laden keine schweren Runtime-Pakete.
 
 ## Phase-2-Island laedt nicht
 
@@ -37,11 +37,11 @@ Aktueller Stand:
 
 ## DuckDB Export Extensions
 
-DuckDB-Wasm laedt die Parquet-Erweiterung beim ersten `read_parquet(...)` oder Parquet-Export. Der XLSX-Export laedt zusaetzlich die Excel-Erweiterung. Ohne weitere Konfiguration versucht DuckDB dafuer `https://extensions.duckdb.org/.../*.duckdb_extension.wasm`.
+DuckDB-Wasm laedt die HTTPFS-Erweiterung beim Catalog-Attach, die Parquet-Erweiterung beim ersten `read_parquet(...)` oder Parquet-Export und die Excel-Erweiterung beim XLSX-Export. Ohne weitere Konfiguration versucht DuckDB dafuer `https://extensions.duckdb.org/.../*.duckdb_extension.wasm`.
 
 Phase-3-Entscheid:
 
-- Die signierten offiziellen Parquet- und Excel-Erweiterungen fuer DuckDB-Wasm `v1.4.3/wasm_mvp` liegen same-origin unter `/explore-extensions/v1.4.3/wasm_mvp/`.
+- Die signierten offiziellen HTTPFS-, Parquet- und Excel-Erweiterungen fuer DuckDB-Wasm `v1.5.4/wasm_mvp` liegen same-origin unter `/explore-extensions/v1.5.4/wasm_mvp/`.
 - Die React-Insel setzt beim DuckDB-Start `custom_extension_repository` auf `${location.origin}/explore-extensions`.
 - Dadurch bleibt `connect-src` eng konfigurierbar, und CI/Playwright braucht keinen Zugriff auf `extensions.duckdb.org`.
 

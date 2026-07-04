@@ -47,6 +47,46 @@ Download-URL-Platzhalter:
 - Enthält ein XTF `${DOWNLOAD_URL}` und ist `download-url` leer, schlägt der Katalog-Load kontrolliert fehl.
 - `download-url` darf eine absolute `http(s)`-URL oder ein root-relativer Pfad wie `/downloads` sein.
 
+Öffentliche Katalog-Artefakte:
+
+- `GET /catalog/published-catalog.xtf` liefert die aktuell konfigurierte PublishedCatalog-XTF-Datei aus. Der `${DOWNLOAD_URL}`-Platzhalter ist dabei bereits ersetzt.
+- `GET /catalog/catalog.duckdb` liefert den aktuell konfigurierten DuckDB-View-Catalog fuer den Explore-Schema-Explorer aus.
+
+## DuckDB-Catalog fuer Erkunden
+
+Der Explore-Browser lädt neben der XTF-Metadatenquelle eine DuckDB-Datei mit
+allen Open-Data-Parquet-Views. Die DuckDB-Datei ist ein eigenes Artefakt und
+wird nicht aus der XTF-Binary gepatcht. Produktion und lokale Entwicklung
+muessen deshalb eine `catalog.duckdb` verwenden, deren Views bereits mit den
+passenden Download-URLs erzeugt wurden.
+
+```yaml
+datenportal:
+  catalog:
+    duckdb:
+      source-type: classpath # classpath | http | file
+      classpath-location: catalog.duckdb
+      file-location: ./config/catalog.duckdb
+      http-url: https://example.org/catalog.duckdb
+      http-connect-timeout: 5s
+      http-read-timeout: 30s
+      max-size: 50MB
+      schema: opendata
+```
+
+`source-type=classpath` ist der lokale Standard. `source-type=http` lädt die
+DuckDB-Datei per HTTP GET; `source-type=file` ist fuer lokale Entwicklung,
+Tests und extern gemountete Artefakte vorgesehen. Timeouts, `max-size` und die
+sichere Source-Beschreibung folgen derselben Logik wie bei der XTF-Quelle.
+
+Das Schema `opendata` wird im Explore-Kontext an den Browser geliefert. Der
+Browser attached die Datei read-only als Datenbank `catalog`, lädt `httpfs`,
+setzt `USE "catalog"."opendata"` und aktualisiert daraus die
+SQLRooms-SchemaTrees fuer den Schema Explorer. Die eigentliche SQL-Ausfuehrung
+läuft direkt gegen diese attached Catalog-Datenbank. Dadurch koennen Abfragen
+auch Views aus mehreren Parquet-Dateien joinen, solange sie im Catalog-Artefakt
+enthalten sind.
+
 ## Reload
 
 Der geschützte Runtime-Reload ist nur aktiv, wenn ein Token gesetzt ist:

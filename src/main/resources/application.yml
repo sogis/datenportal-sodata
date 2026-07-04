@@ -43,6 +43,13 @@ datenportal:
     http-read-timeout: 30s
     max-size: 50MB
     download-url: ${DOWNLOAD_URL:http://localhost:8081/ch.so.datenportal/downloads}
+    duckdb:
+      source-type: classpath
+      classpath-location: catalog.duckdb
+      http-connect-timeout: 5s
+      http-read-timeout: 30s
+      max-size: 50MB
+      schema: opendata
   admin:
     reload-token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN:}
   security:
