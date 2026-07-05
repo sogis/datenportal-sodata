@@ -245,6 +245,26 @@ describe('ExploreApp', () => {
     expect(mocks.refreshTableSchemas).not.toHaveBeenCalled();
   });
 
+  it('keeps the workbench ready when schema refresh hits an unavailable source file', async () => {
+    const user = userEvent.setup();
+    const sourceError = new Error('IO Error: No files found that match the pattern "/explore-fixtures/missing.parquet"');
+    mocks.refreshTableSchemas.mockRejectedValueOnce(sourceError);
+    mocks.connection.query.mockRejectedValueOnce(sourceError);
+
+    render(<ExploreApp context={sampleExploreContext} />);
+
+    expect(await screen.findByText('SCHEMA EXPLORER')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByLabelText('Erkunden Status')).not.toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+
+    expect(await screen.findByRole('alert', {name: 'Abfragefehler'}))
+      .toHaveTextContent('Quelldatei nicht erreichbar.');
+    expect(screen.queryByRole('alert', {name: 'Erkunden Status'})).not.toBeInTheDocument();
+  });
+
   it('renders an unavailable state without Parquet tables', () => {
     render(<ExploreApp context={{...sampleExploreContext, tables: [], recipes: [], codeSnippets: []}} />);
 

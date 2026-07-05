@@ -22,7 +22,20 @@ describe('ResultPanel', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Abfrage nach dem Zeitlimit abgebrochen.');
 
     rerender(panel({...state('error'), error: 'Spalte nicht gefunden'}));
-    expect(screen.getByRole('alert')).toHaveTextContent('Spalte nicht gefunden');
+    expect(screen.getByRole('alert', {name: 'Abfragefehler'})).toHaveTextContent('Spalte nicht gefunden');
+  });
+
+  it('renders technical error details below the main query message', () => {
+    renderPanel({
+      ...state('error'),
+      errorKind: 'source-unavailable',
+      error: 'Quelldatei nicht erreichbar. Die zugrunde liegende Datendatei konnte momentan nicht geladen werden. Bitte versuchen Sie es später erneut.',
+      errorDetail: 'IO Error: No files found that match the pattern "/explore-fixtures/missing.parquet"'
+    });
+
+    expect(screen.getByRole('alert', {name: 'Abfragefehler'})).toHaveTextContent('Quelldatei nicht erreichbar.');
+    expect(screen.getByText('Technische Details')).toBeInTheDocument();
+    expect(screen.getByText(/missing\.parquet/)).toBeInTheDocument();
   });
 
   it('renders a compact result footer with row limit combobox and no standalone CSV button', async () => {

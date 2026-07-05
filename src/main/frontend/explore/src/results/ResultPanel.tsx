@@ -32,7 +32,19 @@ export function ResultPanel({
   }
 
   if (result.status === 'error') {
-    return <p className="dp-explore-runtime-error" role="alert">{result.error ?? 'Die Abfrage konnte nicht ausgeführt werden.'}</p>;
+    const error = result.error ?? 'Die Abfrage konnte nicht ausgeführt werden.';
+    const detail = result.errorDetail && result.errorDetail !== error ? result.errorDetail : undefined;
+    return (
+      <section className="dp-explore-runtime-error" role="alert" aria-label="Abfragefehler">
+        <p className="dp-explore-runtime-error__message">{error}</p>
+        {detail && (
+          <details>
+            <summary>Technische Details</summary>
+            <p>{detail}</p>
+          </details>
+        )}
+      </section>
+    );
   }
 
   return (

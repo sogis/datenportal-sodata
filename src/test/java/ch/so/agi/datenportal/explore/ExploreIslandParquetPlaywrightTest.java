@@ -223,16 +223,20 @@ class ExploreIslandParquetPlaywrightTest {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-broken-parquet/explore"));
 
+            page.waitForSelector(".dp-explore-workbench");
+            page.waitForFunction("() => !document.querySelector('.dp-explore-runtime-overlay')");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Ausführen")).click();
             page.getByRole(com.microsoft.playwright.options.AriaRole.ALERT,
-                    new Page.GetByRoleOptions().setName("Erkunden Status")).waitFor();
+                    new Page.GetByRoleOptions().setName("Abfragefehler")).waitFor();
 
-            assertThat(page.locator(".dp-explore-runtime-overlay__card.is-error").count()).isEqualTo(1);
+            assertThat(page.locator(".dp-explore-runtime-overlay__card.is-error").count()).isZero();
+            assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.ALERT,
+                            new Page.GetByRoleOptions().setName("Abfragefehler")).innerText())
+                    .contains("Quelldatei nicht erreichbar.")
+                    .contains("Technische Details");
             assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.PROGRESSBAR,
                     new Page.GetByRoleOptions().setName("Ladevorgang")).count()).isZero();
-            assertThat(computedStyle(page.locator(".dp-explore-runtime-overlay"), "backgroundColor"))
-                    .isEqualTo("rgba(0, 0, 0, 0.72)");
-            assertThat(computedStyle(page.locator(".dp-explore-runtime-overlay__card"), "boxShadow"))
-                    .isEqualTo("none");
             assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.LINK,
                     new Page.GetByRoleOptions().setName("Zur Datensatzseite")).count()).isZero();
         }

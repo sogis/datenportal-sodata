@@ -3,6 +3,7 @@ import {makeQualifiedTableName, type DataTable, type DuckDbConnector, type Query
 import type {Table} from 'apache-arrow';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
 import type {ExploreCatalogDatabaseDto, ExploreContextDto, ExploreRecipeDto, ExploreTableDto} from '../app/ExploreContext';
+import {classifyExploreQueryError} from '../app/ExploreRuntimeError';
 import {ChartPanel} from '../charts/ChartPanel';
 import {executeDuckDbQuery} from '../duckdb/executeDuckDbQuery';
 import {hasResultLimitApplied, normalizeSqlForExecution, queryTimeoutMessage} from '../duckdb/querySafety';
@@ -136,7 +137,8 @@ export function SqlLaboratory({
       };
       setResult(successResult);
     } catch (error) {
-      const status = timeoutController.signal.aborted ? 'timeout' : activeQuery.current?.signal.aborted ? 'cancelled' : 'error';
+      const status = timeoutController.signal.aborted ? 'timeout' : activeQuery.current?.signal?.aborted ? 'cancelled' : 'error';
+      const queryError = status === 'error' ? classifyExploreQueryError(error) : undefined;
       setResult({
         status,
         sourceSql,
@@ -145,7 +147,9 @@ export function SqlLaboratory({
         rows: [],
         rowCount: 0,
         durationMs: performance.now() - startedAt,
-        error: status === 'timeout' ? queryTimeoutMessage(context.execution.queryTimeoutMs) : status === 'error' ? toErrorMessage(error) : undefined
+        error: status === 'timeout' ? queryTimeoutMessage(context.execution.queryTimeoutMs) : queryError?.summary,
+        errorKind: queryError?.kind,
+        errorDetail: queryError?.detail
       });
     } finally {
       window.clearTimeout(timeoutId);

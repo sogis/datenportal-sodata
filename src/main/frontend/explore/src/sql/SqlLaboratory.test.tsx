@@ -34,6 +34,9 @@ const contextWithRecipes = {
   ]
 };
 
+const neutralSourceError =
+  'Quelldatei nicht erreichbar. Die zugrunde liegende Datendatei konnte momentan nicht geladen werden. Bitte versuchen Sie es später erneut.';
+
 describe('SqlLaboratory', () => {
   const query = vi.fn();
   const connector = {query} as unknown as DuckDbConnector;
@@ -115,6 +118,19 @@ describe('SqlLaboratory', () => {
       expect.stringContaining('limit 1000'),
       expect.objectContaining({signal: expect.any(AbortSignal)})
     );
+  });
+
+  it('shows a neutral source-file error and keeps the query controls usable', async () => {
+    const user = userEvent.setup();
+    query.mockRejectedValueOnce(new Error('IO Error: No files found that match the pattern "/explore-fixtures/missing.parquet"'));
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+
+    expect(await screen.findByRole('alert', {name: 'Abfragefehler'})).toHaveTextContent(neutralSourceError);
+    expect(screen.getByText('Technische Details')).toBeInTheDocument();
+    expect(screen.getByText(/missing\.parquet/)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Ausführen'})).toBeEnabled();
   });
 
   it('switches from table to chart for the current result without changing the query', async () => {

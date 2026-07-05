@@ -25,6 +25,27 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | SQL-Labor fuer Serienausgaben | DONE | Issue detail pages link to Explore; shared Explore controller methods resolve datasets and concrete series issues. |
 | SQL-Labor Diagrammfarben | DONE | Charts use configured additional colors, no red option, stable multi-color palette and clearer axis labels. |
 | DuckDB Catalog Direct Query | DONE | DuckDB-Wasm package upgraded, mirrored extensions moved to `v1.5.4`, catalog files regenerated with DuckDB 1.5.4 and query-side `memory.opendata` mirror removed. |
+| SQL-Labor Query-Fehlerhandling | DONE | Nicht erreichbare Quelldateien zeigen eine neutrale Meldung im Resultatbereich und blockieren die Workbench nicht. |
+
+## SQL-Labor Query-Fehlerhandling Entry
+
+Date: 2026-07-05
+
+Scope:
+
+- Added query-specific error classification for source, CORS, Range, HTTP, Parquet, DuckDB and SQL errors.
+- Kept the Workbench ready when source-related schema refresh fails, falling back to the backend context columns.
+- Rendered source-file query errors as neutral result-panel alerts with technical details behind `Technische Details`.
+- Updated the broken-Parquet browser check to assert the result-panel error instead of a global runtime overlay.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 15 passed (15)`, `Tests 91 passed (91)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.ExploreIslandParquetPlaywrightTest.parquetLoadingFailureShowsReadableErrorWithoutDatasetLink'` | PASS, missing source file renders neutral query error |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 1m 34s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
 
 ## DuckDB Catalog Direct Query Entry
 

@@ -2,7 +2,12 @@ import {useEffect, useMemo, useState} from 'react';
 import type {DataTable, DbSchemaNode, DuckDbConnector} from '@sqlrooms/duckdb';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
-import {classifyExploreRuntimeError, type ExploreRuntimeError} from './ExploreRuntimeError';
+import {
+  classifyExploreQueryError,
+  classifyExploreRuntimeError,
+  isSourceQueryError,
+  type ExploreRuntimeError
+} from './ExploreRuntimeError';
 import {SchemaExplorerPanel} from './SchemaExplorerPanel';
 import {attachCatalogDatabase, type CatalogDatabaseRegistration} from '../duckdb/attachCatalogDatabase';
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
@@ -39,7 +44,6 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     }
 
     let active = true;
-    const primaryTableName = primaryTable.name;
 
     async function initializeDuckDb() {
       setPhase('initializing');
@@ -74,7 +78,21 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
           return;
         }
 
-        const catalogTables = await room.roomStore.getState().db.refreshTableSchemas();
+        let catalogTables: DataTable[];
+        try {
+          catalogTables = await room.roomStore.getState().db.refreshTableSchemas();
+        } catch (schemaError) {
+          const queryError = classifyExploreQueryError(schemaError);
+          if (isSourceQueryError(queryError)) {
+            if (!active) {
+              return;
+            }
+            setRuntimeTables(context.tables);
+            setPhase('ready');
+            return;
+          }
+          throw schemaError;
+        }
         if (!active) {
           return;
         }
@@ -82,7 +100,9 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         const nextRuntimeTables = mergeCatalogRuntimeTables(context.tables, catalogTables, context.catalogDatabase);
         const nextPrimaryTable = selectPrimaryTable(nextRuntimeTables);
         if (!nextPrimaryTable || nextPrimaryTable.columns.length === 0) {
-          throw new Error(`Die View ${primaryTableName} wurde im DuckDB-Catalog nicht gefunden.`);
+          setRuntimeTables(context.tables);
+          setPhase('ready');
+          return;
         }
 
         setRuntimeTables(nextRuntimeTables);
@@ -105,8 +125,17 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
   }, [context, primaryTable, room]);
 
   async function refreshSchemas() {
-    const catalogTables = await room.roomStore.getState().db.refreshTableSchemas();
-    setRuntimeTables(mergeCatalogRuntimeTables(context.tables, catalogTables, context.catalogDatabase));
+    try {
+      const catalogTables = await room.roomStore.getState().db.refreshTableSchemas();
+      setRuntimeTables(mergeCatalogRuntimeTables(context.tables, catalogTables, context.catalogDatabase));
+    } catch (schemaError) {
+      const queryError = classifyExploreQueryError(schemaError);
+      if (isSourceQueryError(queryError)) {
+        setRuntimeTables(context.tables);
+        return;
+      }
+      throw schemaError;
+    }
   }
 
   if (context.tables.length === 0) {

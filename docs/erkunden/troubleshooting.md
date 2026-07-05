@@ -92,8 +92,9 @@ Fehler sollen klar zwischen Netzwerk-, CORS-, Range-Request- und Parquet-Ladepro
 Verhalten:
 
 - Die React-Insel klassifiziert Browserfehler best-effort in DuckDB-Wasm-, CORS-, Range-, HTTP/IO- und Parquet-Ladefehler.
-- Die Fehlerbox bleibt im SQL-Labor sichtbar; Navigation zur Datensatzseite laeuft ueber Breadcrumb/Header, nicht ueber einen sichtbaren Labor-Link.
-- Playwright prueft eine fehlende same-origin Parquet-Datei als reproduzierbaren Fehlerpfad.
+- Source-bezogene Fehler beim Schema-Refresh blockieren die Workbench nicht. Die Query kann erneut ausgefuehrt werden, sobald die Datendatei wieder erreichbar ist.
+- Nicht erreichbare Quelldateien beim Ausfuehren einer Query erscheinen im Resultatbereich mit der neutralen Hauptmeldung `Quelldatei nicht erreichbar. Die zugrunde liegende Datendatei konnte momentan nicht geladen werden. Bitte versuchen Sie es später erneut.` Technische Details bleiben nachrangig unter `Technische Details`.
+- Playwright prueft eine fehlende same-origin Parquet-Datei als reproduzierbaren Query-Fehlerpfad.
 
 Phase-3-Fund:
 
@@ -139,6 +140,7 @@ Verhalten ab Phase 4:
 
 - SQL bleibt sichtbar.
 - Fehlermeldungen werden lesbar angezeigt.
+- Nicht erreichbare Parquet-Quelldateien werden nicht als globaler Runtime-Fehler angezeigt, sondern als neutraler Alert im Resultatbereich. SQL-Editor, Schema Explorer und Run-Button bleiben nutzbar.
 - Clientseitige Query-Guards sind UX-Schutz, keine Sicherheitskontrolle.
 - Mutation und gefaehrliche DuckDB-Kommandos werden nicht als unterstuetzter Workflow angeboten.
 - Erlaubt sind im MVP `select`, `with`, `describe`, `show` und `pragma table_info`.

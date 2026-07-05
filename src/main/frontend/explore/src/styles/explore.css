@@ -1319,6 +1319,11 @@
   overflow-wrap: anywhere;
 }
 
+.dp-explore-runtime-error__message,
+.dp-explore-runtime-error p {
+  margin: 0;
+}
+
 .dp-explore-runtime-error summary {
   cursor: pointer;
   font-weight: 700;
