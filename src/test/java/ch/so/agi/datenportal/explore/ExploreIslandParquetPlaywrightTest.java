@@ -86,6 +86,8 @@ class ExploreIslandParquetPlaywrightTest {
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page, browserErrors);
+            assertThat(page.locator(".dp-schema-explorer__node.is-active:has-text('ch_so_oev_haltestellen')").count()).isZero();
+            openCatalogSchema(page);
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
             waitForSqlResult(page, browserErrors);
 
@@ -108,6 +110,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.navigate(baseUrl("/series/explore-series/issues/current/explore"));
 
             waitForExploreReady(page);
+            openCatalogSchema(page);
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
             page.waitForSelector("[aria-label='SQL Ergebnis']");
 
@@ -116,6 +119,83 @@ class ExploreIslandParquetPlaywrightTest {
             assertThat(page.locator("text=Solothurn").count()).isGreaterThanOrEqualTo(1);
             assertThat(page.locator("text=Olten").count()).isGreaterThanOrEqualTo(1);
             assertThat(browserErrors).isEmpty();
+        }
+    }
+
+    @Test
+    void schemaExplorerStartsCollapsedUsesLightTypographyAndScrollsLocally() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+            waitForExploreReady(page);
+
+            Locator title = page.locator(".dp-schema-explorer__header h2");
+            Locator schemaNode = page.locator(".dp-schema-explorer__node--schema:has-text('opendata')");
+            Locator schemaName = schemaNode.locator(".dp-schema-explorer__name").first();
+            assertThat(computedStyle(title, "fontWeight")).isEqualTo("400");
+            assertThat(computedStyle(schemaName, "fontWeight")).isEqualTo("400");
+            assertThat(computedStyle(schemaName, "fontSize")).isEqualTo("14px");
+            assertThat(schemaNode.getAttribute("aria-expanded")).isEqualTo("false");
+            assertThat(page.locator(".dp-schema-explorer__node.is-active").count()).isZero();
+
+            openCatalogSchema(page);
+
+            Locator tableName = page.locator(".dp-schema-explorer__node--table .dp-schema-explorer__name").first();
+            assertThat(computedStyle(tableName, "fontSize")).isEqualTo("14px");
+            assertThat(page.locator(".dp-schema-explorer__node.is-active:has-text('ch_so_oev_haltestellen')").count()).isEqualTo(1);
+            assertThat(page.locator(".dp-schema-explorer__column .dp-schema-explorer__name:has-text('wert')").count()).isEqualTo(1);
+
+            Locator tree = page.locator(".dp-schema-explorer__tree");
+            tree.evaluate("""
+                    el => {
+                      for (let index = 0; index < 80; index += 1) {
+                        const row = document.createElement('div');
+                        row.className = 'dp-schema-explorer__node dp-schema-explorer__node--table';
+                        row.textContent = `synthetic_table_${index}`;
+                        el.appendChild(row);
+                      }
+                    }
+                    """);
+
+            assertThat((Boolean) tree.evaluate("el => el.scrollHeight > el.clientHeight + 1")).isTrue();
+            assertThat((Boolean) tree.evaluate("""
+                    el => {
+                      el.scrollTop = 120;
+                      return el.scrollTop > 0;
+                    }
+                    """)).isTrue();
+            assertThat(pageLevelHorizontalOverflow(page)).isLessThanOrEqualTo(1);
+        }
+    }
+
+    @Test
+    void schemaExplorerActionMenuClosesAfterCopyAndOutsideClick() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
+            context.grantPermissions(
+                    List.of("clipboard-write"),
+                    new BrowserContext.GrantPermissionsOptions().setOrigin(baseUrl("")));
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+            waitForExploreReady(page);
+            openCatalogSchema(page);
+
+            Locator actionsButton = page.getByRole(
+                    com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Aktionen für ch_so_oev_haltestellen"));
+            actionsButton.click();
+            assertThat(page.locator(".dp-schema-explorer__menu").count()).isEqualTo(1);
+
+            page.getByRole(
+                    com.microsoft.playwright.options.AriaRole.MENUITEM,
+                    new Page.GetByRoleOptions().setName("SELECT kopieren")).click();
+            page.waitForFunction("() => !document.querySelector('.dp-schema-explorer__menu')");
+
+            actionsButton.click();
+            assertThat(page.locator(".dp-schema-explorer__menu").count()).isEqualTo(1);
+            page.locator(".dp-explore-workbench__main").click();
+            page.waitForFunction("() => !document.querySelector('.dp-schema-explorer__menu')");
         }
     }
 
@@ -227,6 +307,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
+            openCatalogSchema(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
             var tableName = page.locator(".dp-schema-explorer__node.is-active .dp-schema-explorer__name").first().textContent().trim();
             var firstColumn = page.locator(".dp-schema-explorer__column .dp-schema-explorer__name").first().textContent().trim();
@@ -589,7 +670,7 @@ class ExploreIslandParquetPlaywrightTest {
 
     private static void waitForExploreReady(Page page, List<String> browserErrors) {
         try {
-            page.waitForSelector(".dp-schema-explorer__node.is-active");
+            page.waitForSelector(".dp-schema-explorer__node--schema:has-text('opendata')");
             page.waitForFunction("() => !document.querySelector('.dp-explore-runtime-overlay')");
         } catch (TimeoutError error) {
             String bodyText = page.locator("body").innerText(new Locator.InnerTextOptions().setTimeout(1_000));
@@ -600,6 +681,16 @@ class ExploreIslandParquetPlaywrightTest {
                     + ". Browser errors: " + browserErrors
                     + ". Body: " + bodyText, error);
         }
+    }
+
+    private static void openCatalogSchema(Page page) {
+        Locator openButton = page.getByRole(
+                com.microsoft.playwright.options.AriaRole.BUTTON,
+                new Page.GetByRoleOptions().setName("opendata ausklappen"));
+        if (openButton.count() > 0) {
+            openButton.click();
+        }
+        page.waitForSelector(".dp-schema-explorer__node.is-active");
     }
 
     private static String truncate(String text) {

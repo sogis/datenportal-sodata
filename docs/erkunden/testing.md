@@ -138,7 +138,8 @@ Fixture-/Runtime-Hinweise:
 - Die Browser-Fixture liegt unter `src/test/resources/static/explore-fixtures/ch.so.oev_haltestellen.parquet`.
 - Die Playwright-Suite nutzt `spec/fixtures/explore_fixture_catalog.duckdb`, eine kleine test-spezifische DuckDB-Datei mit `opendata.ch_so_oev_haltestellen`.
 - Die DuckDB-Wasm Parquet-Erweiterung wird same-origin unter `/explore-extensions/v1.5.4/wasm_mvp/parquet.duckdb_extension.wasm` ausgeliefert.
-- Der Playwright-Test erwartet, dass DuckDB den Catalog attached, den aktuellen View im Schema Explorer markiert, direkt gegen die attached Catalog-View queried, kein globales `Bereit` rendert und Preview-Zeilen mit `Solothurn` und `Olten` zeigt.
+- Der Playwright-Test erwartet, dass DuckDB den Catalog attached, das Schema `opendata` im Schema Explorer initial geschlossen bleibt, der aktuelle View nach manuellem Aufklappen markiert wird, direkt gegen die attached Catalog-View queried, kein globales `Bereit` rendert und Preview-Zeilen mit `Solothurn` und `Olten` zeigt.
+- Die Schema-Explorer-Aktionsmenues werden in React- und Playwright-Tests nach Kopieraktionen, Outside-Click und Escape geschlossen.
 
 Ausgefuehrte Befehle:
 

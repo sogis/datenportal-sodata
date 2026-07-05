@@ -104,17 +104,21 @@
 }
 
 .dp-explore-data-panel {
+  display: flex;
   min-width: 0;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   background: #ffffff;
 }
 
 .dp-schema-explorer {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   min-width: 0;
-  min-height: 100%;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
   padding: 1.55rem 1rem 1rem;
   background: #ffffff;
   color: #020617;
@@ -125,6 +129,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex: 0 0 auto;
   gap: 0.75rem;
   margin-bottom: 0.95rem;
 }
@@ -132,7 +137,7 @@
 .dp-schema-explorer__header h2 {
   color: #66758a;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -166,8 +171,11 @@
 }
 
 .dp-schema-explorer__tree {
+  flex: 1 1 auto;
   min-width: 0;
-  overflow: visible;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .dp-schema-explorer__branch {
@@ -261,11 +269,11 @@
 .dp-schema-explorer__node--database > .dp-schema-explorer__name-wrap > .dp-schema-explorer__name,
 .dp-schema-explorer__node--schema > .dp-schema-explorer__name-wrap > .dp-schema-explorer__name,
 .dp-schema-explorer__node--table > .dp-schema-explorer__name-wrap > .dp-schema-explorer__name {
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .dp-schema-explorer__node--schema > .dp-schema-explorer__name-wrap > .dp-schema-explorer__name {
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .dp-schema-explorer__rows {
@@ -1370,6 +1378,7 @@
   }
 
   .dp-explore-data-panel {
+    height: 18rem;
     max-height: 18rem;
     border-right: 0;
     border-bottom: 1px solid var(--dp-explore-border);

@@ -29,7 +29,8 @@ const mocks = vi.hoisted(() => {
     refreshTableSchemas: vi.fn(),
     attachCatalogDatabase: vi.fn(),
     schemaTrees: [] as DbSchemaNode[],
-    isRefreshingTableSchemas: false
+    isRefreshingTableSchemas: false,
+    copyTextToClipboard: vi.fn()
   };
 });
 
@@ -59,6 +60,10 @@ vi.mock('../duckdb/attachCatalogDatabase', () => ({
   attachCatalogDatabase: mocks.attachCatalogDatabase
 }));
 
+vi.mock('../sql/clipboard', () => ({
+  copyTextToClipboard: mocks.copyTextToClipboard
+}));
+
 describe('ExploreApp', () => {
   beforeEach(() => {
     mocks.connector.query.mockReset().mockResolvedValue(tableFromArrays({
@@ -84,9 +89,11 @@ describe('ExploreApp', () => {
     });
     mocks.schemaTrees = sampleSchemaTrees();
     mocks.isRefreshingTableSchemas = false;
+    mocks.copyTextToClipboard.mockReset().mockResolvedValue(true);
   });
 
   it('initializes DuckDB, attaches the catalog and renders the schema explorer workbench', async () => {
+    const user = userEvent.setup();
     render(<ExploreApp context={sampleExploreContext} />);
 
     expect(screen.getByLabelText('Erkunden SQL-Labor')).toBeInTheDocument();
@@ -98,8 +105,17 @@ describe('ExploreApp', () => {
     expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue('SELECT *\nFROM opendata.ch_so_bauinventar;');
 
     expect(await screen.findByText('SCHEMA EXPLORER')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByLabelText('Erkunden Status')).not.toBeInTheDocument();
+    });
     expect(await screen.findByText('catalog')).toBeInTheDocument();
     expect(screen.getByText('opendata')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'opendata ausklappen'})).toBeInTheDocument();
+    expect(screen.queryByRole('treeitem', {selected: true})).not.toBeInTheDocument();
+    expect(screen.queryByText(/36.?176 rows/)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'opendata ausklappen'}));
+
     expect(screen.getByRole('treeitem', {selected: true})).toHaveTextContent('ch_so_bauinventar');
     expect(screen.getByText(/36.?176 rows/)).toBeInTheDocument();
     expect(screen.getByText('integer')).toBeInTheDocument();
@@ -109,7 +125,6 @@ describe('ExploreApp', () => {
       'data-table-columns',
       'egid,gemeindename,schutzstatus'
     );
-    expect(screen.queryByLabelText('Erkunden Status')).not.toBeInTheDocument();
     expect(mocks.attachCatalogDatabase).toHaveBeenCalledWith(mocks.connector, sampleExploreContext.catalogDatabase);
     expect(mocks.refreshTableSchemas).toHaveBeenCalledTimes(1);
   });
@@ -136,18 +151,66 @@ describe('ExploreApp', () => {
       schema: 'opendata'
     });
 
-    expect(await screen.findByText('schutzstatus')).toBeInTheDocument();
-    expect(screen.queryByLabelText('Erkunden Status')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByLabelText('Erkunden Status')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', {name: 'opendata ausklappen'})).toBeInTheDocument();
+    expect(screen.queryByText('schutzstatus')).not.toBeInTheDocument();
   });
 
-  it('refreshes SQLRooms schema trees from the explorer header action', async () => {
+  it('refreshes SQLRooms schema trees without opening the catalog schema', async () => {
     const user = userEvent.setup();
     render(<ExploreApp context={sampleExploreContext} />);
 
     expect(await screen.findByText('SCHEMA EXPLORER')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByLabelText('Erkunden Status')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', {name: 'opendata ausklappen'})).toBeInTheDocument();
+
     await user.click(screen.getByRole('button', {name: 'Schema Explorer aktualisieren'}));
 
-    expect(mocks.refreshTableSchemas).toHaveBeenCalledTimes(2);
+    await waitFor(() => {
+      expect(mocks.refreshTableSchemas).toHaveBeenCalledTimes(2);
+    });
+    expect(screen.getByRole('button', {name: 'opendata ausklappen'})).toBeInTheDocument();
+    expect(screen.queryByRole('treeitem', {selected: true})).not.toBeInTheDocument();
+  });
+
+  it('closes schema table action menus after copying, outside clicks and Escape', async () => {
+    const user = userEvent.setup();
+    render(<ExploreApp context={sampleExploreContext} />);
+
+    expect(await screen.findByText('SCHEMA EXPLORER')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByLabelText('Erkunden Status')).not.toBeInTheDocument();
+    });
+    await user.click(screen.getByRole('button', {name: 'opendata ausklappen'}));
+
+    const actionsButton = screen.getByRole('button', {name: 'Aktionen für ch_so_bauinventar'});
+    await user.click(actionsButton);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('menuitem', {name: 'SELECT kopieren'}));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    });
+    expect(mocks.copyTextToClipboard).toHaveBeenCalledWith('SELECT * FROM opendata.ch_so_bauinventar;');
+
+    await user.click(actionsButton);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    await user.click(screen.getByText('SCHEMA EXPLORER'));
+    await waitFor(() => {
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    });
+
+    await user.click(actionsButton);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    });
   });
 
   it('runs the initial catalog-view query and renders result rows', async () => {

@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useState, type CSSProperties} from 'react';
 import type {DbSchemaNode} from '@sqlrooms/duckdb';
 import type {ExploreCatalogDatabaseDto, ExploreTableDto} from './ExploreContext';
+import {copyTextToClipboard} from '../sql/clipboard';
 
 interface SchemaExplorerPanelProps {
   schemaTrees: DbSchemaNode[];
@@ -38,6 +39,35 @@ export function SchemaExplorerPanel({
       return changed ? next : current;
     });
   }, [defaultOpenKey, defaultOpenKeys]);
+
+  useEffect(() => {
+    if (menuKey === null) {
+      return undefined;
+    }
+
+    function closeOnOutsidePointerDown(event: MouseEvent | PointerEvent) {
+      const target = event.target;
+      if (target instanceof Element && target.closest('.dp-schema-explorer__actions')) {
+        return;
+      }
+      setMenuKey(null);
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setMenuKey(null);
+      }
+    }
+
+    document.addEventListener('pointerdown', closeOnOutsidePointerDown, true);
+    document.addEventListener('mousedown', closeOnOutsidePointerDown, true);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointerDown, true);
+      document.removeEventListener('mousedown', closeOnOutsidePointerDown, true);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [menuKey]);
 
   function toggle(path: string) {
     setOpenKeys((current) => {
@@ -216,6 +246,16 @@ function TableActions({
   const tableName = object.name;
   const qualifiedName = `${catalogDatabase.schema}.${tableName}`;
 
+  async function copyAndClose(text: string): Promise<void> {
+    try {
+      await copyTextToClipboard(text);
+    } catch {
+      // Clipboard errors must not leave the action menu stuck open.
+    } finally {
+      onMenuToggle(null);
+    }
+  }
+
   return (
     <div className="dp-schema-explorer__actions">
       <button
@@ -229,13 +269,13 @@ function TableActions({
       </button>
       {open && (
         <div className="dp-schema-explorer__menu" role="menu">
-          <button type="button" role="menuitem" onClick={() => void copyText(tableName)}>
+          <button type="button" role="menuitem" onClick={() => void copyAndClose(tableName)}>
             <CopyIcon /> View-Name kopieren
           </button>
-          <button type="button" role="menuitem" onClick={() => void copyText(qualifiedName)}>
+          <button type="button" role="menuitem" onClick={() => void copyAndClose(qualifiedName)}>
             <CopyIcon /> Qualifizierten Namen kopieren
           </button>
-          <button type="button" role="menuitem" onClick={() => void copyText(`SELECT * FROM ${qualifiedName};`)}>
+          <button type="button" role="menuitem" onClick={() => void copyAndClose(`SELECT * FROM ${qualifiedName};`)}>
             <CopyIcon /> SELECT kopieren
           </button>
         </div>
@@ -273,19 +313,15 @@ function collectDefaultOpenKeysForNode(
   keys: Set<string>,
   catalogDatabase: ExploreCatalogDatabaseDto,
   activeTable?: ExploreTableDto
-): boolean {
+): void {
   const object = node.object;
   const children = node.children ?? [];
-  const childContainsActive = children
-    .map((child, index) => collectDefaultOpenKeysForNode(child, nodePath(path, child, index), keys, catalogDatabase, activeTable))
-    .some(Boolean);
   const isCatalogDatabase = object.type === 'database' && object.name === catalogDatabase.database;
-  const isCatalogSchema = object.type === 'schema' && object.name === catalogDatabase.schema;
   const isActiveTable = object.type === 'table' && object.name === activeTable?.name;
-  if (node.isInitialOpen || isCatalogDatabase || isCatalogSchema || isActiveTable || childContainsActive) {
+  if (isCatalogDatabase || isActiveTable) {
     keys.add(path);
   }
-  return isActiveTable || childContainsActive;
+  children.forEach((child, index) => collectDefaultOpenKeysForNode(child, nodePath(path, child, index), keys, catalogDatabase, activeTable));
 }
 
 function nodePath(parentPath: string, node: DbSchemaNode, index: number): string {
@@ -306,10 +342,6 @@ function typeClass(type: string): string {
     return 'text';
   }
   return 'other';
-}
-
-async function copyText(text: string): Promise<void> {
-  await navigator.clipboard?.writeText(text);
 }
 
 function formatSwissNumber(value: number): string {
