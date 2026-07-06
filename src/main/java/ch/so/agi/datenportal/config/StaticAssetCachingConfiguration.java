@@ -37,6 +37,18 @@ public class StaticAssetCachingConfiguration implements WebMvcConfigurer {
                 .resourceChain(true)
                 .addResolver(new EncodedResourceResolver())
                 .addResolver(new PathResourceResolver());
+        registry.addResourceHandler("/webr/**")
+                .addResourceLocations("classpath:/static/webr/")
+                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)).cachePublic())
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new PathResourceResolver());
+        registry.addResourceHandler("/webr-packages/**")
+                .addResourceLocations("classpath:/static/webr-packages/")
+                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)).cachePublic())
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new PathResourceResolver());
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/static/images/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic());

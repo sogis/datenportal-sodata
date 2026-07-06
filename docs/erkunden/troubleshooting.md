@@ -1,8 +1,8 @@
 # Erkunden Troubleshooting
 
-Status: SQL-Labor with result charts
+Status: SQL- und R-Labor
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, laedt `catalog.duckdb`, attached sie read-only als `catalog`, setzt `USE "catalog"."opendata"` und rendert daraus den Schema Explorer. SQL wird direkt gegen die attached Catalog-Views ausgefuehrt, damit auch Joins zwischen mehreren Parquet-Dateien moeglich sind. Das SQL-Labor enthaelt Monaco-Editor, roten `Ausfuehren`-Button, kompakte Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporte fuer CSV, XLSX und Parquet. Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags bleiben deaktiviert und laden keine schweren Runtime-Pakete.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms-, WebR- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, laedt `catalog.duckdb`, attached sie read-only als `catalog`, setzt `USE "catalog"."opendata"` und rendert daraus den Schema Explorer. SQL wird direkt gegen die attached Catalog-Views ausgefuehrt, damit auch Joins zwischen mehreren Parquet-Dateien moeglich sind. Das SQL-Labor enthaelt Monaco-Editor, roten `Ausfuehren`-Button, kompakte Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporte fuer CSV, XLSX und Parquet. Das R-Labor laedt WebR same-origin und arbeitet nur mit explizit uebernommenen SQL-Resultaten als R-Dataframe `daten`. Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags fuer AI, Vega, Mosaic und Geodaten bleiben deaktiviert und laden keine schweren Runtime-Pakete.
 
 ## Phase-2-Island laedt nicht
 
@@ -60,6 +60,23 @@ Aktueller Stand:
 - Die lokale Monaco-Konfiguration importiert neben `editor.api.js` explizit die Suggest-Contribution, damit `editor.action.triggerSuggest`, Quick-Suggestions und das Suggest-Widget ohne CDN-Bundle verfuegbar sind.
 - Die CSP erlaubt weiterhin keine externen Monaco-CDNs. Ein jsDelivr- oder unpkg-Request ist deshalb ein Regressionssignal, nicht ein erlaubter Fallback.
 - Playwright prueft im SQL-Labor, dass eine echte Monaco-Instanz rendert und kein externer Monaco-CDN-Request entsteht.
+
+## WebR startet nicht
+
+Pruefen:
+
+- Sind `/webr/0.6.0/webr.js`, `/webr/0.6.0/webr-worker.js`, `/webr/0.6.0/R.js`, `/webr/0.6.0/R.wasm`, `libRblas.so` und `libRlapack.so` erreichbar?
+- Ist `/webr-packages/bin/emscripten/contrib/4.6/PACKAGES` erreichbar?
+- Erzeugt der Browser Requests an `webr.r-wasm.org` oder `repo.r-wasm.org`? Das waere ein Regressionssignal; V1 muss same-origin laufen.
+- Enthaelt die CSP weiterhin `worker-src 'self' blob:` und `script-src 'self' 'wasm-unsafe-eval'`?
+- Wurde nach Lockdatei-Aenderungen `./gradlew mirrorWebRPackages` bzw. ein Build mit `processResources` ausgefuehrt?
+
+Aktueller Stand:
+
+- WebR `0.6.0` wird ueber `/webr/0.6.0/` ausgeliefert. Der Browser-Loader importiert `webr.js`; `webr.mjs` ist im npm-Dist der Node-ESM-Pfad und darf nicht direkt im Browser importiert werden.
+- Der Paketmirror ist auf den R-4.6-Pfad `bin/emscripten/contrib/4.6` gelockt. Der alte 4.5-Pfad passt nicht zu WebR `0.6.0` (`R version 4.6.0`).
+- Das R-Labor nutzt `ChannelType.PostMessage`, `interactive: false`, `captureR()` und `webr::canvas()`. COOP/COEP und SharedArrayBuffer bleiben out of scope.
+- Der echte WebR-Browser-E2E ist opt-in: `./gradlew playwrightTest -Ddatenportal.playwright.webr=true`. In der Agent-/Playwright-Chromium-Umgebung blieb WebR `0.6.0` beim Wasm-Startup vor der Paketinstallation mit einem Worker-seitigen `WebAssembly.Exception` haengen, obwohl alle same-origin Runtime-Dateien HTTP 200 lieferten. Der normale Playwright-Lauf prueft deshalb UI-, Transfer- und Same-Origin-Guards ohne diesen instabilen Runtime-Smoke.
 
 ## Keine Parquet-Distribution
 
@@ -152,7 +169,7 @@ Verhalten:
 
 - Backend und Komponenten koennen weiterhin statische Beispiele fuer DuckDB CLI, Python und R erzeugen.
 - Im SQL-Labor-Redesign gibt es keinen sichtbaren Tab `Code`.
-- Die Beispiele werden nicht im Browser ausgefuehrt. Insbesondere wird keine WebR-Laufzeit geladen.
+- Die Beispiele werden nicht im Browser ausgefuehrt. Statische R-Codebeispiele laden selbst keine WebR-Laufzeit.
 - Die Beispiele verwenden die primaere Parquet-Tabelle des Datenthemas oder, falls keine primaere Tabelle markiert ist, die erste Parquet-Tabelle.
 - Wenn ein Datenthema keine Parquet-Distribution hat, bleiben `codeSnippets` leer und die Explore-Seite zeigt die Nicht-verfuegbar-Meldung.
 
@@ -171,17 +188,17 @@ Verhalten:
 Standardverhalten:
 
 - `datenportal.explore.ai-enabled=false`
-- `datenportal.explore.webr-enabled=false`
+- `datenportal.explore.webr-enabled=true`
 - `datenportal.explore.vega-enabled=false`
 - `datenportal.explore.mosaic-enabled=false`
 - `datenportal.explore.geospatial-enabled=false`
 
-Wenn ein Zukunftsbereich versehentlich sichtbar wird, zuerst die JSON-Flags unter `/datasets/{datasetId}/explore/context.json` pruefen. Bei Standardkonfiguration darf `FutureExtensionSlots` nichts rendern.
+Wenn ein Zukunftsbereich versehentlich sichtbar wird, zuerst die JSON-Flags unter `/datasets/{datasetId}/explore/context.json` pruefen. Bei Standardkonfiguration darf `FutureExtensionSlots` fuer AI, Vega, Mosaic und Geodaten nichts rendern; WebR ist kein Zukunftsflag mehr, sondern das aktive R-Labor.
 
 `npm --prefix src/main/frontend/explore run check:future-deps` prueft:
 
 - keine direkten Zukunftsabhaengigkeiten in `package.json`
-- keine Source-Imports fuer AI, WebR, Vega, Mosaic oder Kartenframeworks
+- keine Source-Imports fuer AI, Vega, Mosaic oder Kartenframeworks
 - keine entsprechenden Paketmarker in gebauten Explore-Assets
 
 Das vorhandene transitive `react-mosaic-component` ist eine Abhaengigkeit aktueller SQLRooms Shell-/Editor-Pakete. Es ist kein aktivierter Mosaic-Crossfilter-Modus.

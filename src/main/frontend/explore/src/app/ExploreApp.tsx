@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {DataTable, DbSchemaNode, DuckDbConnector} from '@sqlrooms/duckdb';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
@@ -13,8 +13,13 @@ import {attachCatalogDatabase, type CatalogDatabaseRegistration} from '../duckdb
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
 import {mergeRuntimeColumns} from '../duckdb/runtimeSchema';
 import {SqlLaboratory} from '../sql/SqlLaboratory';
+import {RDataFramePanel} from '../webr/RDataFramePanel';
+import {RPanel} from '../webr/RPanel';
+import type {RDataFrameInfo} from '../webr/WebRBridge';
+import type {SqlResultSnapshot} from '../results/sqlResultSnapshot';
 
 type RuntimePhase = 'idle' | 'initializing' | 'registering' | 'ready' | 'error';
+type ActiveLab = 'sql' | 'r';
 
 const EMPTY_SCHEMA_TREES: DbSchemaNode[] = [];
 
@@ -24,6 +29,10 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [catalogRegistration, setCatalogRegistration] = useState<CatalogDatabaseRegistration | undefined>(undefined);
   const [runtimeTables, setRuntimeTables] = useState<ExploreTableDto[]>(() => withoutVisibleRuntimeMetadata(context.tables));
   const [connector, setConnector] = useState<DuckDbConnector | undefined>(undefined);
+  const [activeLab, setActiveLab] = useState<ActiveLab>('sql');
+  const [rLabMounted, setRLabMounted] = useState(false);
+  const [rSnapshot, setRSnapshot] = useState<SqlResultSnapshot | undefined>(undefined);
+  const [rDataFrameInfo, setRDataFrameInfo] = useState<RDataFrameInfo | undefined>(undefined);
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
   const room = useMemo(() => createExploreRoomStore(context), [context]);
   const schemaTrees = room.useRoomStore((state) => state.db.schemaTrees) ?? EMPTY_SCHEMA_TREES;
@@ -138,6 +147,13 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
     }
   }
 
+  const transferToR = useCallback((snapshot: SqlResultSnapshot) => {
+    setRSnapshot(snapshot);
+    setRDataFrameInfo(undefined);
+    setRLabMounted(true);
+    setActiveLab('r');
+  }, []);
+
   if (context.tables.length === 0) {
     return (
       <section className="dp-explore-workbench dp-explore-workbench--unavailable" aria-labelledby="explore-unavailable-title">
@@ -162,11 +178,71 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
       onRefresh={refreshSchemas}
     />
   );
-  const laboratoryPanel = <SqlLaboratory context={runtimeContext} connector={connector} ready={ready} />;
+  const dataPanel = activeLab === 'r' ? (
+    <RDataFramePanel snapshot={rSnapshot} info={rDataFrameInfo} laboratory={context.rLaboratory} />
+  ) : schemaPanel;
+  const laboratoryPanel = (
+    <div className="dp-explore-lab-shell">
+      <div className="dp-explore-lab-tabs" role="tablist" aria-label="Labor auswählen">
+        <button
+          type="button"
+          role="tab"
+          id="dp-explore-tab-sql"
+          aria-controls="dp-explore-panel-sql"
+          aria-selected={activeLab === 'sql'}
+          className={activeLab === 'sql' ? 'is-active' : undefined}
+          onClick={() => setActiveLab('sql')}
+        >
+          SQL-Labor
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="dp-explore-tab-r"
+          aria-controls="dp-explore-panel-r"
+          aria-selected={activeLab === 'r'}
+          className={activeLab === 'r' ? 'is-active' : undefined}
+          onClick={() => {
+            setRLabMounted(true);
+            setActiveLab('r');
+          }}
+        >
+          R-Labor
+        </button>
+      </div>
+      <div className="dp-explore-lab-panels">
+        <div
+          id="dp-explore-panel-sql"
+          role="tabpanel"
+          aria-labelledby="dp-explore-tab-sql"
+          hidden={activeLab !== 'sql'}
+          className="dp-explore-lab-panel"
+        >
+          <SqlLaboratory context={runtimeContext} connector={connector} ready={ready} onTransferToR={transferToR} />
+        </div>
+        {rLabMounted && (
+          <div
+            id="dp-explore-panel-r"
+            role="tabpanel"
+            aria-labelledby="dp-explore-tab-r"
+            hidden={activeLab !== 'r'}
+            className="dp-explore-lab-panel"
+          >
+            <RPanel
+              context={runtimeContext}
+              snapshot={rSnapshot}
+              onDataFrameInfoChange={setRDataFrameInfo}
+              onBackToSql={() => setActiveLab('sql')}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
   const workbenchBody = isNarrowWorkbench ? (
     <div className="dp-explore-workbench__body">
       <aside className="dp-explore-data-panel" aria-label="Daten und Schema">
-        {schemaPanel}
+        {dataPanel}
       </aside>
 
       <section className="dp-explore-workbench__main" aria-busy={isBusyPhase(phase)} aria-label="SQL Arbeitsbereich">
@@ -189,7 +265,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         tagName="aside"
         aria-label="Daten und Schema"
       >
-        {schemaPanel}
+        {dataPanel}
       </Panel>
       <ExploreResizeHandle direction="vertical" label="Schema und SQL-Labor Grösse anpassen" />
       <Panel

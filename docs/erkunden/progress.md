@@ -26,6 +26,30 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | SQL-Labor Diagrammfarben | DONE | Charts use configured additional colors, no red option, stable multi-color palette and clearer axis labels. |
 | DuckDB Catalog Direct Query | DONE | DuckDB-Wasm package upgraded, mirrored extensions moved to `v1.5.4`, catalog files regenerated with DuckDB 1.5.4 and query-side `memory.opendata` mirror removed. |
 | SQL-Labor Query-Fehlerhandling | DONE | Nicht erreichbare Quelldateien zeigen eine neutrale Meldung im Resultatbereich und blockieren die Workbench nicht. |
+| WebR-R-Labor | DONE | SQL-Resultate koennen als typisiertes `daten`-Dataframe ins R-Labor uebernommen werden; WebR runtime/packages werden same-origin ausgeliefert. |
+
+## WebR-R-Labor Entry
+
+Date: 2026-07-06
+
+Scope:
+
+- Added Explore context version 3 with `rLaboratory`, default `datenportal.explore.webr-enabled=true`, WebR runtime URL `/webr/0.6.0/`, package repo `/webr-packages/`, curated R package list and row limits.
+- Added WebR build assets: runtime copy from `webr@0.6.0`, same-origin R-4.6 package mirror under `/webr-packages/bin/emscripten/contrib/4.6/`, lockfile, precompression and cache coverage.
+- Added `SQL-Labor`/`R-Labor` main tabs, SQL `Nach R übernehmen`, R dataframe side panel, R recipes, R execution/copy/export controls, console output and plot output.
+- Added typed SQL-result snapshots and conservative DuckDB/Arrow-to-R mapping. In R, data is available as `daten`, `daten_schema` and `attr(daten, "duckdb_schema_json")`.
+- Kept WebR V1 browser-only, PostMessage-based and without direct R DuckDB/Parquet access. R editor uses the robust textarea fallback; Monaco R highlighting remains a later isolated editor task.
+- Kept the real WebR browser runtime smoke as opt-in with `-Ddatenportal.playwright.webr=true`; Playwright-Chromium in this environment hangs during WebR `0.6.0` Wasm startup before package installation although same-origin runtime requests return HTTP 200.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 20 passed (20)`, `Tests 103 passed (103)` |
+| `./gradlew mirrorWebRPackages --no-daemon` | PASS, mirrored 40 WebR packages to `bin/emscripten/contrib/4.6` |
+| `./gradlew playwrightTest --no-daemon` | PASS, normal Playwright suite; real WebR runtime smoke skipped unless opted in |
+| `./gradlew test --no-daemon` | PASS, `BUILD SUCCESSFUL in 15s` |
 
 ## SQL-Labor Query-Fehlerhandling Entry
 

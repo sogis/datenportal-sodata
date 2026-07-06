@@ -24,6 +24,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.Request;
+import com.microsoft.playwright.Response;
 import com.microsoft.playwright.TimeoutError;
 import com.microsoft.playwright.options.BoundingBox;
 import java.awt.image.BufferedImage;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -123,6 +125,41 @@ class ExploreIslandParquetPlaywrightTest {
     }
 
     @Test
+    void rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult() {
+        Assumptions.assumeTrue(Boolean.getBoolean("datenportal.playwright.webr"),
+                "Real WebR browser runtime test is opt-in because WebR 0.6.0 can hang in Playwright Chromium during Wasm startup.");
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
+            Page page = context.newPage();
+            List<String> browserErrors = collectBrowserErrors(page);
+            List<String> externalWebRRequests = collectExternalWebRRequests(page);
+            List<String> webRRequests = collectWebRRequests(page);
+            List<String> webRResponses = collectWebRResponses(page);
+            List<String> webRRequestFailures = collectWebRRequestFailures(page);
+            List<String> webRWorkerEvents = collectWebRWorkerEvents(page);
+            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+
+            waitForExploreReady(page, browserErrors);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
+            waitForSqlResult(page, browserErrors);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Nach R übernehmen")).click();
+
+            page.waitForSelector("[aria-label='WebR Status']:has-text('WebR wird geladen')",
+                    new Page.WaitForSelectorOptions().setTimeout(30_000));
+            waitForWebRDataFrame(page, browserErrors, webRRequests, webRResponses, webRRequestFailures,
+                    webRWorkerEvents);
+            assertThat(page.locator("[aria-label='Datenbasis R-Labor']:has-text('Data Frame')").count()).isEqualTo(1);
+            assertThat(page.locator("[aria-label='Datenbasis R-Labor']:has-text('Zeilen')").count()).isEqualTo(1);
+
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("R ausführen")).click();
+            page.waitForSelector("[aria-label='R Konsole']:has-text('data.frame')",
+                    new Page.WaitForSelectorOptions().setTimeout(60_000));
+
+            assertThat(externalWebRRequests).isEmpty();
+            assertThat(browserErrors).isEmpty();
+        }
+    }
+
+    @Test
     void schemaExplorerStartsCollapsedUsesLightTypographyAndScrollsLocally() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
             Page page = context.newPage();
@@ -200,13 +237,15 @@ class ExploreIslandParquetPlaywrightTest {
     }
 
     @Test
-    void compactWorkbenchSupportsKeyboardRunWithoutPrimaryTabs() {
+    void compactWorkbenchSupportsKeyboardRunWithLaboratoryTabs() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets/explore-fixture/explore"));
 
             waitForExploreReady(page);
-            assertThat(page.locator("button[role='tab']").count()).isZero();
+            assertThat(page.locator("button[role='tab']").count()).isEqualTo(2);
+            assertThat(page.locator("button[role='tab']:has-text('SQL-Labor')").count()).isEqualTo(1);
+            assertThat(page.locator("button[role='tab']:has-text('R-Labor')").count()).isEqualTo(1);
 
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).focus();
             page.keyboard().press("Enter");
@@ -717,6 +756,42 @@ class ExploreIslandParquetPlaywrightTest {
         return requests;
     }
 
+    private static List<String> collectExternalWebRRequests(Page page) {
+        List<String> requests = new ArrayList<>();
+        page.onRequest(request -> collectExternalWebRRequest(request, requests));
+        return requests;
+    }
+
+    private static List<String> collectWebRRequests(Page page) {
+        List<String> requests = new ArrayList<>();
+        page.onRequest(request -> collectWebRRequest(request, requests));
+        return requests;
+    }
+
+    private static List<String> collectWebRResponses(Page page) {
+        List<String> responses = new ArrayList<>();
+        page.onResponse(response -> collectWebRResponse(response, responses));
+        return responses;
+    }
+
+    private static List<String> collectWebRRequestFailures(Page page) {
+        List<String> failures = new ArrayList<>();
+        page.onRequestFailed(request -> collectWebRRequestFailure(request, failures));
+        return failures;
+    }
+
+    private static List<String> collectWebRWorkerEvents(Page page) {
+        List<String> events = new ArrayList<>();
+        page.onWorker(worker -> {
+            if (worker.url().contains("/webr/")) {
+                events.add("worker started " + worker.url());
+                worker.onConsole(message -> events.add("worker console " + message.type() + " " + message.text()));
+                worker.onClose(closedWorker -> events.add("worker closed " + closedWorker.url()));
+            }
+        });
+        return events;
+    }
+
     private static void collectConsoleError(ConsoleMessage message, List<String> errors) {
         if ("error".equals(message.type())) {
             errors.add(message.text());
@@ -727,6 +802,54 @@ class ExploreIslandParquetPlaywrightTest {
         String url = request.url();
         if ((url.contains("cdn.jsdelivr.net") || url.contains("unpkg.com")) && url.contains("monaco-editor")) {
             requests.add(url);
+        }
+    }
+
+    private static void collectExternalWebRRequest(Request request, List<String> requests) {
+        String url = request.url();
+        if (url.contains("webr.r-wasm.org") || url.contains("repo.r-wasm.org")) {
+            requests.add(url);
+        }
+    }
+
+    private static void collectWebRRequest(Request request, List<String> requests) {
+        String url = request.url();
+        if (url.contains("/webr") || url.contains("/webr-packages")) {
+            requests.add(url);
+        }
+    }
+
+    private static void collectWebRResponse(Response response, List<String> responses) {
+        String url = response.url();
+        if (url.contains("/webr") || url.contains("/webr-packages")) {
+            responses.add(response.status() + " " + url);
+        }
+    }
+
+    private static void collectWebRRequestFailure(Request request, List<String> failures) {
+        String url = request.url();
+        if (url.contains("/webr") || url.contains("/webr-packages")) {
+            failures.add(url + " " + request.failure());
+        }
+    }
+
+    private static void waitForWebRDataFrame(Page page, List<String> browserErrors, List<String> webRRequests,
+            List<String> webRResponses, List<String> webRRequestFailures, List<String> webRWorkerEvents) {
+        try {
+            page.waitForSelector("[aria-label='R Konsole']:has-text('daten ist bereit')",
+                    new Page.WaitForSelectorOptions().setTimeout(180_000));
+        } catch (TimeoutError error) {
+            String bodyText = page.locator("body").innerText(new Locator.InnerTextOptions().setTimeout(1_000));
+            String overlayText = String.join(" | ", page.locator(".dp-explore-runtime-overlay").allTextContents());
+            String consoleText = String.join(" | ", page.locator("[aria-label='R Konsole']").allTextContents());
+            throw new AssertionError("WebR did not receive the SQL result. Overlay: " + overlayText
+                    + ". R console: " + consoleText
+                    + ". WebR requests: " + webRRequests
+                    + ". WebR responses: " + webRResponses
+                    + ". WebR request failures: " + webRRequestFailures
+                    + ". WebR worker events: " + webRWorkerEvents
+                    + ". Browser errors: " + browserErrors
+                    + ". Body: " + truncate(bodyText), error);
         }
     }
 

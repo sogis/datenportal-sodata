@@ -1,6 +1,6 @@
 # Erkunden Tests
 
-Status: SQL-Labor result chart tests
+Status: SQL- und R-Labor tests
 
 Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase-0-Baseline des bestehenden Projekts.
 
@@ -17,7 +17,7 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit Phase 5 existieren Unit-Tests fuer Diagramm-Inferenz und Diagrammkomponenten; nach dem SQL-Labor-Redesign pruefen Vitest und Playwright Diagramme als lokale Resultatansicht statt als alten Haupt-Tab.
 - Seit Phase 6 existieren Tests fuer statische Codebeispiele und lokale Query-Historie; im SQL-Labor-Redesign bleiben diese Bereiche aus der primaeren UI entfernt.
 - Seit Phase 7 pruefen Vitest und Playwright zusaetzlich Status-/Fehlerzustaende, fehlende Parquet-Dateien, Browser-Konsole und page-level Mobile-Overflow. Nicht erreichbare Quelldateien werden im Query-Pfad als neutraler Resultatbereich-Alert geprueft, nicht als globaler Runtime-Overlay-Fehler.
-- Seit Phase 8 pruefen Backend-, Frontend- und npm-Guard-Tests deaktivierte Zukunftsflags und verhindern direkte AI/WebR/Vega/Mosaic/Karten-Abhaengigkeiten.
+- Seit Phase 8 pruefen Backend-, Frontend- und npm-Guard-Tests deaktivierte Zukunftsflags und verhindern direkte AI/Vega/Mosaic/Karten-Abhaengigkeiten. WebR ist seit dem R-Labor kein Zukunftspaket mehr.
 - Seit dem SQL-Labor-Redesign pruefen MVC, Vitest und Playwright die vollflaechige Explore-Layoutvariante, Schema-Karten, Start-SQL gegen registrierte Views, roten Run-Button, lokale Monaco-Assets, Typ-Badges in Resultat-Headern, fehlende alte Tabs und lokale Tabellen-Scrollflaechen.
 - Seit dem SQL-Labor UI-Nachschliff pruefen Vitest und Playwright zusaetzlich den Schema-Status `Tabelle geladen` statt `Registriert`, entfernte `Abfrage 1`-/`SQL`-/`Resultat`-Header, den Play-Icon-Run-Button, den stabilen `✓ SQL kopiert`-Button, sichtbares/editierbares Monaco-SQL und pointer-bedienbare Resizer-Handles.
 - Seit dem Status-Overlay-Nachschliff pruefen Vitest und Playwright, dass Lade- und Runtime-Fehlerzustaende als zentriertes Overlay erscheinen, Ladezustaende eine Progressbar besitzen, Runtime-Fehlerzustaende keine Progressbar anzeigen, der globale `Bereit`-Badge im Erfolgsfall nicht gerendert wird und die Workbench keine Topbar-Hoehe mehr reserviert, aber den oberen Border direkt am Container behaelt.
@@ -25,6 +25,9 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit dem Resultat-Scrollbar-Nachschliff pruefen Vitest und Playwright zusaetzlich die fokussierbare Resultattabellen-Scrollregion, echte lokale horizontale/vertikale Overflow-Situationen und sichtbare Custom-Scrollbar-Pixel bei Hover, Klick und Tastaturfokus.
 - Seit der Diagramm-Wiederaufnahme pruefen Vitest und Playwright die kompakte Beispielabfrage-Auswahl, den `Tabelle`/`Diagramm`-Umschalter, Recharts-Balken/Punkte/Linien/Histogramm, die erlaubten Zusatzfarben ohne Rot, mehrfarbige Balken sowie Pie/Donut mit Segmentfarben und `Farben neu`.
 - Seit der Serienausgaben-Erweiterung pruefen MVC- und Playwright-Tests, dass Open-Data-Ausgaben einen aktiven Explore-Link zeigen, aktuelle und historische Ausgaben eigene Explore-Kontexte liefern, falsche Dataset-/Serienrouten 404 bleiben und das SQL-Labor auf einer Ausgabe echte Parquet-Daten laden und abfragen kann.
+- Seit dem R-Labor pruefen Backend-Tests den Explore-Kontext Version 3 mit `rLaboratory`, WebR-Featureflag und statischen Asset-/Cache-Regeln fuer `/webr/**` und `/webr-packages/**`.
+- Vitest prueft DuckDB/Arrow-nahes Type-Mapping, Snapshot-Erzeugung aus SQL-Resultaten, R-Rezeptgenerierung, WebR-Runtime-Ladephasen mit gemocktem `webr`, R-Panel-UI, Limit-Warnungen, Exportbuttons und das Package-Mirror-Script inklusive Dependency-Closure und Lockdatei.
+- Der echte WebR-Browser-Smoke ist opt-in: `./gradlew playwrightTest -Ddatenportal.playwright.webr=true`. Der normale `playwrightTest`-Task ueberspringt ihn, weil WebR `0.6.0` in der aktuellen Playwright-Chromium-Umgebung beim Wasm-Startup vor der Paketinstallation haengen kann. Der Test bleibt im Code, um lokale Browser-/Runtime-Fixes gezielt zu verifizieren.
 
 ## Baseline am 2026-07-01
 

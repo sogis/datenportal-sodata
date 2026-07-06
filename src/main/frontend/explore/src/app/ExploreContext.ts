@@ -85,8 +85,20 @@ export const exploreCatalogDatabaseSchema = z.object({
   schema: z.string()
 });
 
+export const exploreRLaboratorySchema = z.object({
+  dataFrameName: z.literal('daten'),
+  runtimeBaseUrl: z.string(),
+  packageRepoUrl: z.string(),
+  packages: z.array(z.string()),
+  recommendedRows: z.number(),
+  warningRows: z.number(),
+  hardRows: z.number(),
+  plotWidth: z.number(),
+  plotHeight: z.number()
+});
+
 export const exploreContextSchema = z.object({
-  version: z.literal(2),
+  version: z.literal(3),
   datasetId: z.string(),
   title: z.string(),
   description: z.string().optional(),
@@ -98,7 +110,8 @@ export const exploreContextSchema = z.object({
   tables: z.array(exploreTableSchema),
   recipes: z.array(exploreRecipeSchema),
   codeSnippets: z.array(exploreCodeSnippetSchema),
-  featureFlags: exploreFeatureFlagsSchema
+  featureFlags: exploreFeatureFlagsSchema,
+  rLaboratory: exploreRLaboratorySchema
 });
 
 export type ExploreColumnRole = z.infer<typeof exploreColumnRoleSchema>;
@@ -110,6 +123,7 @@ export type ExploreCodeSnippetDto = z.infer<typeof exploreCodeSnippetSchema>;
 export type ExploreFeatureFlagsDto = z.infer<typeof exploreFeatureFlagsSchema>;
 export type ExploreExecutionDto = z.infer<typeof exploreExecutionSchema>;
 export type ExploreCatalogDatabaseDto = z.infer<typeof exploreCatalogDatabaseSchema>;
+export type ExploreRLaboratoryDto = z.infer<typeof exploreRLaboratorySchema>;
 export type ExploreContextDto = z.infer<typeof exploreContextSchema>;
 
 export function parseExploreContext(rawJson: string): ExploreContextDto {

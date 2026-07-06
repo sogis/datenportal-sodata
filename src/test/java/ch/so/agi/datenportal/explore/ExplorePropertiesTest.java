@@ -22,5 +22,21 @@ class ExplorePropertiesTest {
         assertThat(properties.featureFlags().vega()).isFalse();
         assertThat(properties.featureFlags().mosaic()).isFalse();
         assertThat(properties.featureFlags().geospatial()).isFalse();
+        assertThat(properties.rLaboratory().dataFrameName()).isEqualTo("daten");
+        assertThat(properties.rLaboratory().runtimeBaseUrl()).isEqualTo("/webr/0.6.0/");
+        assertThat(properties.rLaboratory().packageRepoUrl()).isEqualTo("/webr-packages/");
+        assertThat(properties.rLaboratory().packages()).containsExactly(
+                "ggplot2",
+                "dplyr",
+                "tidyr",
+                "readr",
+                "tibble",
+                "scales",
+                "RColorBrewer",
+                "viridisLite",
+                "jsonlite");
+        assertThat(properties.rLaboratory().recommendedRows()).isEqualTo(5_000);
+        assertThat(properties.rLaboratory().warningRows()).isEqualTo(10_000);
+        assertThat(properties.rLaboratory().hardRows()).isEqualTo(50_000);
     }
 }

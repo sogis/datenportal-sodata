@@ -32,6 +32,8 @@ public final class ExploreContextJsonWriter {
         snippets(json, context.codeSnippets());
         comma(json);
         featureFlags(json, context.featureFlags());
+        comma(json);
+        rLaboratory(json, context.rLaboratory());
         json.append('}');
         return json.toString();
     }
@@ -201,6 +203,35 @@ public final class ExploreContextJsonWriter {
         field(json, "mosaic", flags.mosaic());
         comma(json);
         field(json, "geospatial", flags.geospatial());
+        json.append('}');
+    }
+
+    private static void rLaboratory(StringBuilder json, ExploreRLaboratoryDto rLaboratory) {
+        name(json, "rLaboratory").append('{');
+        field(json, "dataFrameName", rLaboratory.dataFrameName());
+        comma(json);
+        field(json, "runtimeBaseUrl", rLaboratory.runtimeBaseUrl());
+        comma(json);
+        field(json, "packageRepoUrl", rLaboratory.packageRepoUrl());
+        comma(json);
+        name(json, "packages").append('[');
+        for (int index = 0; index < rLaboratory.packages().size(); index++) {
+            if (index > 0) {
+                comma(json);
+            }
+            string(json, rLaboratory.packages().get(index));
+        }
+        json.append(']');
+        comma(json);
+        field(json, "recommendedRows", rLaboratory.recommendedRows());
+        comma(json);
+        field(json, "warningRows", rLaboratory.warningRows());
+        comma(json);
+        field(json, "hardRows", rLaboratory.hardRows());
+        comma(json);
+        field(json, "plotWidth", rLaboratory.plotWidth());
+        comma(json);
+        field(json, "plotHeight", rLaboratory.plotHeight());
         json.append('}');
     }
 

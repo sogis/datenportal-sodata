@@ -12,8 +12,6 @@ const forbiddenDirectDependencies = [
   '@sqlrooms/ai',
   '@sqlrooms/vega',
   '@sqlrooms/mosaic',
-  '@r-wasm/webr',
-  'webr',
   '@deck.gl/core',
   '@deck.gl/layers',
   'deck.gl',
@@ -26,8 +24,6 @@ const forbiddenImportMarkers = [
   '@sqlrooms/ai',
   '@sqlrooms/vega',
   '@sqlrooms/mosaic',
-  '@r-wasm/webr',
-  'webr',
   '@deck.gl/',
   'deck.gl',
   'kepler.gl',
@@ -39,9 +35,6 @@ const forbiddenBuiltAssetMarkers = [
   '@sqlrooms/ai',
   '@sqlrooms/vega',
   '@sqlrooms/mosaic',
-  '@r-wasm/webr',
-  'webr-worker',
-  'webRWorker',
   'deck.gl',
   'kepler.gl',
   'maplibre-gl',
@@ -62,7 +55,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log('Future dependency check passed: no disabled AI/WebR/Vega/Mosaic/geospatial packages are directly loaded.');
+console.log('Future dependency check passed: no disabled AI/Vega/Mosaic/geospatial packages are directly loaded.');
 
 async function checkDirectDependencies() {
   const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));

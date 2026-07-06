@@ -16,7 +16,8 @@ public record ExploreContextDto(
         List<ExploreTableDto> tables,
         List<ExploreRecipeDto> recipes,
         List<ExploreCodeSnippetDto> codeSnippets,
-        ExploreFeatureFlagsDto featureFlags) {
+        ExploreFeatureFlagsDto featureFlags,
+        ExploreRLaboratoryDto rLaboratory) {
 
     public ExploreContextDto {
         description = description == null ? Optional.empty() : description.filter(value -> !value.isBlank());

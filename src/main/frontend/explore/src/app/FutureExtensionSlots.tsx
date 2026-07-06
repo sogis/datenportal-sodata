@@ -1,8 +1,7 @@
 import type {ExploreFeatureFlagsDto} from './ExploreContext';
 
-const futureSlots: Array<{flag: keyof Pick<ExploreFeatureFlagsDto, 'aiAssistant' | 'webR' | 'vega' | 'mosaic' | 'geospatial'>; label: string}> = [
+const futureSlots: Array<{flag: keyof Pick<ExploreFeatureFlagsDto, 'aiAssistant' | 'vega' | 'mosaic' | 'geospatial'>; label: string}> = [
   {flag: 'aiAssistant', label: 'AI SQL-Vorschlaege'},
-  {flag: 'webR', label: 'WebR / r-stats'},
   {flag: 'vega', label: 'Vega-Lite'},
   {flag: 'mosaic', label: 'Mosaic Crossfilter'},
   {flag: 'geospatial', label: 'Geodaten-Erkundung'}

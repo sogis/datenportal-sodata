@@ -8,11 +8,13 @@ export function SqlToolbar({
   canRun,
   canCancel,
   canExport,
+  canTransferToR,
   exportingFormat,
   onRun,
   onCancel,
   onCopy,
   onExport,
+  onTransferToR,
   copied
 }: {
   leading?: ReactNode;
@@ -20,11 +22,13 @@ export function SqlToolbar({
   canRun: boolean;
   canCancel: boolean;
   canExport: boolean;
+  canTransferToR?: boolean;
   exportingFormat?: ResultExportFormat | null;
   onRun: () => void;
   onCancel: () => void;
   onCopy: () => void;
   onExport: (format: ResultExportFormat) => void;
+  onTransferToR?: () => void;
   copied: boolean;
 }) {
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
@@ -51,6 +55,16 @@ export function SqlToolbar({
         <button type="button" className="dp-explore-button dp-explore-button--secondary dp-explore-button--copy" disabled={running} onClick={onCopy}>
           <span>{copied ? '✓ SQL kopiert' : 'SQL kopieren'}</span>
         </button>
+        {onTransferToR && (
+          <button
+            type="button"
+            className="dp-explore-button dp-explore-button--secondary"
+            disabled={!canTransferToR || running}
+            onClick={onTransferToR}
+          >
+            Nach R übernehmen
+          </button>
+        )}
       </div>
 
       <div className="dp-explore-sql-toolbar__export">

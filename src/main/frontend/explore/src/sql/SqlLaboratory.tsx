@@ -11,6 +11,7 @@ import {ResultPanel} from '../results/ResultPanel';
 import {idleQueryResult, type QueryResultState} from '../results/queryResultTypes';
 import {successfulQueryResult} from '../results/arrowResult';
 import {exportQueryResult, type ResultExportFormat} from '../results/ResultExport';
+import {sqlResultSnapshotFromQueryResult, type SqlResultSnapshot} from '../results/sqlResultSnapshot';
 import {copyTextToClipboard} from './clipboard';
 import {SqlEditorField} from './SqlEditorField';
 import {SqlToolbar} from './SqlToolbar';
@@ -23,12 +24,14 @@ export function SqlLaboratory({
   context,
   connector,
   ready,
-  onResultChange
+  onResultChange,
+  onTransferToR
 }: {
   context: ExploreContextDto;
   connector?: DuckDbConnector;
   ready: boolean;
   onResultChange?: (result: QueryResultState) => void;
+  onTransferToR?: (snapshot: SqlResultSnapshot) => void;
 }) {
   const initialRecipe = useMemo(() => context.recipes[0], [context.recipes]);
   const initialSql = useMemo(() => initialRecipe?.sql ?? buildInitialSql(context.tables[0], context.catalogDatabase), [
@@ -183,8 +186,20 @@ export function SqlLaboratory({
     }
   }
 
+  function transferToR() {
+    if (result.status !== 'success') {
+      return;
+    }
+    try {
+      onTransferToR?.(sqlResultSnapshotFromQueryResult(result, context.tables));
+    } catch (error) {
+      setExportError(`Resultat konnte nicht nach R übernommen werden: ${toErrorMessage(error)}`);
+    }
+  }
+
   const running = result.status === 'running';
   const canExport = result.status === 'success' && result.rows.length > 0;
+  const canTransferToR = context.featureFlags.webR && result.status === 'success' && result.rows.length > 0;
   const chartsEnabled = context.featureFlags.charts;
 
   return (
@@ -220,11 +235,13 @@ export function SqlLaboratory({
               canRun={ready && sql.trim().length > 0}
               canCancel={running}
               canExport={canExport}
+              canTransferToR={canTransferToR}
               exportingFormat={exportingFormat}
               onRun={() => void runSql()}
               onCancel={() => void cancelQuery()}
               onCopy={() => void copySql()}
               onExport={(format) => void exportResult(format)}
+              onTransferToR={onTransferToR ? transferToR : undefined}
               copied={copied}
             />
           </div>

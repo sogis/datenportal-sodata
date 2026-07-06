@@ -82,7 +82,7 @@ public final class ExploreContextService {
                 entry.title(),
                 canonicalUrl);
         return new ExploreContextDto(
-                2,
+                3,
                 entry.identifier(),
                 entry.title(),
                 Optional.of(entry.description()),
@@ -97,7 +97,8 @@ public final class ExploreContextService {
                 tables,
                 recipeService.generateRecipes(tables),
                 codeSnippetService.generateSnippets(source, tables),
-                properties.featureFlags());
+                properties.featureFlags(),
+                properties.rLaboratory());
     }
 
     private static CatalogNotFoundException notFound(String identifier) {

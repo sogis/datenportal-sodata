@@ -40,7 +40,9 @@ class ExplorePageControllerMvcTest {
                 .andExpect(content().string(containsString("\"mode\":\"browser-local\"")))
                 .andExpect(content().string(containsString("\"charts\":true")))
                 .andExpect(content().string(containsString("\"aiAssistant\":false")))
-                .andExpect(content().string(containsString("\"webR\":false")))
+                .andExpect(content().string(containsString("\"webR\":true")))
+                .andExpect(content().string(containsString("\"rLaboratory\"")))
+                .andExpect(content().string(containsString("\"dataFrameName\":\"daten\"")))
                 .andExpect(content().string(containsString("\"vega\":false")))
                 .andExpect(content().string(containsString("\"mosaic\":false")))
                 .andExpect(content().string(containsString("\"geospatial\":false")))
@@ -57,7 +59,7 @@ class ExplorePageControllerMvcTest {
         mockMvc.perform(get("/datasets/ch.so.bauinventar/explore/context.json"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, containsString("no-cache")))
-                .andExpect(jsonPath("$.version").value(2))
+                .andExpect(jsonPath("$.version").value(3))
                 .andExpect(jsonPath("$.datasetId").value("ch.so.bauinventar"))
                 .andExpect(jsonPath("$.title").value("Bauinventar"))
                 .andExpect(jsonPath("$.canonicalUrl").value("/datasets/ch.so.bauinventar"))
@@ -76,10 +78,17 @@ class ExplorePageControllerMvcTest {
                 .andExpect(jsonPath("$.featureFlags.charts").value(true))
                 .andExpect(jsonPath("$.featureFlags.localHistory").value(false))
                 .andExpect(jsonPath("$.featureFlags.aiAssistant").value(false))
-                .andExpect(jsonPath("$.featureFlags.webR").value(false))
+                .andExpect(jsonPath("$.featureFlags.webR").value(true))
                 .andExpect(jsonPath("$.featureFlags.vega").value(false))
                 .andExpect(jsonPath("$.featureFlags.mosaic").value(false))
-                .andExpect(jsonPath("$.featureFlags.geospatial").value(false));
+                .andExpect(jsonPath("$.featureFlags.geospatial").value(false))
+                .andExpect(jsonPath("$.rLaboratory.dataFrameName").value("daten"))
+                .andExpect(jsonPath("$.rLaboratory.runtimeBaseUrl").value("/webr/0.6.0/"))
+                .andExpect(jsonPath("$.rLaboratory.packageRepoUrl").value("/webr-packages/"))
+                .andExpect(jsonPath("$.rLaboratory.packages[0]").value("ggplot2"))
+                .andExpect(jsonPath("$.rLaboratory.recommendedRows").value(5000))
+                .andExpect(jsonPath("$.rLaboratory.warningRows").value(10000))
+                .andExpect(jsonPath("$.rLaboratory.hardRows").value(50000));
     }
 
     @Test
@@ -106,7 +115,7 @@ class ExplorePageControllerMvcTest {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/current/explore/context.json"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, containsString("no-cache")))
-                .andExpect(jsonPath("$.version").value(2))
+                .andExpect(jsonPath("$.version").value(3))
                 .andExpect(jsonPath("$.datasetId").value("ch.so.abstimmungsresultate_2026"))
                 .andExpect(jsonPath("$.title").value("Abstimmungsresultate 2026"))
                 .andExpect(jsonPath("$.canonicalUrl").value("/series/ch.so.abstimmungsresultate/issues/current"))

@@ -87,6 +87,31 @@ läuft direkt gegen diese attached Catalog-Datenbank. Dadurch koennen Abfragen
 auch Views aus mehreren Parquet-Dateien joinen, solange sie im Catalog-Artefakt
 enthalten sind.
 
+## WebR fuer Erkunden
+
+Das R-Labor ist standardmaessig aktiv und arbeitet ausschliesslich mit explizit aus dem SQL-Labor uebernommenen Query-Resultaten. R bekommt keinen direkten DuckDB- oder Parquet-Zugriff.
+
+```yaml
+datenportal:
+  explore:
+    webr-enabled: true
+```
+
+Der Explore-Kontext liefert dem Browser die WebR-Konfiguration:
+
+- Runtime-Basis: `/webr/0.6.0/`
+- Paket-Repository: `/webr-packages/`
+- R-Dataframe-Name: `daten`
+- Limits: empfohlen `5'000`, Warnung `10'000`, hart `50'000` Zeilen
+
+Die Runtime- und Paketdateien werden zur Buildzeit generiert:
+
+- `copyWebRRuntime` kopiert `node_modules/webr/dist` nach `build/generated-resources/webr/static/webr/0.6.0`.
+- `mirrorWebRPackages` erzeugt aus `src/main/frontend/explore/scripts/webr-packages.lock.json` ein kuratiertes Repository unter `build/generated-resources/webr/static/webr-packages/bin/emscripten/contrib/4.6`.
+- `precompressStaticAssets` erzeugt Brotli-/Gzip-Varianten fuer WebR-Runtime und Paketmirror.
+
+Der Browser darf fuer WebR keine externen Requests an `webr.r-wasm.org` oder `repo.r-wasm.org` benoetigen. Die CSP bleibt bei `worker-src 'self' blob:` und `script-src 'self' 'wasm-unsafe-eval'`; Cross-Origin-Isolation ist fuer V1 nicht vorgesehen.
+
 ## Reload
 
 Der geschützte Runtime-Reload ist nur aktiv, wenn ein Token gesetzt ist:

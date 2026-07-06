@@ -61,6 +61,7 @@ def gitCommitProvider = providers.provider {
 
 def exploreFrontendDir = layout.projectDirectory.dir('src/main/frontend/explore')
 def exploreGeneratedResourcesDir = layout.buildDirectory.dir('generated-resources/explore')
+def webRGeneratedResourcesDir = layout.buildDirectory.dir('generated-resources/webr')
 def precompressedStaticResourcesDir = layout.buildDirectory.dir('generated-resources/precompressed-static')
 
 // Damit sind die Inhalte dieses Verzeichnisses via Classpath greifbar.
@@ -69,6 +70,7 @@ sourceSets {
         resources {
             srcDir 'spec/fixtures'
             srcDir exploreGeneratedResourcesDir
+            srcDir webRGeneratedResourcesDir
             srcDir precompressedStaticResourcesDir
         }
     }
@@ -147,13 +149,33 @@ tasks.register('npmBuildExplore', Exec) {
     outputs.dir exploreGeneratedResourcesDir
 }
 
+tasks.register('copyWebRRuntime', Copy) {
+    group = 'build'
+    description = 'Copies the WebR runtime into generated same-origin Spring static resources.'
+    dependsOn tasks.named('npmInstallExplore')
+    from exploreFrontendDir.dir('node_modules/webr/dist')
+    into webRGeneratedResourcesDir.map { it.dir('static/webr/0.6.0') }
+}
+
+tasks.register('mirrorWebRPackages', Exec) {
+    group = 'build'
+    description = 'Builds the curated same-origin WebR package repository.'
+    workingDir = exploreFrontendDir.asFile
+    commandLine 'node', 'scripts/mirrorWebRPackages.mjs'
+    dependsOn tasks.named('npmInstallExplore')
+    inputs.file exploreFrontendDir.file('scripts/mirrorWebRPackages.mjs')
+    inputs.file exploreFrontendDir.file('scripts/webr-packages.lock.json')
+    outputs.dir webRGeneratedResourcesDir.map { it.dir('static/webr-packages') }
+}
+
 tasks.register('precompressStaticAssets', Exec) {
     group = 'build'
-    description = 'Precompresses Explore and DuckDB static assets with Brotli and Gzip.'
+    description = 'Precompresses Explore, DuckDB and WebR static assets with Brotli and Gzip.'
     workingDir = exploreFrontendDir.asFile
     commandLine 'node', 'scripts/precompressStaticAssets.mjs'
-    dependsOn tasks.named('npmBuildExplore')
+    dependsOn tasks.named('npmBuildExplore'), tasks.named('copyWebRRuntime'), tasks.named('mirrorWebRPackages')
     inputs.dir exploreGeneratedResourcesDir
+    inputs.dir webRGeneratedResourcesDir
     inputs.dir layout.projectDirectory.dir('src/main/resources/static/explore-extensions')
     inputs.file exploreFrontendDir.file('scripts/precompressStaticAssets.mjs')
     outputs.dir precompressedStaticResourcesDir
@@ -183,6 +205,9 @@ tasks.register('playwrightTest', Test) {
     shouldRunAfter tasks.named('test')
     dependsOn tasks.named('installPlaywrightChromium')
     environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
+    if (System.getProperty('datenportal.playwright.webr') != null) {
+        systemProperty 'datenportal.playwright.webr', System.getProperty('datenportal.playwright.webr')
+    }
     useJUnitPlatform {
         includeTags 'playwright'
     }

@@ -120,6 +120,26 @@ describe('SqlLaboratory', () => {
     );
   });
 
+  it('enables transfer to R only for successful result rows', async () => {
+    const user = userEvent.setup();
+    const onTransferToR = vi.fn();
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready onTransferToR={onTransferToR} />);
+
+    expect(screen.getByRole('button', {name: 'Nach R übernehmen'})).toBeDisabled();
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    expect(await screen.findByLabelText('SQL Ergebnis')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Nach R übernehmen'}));
+
+    expect(onTransferToR).toHaveBeenCalledWith(expect.objectContaining({
+      rowCount: 2,
+      columns: expect.arrayContaining([
+        expect.objectContaining({name: 'gemeindename', rType: 'character'}),
+        expect.objectContaining({name: 'anzahl', rType: 'numeric'})
+      ])
+    }));
+  });
+
   it('shows a neutral source-file error and keeps the query controls usable', async () => {
     const user = userEvent.setup();
     query.mockRejectedValueOnce(new Error('IO Error: No files found that match the pattern "/explore-fixtures/missing.parquet"'));

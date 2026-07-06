@@ -1,7 +1,7 @@
 import type {ExploreContextDto} from '../app/ExploreContext';
 
 export const sampleExploreContext: ExploreContextDto = {
-  version: 2,
+  version: 3,
   datasetId: 'ch.so.bauinventar',
   title: 'Bauinventar',
   description: 'Schützenswerte und geschützte Gebäude.',
@@ -76,9 +76,20 @@ export const sampleExploreContext: ExploreContextDto = {
     charts: true,
     localHistory: true,
     aiAssistant: false,
-    webR: false,
+    webR: true,
     vega: false,
     mosaic: false,
     geospatial: false
+  },
+  rLaboratory: {
+    dataFrameName: 'daten',
+    runtimeBaseUrl: '/webr/0.6.0/',
+    packageRepoUrl: '/webr-packages/',
+    packages: ['ggplot2', 'dplyr', 'tidyr', 'readr', 'tibble', 'scales', 'RColorBrewer', 'viridisLite', 'jsonlite'],
+    recommendedRows: 5000,
+    warningRows: 10000,
+    hardRows: 50000,
+    plotWidth: 700,
+    plotHeight: 420
   }
 };

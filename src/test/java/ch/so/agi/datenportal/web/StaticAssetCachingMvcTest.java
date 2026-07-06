@@ -49,6 +49,19 @@ class StaticAssetCachingMvcTest {
     }
 
     @Test
+    void webRRuntimeAndPackageMirrorUseLongCacheHeader() throws Exception {
+        mockMvc.perform(get("/webr/0.6.0/webr.mjs"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))))
+                .andExpect(content().string(containsString("WebR")));
+
+        mockMvc.perform(get("/webr-packages/bin/emscripten/contrib/4.6/PACKAGES"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))))
+                .andExpect(content().string(containsString("Package: ggplot2")));
+    }
+
+    @Test
     void exploreDuckDbWasmUsesBrotliWhenAccepted() throws Exception {
         mockMvc.perform(get("/explore/assets/duckdb-mvp.wasm").header("Accept-Encoding", "br, gzip"))
                 .andExpect(status().isOk())

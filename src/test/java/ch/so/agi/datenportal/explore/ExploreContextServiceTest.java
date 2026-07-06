@@ -36,7 +36,7 @@ class ExploreContextServiceTest {
 
         ExploreContextDto context = service.buildContext("ch.so.gemeinden");
 
-        assertThat(context.version()).isEqualTo(2);
+        assertThat(context.version()).isEqualTo(3);
         assertThat(context.datasetId()).isEqualTo("ch.so.gemeinden");
         assertThat(context.canonicalUrl()).isEqualTo("/datasets/ch.so.gemeinden");
         assertThat(context.catalogDatabase().url()).isEqualTo("/catalog/catalog.duckdb");
@@ -52,7 +52,11 @@ class ExploreContextServiceTest {
                 .contains(ExploreSnippetLanguage.SQL, ExploreSnippetLanguage.PYTHON, ExploreSnippetLanguage.R);
         assertThat(context.featureFlags().charts()).isTrue();
         assertThat(context.featureFlags().aiAssistant()).isFalse();
+        assertThat(context.featureFlags().webR()).isTrue();
         assertThat(context.featureFlags().geospatial()).isFalse();
+        assertThat(context.rLaboratory().dataFrameName()).isEqualTo("daten");
+        assertThat(context.rLaboratory().runtimeBaseUrl()).isEqualTo("/webr/0.6.0/");
+        assertThat(context.rLaboratory().packageRepoUrl()).isEqualTo("/webr-packages/");
     }
 
     @Test
@@ -141,7 +145,7 @@ class ExploreContextServiceTest {
                 "test"));
         var sanitizer = new ExploreSqlNameSanitizer();
         var roleDetector = new ExploreColumnRoleDetector();
-        var properties = new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, false, false, false, false);
+        var properties = new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, true, false, false, false);
         var duckDbProperties = duckDbProperties();
         return new ExploreContextService(
                 catalogService,

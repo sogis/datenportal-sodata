@@ -61,7 +61,8 @@ class ExploreIslandPlaywrightTest {
             assertThat(page.locator("text=Abfrage 1").count()).isZero();
             assertThat(page.locator("text=Zur Datensatzseite").count()).isZero();
             assertThat(page.locator("button[role='tab']:has-text('Vorschau')").count()).isZero();
-            assertThat(page.locator("button[role='tab']:has-text('SQL-Labor')").count()).isZero();
+            assertThat(page.locator("button[role='tab']:has-text('SQL-Labor')").count()).isEqualTo(1);
+            assertThat(page.locator("button[role='tab']:has-text('R-Labor')").count()).isEqualTo(1);
             assertThat(page.locator("button[role='tab']:has-text('Diagramm')").count()).isZero();
             assertThat(page.locator("button[role='tab']:has-text('Code')").count()).isZero();
             assertThat(page.locator("text=Die interaktive Erkunden-Oberfläche wird in der nächsten Phase eingebunden").count()).isZero();
