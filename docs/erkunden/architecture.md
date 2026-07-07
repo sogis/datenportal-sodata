@@ -163,6 +163,14 @@ Die Spaltenrollen entstehen heuristisch in `ExploreColumnRoleDetector`:
 - `YEAR`: Spaltennamen `jahr`, `year`, `periode` oder `berichtsjahr`.
 - `DATE`: Datentyp mit `date`/`time` oder Spaltennamen `datum`, `date`, `stand`, `stichtag`, `gueltig_ab`, `gueltig_bis`, `updated_at`.
 
+### Generierte R-Beispiele
+
+Die R-Beispiele werden nicht vom Backend erzeugt. `RRecipes.ts` baut sie im Browser aus dem aktuellen `SqlResultSnapshot`, also aus dem Resultat, das explizit aus dem SQL-Labor als Dataframe `daten` uebernommen wurde. Ohne Snapshot gibt es nur ein eigenstaendiges `R-Beispiel`, das WebR und die Ausgabe auch ohne SQL-Result nutzbar macht.
+
+Mit Snapshot entstehen immer `Datenüberblick`, `Spaltenstruktur` und `Fehlende Werte`. Danach waehlt die Logik je hoechstens eine Datum-/Jahrspalte, eine numerische Messwertspalte und eine Kategorie-Spalte. Die numerische Auswahl bevorzugt `numeric`, die Rolle `measure` und Namen wie `messwert`, `wert`, `quote`, `rate` oder `index`; sie bestraft Jahr-/Monat-/Tag-Spalten sowie IDs, Nummern und Codes. Die Kategorie-Auswahl bevorzugt Rollen wie `category`, `municipality` und `label` sowie Namen wie `gemeinde`, `name`, `parameter`, `status` oder `thema`; Codes, IDs und Nummern werden nach hinten sortiert.
+
+Aus diesen Spalten entstehen optional `Numerische Zusammenfassung`, `Histogramm «<messwert>»`, `Boxplot «<messwert>» nach «<kategorie>»` und `Trend «<messwert>» nach «<datum>»`. Histogramm und Boxplot plotten Rohdaten und setzen deshalb im generierten R-Code `plot_limit <- 10000`; der Trend aggregiert zuerst nach Datum/Jahr. Die Rezepttitel verwenden Schweizer Anfuehrungszeichen, damit Spaltennamen im Dropdown gleich markiert sind wie im SQL-Labor.
+
 Fuer Diagramme liefern Kategorie- und Zeitrezepte eine `preferredChart`-Vorgabe. Diese Vorgabe wird im Frontend nur verwendet, wenn genau das unveraenderte Rezept-SQL ausgefuehrt wurde. Sobald Nutzerinnen oder Nutzer das SQL aendern oder freies SQL ausfuehren, klassifiziert `chartInference` die Resultatspalten und die angezeigten Werte neu: Jahr-/Datum plus Zahl ergibt eine Linie, Kategorie plus Zahl einen Balken, zwei Zahlenwerte Punkte und ein einzelner Zahlenwert ein Histogramm.
 
 Balken- und Histogramm-Diagramme duerfen nicht gleich behandelt werden:
@@ -246,11 +254,15 @@ Der Explore-Kontext ist Version `3` und enthaelt `rLaboratory`. Standardwerte:
 - Limits: empfohlen `5'000`, Warnung `10'000`, hart `50'000` Zeilen
 - Kuratierte Root-Pakete: `ggplot2`, `dplyr`, `tidyr`, `readr`, `tibble`, `scales`, `RColorBrewer`, `viridisLite`, `jsonlite`
 
-Das R-Labor arbeitet nur mit einem explizit aus dem SQL-Labor uebernommenen Resultat. Aus `QueryResultState.arrowTable` entsteht ein typisierter `SqlResultSnapshot` mit Spaltennamen, DuckDB-/Arrow-nahen Typen, Nullable-Info, Rollen und Zeilen. Das Mapping ist konservativ: IDs, `BIGINT`, `DECIMAL`, Geometrien und Binaries werden `character`; 32-bit Integer werden `integer`; Float/Double werden `numeric`; `DATE` wird `Date`; Timestamps werden `POSIXct` in UTC. Der Transfer erfolgt als JSON-Snapshot plus R-Konvertierungsskript. In WebR stehen `daten`, `daten_schema` und `attr(daten, "duckdb_schema_json")` zur Verfuegung.
+Das R-Labor kann WebR auch ohne SQL-Result initialisieren. Ein fachlicher Dataframe entsteht aber nur durch ein explizit aus dem SQL-Labor uebernommenes Resultat. Aus `QueryResultState.arrowTable` entsteht dann ein typisierter `SqlResultSnapshot` mit Spaltennamen, DuckDB-/Arrow-nahen Typen, Nullable-Info, Rollen und Zeilen. Das Mapping ist konservativ: IDs, `BIGINT`, `DECIMAL`, Geometrien und Binaries werden `character`; 32-bit Integer werden `integer`; Float/Double werden `numeric`; `DATE` wird `Date`; Timestamps werden `POSIXct` in UTC. Der Transfer erfolgt als JSON-Snapshot plus R-Konvertierungsskript. In WebR stehen danach `daten`, `daten_schema` und `attr(daten, "duckdb_schema_json")` zur Verfuegung.
 
 WebR `0.6.0` und der Paketmirror werden same-origin ausgeliefert. `copyWebRRuntime` kopiert `node_modules/webr/dist` nach `/webr/0.6.0/`; `mirrorWebRPackages` erzeugt aus `scripts/webr-packages.lock.json` ein kleines Repository unter `/webr-packages/bin/emscripten/contrib/4.6/`. Browser duerfen fuer WebR keine Requests an `webr.r-wasm.org` oder `repo.r-wasm.org` erzeugen. Die Runtime nutzt `ChannelType.PostMessage`, `interactive: false`, `captureR()` und `webr::canvas()`; COOP/COEP bleibt unveraendert out of scope.
 
 Der R-Editor verwendet aktuell eine robuste Textarea. Monaco-R-Syntaxhighlighting wurde nicht aktiviert, weil die vorhandene Monaco-Integration beim gleichzeitigen SQL- und R-Editor in Chromium Service-Fehler ausloeste. Die Textarea bleibt der sichere Fallback und kann spaeter durch einen isolierten R-Editor ersetzt werden.
+
+Die R-Ausgabe folgt der kompakten SQL-Labor-Flaechenlogik: Konsole und Plot werden ohne sichtbare Paneltitel und ohne breite graue Innen-Gutters gerendert. Die Output-Panes sind mit einem `react-resizable-panels`-Handle getrennt. `Resultat exportieren` sitzt rechts in der R-Konsole und wird erst nach einer R-Ausfuehrung mit tabellarischem Resultat aktiv; `Plot exportieren` sitzt rechts im Plotbereich und wird erst aktiv, wenn ein echter Plot-Canvas vorhanden ist. Placeholder-Texte sind nicht exportierbar und linksbuendig wie andere Konsolenmeldungen.
+
+Das R-Labor kann ohne vorherige SQL-Ausfuehrung starten. In diesem Zustand wird WebR initialisiert, ein eigenstaendiges R-Beispiel angeboten und die linke Datenbasis-Spalte weist nur darauf hin, dass noch kein SQL-Resultat als `daten` uebernommen wurde. Nach einer Uebernahme werden datenbezogene Rezepte generiert. Die Rezeptauswahl bevorzugt fachliche Messwertspalten gegenueber Jahren, IDs, Nummern und Codes; Plotrezepte begrenzen Rohdatenplots intern auf 10'000 Zeilen und setzen Spaltennamen in Titeln mit Schweizer Anfuehrungszeichen.
 
 ## Zukunfts-Hooks ab Phase 8
 

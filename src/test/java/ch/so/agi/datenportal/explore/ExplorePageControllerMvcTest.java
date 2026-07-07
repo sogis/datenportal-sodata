@@ -26,6 +26,9 @@ class ExplorePageControllerMvcTest {
     void explorePageRendersPortalHostAndEmbeddedContext() throws Exception {
         mockMvc.perform(get("/datasets/ch.so.bauinventar/explore"))
                 .andExpect(status().isOk())
+                .andExpect(header().string(
+                        "Content-Security-Policy",
+                        containsString("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'")))
                 .andExpect(content().string(containsString("<so-header")))
                 .andExpect(content().string(containsString("<so-breadcrumb>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets/ch.so.bauinventar\">Bauinventar</so-breadcrumb-item>")))

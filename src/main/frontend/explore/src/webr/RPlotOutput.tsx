@@ -2,9 +2,13 @@ import {useEffect, useRef} from 'react';
 
 export function RPlotOutput({
   image,
+  canExport,
+  onExport,
   onCanvasReady
 }: {
   image?: ImageBitmap;
+  canExport: boolean;
+  onExport: () => void;
   onCanvasReady?: (canvas: HTMLCanvasElement | null) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -26,7 +30,11 @@ export function RPlotOutput({
   return (
     <section className="dp-explore-r-output dp-explore-r-plot" aria-label="R Plot">
       <div className="dp-explore-r-output__header">
-        <h3>Plot</h3>
+        <div className="dp-explore-r-output__actions">
+          <button type="button" className="dp-explore-button" disabled={!canExport} onClick={onExport}>
+            Plot exportieren
+          </button>
+        </div>
       </div>
       <div className="dp-explore-r-plot__body">
         {image ? (

@@ -1,4 +1,4 @@
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {RPanel} from './RPanel';
@@ -84,12 +84,47 @@ describe('RPanel', () => {
     }));
     expect(onInfo).toHaveBeenLastCalledWith(expect.objectContaining({name: 'daten', rowCount: 2, columnCount: 2}));
 
+    const rActions = screen.getByLabelText('R Aktionen');
+    expect(within(rActions).queryByRole('button', {name: 'Resultat exportieren'})).not.toBeInTheDocument();
+    expect(within(rActions).queryByRole('button', {name: 'Plot exportieren'})).not.toBeInTheDocument();
+
+    const consoleOutput = screen.getByLabelText('R Konsole');
+    const plotOutput = screen.getByLabelText('R Plot');
+    expect(screen.getByLabelText('R-Konsole und R-Plot Grösse anpassen')).toBeInTheDocument();
+    expect(within(consoleOutput).queryByRole('heading', {name: /Konsole/i})).not.toBeInTheDocument();
+    expect(within(plotOutput).queryByRole('heading', {name: /Plot/i})).not.toBeInTheDocument();
+    expect(within(consoleOutput).getByRole('button', {name: 'Resultat exportieren'})).toBeDisabled();
+    expect(within(plotOutput).getByRole('button', {name: 'Plot exportieren'})).toBeDisabled();
+
     await user.click(screen.getByRole('button', {name: 'R ausführen'}));
 
     expect(await screen.findByText('str output')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(within(consoleOutput).getByRole('button', {name: 'Resultat exportieren'})).toBeEnabled();
+    });
     expect(mockWebR.captureR).toHaveBeenCalledWith(expect.stringContaining('str(daten)'), expect.objectContaining({
       captureGraphics: expect.objectContaining({width: 700, height: 420})
     }));
+  });
+
+  it('starts WebR and runs standalone R code without a transferred SQL result', async () => {
+    const user = userEvent.setup();
+    const onInfo = vi.fn();
+
+    render(<RPanel context={sampleExploreContext} onDataFrameInfoChange={onInfo} onBackToSql={vi.fn()} />);
+
+    expect(screen.getByRole('status', {name: 'WebR Status'})).toHaveTextContent('WebR wird geladen');
+    expect(await screen.findByText(/R ist bereit/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Kein Data Frame übernommen')).not.toBeInTheDocument();
+    });
+    expect(onInfo).toHaveBeenLastCalledWith(undefined);
+    expect(screen.getByDisplayValue(/data\.frame\(wert = werte/)).toBeEnabled();
+
+    await user.click(screen.getByRole('button', {name: 'R ausführen'}));
+
+    expect(await screen.findByText('str output')).toBeInTheDocument();
+    expect(mockWebR.captureR).toHaveBeenCalledWith(expect.stringContaining('data.frame(wert = werte'), expect.any(Object));
   });
 
   it('warns for oversized data and transfers the recommended slice on request', async () => {

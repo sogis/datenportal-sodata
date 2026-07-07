@@ -38,6 +38,35 @@ class SecurityHeadersConfigurationTest {
         assertThat(configuration.csp()).contains("connect-src 'self';");
     }
 
+    @Test
+    void normalPagesKeepUnsafeEvalDisabled() {
+        var configuration = new SecurityHeadersConfiguration(
+                new SecurityCspProperties(null, true),
+                catalogProperties("/downloads"));
+
+        assertThat(configuration.csp("/"))
+                .contains("script-src 'self' 'wasm-unsafe-eval';")
+                .doesNotContain("'unsafe-eval'");
+    }
+
+    @Test
+    void exploreAndWebRRuntimePathsAllowUnsafeEvalForBrowserRuntimes() {
+        var configuration = new SecurityHeadersConfiguration(
+                new SecurityCspProperties(null, true),
+                catalogProperties("/downloads"));
+
+        assertThat(configuration.csp("/datasets/ch.so.bauinventar/explore"))
+                .contains("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval';");
+        assertThat(configuration.csp("/series/ch.so.foo/issues/current/explore/context.json"))
+                .contains("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval';");
+        assertThat(configuration.csp("/explore/assets/explore.js"))
+                .contains("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval';");
+        assertThat(configuration.csp("/webr/0.6.0/webr-worker.js"))
+                .contains("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval';");
+        assertThat(configuration.csp("/webr-packages/bin/emscripten/contrib/4.6/PACKAGES"))
+                .contains("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval';");
+    }
+
     private static CatalogProperties catalogProperties(String downloadUrl) {
         return new CatalogProperties(
                 null,

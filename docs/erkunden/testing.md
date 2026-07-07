@@ -27,7 +27,9 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit der Serienausgaben-Erweiterung pruefen MVC- und Playwright-Tests, dass Open-Data-Ausgaben einen aktiven Explore-Link zeigen, aktuelle und historische Ausgaben eigene Explore-Kontexte liefern, falsche Dataset-/Serienrouten 404 bleiben und das SQL-Labor auf einer Ausgabe echte Parquet-Daten laden und abfragen kann.
 - Seit dem R-Labor pruefen Backend-Tests den Explore-Kontext Version 3 mit `rLaboratory`, WebR-Featureflag und statischen Asset-/Cache-Regeln fuer `/webr/**` und `/webr-packages/**`.
 - Vitest prueft DuckDB/Arrow-nahes Type-Mapping, Snapshot-Erzeugung aus SQL-Resultaten, R-Rezeptgenerierung, WebR-Runtime-Ladephasen mit gemocktem `webr`, R-Panel-UI, Limit-Warnungen, Exportbuttons und das Package-Mirror-Script inklusive Dependency-Closure und Lockdatei.
-- Der echte WebR-Browser-Smoke ist opt-in: `./gradlew playwrightTest -Ddatenportal.playwright.webr=true`. Der normale `playwrightTest`-Task ueberspringt ihn, weil WebR `0.6.0` in der aktuellen Playwright-Chromium-Umgebung beim Wasm-Startup vor der Paketinstallation haengen kann. Der Test bleibt im Code, um lokale Browser-/Runtime-Fixes gezielt zu verifizieren.
+- Seit dem R-Labor UI-Nachschliff prueft Vitest zusaetzlich, dass R-Exportbuttons in den Outputbereichen statt in der oberen Toolbar sitzen, Paneltitel fuer Konsole/Plot nicht sichtbar gerendert werden, der Resultat-Export erst nach tabellarischem R-Resultat aktiv wird und die Dataframe-Kennzahlen `Anzahl Zeilen`/`Anzahl Spalten` heissen.
+- Seit dem zweiten R-Labor UI-Nachschliff prueft Vitest, dass R ohne SQL-Result startet, Konsole und Plot einen eigenen Resize-Handle haben, die Rezepttitel Schweizer Anfuehrungszeichen verwenden und die Plot-Heuristik Messwerte statt Jahre/Codes priorisiert.
+- Der echte WebR-Browser-Smoke ist opt-in: `./gradlew playwrightTest -Ddatenportal.playwright.webr=true`. Der normale `playwrightTest`-Task ueberspringt ihn, weil WebR die Laufzeit deutlich verlaengert. Bei Aenderungen an CSP, WebR-Runtime, Paketmirror oder R-Transfer muss der gezielte Test `ExploreIslandParquetPlaywrightTest.rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult` zusaetzlich ausgefuehrt werden.
 
 ## Baseline am 2026-07-01
 
@@ -133,7 +135,7 @@ Phase 3 ergaenzt:
 - Frontend-Unit-Tests fuer DuckDB-Catalog-Attach, Schema-Explorer-Rendering, Tabellenname-/URL-Validierung und alte per-table Registrierungsergebnisse.
 - Frontend-Unit-Tests fuer den Phase-3 Query Guard: read-only Statements, blockierte Mutations-/Systembefehle, Single-Statement-Verhalten und Limit-Wrapping.
 - React-Komponententests fuer DuckDB-Initialisierung, Catalog-Attach, Fehleranzeige, Schema Explorer und Preview-Tabelle.
-- MVC-/Header-Test fuer CSP `worker-src`, `wasm-unsafe-eval` und `connect-src`.
+- MVC-/Header-Test fuer CSP `worker-src`, `wasm-unsafe-eval`, Explore-runtime-begrenztes `unsafe-eval` und `connect-src`.
 - Java-Playwright-Test mit `/explore-fixtures/ch.so.oev_haltestellen.parquet`.
 
 Fixture-/Runtime-Hinweise:

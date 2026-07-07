@@ -33,6 +33,9 @@ class StaticAssetCachingMvcTest {
         mockMvc.perform(get("/explore/assets/explore.js"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", allOf(containsString("max-age=3600"), containsString("public"))))
+                .andExpect(header().string(
+                        "Content-Security-Policy",
+                        containsString("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'")))
                 .andExpect(content().string(containsString("datenportal-explore-root")));
 
         mockMvc.perform(get("/explore/assets/explore.css"))
@@ -53,12 +56,22 @@ class StaticAssetCachingMvcTest {
         mockMvc.perform(get("/webr/0.6.0/webr.mjs"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))))
+                .andExpect(header().string(
+                        "Content-Security-Policy",
+                        containsString("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'")))
                 .andExpect(content().string(containsString("WebR")));
 
         mockMvc.perform(get("/webr-packages/bin/emscripten/contrib/4.6/PACKAGES"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))))
                 .andExpect(content().string(containsString("Package: ggplot2")));
+
+        mockMvc.perform(get("/webr-packages/bin/emscripten/contrib/4.6/PACKAGES.rds"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=31536000"), containsString("public"))))
+                .andExpect(header().string(
+                        "Content-Security-Policy",
+                        containsString("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'")));
     }
 
     @Test
@@ -175,6 +188,7 @@ class StaticAssetCachingMvcTest {
                 .andExpect(header().string("Permissions-Policy", containsString("geolocation=()")))
                 .andExpect(header().string("Content-Security-Policy", containsString("default-src 'self'")))
                 .andExpect(header().string("Content-Security-Policy", containsString("script-src 'self' 'wasm-unsafe-eval'")))
+                .andExpect(header().string("Content-Security-Policy", not(containsString("'unsafe-eval'"))))
                 .andExpect(header().string(
                         "Content-Security-Policy",
                         containsString("connect-src 'self' https://data.so.ch http://localhost:8081")))

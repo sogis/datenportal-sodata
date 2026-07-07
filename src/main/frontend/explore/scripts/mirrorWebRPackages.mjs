@@ -48,6 +48,7 @@ export async function mirrorWebRPackages({lockPath = defaultLockPath, targetRoot
   const filteredIndex = formatPackageIndex(selectedRecords);
   await writeFile(join(packageDir, 'PACKAGES'), filteredIndex, 'utf8');
   await writeFile(join(packageDir, 'PACKAGES.gz'), gzipSync(filteredIndex));
+  await downloadPackage(`${repoBaseUrl}/PACKAGES.rds`, join(packageDir, 'PACKAGES.rds'));
   await writeFile(
     join(targetRoot, 'datenportal-webr-package-lock.json'),
     JSON.stringify({

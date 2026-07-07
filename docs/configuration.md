@@ -89,7 +89,7 @@ enthalten sind.
 
 ## WebR fuer Erkunden
 
-Das R-Labor ist standardmaessig aktiv und arbeitet ausschliesslich mit explizit aus dem SQL-Labor uebernommenen Query-Resultaten. R bekommt keinen direkten DuckDB- oder Parquet-Zugriff.
+Das R-Labor ist standardmaessig aktiv und kann auch ohne vorherige SQL-Ausfuehrung starten. Ein Dataframe `daten` entsteht aber ausschliesslich durch explizit aus dem SQL-Labor uebernommene Query-Resultate; R bekommt keinen direkten DuckDB- oder Parquet-Zugriff.
 
 ```yaml
 datenportal:
@@ -107,10 +107,10 @@ Der Explore-Kontext liefert dem Browser die WebR-Konfiguration:
 Die Runtime- und Paketdateien werden zur Buildzeit generiert:
 
 - `copyWebRRuntime` kopiert `node_modules/webr/dist` nach `build/generated-resources/webr/static/webr/0.6.0`.
-- `mirrorWebRPackages` erzeugt aus `src/main/frontend/explore/scripts/webr-packages.lock.json` ein kuratiertes Repository unter `build/generated-resources/webr/static/webr-packages/bin/emscripten/contrib/4.6`.
+- `mirrorWebRPackages` erzeugt aus `src/main/frontend/explore/scripts/webr-packages.lock.json` ein kuratiertes Repository unter `build/generated-resources/webr/static/webr-packages/bin/emscripten/contrib/4.6` und spiegelt neben `PACKAGES`/`PACKAGES.gz` auch `PACKAGES.rds`, damit WebR/R beim Paketindex keine 404-Fallback-Meldung erzeugt.
 - `precompressStaticAssets` erzeugt Brotli-/Gzip-Varianten fuer WebR-Runtime und Paketmirror.
 
-Der Browser darf fuer WebR keine externen Requests an `webr.r-wasm.org` oder `repo.r-wasm.org` benoetigen. Die CSP bleibt bei `worker-src 'self' blob:` und `script-src 'self' 'wasm-unsafe-eval'`; Cross-Origin-Isolation ist fuer V1 nicht vorgesehen.
+Der Browser darf fuer WebR keine externen Requests an `webr.r-wasm.org` oder `repo.r-wasm.org` benoetigen. Fuer Explore-Seiten sowie `/explore/**`, `/webr/**` und `/webr-packages/**` erlaubt die CSP `worker-src 'self' blob:` und `script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'`, weil WebR 0.6.0/Emscripten beim Runtime-Start dynamische JavaScript-Auswertung nutzt. Normale Katalog- und Detailseiten bleiben bei `script-src 'self' 'wasm-unsafe-eval'`; Cross-Origin-Isolation ist fuer V1 nicht vorgesehen.
 
 ## Reload
 

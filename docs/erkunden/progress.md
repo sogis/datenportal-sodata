@@ -27,6 +27,73 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | DuckDB Catalog Direct Query | DONE | DuckDB-Wasm package upgraded, mirrored extensions moved to `v1.5.4`, catalog files regenerated with DuckDB 1.5.4 and query-side `memory.opendata` mirror removed. |
 | SQL-Labor Query-Fehlerhandling | DONE | Nicht erreichbare Quelldateien zeigen eine neutrale Meldung im Resultatbereich und blockieren die Workbench nicht. |
 | WebR-R-Labor | DONE | SQL-Resultate koennen als typisiertes `daten`-Dataframe ins R-Labor uebernommen werden; WebR runtime/packages werden same-origin ausgeliefert. |
+| WebR CSP-Fix | DONE | Explore- und WebR-Runtime-Pfade erlauben `unsafe-eval` zusaetzlich zu `wasm-unsafe-eval`, normale Katalogseiten bleiben strenger. |
+| R-Labor UI-Nachschliff | DONE | R-Ausgaben nutzen schlanke Trenner ohne sichtbare Paneltitel; Exporte sitzen in den Output-Kopfzeilen und werden erst bei echten Exportinhalten aktiv. |
+| R-Labor UI-Nachschliff 2 | DONE | Konsole/Plot sind resizable, R startet ohne SQL-Result, und R-Rezepte priorisieren fachliche Messwertspalten mit Schweizer Anfuehrungszeichen. |
+
+## R-Labor UI-Nachschliff 2 Entry
+
+Date: 2026-07-07
+
+Scope:
+
+- Added a resizable vertical handle between the R console and plot panes.
+- Left-aligned the empty plot message with the rest of the R output messaging.
+- Allowed the R-Labor tab to initialize WebR and run standalone R code without a prior SQL result transfer.
+- Renamed the default recipe from `Start` to `Datenüberblick` when `daten` exists and to `R-Beispiel` without SQL data.
+- Improved generated R plot recipes to prefer measure-like columns over years, IDs, numbers and codes; raw plot recipes use a 10'000-row plot limit.
+- Rendered column names in recipe titles with Swiss quotes.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test -- RPanel.test.tsx RRecipes.test.ts RDataFramePanel.test.tsx` | PASS, `Test Files 3 passed (3)`, `Tests 8 passed (8)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run test` | PASS, `Test Files 21 passed (21)`, `Tests 107 passed (107)` |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 58s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+## R-Labor UI-Nachschliff Entry
+
+Date: 2026-07-07
+
+Scope:
+
+- Removed visible `Konsole` and `Plot` titles from the R output panes while keeping accessible output labels.
+- Moved `Resultat exportieren` into the R console header and `Plot exportieren` into the plot header.
+- Disabled R result export until a user R run produces a tabular result; the loaded SQL dataframe and placeholder text are no longer export-enabled.
+- Removed broad grey R output gutters and double panel borders in favor of slim 1px separators matching the SQL-Labor visual model.
+- Renamed Dataframe facts from `Zeilen`/`Spalten` to `Anzahl Zeilen`/`Anzahl Spalten`; the later columns list remains `Spalten`.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test -- RPanel.test.tsx RDataFramePanel.test.tsx` | PASS, `Test Files 2 passed (2)`, `Tests 3 passed (3)` |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
+| `npm --prefix src/main/frontend/explore run test` | PASS, `Test Files 21 passed (21)`, `Tests 104 passed (104)` |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 1m 4s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
+
+## WebR CSP-Fix Entry
+
+Date: 2026-07-07
+
+Scope:
+
+- Fixed the browser CSP for WebR 0.6.0/Emscripten runtime startup by allowing `script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'` on Explore pages and same-origin Explore/WebR runtime asset paths only.
+- Mirrored `PACKAGES.rds` next to `PACKAGES` and `PACKAGES.gz` so WebR/R does not log a same-origin package-index 404 before falling back.
+- Kept normal catalog and detail pages on the stricter `script-src 'self' 'wasm-unsafe-eval'`.
+- Updated MVC and configuration tests so the browser-visible headers cover both paths.
+- Updated WebR troubleshooting/configuration docs to reflect the runtime requirement while keeping external WebR/CDN requests disallowed.
+
+Test evidence:
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.config.SecurityHeadersConfigurationTest' --tests 'ch.so.agi.datenportal.web.StaticAssetCachingMvcTest' --tests 'ch.so.agi.datenportal.explore.ExplorePageControllerMvcTest'` | PASS, focused CSP/MVC/static-asset tests |
+| `./gradlew mirrorWebRPackages` | PASS, mirrored 40 WebR packages including `PACKAGES.rds` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.ExploreIslandParquetPlaywrightTest.rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult' -Ddatenportal.playwright.webr=true` | PASS, real WebR browser smoke transferred SQL result into R and executed R code |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 58s`; included Vitest, typecheck, Vite build, backend tests and Playwright |
 
 ## WebR-R-Labor Entry
 
@@ -39,7 +106,7 @@ Scope:
 - Added `SQL-Labor`/`R-Labor` main tabs, SQL `Nach R übernehmen`, R dataframe side panel, R recipes, R execution/copy/export controls, console output and plot output.
 - Added typed SQL-result snapshots and conservative DuckDB/Arrow-to-R mapping. In R, data is available as `daten`, `daten_schema` and `attr(daten, "duckdb_schema_json")`.
 - Kept WebR V1 browser-only, PostMessage-based and without direct R DuckDB/Parquet access. R editor uses the robust textarea fallback; Monaco R highlighting remains a later isolated editor task.
-- Kept the real WebR browser runtime smoke as opt-in with `-Ddatenportal.playwright.webr=true`; Playwright-Chromium in this environment hangs during WebR `0.6.0` Wasm startup before package installation although same-origin runtime requests return HTTP 200.
+- Kept the real WebR browser runtime smoke as opt-in with `-Ddatenportal.playwright.webr=true`; at initial R-Labor delivery it still exposed browser-runtime instability. The 2026-07-07 WebR CSP fix made the targeted opt-in smoke pass in Playwright-Chromium.
 
 Test evidence:
 

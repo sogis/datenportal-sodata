@@ -430,7 +430,7 @@
   color: #24364b;
   font: inherit;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 400;
   cursor: pointer;
 }
 
@@ -1220,7 +1220,11 @@
 .dp-r-dataframe-panel__header h2 {
   color: #24364b;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 400;
+}
+
+.dp-r-dataframe-panel .dp-explore-kicker {
+  font-weight: 400;
 }
 
 .dp-r-dataframe-panel__facts {
@@ -1239,7 +1243,7 @@
 .dp-r-dataframe-panel__warnings h3 {
   color: #66758a;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
 }
 
@@ -1267,7 +1271,14 @@
   min-width: 0;
 }
 
-.dp-r-dataframe-panel__columns ul,
+.dp-r-dataframe-panel__columns ul {
+  display: grid;
+  gap: 0.14rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .dp-r-dataframe-panel__warnings ul {
   display: grid;
   gap: 0.25rem;
@@ -1278,26 +1289,52 @@
 
 .dp-r-dataframe-panel__columns li {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.5rem;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.55rem;
   align-items: center;
   min-width: 0;
-  min-height: 1.55rem;
+  min-height: 1.35rem;
 }
 
 .dp-r-dataframe-panel__columns span {
   overflow: hidden;
+  color: #020617;
+  font-size: 13px;
+  font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dp-r-dataframe-panel__columns small {
-  padding: 0.1rem 0.4rem;
-  border-radius: 999px;
+.dp-r-dataframe-panel__type {
+  overflow: hidden;
+  padding: 0.25rem 0.45rem;
+  border-radius: 5px;
+  font-family: var(--dp-font-mono);
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dp-r-dataframe-panel__type--numeric {
+  background: #dcfce7;
+  color: #4ade80;
+}
+
+.dp-r-dataframe-panel__type--text {
+  background: #e8f1ff;
+  color: #60a5fa;
+}
+
+.dp-r-dataframe-panel__type--boolean {
+  background: #fee2e2;
+  color: #fb7185;
+}
+
+.dp-r-dataframe-panel__type--other {
   background: #f1f5f9;
   color: #64748b;
-  font-family: var(--dp-font-mono);
-  font-size: 10px;
 }
 
 .dp-r-dataframe-panel__warnings li {
@@ -1321,45 +1358,53 @@
   display: grid;
   min-width: 0;
   min-height: 0;
-  background: #f3f6fa;
+  background: #ffffff;
 }
 
 .dp-explore-r-result-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  gap: 0.35rem;
   min-width: 0;
   min-height: 0;
-  padding: 0.35rem;
+  background: #ffffff;
+}
+
+.dp-explore-r-result-grid.dp-explore-resizable-group {
+  display: flex;
+}
+
+.dp-explore-r-output-panel {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
 }
 
 .dp-explore-r-output {
   display: grid;
+  flex: 1 1 auto;
   grid-template-rows: 2.35rem minmax(0, 1fr);
   min-width: 0;
   min-height: 0;
-  border: 1px solid var(--dp-explore-border);
   background: #ffffff;
 }
 
 .dp-explore-r-output__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   min-width: 0;
   padding: 0 0.75rem;
   border-bottom: 1px solid var(--dp-explore-border);
   background: var(--dp-explore-header);
 }
 
-.dp-explore-r-output__header h3 {
-  color: #52657d;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
+.dp-explore-r-output__actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
-.dp-explore-r-output__header span {
+.dp-explore-r-output__status {
   color: var(--dp-explore-red);
   font-size: 11px;
 }
@@ -1393,7 +1438,9 @@
 
 .dp-explore-r-plot__body {
   display: grid;
-  place-items: center;
+  align-items: start;
+  justify-items: start;
+  align-content: start;
   min-width: 0;
   min-height: 0;
   padding: 0.75rem;
@@ -1795,8 +1842,11 @@
   }
 
   .dp-explore-r-result-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(12rem, 1fr) minmax(12rem, 1fr);
+    flex-direction: column !important;
+  }
+
+  .dp-explore-r-result-grid .dp-explore-r-output-panel:last-child {
+    border-top: 1px solid var(--dp-explore-border);
   }
 
   .dp-explore-lab-tabs {

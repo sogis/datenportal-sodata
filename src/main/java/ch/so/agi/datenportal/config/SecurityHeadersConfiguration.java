@@ -41,7 +41,7 @@ public class SecurityHeadersConfiguration {
                 response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
                 response.setHeader("X-Frame-Options", "DENY");
                 response.setHeader("Permissions-Policy", "accelerometer=(), camera=(), geolocation=(), gyroscope=(), microphone=(), payment=(), usb=()");
-                response.setHeader("Content-Security-Policy", csp());
+                response.setHeader("Content-Security-Policy", csp(request));
                 filterChain.doFilter(request, response);
             }
         });
@@ -49,9 +49,21 @@ public class SecurityHeadersConfiguration {
         return registration;
     }
 
+    String csp(HttpServletRequest request) {
+        return csp(normalizedPath(request));
+    }
+
+    String csp(String requestPath) {
+        return csp(requiresBrowserRuntimeEval(requestPath));
+    }
+
     String csp() {
+        return csp(false);
+    }
+
+    private String csp(boolean allowUnsafeEval) {
         return "default-src 'self'; "
-                + "script-src 'self' 'wasm-unsafe-eval'; "
+                + "script-src 'self' 'wasm-unsafe-eval'" + (allowUnsafeEval ? " 'unsafe-eval'" : "") + "; "
                 + "style-src 'self' 'unsafe-inline'; "
                 + "img-src 'self' data:; "
                 + "font-src 'self'; "
@@ -61,6 +73,29 @@ public class SecurityHeadersConfiguration {
                 + "base-uri 'self'; "
                 + "frame-ancestors 'none'; "
                 + "form-action 'self'";
+    }
+
+    static boolean requiresBrowserRuntimeEval(String requestPath) {
+        if (requestPath == null || requestPath.isBlank()) {
+            return false;
+        }
+        if (requestPath.equals("/explore")
+                || requestPath.startsWith("/explore/")
+                || requestPath.startsWith("/webr/")
+                || requestPath.startsWith("/webr-packages/")) {
+            return true;
+        }
+        return (requestPath.startsWith("/datasets/") || requestPath.startsWith("/series/"))
+                && requestPath.contains("/explore");
+    }
+
+    private static String normalizedPath(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (contextPath != null && !contextPath.isBlank() && path.startsWith(contextPath)) {
+            return path.substring(contextPath.length());
+        }
+        return path;
     }
 
     private String connectSrc() {

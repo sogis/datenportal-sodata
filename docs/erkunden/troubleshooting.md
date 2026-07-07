@@ -2,7 +2,7 @@
 
 Status: SQL- und R-Labor
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms-, WebR- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, laedt `catalog.duckdb`, attached sie read-only als `catalog`, setzt `USE "catalog"."opendata"` und rendert daraus den Schema Explorer. SQL wird direkt gegen die attached Catalog-Views ausgefuehrt, damit auch Joins zwischen mehreren Parquet-Dateien moeglich sind. Das SQL-Labor enthaelt Monaco-Editor, roten `Ausfuehren`-Button, kompakte Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporte fuer CSV, XLSX und Parquet. Das R-Labor laedt WebR same-origin und arbeitet nur mit explizit uebernommenen SQL-Resultaten als R-Dataframe `daten`. Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags fuer AI, Vega, Mosaic und Geodaten bleiben deaktiviert und laden keine schweren Runtime-Pakete.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms-, WebR- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, laedt `catalog.duckdb`, attached sie read-only als `catalog`, setzt `USE "catalog"."opendata"` und rendert daraus den Schema Explorer. SQL wird direkt gegen die attached Catalog-Views ausgefuehrt, damit auch Joins zwischen mehreren Parquet-Dateien moeglich sind. Das SQL-Labor enthaelt Monaco-Editor, roten `Ausfuehren`-Button, kompakte Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporte fuer CSV, XLSX und Parquet. Das R-Labor laedt WebR same-origin und kann auch ohne SQL-Result genutzt werden; ein Dataframe `daten` steht erst nach expliziter Uebernahme aus dem SQL-Labor bereit. Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags fuer AI, Vega, Mosaic und Geodaten bleiben deaktiviert und laden keine schweren Runtime-Pakete.
 
 ## Phase-2-Island laedt nicht
 
@@ -25,7 +25,7 @@ Pruefen:
 - Sind `/explore/assets/duckdb-browser-mvp.worker.js` und `/explore/assets/duckdb-mvp.wasm` erreichbar?
 - Werden fuer grosse Assets bei `Accept-Encoding: br, gzip` komprimierte Varianten ausgeliefert, z.B. mit `Content-Encoding: br` fuer `/explore/assets/duckdb-mvp.wasm`?
 - Enthaelt die CSP `worker-src 'self' blob:`?
-- Enthaelt die CSP `script-src 'self' 'wasm-unsafe-eval'`?
+- Enthaelt die CSP fuer Explore-Seiten und `/explore/**` `script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'`?
 - Wurde der Vite-Build mit `base: '/explore/'` ausgefuehrt, damit Worker/Wasm-URLs unter `/explore/assets/` liegen?
 
 Aktueller Stand:
@@ -66,17 +66,17 @@ Aktueller Stand:
 Pruefen:
 
 - Sind `/webr/0.6.0/webr.js`, `/webr/0.6.0/webr-worker.js`, `/webr/0.6.0/R.js`, `/webr/0.6.0/R.wasm`, `libRblas.so` und `libRlapack.so` erreichbar?
-- Ist `/webr-packages/bin/emscripten/contrib/4.6/PACKAGES` erreichbar?
+- Sind `/webr-packages/bin/emscripten/contrib/4.6/PACKAGES` und `/webr-packages/bin/emscripten/contrib/4.6/PACKAGES.rds` erreichbar?
 - Erzeugt der Browser Requests an `webr.r-wasm.org` oder `repo.r-wasm.org`? Das waere ein Regressionssignal; V1 muss same-origin laufen.
-- Enthaelt die CSP weiterhin `worker-src 'self' blob:` und `script-src 'self' 'wasm-unsafe-eval'`?
+- Enthaelt die CSP fuer die Explore-Seite, `/webr/**` und `/webr-packages/**` weiterhin `worker-src 'self' blob:` und `script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'`?
 - Wurde nach Lockdatei-Aenderungen `./gradlew mirrorWebRPackages` bzw. ein Build mit `processResources` ausgefuehrt?
 
 Aktueller Stand:
 
 - WebR `0.6.0` wird ueber `/webr/0.6.0/` ausgeliefert. Der Browser-Loader importiert `webr.js`; `webr.mjs` ist im npm-Dist der Node-ESM-Pfad und darf nicht direkt im Browser importiert werden.
-- Der Paketmirror ist auf den R-4.6-Pfad `bin/emscripten/contrib/4.6` gelockt. Der alte 4.5-Pfad passt nicht zu WebR `0.6.0` (`R version 4.6.0`).
+- Der Paketmirror ist auf den R-4.6-Pfad `bin/emscripten/contrib/4.6` gelockt und liefert `PACKAGES`, `PACKAGES.gz` sowie `PACKAGES.rds` same-origin aus. Der alte 4.5-Pfad passt nicht zu WebR `0.6.0` (`R version 4.6.0`).
 - Das R-Labor nutzt `ChannelType.PostMessage`, `interactive: false`, `captureR()` und `webr::canvas()`. COOP/COEP und SharedArrayBuffer bleiben out of scope.
-- Der echte WebR-Browser-E2E ist opt-in: `./gradlew playwrightTest -Ddatenportal.playwright.webr=true`. In der Agent-/Playwright-Chromium-Umgebung blieb WebR `0.6.0` beim Wasm-Startup vor der Paketinstallation mit einem Worker-seitigen `WebAssembly.Exception` haengen, obwohl alle same-origin Runtime-Dateien HTTP 200 lieferten. Der normale Playwright-Lauf prueft deshalb UI-, Transfer- und Same-Origin-Guards ohne diesen instabilen Runtime-Smoke.
+- Der echte WebR-Browser-E2E ist opt-in: `./gradlew playwrightTest -Ddatenportal.playwright.webr=true`. Nach CSP- und Paketindex-Fix laeuft der gezielte Smoke in Playwright-Chromium durch; der normale Playwright-Lauf ueberspringt ihn weiterhin aus Laufzeitgruenden und prueft UI-, Transfer- und Same-Origin-Guards ohne echte WebR-Initialisierung.
 
 ## Keine Parquet-Distribution
 
@@ -205,7 +205,7 @@ Das vorhandene transitive `react-mosaic-component` ist eine Abhaengigkeit aktuel
 
 ## SQLRooms Editor in Tests
 
-Der Produktions-Build verwendet `SqlMonacoEditor` aus `@sqlrooms/sql-editor@0.28.0`. In Vitest wird dieser Editor gemockt, weil das installierte Paket extensionless interne ESM-Imports verwendet, die der Test-Runner nicht direkt aufloest. Die Query-Guards, Ausfuehrungslogik, Copy-Feedback, Row-Limit-Logik, Schema-Autocomplete-Verdrahtung und Exporthelfer werden unabhaengig davon getestet. Der Editor erhaelt SQLRooms-`tableSchemas` und ein memoisiertes `getLatestSchemas`; die Tabellen-, Spalten-, Keyword- und statischen Funktionsvorschlaege kommen damit aus dem SQLRooms-eigenen Completion-Provider statt aus einem lokalen Datenportal-Fallback. Der DuckDB-Connector wird bewusst nicht an `SqlMonacoEditor` uebergeben, weil SQLRooms `0.28.0` fuer dynamische `duckdb_functions()`-Metadaten intern `createTypedRowAccessor` nutzt, was unter der aktuellen CSP wegen `Function(...)` als `unsafe-eval` blockiert wird. Ein Paket-Upgrade oder ein CSP-sicherer SQLRooms-Fix kann dynamische Funktionsmetadaten spaeter wieder aktivieren.
+Der Produktions-Build verwendet `SqlMonacoEditor` aus `@sqlrooms/sql-editor@0.28.0`. In Vitest wird dieser Editor gemockt, weil das installierte Paket extensionless interne ESM-Imports verwendet, die der Test-Runner nicht direkt aufloest. Die Query-Guards, Ausfuehrungslogik, Copy-Feedback, Row-Limit-Logik, Schema-Autocomplete-Verdrahtung und Exporthelfer werden unabhaengig davon getestet. Der Editor erhaelt SQLRooms-`tableSchemas` und ein memoisiertes `getLatestSchemas`; die Tabellen-, Spalten-, Keyword- und statischen Funktionsvorschlaege kommen damit aus dem SQLRooms-eigenen Completion-Provider statt aus einem lokalen Datenportal-Fallback. Der DuckDB-Connector wird weiterhin bewusst nicht an `SqlMonacoEditor` uebergeben; die dynamischen `duckdb_functions()`-Metadaten von SQLRooms `0.28.0` duerfen erst wieder aktiviert werden, wenn dieser Pfad explizit mit der Explore-CSP und Browser-Smokes abgedeckt ist. Die fuer WebR noetige `unsafe-eval`-Erlaubnis ist auf Explore-/Runtime-Pfade begrenzt und oeffnet keine externen Script- oder Connect-Quellen.
 
 ## SQLRooms Recharts in Tests
 

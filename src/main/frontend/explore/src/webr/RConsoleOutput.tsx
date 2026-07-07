@@ -1,11 +1,25 @@
 import type {RConsoleEntry} from './WebRBridge';
 
-export function RConsoleOutput({entries, running}: {entries: RConsoleEntry[]; running: boolean}) {
+export function RConsoleOutput({
+  entries,
+  running,
+  canExport,
+  onExport
+}: {
+  entries: RConsoleEntry[];
+  running: boolean;
+  canExport: boolean;
+  onExport: () => void;
+}) {
   return (
     <section className="dp-explore-r-output dp-explore-r-console" aria-label="R Konsole" aria-live="polite">
       <div className="dp-explore-r-output__header">
-        <h3>Konsole</h3>
-        {running && <span>läuft</span>}
+        <div className="dp-explore-r-output__actions">
+          {running && <span className="dp-explore-r-output__status">läuft</span>}
+          <button type="button" className="dp-explore-button" disabled={!canExport} onClick={onExport}>
+            Resultat exportieren
+          </button>
+        </div>
       </div>
       <pre className="dp-explore-r-console__body">
         {entries.length === 0 ? '> ' : entries.map((entry, index) => (

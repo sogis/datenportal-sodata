@@ -37,11 +37,11 @@ export function RDataFramePanel({
             <dd>{info?.name ?? laboratory.dataFrameName}</dd>
           </div>
           <div>
-            <dt>Zeilen</dt>
+            <dt>Anzahl Zeilen</dt>
             <dd>{formatNumber(rows ?? 0)}</dd>
           </div>
           <div>
-            <dt>Spalten</dt>
+            <dt>Anzahl Spalten</dt>
             <dd>{formatNumber(columns?.length ?? 0)}</dd>
           </div>
         </dl>
@@ -60,8 +60,10 @@ export function RDataFramePanel({
           <ul>
             {columns.map((column) => (
               <li key={column.name}>
+                <small className={`dp-r-dataframe-panel__type dp-r-dataframe-panel__type--${rTypeClass(column.rType)}`}>
+                  {column.rType}
+                </small>
                 <span title={column.name}>{column.name}</span>
-                <small>{column.rType}</small>
               </li>
             ))}
           </ul>
@@ -84,4 +86,18 @@ export function RDataFramePanel({
 
 function formatNumber(value: number): string {
   return new Intl.NumberFormat('de-CH').format(value);
+}
+
+function rTypeClass(type: string): string {
+  switch (type) {
+    case 'integer':
+    case 'numeric':
+      return 'numeric';
+    case 'character':
+      return 'text';
+    case 'logical':
+      return 'boolean';
+    default:
+      return 'other';
+  }
 }

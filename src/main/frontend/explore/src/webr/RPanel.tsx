@@ -12,6 +12,7 @@ import {WebRBridge, type RConsoleEntry, type RDataFrameInfo} from './WebRBridge'
 import {initialWebRSteps, stepLabel, WebRRuntime, type WebRStepState} from './WebRRuntime';
 
 type RPanelStatus = 'idle' | 'limit-warning' | 'loading' | 'ready' | 'error';
+type ResizeHandleDirection = 'horizontal' | 'vertical';
 
 export function RPanel({
   context,
@@ -28,7 +29,7 @@ export function RPanel({
   const [snapshotOverride, setSnapshotOverride] = useState<SqlResultSnapshot | undefined>(undefined);
   const activeSnapshot = snapshotOverride ?? snapshot;
   const recipes = useMemo(() => buildRRecipes(activeSnapshot, laboratory.dataFrameName), [activeSnapshot, laboratory.dataFrameName]);
-  const [selectedRecipeId, setSelectedRecipeId] = useState(recipes[0]?.id ?? 'start');
+  const [selectedRecipeId, setSelectedRecipeId] = useState(recipes[0]?.id ?? 'r-example');
   const selectedRecipe = recipes.find((recipe) => recipe.id === selectedRecipeId) ?? recipes[0];
   const [code, setCode] = useState(selectedRecipe?.code ?? '');
   const [status, setStatus] = useState<RPanelStatus>('idle');
@@ -37,7 +38,6 @@ export function RPanel({
   const [running, setRunning] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dataFrameInfo, setDataFrameInfo] = useState<RDataFrameInfo | undefined>(undefined);
   const [lastPlot, setLastPlot] = useState<ImageBitmap | undefined>(undefined);
   const [plotCanvas, setPlotCanvas] = useState<HTMLCanvasElement | null>(null);
   const [hasTabularResult, setHasTabularResult] = useState(false);
@@ -49,7 +49,7 @@ export function RPanel({
   }, [snapshot]);
 
   useEffect(() => {
-    setSelectedRecipeId(recipes[0]?.id ?? 'start');
+    setSelectedRecipeId(recipes[0]?.id ?? 'r-example');
     setCode(recipes[0]?.code ?? '');
   }, [recipes]);
 
@@ -60,17 +60,25 @@ export function RPanel({
       return undefined;
     }
     if (!activeSnapshot) {
-      setStatus('idle');
-      setDataFrameInfo(undefined);
       onDataFrameInfoChange?.(undefined);
-      return undefined;
+      let active = true;
+      void initializeRuntimeWithoutData().catch((runtimeError) => {
+        if (!active) {
+          return;
+        }
+        setStatus('error');
+        setError(toErrorMessage(runtimeError));
+      });
+
+      return () => {
+        active = false;
+      };
     }
     if (!snapshotOverride && activeSnapshot.rowCount > laboratory.recommendedRows) {
       setStatus(activeSnapshot.rowCount > laboratory.hardRows ? 'error' : 'limit-warning');
       setError(activeSnapshot.rowCount > laboratory.hardRows
         ? `Das SQL-Resultat hat ${formatNumber(activeSnapshot.rowCount)} Zeilen und überschreitet die harte Grenze von ${formatNumber(laboratory.hardRows)} Zeilen.`
         : null);
-      setDataFrameInfo(undefined);
       onDataFrameInfoChange?.(undefined);
       return undefined;
     }
@@ -93,11 +101,28 @@ export function RPanel({
     setSteps((current) => current.map((state) => state.step === next.step ? next : state));
   }
 
+  async function initializeRuntimeWithoutData() {
+    setStatus('loading');
+    setError(null);
+    setConsoleEntries([]);
+    setLastPlot(undefined);
+    setPlotCanvas(null);
+    setHasTabularResult(false);
+    setSteps(initialWebRSteps());
+    runtimeRef.current ??= new WebRRuntime(laboratory, updateStep);
+    const webR = await runtimeRef.current.initialize();
+    bridgeRef.current = new WebRBridge(webR);
+    updateStep({step: 'data', status: 'done'});
+    setConsoleEntries([{type: 'message', text: 'R ist bereit. Übernimm ein SQL-Result, um den Dataframe daten zu verwenden.'}]);
+    setStatus('ready');
+  }
+
   async function transferSnapshot(nextSnapshot: SqlResultSnapshot, limitedFrom?: number) {
     setStatus('loading');
     setError(null);
     setConsoleEntries([]);
     setLastPlot(undefined);
+    setPlotCanvas(null);
     setHasTabularResult(false);
     setSteps(initialWebRSteps());
     runtimeRef.current ??= new WebRRuntime(laboratory, updateStep);
@@ -106,7 +131,6 @@ export function RPanel({
     updateStep({step: 'data', status: 'running'});
     const info = await bridgeRef.current.loadDataFrame(nextSnapshot, laboratory.dataFrameName, limitedFrom);
     updateStep({step: 'data', status: 'done'});
-    setDataFrameInfo(info);
     onDataFrameInfoChange?.(info);
     setConsoleEntries([{type: 'message', text: `${laboratory.dataFrameName} ist bereit (${formatNumber(info.rowCount)} Zeilen, ${formatNumber(info.columnCount)} Spalten).`}]);
     setStatus('ready');
@@ -137,7 +161,7 @@ export function RPanel({
   }
 
   async function exportTable() {
-    if (!bridgeRef.current || status !== 'ready') {
+    if (!bridgeRef.current || status !== 'ready' || !hasTabularResult) {
       return;
     }
     const csv = await bridgeRef.current.exportCurrentTableCsv(laboratory.dataFrameName);
@@ -148,7 +172,7 @@ export function RPanel({
   }
 
   async function exportPlot() {
-    if (!plotCanvas) {
+    if (!plotCanvas || !lastPlot) {
       return;
     }
     const blob = await canvasToBlob(plotCanvas);
@@ -206,12 +230,6 @@ export function RPanel({
                   <button type="button" className="dp-explore-button dp-explore-button--secondary dp-explore-button--copy" disabled={running} onClick={() => void copyR()}>
                     {copied ? '✓ R kopiert' : 'R kopieren'}
                   </button>
-                  <button type="button" className="dp-explore-button" disabled={!ready || running || (!hasTabularResult && !dataFrameInfo)} onClick={() => void exportTable()}>
-                    Resultat exportieren
-                  </button>
-                  <button type="button" className="dp-explore-button" disabled={!plotCanvas || running} onClick={() => void exportPlot()}>
-                    Plot exportieren
-                  </button>
                 </div>
               </div>
             </div>
@@ -235,14 +253,46 @@ export function RPanel({
           tagName="section"
           aria-label="R Resultat"
         >
-          <div className="dp-explore-r-result-grid">
-            <RConsoleOutput entries={consoleEntries} running={running} />
-            <RPlotOutput image={lastPlot} onCanvasReady={setPlotCanvas} />
-          </div>
+          <PanelGroup
+            autoSaveId={`datenportal.explore.${context.datasetId}.r.outputs.v1`}
+            className="dp-explore-r-result-grid dp-explore-resizable-group dp-explore-resizable-group--horizontal"
+            direction="horizontal"
+          >
+            <Panel
+              className="dp-explore-r-output-panel"
+              defaultSize={46}
+              id="r-console"
+              minSize={25}
+              order={1}
+            >
+              <RConsoleOutput
+                entries={consoleEntries}
+                running={running}
+                canExport={ready && hasTabularResult && !running}
+                onExport={() => void exportTable()}
+              />
+            </Panel>
+
+            <ExploreResizeHandle direction="vertical" label="R-Konsole und R-Plot Grösse anpassen" />
+
+            <Panel
+              className="dp-explore-r-output-panel"
+              defaultSize={54}
+              id="r-plot"
+              minSize={25}
+              order={2}
+            >
+              <RPlotOutput
+                image={lastPlot}
+                canExport={Boolean(lastPlot && plotCanvas) && !running}
+                onCanvasReady={setPlotCanvas}
+                onExport={() => void exportPlot()}
+              />
+            </Panel>
+          </PanelGroup>
         </Panel>
       </PanelGroup>
 
-      {status === 'idle' && <RIdleState onBackToSql={onBackToSql} />}
       {status === 'limit-warning' && snapshot && (
         <RLimitState snapshot={snapshot} recommendedRows={laboratory.recommendedRows} onLimit={limitToRecommendedRows} onBackToSql={onBackToSql} />
       )}
@@ -276,18 +326,6 @@ function RRecipePicker({
         ))}
       </select>
     </label>
-  );
-}
-
-function RIdleState({onBackToSql}: {onBackToSql: () => void}) {
-  return (
-    <div className="dp-explore-r-state" role="status">
-      <p className="dp-explore-runtime-overlay__title">Kein Data Frame übernommen</p>
-      <p>Führe im SQL-Labor eine Abfrage aus und übernimm das Resultat nach R.</p>
-      <button type="button" className="dp-explore-button dp-explore-button--secondary" onClick={onBackToSql}>
-        Zurück ins SQL-Labor
-      </button>
-    </div>
   );
 }
 
@@ -339,11 +377,11 @@ function RLoadingOverlay({steps}: {steps: WebRStepState[]}) {
   );
 }
 
-function ExploreResizeHandle({label}: {label: string}) {
+function ExploreResizeHandle({label, direction = 'horizontal'}: {label: string; direction?: ResizeHandleDirection}) {
   return (
     <PanelResizeHandle
       aria-label={label}
-      className="dp-explore-resize-handle dp-explore-resize-handle--horizontal"
+      className={`dp-explore-resize-handle dp-explore-resize-handle--${direction}`}
       hitAreaMargins={{coarse: 12, fine: 8}}
     >
       <span className="dp-explore-resize-handle__knob" aria-hidden="true" />
