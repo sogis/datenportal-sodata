@@ -4,7 +4,6 @@ import ch.so.agi.datenportal.search.FacetValue;
 import ch.so.agi.datenportal.search.Facets;
 import ch.so.agi.datenportal.web.view.FilterChipVm;
 import ch.so.agi.datenportal.web.view.FilterGroupVm;
-import ch.so.agi.datenportal.web.view.FilterGroupType;
 import ch.so.agi.datenportal.web.view.FilterOptionVm;
 import ch.so.agi.datenportal.web.view.FilterPanelVm;
 import java.util.ArrayList;
@@ -27,9 +26,9 @@ public final class FilterVmFactory {
     public FilterPanelVm create(CatalogQueryParams params, Facets facets) {
         var normalized = params.normalized();
         var groups = List.of(
-                group(normalized, "theme", "Thema", "theme", "Alle Themen", FilterGroupType.MULTI_SELECT, normalized.theme(), facets.themes()),
-                group(normalized, "office", "Fachstelle / Amt", "office", "Alle Fachstellen", FilterGroupType.MULTI_SELECT, normalized.office(), facets.offices()),
-                group(normalized, "modified", "Publikationsdatum", "modified", "Alle Zeiträume", FilterGroupType.SINGLE_SELECT, normalized.modified(), facets.modifiedRanges()));
+                group(normalized, "theme", "Thema", "theme", "Alle Themen", false, normalized.theme(), facets.themes()),
+                group(normalized, "office", "Fachstelle / Amt", "office", "Alle Fachstellen", false, normalized.office(), facets.offices()),
+                group(normalized, "modified", "Publikationsdatum", "modified", "Alle Zeiträume", true, normalized.modified(), facets.modifiedRanges()));
 
         var chips = new ArrayList<FilterChipVm>();
         chips.addAll(chipsFor(normalized, "Thema", "theme", normalized.theme(), facets.themes()));
@@ -51,7 +50,7 @@ public final class FilterVmFactory {
             String label,
             String parameterName,
             String emptyLabel,
-            FilterGroupType type,
+            boolean singleSelect,
             List<String> selected,
             List<FacetValue> values) {
         var selectedSet = Set.copyOf(selected);
@@ -70,7 +69,7 @@ public final class FilterVmFactory {
                 parameterName,
                 collapsedLabel(emptyLabel, selected, values),
                 selected.size(),
-                type,
+                singleSelect,
                 "modified".equals(id),
                 urlFactory.filterPopover(params, id),
                 urlFactory.resetFilterGroup(params, parameterName),

@@ -32,7 +32,7 @@ public final class CatalogDetailController {
             }
 
             model.addAttribute("page", detailPageVmFactory.dataset(dataset));
-            return "pages/datasetDetail";
+            return "pages/entryDetail";
         });
     }
 
@@ -78,7 +78,7 @@ public final class CatalogDetailController {
         return catalogService.withSnapshot(snapshot -> {
             DatasetSeriesEntry series = findSeries(snapshot, seriesIdentifier);
             model.addAttribute("page", detailPageVmFactory.issue(series, series.currentIssueOrThrow()));
-            return "pages/issueDetail";
+            return "pages/entryDetail";
         });
     }
 
@@ -113,7 +113,7 @@ public final class CatalogDetailController {
                     .orElseThrow(() -> notFound(issueIdentifier));
 
             model.addAttribute("page", detailPageVmFactory.issue(series, issue));
-            return "pages/issueDetail";
+            return "pages/entryDetail";
         });
     }
 

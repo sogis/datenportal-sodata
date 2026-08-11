@@ -55,11 +55,24 @@ Verifikation:
 - `git diff --check`: PASS
 - `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 55s`
 
-Commit: wird nach dem Commit eingetragen.
+Commit: `95c57b8`
 
 ## Phase 4 — UI-Vertrag und Interaktion
 
-Status: ausstehend.
+Status: abgeschlossen am 2026-08-11.
+
+Schwerpunkte: fachliches Struktur-Badge-Mapping, deklarative Serienzeilen-
+Expansion über das bestehende Disclosure-Element, Schutz interaktiver
+Nachfahren und echte Qualitätsreport-Links ohne Platzhalter-URLs.
+
+Verifikation:
+
+- fokussierte MVC-/Factory-Suite: PASS, 74 Tests
+- gezielter Serienzeilen-Playwright-Test: PASS
+- `git diff --check`: PASS
+- `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 55s`
+
+Commit: wird nach dem Commit eingetragen.
 
 ## Phase 5 — ViewModel- und Template-Konsolidierung
 

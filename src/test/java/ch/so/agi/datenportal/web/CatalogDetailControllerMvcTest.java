@@ -148,6 +148,8 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("SO_AGI_Geobasisdaten_Publikation_20260624")))
                 .andExpect(content().string(containsString("Validierungsreport")))
                 .andExpect(content().string(containsString("ilivalidator.log")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/validation/ch.so.bauinventar/ilivalidator.log\"")))
+                .andExpect(content().string(not(containsString("href=\"#\""))))
                 .andExpect(content().string(not(containsString("class=\"dp-detail-panel dp-quality-card\""))))
                 .andExpect(content().string(not(containsString("Gemeinden"))))
                 .andExpect(content().string(not(containsString("Felder"))))
@@ -195,7 +197,7 @@ class CatalogDetailControllerMvcTest {
     }
 
     @Test
-    void datasetUsageRendersDirectAccessCodeExamplesAndStarterRecipesWithoutAside() throws Exception {
+    void datasetUsageRendersDirectAccessCodeExamplesWithoutStarterRecipesOrAside() throws Exception {
         mockMvc.perform(get("/datasets/ch.so.verwaltungseinheiten/usage"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<so-header")))
@@ -205,7 +207,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<h1 class=\"dp-detail-title\">Daten verwenden</h1>")))
                 .andExpect(content().string(containsString("Direktzugriff")))
                 .andExpect(content().string(containsString("Codebeispiele")))
-                .andExpect(content().string(containsString("Starter-Rezepte")))
+                .andExpect(content().string(not(containsString("Starter-Rezepte"))))
                 .andExpect(content().string(containsString("class=\"dp-detail-summary-layout dp-usage-layout\"")))
                 .andExpect(content().string(containsString("<th scope=\"col\">Format</th>")))
                 .andExpect(content().string(containsString("<th scope=\"col\">Beschreibung</th>")))
@@ -234,21 +236,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("ch.so.verwaltungseinheiten.csv")))
                 .andExpect(content().string(containsString("pd.read_csv")))
                 .andExpect(content().string(containsString("read_parquet")))
-                .andExpect(content().string(containsString("Mit DuckDB analysieren")))
-                .andExpect(content().string(containsString("In R auswerten")))
-                .andExpect(content().string(containsString("Daten in R einlesen und analysieren (readr oder data.table).")))
-                .andExpect(content().string(containsString("In Python weiterverarbeiten")))
-                .andExpect(content().string(containsString("Daten mit pandas laden und weiterverarbeiten.")))
-                .andExpect(content().string(containsString("src=\"/images/usage-recipes/excel.png\"")))
-                .andExpect(content().string(containsString("src=\"/images/usage-recipes/duckdb.png\"")))
-                .andExpect(content().string(containsString("src=\"/images/usage-recipes/r.png\"")))
-                .andExpect(content().string(containsString("src=\"/images/usage-recipes/python.png\"")))
-                .andExpect(content().string(containsString("width=\"24\" height=\"24\"")))
-                .andExpect(content().string(containsString("class=\"bi bi-box-arrow-up-right\"")))
-                .andExpect(content().string(containsString("class=\"dp-usage-recipe__title\"")))
-                .andExpect(content().string(containsString("class=\"dp-usage-recipe__name\"")))
-                .andExpect(content().string(not(containsString("<strong>In Excel öffnen</strong>"))))
-                .andExpect(content().string(containsString("href=\"#\"")))
+                .andExpect(content().string(not(containsString("href=\"#\""))))
                 .andExpect(content().string(not(containsString("class=\"bi bi-file-earmark-excel\""))))
                 .andExpect(content().string(not(containsString("class=\"bi bi-r-circle\""))))
                 .andExpect(content().string(not(containsString("class=\"bi bi-filetype-py\""))))
@@ -392,7 +380,9 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<th scope=\"row\">ja_stimmen</th>")))
                 .andExpect(content().string(containsString("<td>Stimmen</td>")))
                 .andExpect(content().string(containsString("SO_SK_Politik_Abstimmungen_Publikation_20260624")))
-                .andExpect(content().string(containsString("ilivalidator.log")));
+                .andExpect(content().string(containsString("ilivalidator.log")))
+                .andExpect(content().string(containsString("href=\"https://data.so.ch/validation/ch.so.abstimmungsresultate_2026/ilivalidator.log\"")))
+                .andExpect(content().string(not(containsString("href=\"#\""))));
     }
 
     @Test

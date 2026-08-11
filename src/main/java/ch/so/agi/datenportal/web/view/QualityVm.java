@@ -4,13 +4,14 @@ import java.util.Optional;
 
 public record QualityVm(
         Optional<String> modelName,
-        String modelHref,
-        String validationReportName,
-        String validationReportHref,
+        Optional<String> validationReportName,
+        Optional<String> validationReportHref,
         Optional<String> missingModelMessage) {
 
     public QualityVm {
         modelName = modelName == null ? Optional.empty() : modelName;
+        validationReportName = validationReportName == null ? Optional.empty() : validationReportName;
+        validationReportHref = validationReportHref == null ? Optional.empty() : validationReportHref;
         missingModelMessage = missingModelMessage == null ? Optional.empty() : missingModelMessage;
     }
 }

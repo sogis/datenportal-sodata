@@ -1,8 +1,12 @@
 package ch.so.agi.datenportal.web.view;
 
-import java.util.Optional;
+import java.util.List;
 
 public record MetadataItemVm(
         String label,
-        String value,
-        Optional<String> href) {}
+        List<MetadataLineVm> lines) {
+
+    public MetadataItemVm {
+        lines = List.copyOf(lines);
+    }
+}

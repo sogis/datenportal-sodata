@@ -1,6 +1,6 @@
-@import ch.so.agi.datenportal.web.view.ResultItemVm
-@param ResultItemVm row
-<tr class="${row.series() ? "dp-entry-row dp-entry-row--series" : "dp-entry-row"}">
+@import ch.so.agi.datenportal.web.view.EntryRowVm
+@param EntryRowVm row
+<tr class="${row.series() ? "dp-entry-row dp-entry-row--series" : "dp-entry-row"}" data-series-expand-href="${row.series() ? row.expandHref() : null}">
   <td class="dp-entry-table__expand">
     @if(row.series())
       <a

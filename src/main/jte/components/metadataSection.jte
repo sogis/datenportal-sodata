@@ -7,11 +7,16 @@
       <div class="dp-metadata-item">
         <dt>${item.label()}</dt>
         <dd>
-          @if(item.href().isPresent())
-            <a href="${item.href().get()}" target="_blank">${item.value()}</a>
-          @else
-            ${item.value()}
-          @endif
+          @for(var i = 0; i < item.lines().size(); i++)
+            @if(i > 0)
+              <br>
+            @endif
+            @if(item.lines().get(i).href().isPresent())
+              <a href="${item.lines().get(i).href().get()}" target="_blank">${item.lines().get(i).value()}</a>
+            @else
+              ${item.lines().get(i).value()}
+            @endif
+          @endfor
         </dd>
       </div>
     @endfor

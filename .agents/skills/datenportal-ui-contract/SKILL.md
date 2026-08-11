@@ -42,7 +42,7 @@ The UI contract is authoritative for UI details and is integrated into `datenpor
 - Header and breadcrumb must use the `so-web-components` integration, with a semantic fallback only as backup.
 - Filters must support multiple selected values and show active filter chips.
 - The list view must not show thematic icons in the dataset/title column.
-- `Datensatz` and `Datenreihe` use the same grey type badge style.
+- `Datensatz` and `Datenreihe` use the same blue info type badge style (`dp-status-badge--info`).
 - Data series root rows must be expandable with plus/minus and optional row click.
 - Clicking an info link or a download link must not expand the row.
 - Downloads on data series root rows represent the current issue and must be labelled accordingly.

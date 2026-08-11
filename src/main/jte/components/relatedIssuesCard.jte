@@ -1,12 +1,13 @@
-@import ch.so.agi.datenportal.web.view.RelatedIssuesVm
-@param RelatedIssuesVm relatedIssues
+@import java.util.List
+@import ch.so.agi.datenportal.web.view.RelatedIssueVm
+@param List<RelatedIssueVm> relatedIssues
 <section class="dp-detail-panel dp-related-issues" aria-labelledby="related-issues-title">
   <h2 id="related-issues-title">Weitere Ausgaben</h2>
-  @if(relatedIssues.issues().isEmpty())
+  @if(relatedIssues.isEmpty())
     <p>Zu dieser Datenreihe sind keine weiteren Ausgaben verfügbar.</p>
   @else
     <ul class="dp-related-issues__list">
-      @for(var issue : relatedIssues.issues())
+      @for(var issue : relatedIssues)
         <li class="dp-related-issue">
           <a class="dp-related-issue__title" href="${issue.detailHref()}">${issue.title()}</a>
           <span class="dp-related-issue__meta">Ausgabe ${issue.issueLabel()} · Publiziert ${issue.publicationDateLabel()}</span>

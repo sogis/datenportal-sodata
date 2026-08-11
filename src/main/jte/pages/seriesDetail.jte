@@ -6,12 +6,6 @@
       @template.components.detailHero(
         title = page.title(),
         description = page.description(),
-        typeLabel = page.typeLabel(),
-        accessState = page.accessState(),
-        structureDescribed = page.structureDescribed(),
-        modifiedLabel = page.modifiedLabel(),
-        issuedLabel = page.issuedLabel(),
-        showFacts = false,
         titleBadgeLabel = ""
       )
       <p class="dp-series-issues-intro">Zu dieser Serie sind folgende Ausgaben verfügbar:</p>

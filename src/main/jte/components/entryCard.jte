@@ -1,5 +1,5 @@
-@import ch.so.agi.datenportal.web.view.CardResultVm
-@param CardResultVm card
+@import ch.so.agi.datenportal.web.view.EntryCardVm
+@param EntryCardVm card
 <article class="dp-result-card">
   <div class="dp-result-card__badges">
     <span class="dp-type-badge dp-result-card__type-badge dp-status-badge--info">

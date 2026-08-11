@@ -1,6 +1,6 @@
 @import java.util.List
-@import ch.so.agi.datenportal.web.view.ResultItemVm
-@param List<ResultItemVm> rows
+@import ch.so.agi.datenportal.web.view.EntryRowVm
+@param List<EntryRowVm> rows
 <div class="dp-entry-table-wrapper">
   <table class="dp-entry-table">
     <colgroup>

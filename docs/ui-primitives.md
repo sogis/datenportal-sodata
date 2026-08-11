@@ -62,10 +62,10 @@ Regeln:
 
 Status-Varianten:
 
-- neutral: `Datensatz`, `Datenreihe`, `Struktur beschrieben`, Keyword-/Themen-Labels auf Cards
+- neutral: `Struktur beschrieben`, Keyword-/Themen-Labels auf Cards
 - positive: `Open Data`
 - warning: nicht offene Zugriffsrechte wie `Oeffentlich mit Bedingungen`, `Eingeschraenkt`, `Intern`, `Vertraulich`
-- info: `Aktuelle Ausgabe`
+- info: `Datensatz`, `Datenreihe`, `Aktuelle Ausgabe`
 
 Lokale Ausnahme fuer Card-Keywords:
 
@@ -155,7 +155,7 @@ Nicht erlaubt:
 ## 3. Mapping im Datenportal
 
 - aktive Filter oberhalb der Resultate = Filter Chips
-- `Datensatz` und `Datenreihe` = neutrale Status-Badges
+- `Datensatz` und `Datenreihe` = sachliche Info-/Ink-Status-Badges
 - `Struktur beschrieben` = neutrales Status-Badge
 - `Open Data` = positives Status-Badge
 - `Oeffentlich mit Bedingungen`, `Eingeschraenkt`, `Intern`, `Vertraulich` = Warning-Status-Badge

@@ -12,7 +12,6 @@
           @if(!page.codeExamples().isEmpty())
             @template.components.usageCodeExamples(examples = page.codeExamples())
           @endif
-          @template.components.usageStarterRecipes(recipes = page.starterRecipes())
         </div>
       </div>
     </div>

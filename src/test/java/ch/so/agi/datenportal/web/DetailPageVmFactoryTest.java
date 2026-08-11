@@ -58,11 +58,11 @@ class DetailPageVmFactoryTest {
 
         var page = factory.dataset(dataset);
 
-        assertThat(page.metadataSections())
+        assertThat(List.of(page.overview(), page.topics(), page.responsibilitiesContact()))
                 .flatExtracting(section -> section.items())
                 .extracting(item -> item.label())
-                .contains("Identifier", "Typ", "Zugriff", "Aktualisiert", "Thema", "Keywords", "Fachstelle / Amt")
-                .doesNotContain("Lizenz", "Landing Page", "Kontakt", "Zeitlicher Bezug");
+                .contains("Identifier", "Typ", "Zugriff", "Aktualisiert", "Thema", "Schlagworte")
+                .doesNotContain("Lizenz", "Landing Page", "Zeitlicher Bezug");
     }
 
     @Test
@@ -86,7 +86,7 @@ class DetailPageVmFactoryTest {
 
         var page = factory.dataset(dataset);
 
-        assertThat(page.downloads().links())
+        assertThat(page.downloads())
                 .extracting(link -> link.label())
                 .containsExactly("CSV", "XLSX", "Parquet", "Weitere");
     }
@@ -110,7 +110,7 @@ class DetailPageVmFactoryTest {
 
         assertThat(page.overview().title()).isEqualTo("Übersicht");
         assertThat(page.overview().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(
                         tuple("Identifier", "dataset"),
                         tuple("Typ", "Datensatz"),
@@ -121,7 +121,7 @@ class DetailPageVmFactoryTest {
                         tuple("Aktualisiert", "19.05.2026"),
                         tuple("Aktualisierungsintervall", "bei Bedarf"),
                         tuple("Lizenz", "https://creativecommons.org/licenses/by/4.0/"));
-        assertThat(page.overview().items().getLast().href())
+        assertThat(page.overview().items().getLast().lines().getFirst().href())
                 .contains("https://creativecommons.org/licenses/by/4.0/");
     }
 
@@ -134,7 +134,7 @@ class DetailPageVmFactoryTest {
 
         assertThat(page.temporalCoverage().title()).isEqualTo("Zeitliche Abdeckung");
         assertThat(page.temporalCoverage().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(tuple("Stichtag", "19.05.2026"));
     }
 
@@ -146,7 +146,7 @@ class DetailPageVmFactoryTest {
                 Optional.empty()))));
 
         assertThat(page.temporalCoverage().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(tuple("Zeitraum", "01.01.2018 bis 31.12.2025"));
     }
 
@@ -158,7 +158,7 @@ class DetailPageVmFactoryTest {
                 Optional.empty()))));
 
         assertThat(page.temporalCoverage().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(tuple("Zeitraum", "ab 01.01.2018"));
     }
 
@@ -170,7 +170,7 @@ class DetailPageVmFactoryTest {
                 Optional.empty()))));
 
         assertThat(page.temporalCoverage().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(tuple("Zeitraum", "bis 31.12.2025"));
     }
 
@@ -203,7 +203,7 @@ class DetailPageVmFactoryTest {
 
         assertThat(page.topics().title()).isEqualTo("Themen und Schlagworte");
         assertThat(page.topics().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(
                         tuple("Thema", "Bevölkerung, Mobilität und Verkehr"),
                         tuple("Schlagworte", "ÖV, Pendler"));
@@ -300,7 +300,7 @@ class DetailPageVmFactoryTest {
         assertThat(page.originUsage()).isPresent();
         assertThat(page.originUsage().get().title()).isEqualTo("Herkunft & Verwendung");
         assertThat(page.originUsage().get().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(
                         tuple("Erhebungs- / Messmethode", "Fachliche Erhebung und Qualitätskontrolle"),
                         tuple("Hilfsdaten", "Referenztabellen und Prüflisten"),
@@ -372,7 +372,17 @@ class DetailPageVmFactoryTest {
                                 Optional.empty(),
                                 Optional.of("m2"),
                                 false)),
-                Optional.of("SO_AGI_TestModel"));
+                Optional.of("SO_AGI_TestModel"),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(new QualitySummary(
+                        "success",
+                        0,
+                        OffsetDateTime.parse("2026-06-24T02:28:00+02:00"),
+                        URI.create("https://data.so.ch/validation/test/ilivalidator.log"))),
+                Optional.empty());
 
         var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(metadata));
 
@@ -389,10 +399,43 @@ class DetailPageVmFactoryTest {
                         tuple("identifier", "TEXT", "Ja", "–", "Fachlicher Identifikator"),
                         tuple("flaeche_m2", "DECIMAL", "Nein", "m2", "–"));
         assertThat(page.quality().modelName()).contains("SO_AGI_TestModel");
-        assertThat(page.quality().modelHref()).isEqualTo("#");
-        assertThat(page.quality().validationReportName()).isEqualTo("ilivalidator.log");
-        assertThat(page.quality().validationReportHref()).isEqualTo("#");
+        assertThat(page.quality().validationReportName()).contains("ilivalidator.log");
+        assertThat(page.quality().validationReportHref())
+                .contains("https://data.so.ch/validation/test/ilivalidator.log");
         assertThat(page.quality().missingModelMessage()).isEmpty();
+    }
+
+    @Test
+    void structureQualityOriginMapsReportOnlyAndUsesFallbackNameForPathlessUri() {
+        CatalogEntryMetadata metadata = new CatalogEntryMetadata(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                List.of(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(new QualitySummary(
+                        "success",
+                        0,
+                        OffsetDateTime.parse("2026-06-24T02:28:00+02:00"),
+                        URI.create("https://data.so.ch?entry=dataset"))),
+                Optional.empty());
+
+        var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(metadata));
+
+        assertThat(page.quality().modelName()).isEmpty();
+        assertThat(page.quality().validationReportName()).contains("Validierungsreport");
+        assertThat(page.quality().validationReportHref())
+                .contains("https://data.so.ch?entry=dataset");
+        assertThat(page.quality().missingModelMessage()).isPresent();
     }
 
     @Test
@@ -489,15 +532,9 @@ class DetailPageVmFactoryTest {
 
         assertThat(page.accessState().openData()).isFalse();
         assertThat(page.accessState().label()).isEqualTo("Öffentlich mit Bedingungen");
-        assertThat(page.downloads().accessState().openData()).isFalse();
-        assertThat(page.downloads().lead()).contains("keine Open-Data-Downloads");
-        assertThat(page.metadataSections())
-                .filteredOn(section -> section.id().equals("resources"))
-                .singleElement()
-                .satisfies(section -> assertThat(section.items())
-                        .extracting(item -> item.label())
-                        .contains("Formate")
-                        .doesNotContain("CSV", "XLSX"));
+        assertThat(page.downloads())
+                .extracting(link -> link.label())
+                .containsExactly("CSV", "XLSX");
     }
 
     @Test
@@ -566,17 +603,17 @@ class DetailPageVmFactoryTest {
                         tuple("Attribute beschrieben", true),
                         tuple("Daten validiert", true));
         assertThat(page.overview().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .contains(
                         tuple("Identifier", "series-2026"),
                         tuple("Typ", "Ausgabe"),
                         tuple("Publiziert", "15.01.2026"),
                         tuple("Aktualisiert", "31.12.2026"));
         assertThat(page.temporalCoverage().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(tuple("Zeitraum", "01.01.2026 bis 31.12.2026"));
         assertThat(page.topics().items())
-                .extracting(item -> item.label(), item -> item.value())
+                .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .containsExactly(
                         tuple("Thema", "Geografie"),
                         tuple("Schlagworte", "2026"));
@@ -588,7 +625,7 @@ class DetailPageVmFactoryTest {
                         tuple("zeitreihe@example.test", Optional.of("mailto:zeitreihe@example.test")));
         assertThat(page.structureQualityOriginHref()).isEqualTo("/series/series/issues/current/structure-quality-origin");
         assertThat(page.exploreHref()).isEqualTo("/series/series/issues/current/explore");
-        assertThat(page.relatedIssues().issues())
+        assertThat(page.relatedIssues())
                 .extracting(
                         issue -> issue.issueLabel(),
                         issue -> issue.title(),
@@ -620,7 +657,7 @@ class DetailPageVmFactoryTest {
         assertThat(page.currentIssue()).isFalse();
         assertThat(page.structureQualityOriginHref()).isEqualTo("/series/series/issues/series-2025/structure-quality-origin");
         assertThat(page.exploreHref()).isEqualTo("/series/series/issues/series-2025/explore");
-        assertThat(page.relatedIssues().issues())
+        assertThat(page.relatedIssues())
                 .extracting(issue -> issue.issueLabel(), issue -> issue.detailHref(), issue -> issue.current())
                 .containsExactly(
                         tuple("2026", "/series/series/issues/current", true),
@@ -645,7 +682,7 @@ class DetailPageVmFactoryTest {
         var page = factory.issue(series, currentIssue);
 
         assertThat(page.currentIssue()).isTrue();
-        assertThat(page.relatedIssues().issues()).isEmpty();
+        assertThat(page.relatedIssues()).isEmpty();
     }
 
     @Test
@@ -717,11 +754,11 @@ class DetailPageVmFactoryTest {
 
         var page = factory.series(series);
 
-        assertThat(page.issues().issues())
+        assertThat(page.issues())
                 .extracting(issue -> issue.issueLabel())
                 .containsExactly("foo 2024", "foo 2025", "foo 2023");
-        assertThat(page.issues().issues().getFirst().current()).isTrue();
-        assertThat(page.issues().issues().getFirst().detailHref()).isEqualTo("/series/series/issues/current");
+        assertThat(page.issues().getFirst().current()).isTrue();
+        assertThat(page.issues().getFirst().detailHref()).isEqualTo("/series/series/issues/current");
     }
 
     @Test
@@ -752,8 +789,7 @@ class DetailPageVmFactoryTest {
 
         var page = factory.series(series);
 
-        assertThat(page.accessState().openData()).isTrue();
-        assertThat(page.issues().issues())
+        assertThat(page.issues())
                 .allSatisfy(issue -> {
                     assertThat(issue.accessState().openData()).isFalse();
                     assertThat(issue.accessState().label()).isEqualTo("Öffentlich mit Bedingungen");

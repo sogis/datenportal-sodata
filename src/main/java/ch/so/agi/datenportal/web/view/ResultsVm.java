@@ -1,14 +1,17 @@
 package ch.so.agi.datenportal.web.view;
 
+import ch.so.agi.datenportal.search.SortMode;
 import ch.so.agi.datenportal.web.ViewMode;
 import java.util.List;
 
 public record ResultsVm(
         int totalElements,
         ViewMode viewMode,
-        ResultControlsVm controls,
-        List<ResultItemVm> rows,
-        List<CardResultVm> cards) {
+        String listHref,
+        String cardsHref,
+        SortMode sortMode,
+        List<EntryRowVm> rows,
+        List<EntryCardVm> cards) {
 
     public ResultsVm {
         rows = List.copyOf(rows);
@@ -25,5 +28,9 @@ public record ResultsVm(
 
     public boolean isEmpty() {
         return totalElements == 0;
+    }
+
+    public String totalLabel() {
+        return totalElements == 1 ? "1 Eintrag gefunden" : totalElements + " Einträge gefunden";
     }
 }

@@ -1,8 +1,10 @@
 @import java.util.List
+@import ch.so.agi.datenportal.web.view.AccessStateVm
 @import ch.so.agi.datenportal.web.view.DetailFeatureVm
-@import ch.so.agi.datenportal.web.view.DownloadSectionVm
+@import ch.so.agi.datenportal.web.view.DownloadLinkVm
 @param List<DetailFeatureVm> features
-@param DownloadSectionVm downloads
+@param AccessStateVm accessState
+@param List<DownloadLinkVm> downloads
 <section class="dp-detail-panel dp-detail-feature-downloads" aria-label="Datenmerkmale und Downloads">
   <div class="dp-detail-feature-downloads__features">
     <h2>Datenmerkmale</h2>
@@ -33,7 +35,7 @@
     </ul>
   </div>
   <div class="dp-detail-feature-downloads__downloads">
-    <h2>${downloads.title()}</h2>
-    @template.components.downloadLink(accessState = downloads.accessState(), downloads = downloads.links())
+    <h2>Downloads</h2>
+    @template.components.downloadLink(accessState = accessState, downloads = downloads)
   </div>
 </section>

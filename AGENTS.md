@@ -122,7 +122,7 @@ Mandatory UI decisions:
 - Filters must support multiple selected values.
 - Active filters must be visible as removable chips.
 - List view must not show icons in the “Thema / Datensatz” column.
-- `Datensatz` and `Datenreihe` must use the same neutral grey type-badge style.
+- `Datensatz` and `Datenreihe` must use the same blue info type-badge style (`dp-status-badge--info`).
 - Data series root rows must be expandable using plus/minus and row activation.
 - Clicking the info link or a download must not expand the row.
 - Data series root downloads refer to the current issue and use the plain format label in the action pill, for example `CSV`.

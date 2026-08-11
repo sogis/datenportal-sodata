@@ -317,6 +317,29 @@
     input.focus();
   });
 
+  function rowForEvent(event) {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target || target.closest("a, button, input, select, textarea, label, option, form, [role='button'], [data-no-row-toggle]")) {
+      return null;
+    }
+    return target.closest("tr[data-series-expand-href]");
+  }
+
+  doc.addEventListener("click", (event) => {
+    const row = rowForEvent(event);
+    if (!(row instanceof HTMLElement)) {
+      return;
+    }
+
+    const expandButton = row.querySelector(".dp-expand-button");
+    if (!(expandButton instanceof HTMLElement)) {
+      return;
+    }
+
+    event.preventDefault();
+    expandButton.click();
+  });
+
   doc.body.addEventListener("htmx:beforeRequest", (event) => {
     const trigger = triggerForEvent(event);
     if (!trigger) {

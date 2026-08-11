@@ -5,15 +5,12 @@ import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.search.SearchResult;
-import ch.so.agi.datenportal.search.SortMode;
 import ch.so.agi.datenportal.web.view.AccessStateVm;
-import ch.so.agi.datenportal.web.view.CardResultVm;
+import ch.so.agi.datenportal.web.view.EntryCardVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
 import ch.so.agi.datenportal.web.view.IssueRowVm;
-import ch.so.agi.datenportal.web.view.ResultControlsVm;
-import ch.so.agi.datenportal.web.view.ResultItemVm;
+import ch.so.agi.datenportal.web.view.EntryRowVm;
 import ch.so.agi.datenportal.web.view.ResultsVm;
-import ch.so.agi.datenportal.web.view.SortOptionVm;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -34,7 +31,9 @@ public final class ResultsVmFactory {
         return new ResultsVm(
                 searchResult.totalElements(),
                 normalized.viewMode(),
-                controls(searchResult, normalized),
+                urlFactory.withView(normalized, ViewMode.LIST),
+                urlFactory.withView(normalized, ViewMode.CARDS),
+                normalized.sortMode(),
                 searchResult.entries().stream()
                         .map(entry -> row(entry, normalized))
                         .toList(),
@@ -43,26 +42,9 @@ public final class ResultsVmFactory {
                         .toList());
     }
 
-    private ResultControlsVm controls(SearchResult searchResult, CatalogQueryParams params) {
-        return new ResultControlsVm(
-                searchResult.totalElements() == 1
-                        ? "1 Eintrag gefunden"
-                        : searchResult.totalElements() + " Einträge gefunden",
-                urlFactory.withView(params, ViewMode.LIST),
-                urlFactory.withView(params, ViewMode.CARDS),
-                params.viewMode() == ViewMode.LIST,
-                params.viewMode() == ViewMode.CARDS,
-                java.util.Arrays.stream(SortMode.values())
-                        .map(mode -> new SortOptionVm(
-                                mode.parameterValue(),
-                                mode.label(),
-                                params.sortMode() == mode))
-                        .toList());
-    }
-
-    private ResultItemVm row(CatalogEntry entry, CatalogQueryParams params) {
+    private EntryRowVm row(CatalogEntry entry, CatalogQueryParams params) {
         var expanded = entry instanceof DatasetSeriesEntry && params.expanded().contains(entry.identifier());
-        return new ResultItemVm(
+        return new EntryRowVm(
                 entry.identifier(),
                 entry.title(),
                 entry.description(),
@@ -97,14 +79,14 @@ public final class ResultsVmFactory {
                         .toList());
     }
 
-    private CardResultVm card(CatalogEntry entry) {
-        return new CardResultVm(
+    private EntryCardVm card(CatalogEntry entry) {
+        return new EntryCardVm(
                 entry.identifier(),
                 entry.title(),
                 entry.description(),
                 entry.type().label(),
                 accessState(entry),
-                false,
+                entry.metadata().hasStructureInformation(),
                 keywords(entry),
                 entry.distributionsForListing().stream()
                         .map(link -> download(entry.title(), link))

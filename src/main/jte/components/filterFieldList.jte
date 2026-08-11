@@ -1,9 +1,8 @@
-@import ch.so.agi.datenportal.web.view.FilterGroupType
 @import ch.so.agi.datenportal.web.view.FilterGroupVm
 @param FilterGroupVm group
 @param String inputIdPrefix
 <div class="dp-filter-group__options">
-  @if(group.type() == FilterGroupType.SINGLE_SELECT)
+  @if(group.singleSelect())
     <label class="dp-filter-option" for="${inputIdPrefix}-all">
       <input
         id="${inputIdPrefix}-all"
@@ -18,7 +17,7 @@
     <label class="dp-filter-option" for="${inputIdPrefix}-${option.value()}">
       <input
         id="${inputIdPrefix}-${option.value()}"
-        type="${group.type() == FilterGroupType.SINGLE_SELECT ? "radio" : "checkbox"}"
+        type="${group.singleSelect() ? "radio" : "checkbox"}"
         name="${group.parameterName()}"
         value="${option.value()}"
         checked="${option.selected()}"

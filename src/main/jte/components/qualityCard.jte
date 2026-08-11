@@ -2,18 +2,23 @@
 @param QualityVm quality
 <section class="dp-quality-card" aria-labelledby="quality-title">
   <h2 id="quality-title">Qualität</h2>
-  @if(quality.modelName().isPresent())
+  @if(quality.missingModelMessage().isPresent())
+    <p class="dp-quality-card__empty">${quality.missingModelMessage().get()}</p>
+  @endif
+  @if(quality.modelName().isPresent() || quality.validationReportName().isPresent())
     <dl class="dp-metadata-list">
-      <div class="dp-metadata-item">
-        <dt>Datenmodell</dt>
-        <dd><a href="${quality.modelHref()}">${quality.modelName().get()}</a></dd>
-      </div>
-      <div class="dp-metadata-item">
-        <dt>Validierungsreport</dt>
-        <dd><a href="${quality.validationReportHref()}">${quality.validationReportName()}</a></dd>
-      </div>
+      @if(quality.modelName().isPresent())
+        <div class="dp-metadata-item">
+          <dt>Datenmodell</dt>
+          <dd>${quality.modelName().get()}</dd>
+        </div>
+      @endif
+      @if(quality.validationReportName().isPresent() && quality.validationReportHref().isPresent())
+        <div class="dp-metadata-item">
+          <dt>Validierungsreport</dt>
+          <dd><a href="${quality.validationReportHref().get()}">${quality.validationReportName().get()}</a></dd>
+        </div>
+      @endif
     </dl>
-  @else
-    <p class="dp-quality-card__empty">${quality.missingModelMessage().orElse("")}</p>
   @endif
 </section>

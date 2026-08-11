@@ -392,7 +392,7 @@ class CatalogFiltersPlaywrightTest {
             Locator usageMain = page.locator(".dp-usage-page .dp-detail-summary-main");
 
             assertThat(cssValue(usageMain, "row-gap")).isEqualTo("96px");
-            assertThat(page.locator(".dp-usage-section").count()).isGreaterThanOrEqualTo(3);
+            assertThat(page.locator(".dp-usage-section").count()).isEqualTo(2);
         }
     }
 
@@ -820,6 +820,47 @@ class CatalogFiltersPlaywrightTest {
             assertThat(Math.abs(expandIconBox.height - 24.0d)).isLessThan(0.5d);
             assertThat(Math.abs(metadataIconBox.width - 24.0d)).isLessThan(0.5d);
             assertThat(Math.abs(metadataIconBox.height - 24.0d)).isLessThan(0.5d);
+        }
+    }
+
+    @Test
+    void seriesRootRowClickTogglesUsingDisclosureLinkAndIgnoresInteractiveChildren() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets"));
+
+            Locator seriesRow = page.locator("tr.dp-entry-row--series")
+                    .filter(new Locator.FilterOptions().setHasText("Abstimmungsresultate"))
+                    .first();
+            assertThat(seriesRow.getAttribute("data-series-expand-href")).contains("expanded=ch.so.abstimmungsresultate");
+            assertThat(seriesRow.locator(".dp-expand-button").getAttribute("aria-expanded")).isEqualTo("false");
+
+            seriesRow.locator(".dp-entry-summary").click();
+            page.waitForFunction(
+                    "() => document.querySelector('tr.dp-entry-row--series .dp-expand-button[aria-expanded=\\\"true\\\"]') !== null");
+            assertThat(page.url()).contains("expanded=ch.so.abstimmungsresultate");
+            assertThat(page.locator(".dp-issue-row").count()).isGreaterThan(0);
+
+            Locator expandedSeriesRow = page.locator("tr.dp-entry-row--series")
+                    .filter(new Locator.FilterOptions().setHasText("Abstimmungsresultate"))
+                    .first();
+            expandedSeriesRow.locator(".dp-entry-summary").click();
+            page.waitForFunction(
+                    "() => document.querySelector('tr.dp-entry-row--series .dp-expand-button[aria-expanded=\\\"true\\\"]') === null");
+            assertThat(page.locator(".dp-issue-row").count()).isZero();
+
+            Locator interactiveRow = page.locator("tr.dp-entry-row--series")
+                    .filter(new Locator.FilterOptions().setHasText("Abstimmungsresultate"))
+                    .first();
+            Locator download = interactiveRow.locator(".dp-download-link").first();
+            download.evaluate("element => element.setAttribute('href', '#download-test')");
+            download.click();
+            assertThat(interactiveRow.locator(".dp-expand-button").getAttribute("aria-expanded")).isEqualTo("false");
+
+            Locator info = interactiveRow.locator(".dp-metadata-link");
+            info.evaluate("element => element.setAttribute('href', '#info-test')");
+            info.click();
+            assertThat(interactiveRow.locator(".dp-expand-button").getAttribute("aria-expanded")).isEqualTo("false");
         }
     }
 

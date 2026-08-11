@@ -517,28 +517,26 @@ Pflicht für Ausgabezeilen:
 
 Das Plus-/Minus-Verhalten muss ohne eigenes JavaScript über einen Link/Button funktionieren.
 
-Zusätzlich darf eine kleine JavaScript-Insel ergänzt werden, um den Zeilenklick komfortabler zu machen:
-
-```text
-src/main/resources/static/js/row-disclosure.js
-```
+Zusätzlich darf die bestehende kleine JavaScript-Insel `src/main/resources/static/js/catalog-filters.js` den Zeilenklick komfortabler machen.
 
 Regel für die JS-Insel:
 
-- Event Delegation auf `tr[data-disclosure-row]`
-- Ignoriere Klicks auf `a`, `button`, `input`, `select`, `label`, `[data-no-row-toggle]`
+- Event Delegation auf `tr[data-series-expand-href]`
+- Ignoriere Klicks auf `a`, `button`, `input`, `select`, `textarea`, `label`, Formelemente und `[data-no-row-toggle]`
 - Löst intern den Plus-/Minus-Button aus
-- Keine weitere UI-Logik in dieser Datei
+- Keine weitere UI-Logik oder Client-State in dieser Datei
 
 ### 6.6 Listen-ViewModels
 
 ```java
 public record ResultsVm(
+    int totalElements,
     ViewMode viewMode,
-    long totalResults,
+    String listHref,
+    String cardsHref,
+    SortMode sortMode,
     List<EntryRowVm> rows,
-    List<EntryCardVm> cards,
-    ResultControlsVm controls
+    List<EntryCardVm> cards
 ) {}
 
 public record EntryRowVm(
@@ -546,10 +544,9 @@ public record EntryRowVm(
     String title,
     String description,
     String typeLabel,
-    String typeCssClass,
     String publicationDateLabel,
     String detailHref,
-    List<DownloadButtonVm> downloads,
+    List<DownloadLinkVm> downloads,
     boolean series,
     boolean expandable,
     boolean expanded,
@@ -561,17 +558,11 @@ public record IssueRowVm(
     String id,
     String title,
     String description,
+    String typeLabel,
     String publicationDateLabel,
     String detailHref,
-    List<DownloadButtonVm> downloads
-) {}
-
-public record DownloadButtonVm(
-    String formatLabel,
-    Optional<String> contextLabel,
-    String href,
-    String contentType,
-    boolean enabled
+    AccessStateVm accessState,
+    List<DownloadLinkVm> downloads
 ) {}
 ```
 
@@ -610,7 +601,7 @@ Die Card-Ansicht zeigt ein Grid. Die Card folgt dem Screenshot `cards.png`.
 
 Pflicht je Card:
 
-- graues Typ-Badge `Datensatz` oder `Datenreihe`, gleiches graues Badge-Aussehen wie auf anderen Badge-Stellen der App
+- blaues Info-Typ-Badge `Datensatz` oder `Datenreihe`, im gemeinsamen `dp-status-badge--info`-Stil
 - der Typ-Badge in Cards zeigt als Prefix ein Datei-Icon fuer `Datensatz` und ein Collection-Icon fuer `Datenreihe`, vertikal mittig zum Text ausgerichtet
 - Badge `Open Data` nur fuer offene Eintraege; nicht offene Eintraege zeigen stattdessen ein gelbes Badge mit dem lesbaren Zugriffstext
 - zusätzlicher Badge `Struktur beschrieben`, wenn Attribute beschrieben sind oder ein Datenmodell vorhanden ist
@@ -652,11 +643,10 @@ public record EntryCardVm(
     String title,
     String description,
     String typeLabel,
-    String typeCssClass,
-    boolean openData,
+    AccessStateVm accessState,
     boolean structureDescribed,
     List<String> keywords,
-    List<DownloadButtonVm> downloads,
+    List<DownloadLinkVm> downloads,
     String dateLabel,
     String detailHref
 ) {}
@@ -708,7 +698,7 @@ Die Subseite `Struktur, Qualität und Herkunft` ist serverseitig gerendert und w
 - Titel `Struktur, Qualität und Herkunft` in derselben H1-Groesse und Farbe wie Detailseiten.
 - KPI-Reihe vor der Attributtabelle mit `Validierung`, `Objekte` und `Attribute`. Die Werte stammen aus `qualitySummary` und `structureSummary`; ohne `qualitySummary` zeigt `Validierung` den Status `Nicht prüfbar` und den Hinweis `Kein Datenmodell`. Die KPI-Cards verwenden eingebettete Bootstrap-SVG-Icons und keine grüne Erfolgsfarbe.
 - Attribute als plain table ohne Card. Wenn keine Attribute beschrieben sind, erscheint `Für dieses Datenthema sind keine Attribute beschrieben.`
-- Card `Qualität` mit Datenmodell-Link und Validierungsreport `ilivalidator.log`, falls ein Datenmodell vorhanden ist. Ohne Datenmodell erscheint `Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.`
+- Card `Qualität` mit dem Datenmodell als Text, falls vorhanden, und einem Validierungsreport-Link nur dann, wenn `qualitySummary` vorhanden ist. Der sichtbare Reportname wird aus dem URI-Pfad gelesen; ohne sinnvollen Dateinamen wird `Validierungsreport` angezeigt. Es gibt keine Platzhalter-Links wie `href="#"`. Ohne Datenmodell erscheint `Für dieses Datenthema ist kein Datenmodell hinterlegt. Ohne Datenmodell kann die Struktur nicht automatisiert geprüft oder validiert werden.`
 - Optionale Card `Herkunft & Verwendung` mit `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab`.
 - Cards unterhalb der Attributtabelle nutzen dieselbe Breite wie die Cards auf Detailseiten; die Attributtabelle bleibt full-width.
 
@@ -723,7 +713,7 @@ Die Subseite `Daten verwenden` ist serverseitig gerendert und wird ueber das Sei
 - Aktionen `Herunterladen` und `URL kopieren` verwenden eingebettete Bootstrap-SVG-Icons, transparente Flaeche und `1px solid var(--dp-color-border)`. `URL kopieren` kopiert die vorhandene URL in die Zwischenablage und zeigt kurz `URL kopiert` mit gruenem Check-Icon.
 - Abschnitt `Codebeispiele` mit Tabs `cURL`, `Python`, `DuckDB` im Tab-Styling des Datenblatt-Editors. Codetext verwendet den lokal vendorten Font `JetBrains Mono`; Bash-Beispiele sind so umbrochen, dass keine horizontale Scrollbar noetig ist.
 - Codebeispiel-Copy verwendet dasselbe Clipboard-zu-Check-Feedback.
-- Abschnitt `Starter-Rezepte` mit `18px` Typografie, Standard-Textfarbe, roten Links auf `#`, lokalen PNG-Produkticons vor dem Namen und einem Bootstrap-Absprung-Icon im Link. Die Produkticons werden auf `24px` mal `24px` begrenzt. Der Rezeptname verwendet `font-weight: 400`; die Titelsaeule bricht nicht um. MVP-Rezepte: Excel, DuckDB, R und Python.
+- Keine vorbereiteten Starter-Rezepte ohne echte Ziel-URLs. Ein Link auf `#` ist nicht zulässig.
 - Keine Card `Hinweise zur Verwendung`.
 
 ### 8.2 Detailseite für Datenreihen und Ausgaben
@@ -785,59 +775,31 @@ Alternativ darf der Agent eine slugbasierte Variante verwenden, wenn die Identif
 ### 8.4 Detail-ViewModels
 
 ```java
-public record DatasetDetailPageVm(
+public record EntryDetailPageVm(
     PageChromeVm chrome,
-    String identifier,
+    Optional<String> seriesTitle,
+    Optional<String> seriesHref,
     String title,
     String description,
-    String typeLabel,
     AccessStateVm accessState,
-    boolean structureDescribed,
     String structureQualityOriginHref,
-    String modifiedLabel,
-    String issuedLabel,
+    String exploreHref,
+    String usageHref,
+    boolean currentIssue,
     List<DetailFeatureVm> features,
-    DownloadSectionVm downloads,
+    List<DownloadLinkVm> downloads,
     MetadataSectionVm overview,
     MetadataSectionVm temporalCoverage,
     MetadataSectionVm topics,
-    ContactMetadataSectionVm responsibilitiesContact,
-    List<MetadataSectionVm> metadataSections
+    MetadataSectionVm responsibilitiesContact,
+    List<RelatedIssueVm> relatedIssues
 ) {}
 
 public record SeriesDetailPageVm(
     PageChromeVm chrome,
-    String identifier,
     String title,
     String description,
-    String typeLabel,
-    AccessStateVm accessState,
-    boolean structureDescribed,
-    String modifiedLabel,
-    String issuedLabel,
-    SeriesIssuesVm issues
-) {}
-
-public record IssueDetailPageVm(
-    PageChromeVm chrome,
-    String seriesTitle,
-    String seriesHref,
-    String identifier,
-    String title,
-    String description,
-    AccessStateVm accessState,
-    boolean structureDescribed,
-    String structureQualityOriginHref,
-    boolean currentIssue,
-    String modifiedLabel,
-    String issuedLabel,
-    List<DetailFeatureVm> features,
-    DownloadSectionVm downloads,
-    MetadataSectionVm overview,
-    MetadataSectionVm temporalCoverage,
-    MetadataSectionVm topics,
-    ContactMetadataSectionVm responsibilitiesContact,
-    RelatedIssuesVm relatedIssues
+    List<SeriesIssueVm> issues
 ) {}
 
 public record StructureQualityOriginPageVm(
@@ -848,10 +810,6 @@ public record StructureQualityOriginPageVm(
     String emptyAttributesText,
     QualityVm quality,
     Optional<MetadataSectionVm> originUsage
-) {}
-
-public record RelatedIssuesVm(
-    List<RelatedIssueVm> issues
 ) {}
 
 public record RelatedIssueVm(
@@ -870,14 +828,10 @@ public record MetadataSectionVm(
 
 public record MetadataItemVm(
     String label,
-    String value,
-    Optional<String> href
+    List<MetadataLineVm> lines
 ) {}
 
-public record SeriesIssuesVm(
-    String title,
-    List<SeriesIssueVm> issues
-) {}
+public record MetadataLineVm(String value, Optional<String> href) {}
 
 public record SeriesIssueVm(
     String issueLabel,
@@ -893,12 +847,10 @@ public record SeriesIssueVm(
 ### 8.5 Detail-JTE
 
 ```text
-src/main/jte/pages/datasetDetail.jte
-src/main/jte/pages/seriesIssueDetail.jte
+src/main/jte/pages/entryDetail.jte
 src/main/jte/components/detailHero.jte
-src/main/jte/components/detailDownloadPanel.jte
 src/main/jte/components/metadataSection.jte
-src/main/jte/components/otherIssues.jte
+src/main/jte/components/relatedIssuesCard.jte
 ```
 
 ---
@@ -940,12 +892,12 @@ src/main/resources/static/css/
 
 ### 9.4 Typ-Badges
 
-Wenn `Datensatz`- oder `Datenreihe`-Badges gerendert werden, verwenden sie denselben neutralen Status-Badge-Stil. Die konkrete Primitive-Definition liegt in `docs/ui-primitives.md`. Dies gilt weiterhin für Kartenansicht und Detailseiten:
+Wenn `Datensatz`- oder `Datenreihe`-Badges gerendert werden, verwenden sie denselben sachlichen Info-/Ink-Status-Badge-Stil. Die konkrete Primitive-Definition liegt in `docs/ui-primitives.md`. Dies gilt weiterhin für Kartenansicht und Detailseiten:
 
 ```css
 .dp-type-badge {
-  background: var(--dp-color-badge);
-  color: var(--dp-color-text);
+  background: var(--dp-color-badge-info-bg);
+  color: var(--dp-color-badge-info-text);
   border: 0;
   border-radius: .25rem;
   font-size: 16px;
@@ -1056,8 +1008,8 @@ public class CardVmFactory {
 
 @Service
 public class DetailPageVmFactory {
-    public DatasetDetailPageVm dataset(DatasetEntry dataset) { ... }
-    public SeriesIssueDetailPageVm seriesIssue(DatasetSeriesEntry series, DatasetIssueEntry issue) { ... }
+    public EntryDetailPageVm dataset(DatasetEntry dataset) { ... }
+    public EntryDetailPageVm issue(DatasetSeriesEntry series, DatasetIssueEntry issue) { ... }
 }
 
 @Service
@@ -1124,7 +1076,7 @@ Keine Screenshot-Pixelvergleiche im MVP. Stattdessen HTML-Struktur, Klassen, ARI
 - `CatalogQueryParams` mit Mehrfachfiltern.
 - Filterbar mit aktiven Chips.
 - Listenansicht gemäss `startseite_liste.png`.
-- Datensatz-/Datenreihe-Badges grau.
+- Datensatz-/Datenreihe-Badges im blauen Info-/Ink-Stil.
 - Downloads zur aktuellen Ausgabe.
 - MVC-Tests.
 
