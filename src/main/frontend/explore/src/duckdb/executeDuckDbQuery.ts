@@ -12,35 +12,50 @@ export function executeDuckDbQuery(
 
   const connection = connector.getConnection();
   const controller = new AbortController();
-  const queryPromise = connection.query(sql);
+  const queryPromise = Promise.resolve().then(() => connection.query(sql));
+  let cancelPromise: Promise<void> | undefined;
 
-  const abortPromise = new Promise<never>((_, reject) => {
-    controller.signal.addEventListener('abort', () => reject(abortError()), {once: true});
-    options?.signal?.addEventListener(
-      'abort',
-      () => {
+  const cancel = () => {
+    cancelPromise ??= (async () => {
+      if (!controller.signal.aborted) {
         controller.abort();
-        void connection.cancelSent().catch(() => undefined);
-      },
-      {once: true}
-    );
-    if (options?.signal?.aborted) {
-      controller.abort();
-    }
-  });
+      }
+      try {
+        await connection.cancelSent();
+      } catch {
+        // The original query still has to settle before cancellation completes.
+      }
+      await queryPromise.catch(() => undefined);
+    })();
+    return cancelPromise;
+  };
 
-  const result = Promise.race([queryPromise, abortPromise]);
-  queryPromise.catch(() => undefined);
+  options?.signal?.addEventListener('abort', () => {
+    void cancel();
+  }, {once: true});
+  if (options?.signal?.aborted) {
+    void cancel();
+  }
+
+  const result = queryPromise.then(
+    (table) => {
+      if (controller.signal.aborted) {
+        throw abortError();
+      }
+      return table;
+    },
+    (error: unknown) => {
+      if (controller.signal.aborted) {
+        throw abortError();
+      }
+      throw error;
+    }
+  );
 
   return {
     result,
     signal: controller.signal,
-    cancel: async () => {
-      if (!controller.signal.aborted) {
-        controller.abort();
-      }
-      await connection.cancelSent().catch(() => undefined);
-    },
+    cancel,
     then: result.then.bind(result),
     catch: result.catch.bind(result),
     finally: result.finally.bind(result)

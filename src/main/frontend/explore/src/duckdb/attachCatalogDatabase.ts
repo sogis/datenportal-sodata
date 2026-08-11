@@ -16,7 +16,8 @@ const CATALOG_FILE_NAME = 'catalog.duckdb';
 export async function attachCatalogDatabase(
   connector: DuckDbConnector,
   catalogDatabase: ExploreCatalogDatabaseDto,
-  baseUrl: string = globalThis.location?.href ?? 'http://localhost/'
+  baseUrl: string = globalThis.location?.href ?? 'http://localhost/',
+  signal?: AbortSignal
 ): Promise<CatalogDatabaseRegistration> {
   const url = resolveCatalogUrl(catalogDatabase.url, baseUrl);
   try {
@@ -24,7 +25,11 @@ export async function attachCatalogDatabase(
       throw new Error('DuckDB-Wasm connector is required to attach the catalog database.');
     }
 
-    const response = await fetch(url, {credentials: 'same-origin'});
+    const fetchOptions: RequestInit = {credentials: 'same-origin'};
+    if (signal) {
+      fetchOptions.signal = signal;
+    }
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`DuckDB catalog download failed with HTTP ${response.status}.`);
     }

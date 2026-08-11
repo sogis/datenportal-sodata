@@ -13,7 +13,8 @@ const mockWebR = vi.hoisted(() => ({
   installPackages: vi.fn(),
   evalRVoid: vi.fn(),
   evalRBoolean: vi.fn(),
-  captureR: vi.fn()
+  captureR: vi.fn(),
+  close: vi.fn()
 }));
 
 vi.mock('webr', () => ({
@@ -49,7 +50,9 @@ vi.mock('webr', () => ({
       return mockWebR.evalRBoolean(code);
     }
 
-    close() {}
+    close() {
+      mockWebR.close();
+    }
   }
 }));
 
@@ -66,6 +69,7 @@ describe('RPanel', () => {
       output: [{type: 'stdout', data: 'str output'}],
       images: []
     });
+    mockWebR.close.mockReset();
   });
 
   it('loads WebR, transfers daten and runs R code through captureR', async () => {
@@ -139,6 +143,50 @@ describe('RPanel', () => {
     expect(await screen.findByText(/daten ist bereit \(5/)).toBeInTheDocument();
     const payload = JSON.parse(new TextDecoder().decode(mockWebR.writeFile.mock.calls.at(-1)?.[1] as Uint8Array));
     expect(payload.rows).toHaveLength(5000);
+  });
+
+  it('closes WebR and ignores a late initialization after unmount', async () => {
+    let resolveInit!: () => void;
+    mockWebR.init.mockReturnValue(new Promise<void>((resolve) => {
+      resolveInit = resolve;
+    }));
+    const {unmount} = render(<RPanel context={sampleExploreContext} onDataFrameInfoChange={vi.fn()} onBackToSql={vi.fn()} />);
+
+    await waitFor(() => expect(mockWebR.init).toHaveBeenCalled());
+    unmount();
+    resolveInit();
+
+    await waitFor(() => expect(mockWebR.close).toHaveBeenCalledTimes(1));
+    expect(mockWebR.installPackages).not.toHaveBeenCalled();
+  });
+
+  it('does not let an older transfer overwrite a newer transfer', async () => {
+    let resolveFirstTransfer!: () => void;
+    mockWebR.evalRVoid
+      .mockImplementationOnce(() => new Promise<void>((resolve) => {
+        resolveFirstTransfer = resolve;
+      }))
+      .mockResolvedValue(undefined);
+    const onInfo = vi.fn();
+    const firstSnapshot = smallSnapshot();
+    const secondSnapshot = {
+      ...firstSnapshot,
+      sourceSql: 'select second',
+      executedSql: 'select second limit 1000'
+    };
+    const {rerender} = render(
+      <RPanel context={sampleExploreContext} snapshot={firstSnapshot} onDataFrameInfoChange={onInfo} onBackToSql={vi.fn()} />
+    );
+
+    await waitFor(() => expect(mockWebR.evalRVoid).toHaveBeenCalledTimes(1));
+    rerender(
+      <RPanel context={sampleExploreContext} snapshot={secondSnapshot} onDataFrameInfoChange={onInfo} onBackToSql={vi.fn()} />
+    );
+    await waitFor(() => expect(mockWebR.evalRVoid).toHaveBeenCalledTimes(2));
+    resolveFirstTransfer();
+
+    await waitFor(() => expect(onInfo).toHaveBeenLastCalledWith(expect.objectContaining({sourceSql: 'select second'})));
+    expect(onInfo).not.toHaveBeenCalledWith(expect.objectContaining({sourceSql: firstSnapshot.sourceSql}));
   });
 });
 

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {DataTable, DbSchemaNode, DuckDbConnector} from '@sqlrooms/duckdb';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
@@ -33,6 +33,8 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
   const [rLabMounted, setRLabMounted] = useState(false);
   const [rSnapshot, setRSnapshot] = useState<SqlResultSnapshot | undefined>(undefined);
   const [rDataFrameInfo, setRDataFrameInfo] = useState<RDataFrameInfo | undefined>(undefined);
+  const initializationGeneration = useRef(0);
+  const mountedRef = useRef(true);
   const primaryTable = useMemo(() => selectPrimaryTable(context.tables), [context.tables]);
   const room = useMemo(() => createExploreRoomStore(context), [context]);
   const schemaTrees = room.useRoomStore((state) => state.db.schemaTrees) ?? EMPTY_SCHEMA_TREES;
@@ -48,36 +50,57 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
   }), [context, runtimeTables]);
 
   useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const generation = ++initializationGeneration.current;
     if (context.tables.length === 0 || !primaryTable) {
       return undefined;
     }
 
+    const controller = new AbortController();
+    const db = room.roomStore.getState().db;
     let active = true;
+    let destroyRequested = false;
+    let initializationFinished = false;
+    let destroyPromise: Promise<void> | undefined;
+
+    const isCurrent = () => active && generation === initializationGeneration.current;
+    const destroyOnce = () => {
+      destroyPromise ??= Promise.resolve().then(() => db.destroy()).catch(() => undefined);
+      return destroyPromise;
+    };
 
     async function initializeDuckDb() {
-      setPhase('initializing');
-      setRuntimeError(null);
-      setRuntimeTables(withoutVisibleRuntimeMetadata(context.tables));
-      setCatalogRegistration({
-        status: 'pending',
-        url: context.catalogDatabase.url,
-        database: context.catalogDatabase.database,
-        schema: context.catalogDatabase.schema
-      });
-      setConnector(undefined);
-
       try {
-        await room.roomStore.getState().db.initialize();
-        if (!active) {
+        setPhase('initializing');
+        setRuntimeError(null);
+        setRuntimeTables(withoutVisibleRuntimeMetadata(context.tables));
+        setCatalogRegistration({
+          status: 'pending',
+          url: context.catalogDatabase.url,
+          database: context.catalogDatabase.database,
+          schema: context.catalogDatabase.schema
+        });
+        setConnector(undefined);
+
+        await db.initialize();
+        if (!isCurrent()) {
           return;
         }
 
-        const nextConnector = await room.roomStore.getState().db.getConnector();
+        const nextConnector = await db.getConnector();
+        if (!isCurrent()) {
+          return;
+        }
         setConnector(nextConnector);
         setPhase('registering');
 
-        const registration = await attachCatalogDatabase(nextConnector, context.catalogDatabase);
-        if (!active) {
+        const registration = await attachCatalogDatabase(nextConnector, context.catalogDatabase, undefined, controller.signal);
+        if (!isCurrent()) {
           return;
         }
         setCatalogRegistration(registration);
@@ -89,11 +112,11 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
 
         let catalogTables: DataTable[];
         try {
-          catalogTables = await room.roomStore.getState().db.refreshTableSchemas();
+          catalogTables = await db.refreshTableSchemas();
         } catch (schemaError) {
           const queryError = classifyExploreQueryError(schemaError);
           if (isSourceQueryError(queryError)) {
-            if (!active) {
+            if (!isCurrent()) {
               return;
             }
             setRuntimeTables(context.tables);
@@ -102,7 +125,7 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
           }
           throw schemaError;
         }
-        if (!active) {
+        if (!isCurrent()) {
           return;
         }
 
@@ -117,29 +140,47 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
         setRuntimeTables(nextRuntimeTables);
         setPhase('ready');
       } catch (error) {
-        if (!active) {
+        if (!isCurrent()) {
           return;
         }
         setRuntimeError(classifyExploreRuntimeError(error));
         setPhase('error');
+      } finally {
+        initializationFinished = true;
+        if (destroyRequested) {
+          await destroyOnce();
+        }
       }
     }
 
-    void initializeDuckDb();
+    const initialization = initializeDuckDb();
 
     return () => {
       active = false;
-      void room.roomStore.getState().db.destroy();
+      controller.abort();
+      destroyRequested = true;
+      if (initializationFinished) {
+        void destroyOnce();
+      } else {
+        void initialization;
+      }
     };
   }, [context, primaryTable, room]);
 
   async function refreshSchemas() {
+    const generation = initializationGeneration.current;
     try {
       const catalogTables = await room.roomStore.getState().db.refreshTableSchemas();
+      if (!mountedRef.current || generation !== initializationGeneration.current) {
+        return;
+      }
       setRuntimeTables(mergeCatalogRuntimeTables(context.tables, catalogTables, context.catalogDatabase));
     } catch (schemaError) {
       const queryError = classifyExploreQueryError(schemaError);
       if (isSourceQueryError(queryError)) {
+        if (!mountedRef.current || generation !== initializationGeneration.current) {
+          return;
+        }
         setRuntimeTables(context.tables);
         return;
       }

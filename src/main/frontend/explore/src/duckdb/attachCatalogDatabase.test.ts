@@ -71,6 +71,23 @@ describe('attachCatalogDatabase', () => {
     expect(getConnection).not.toHaveBeenCalled();
   });
 
+  it('passes an abort signal to the catalog fetch', async () => {
+    const connector = {
+      type: 'wasm',
+      getDb: vi.fn(),
+      getConnection: vi.fn()
+    } as unknown as DuckDbConnector;
+    const signal = new AbortController().signal;
+    vi.mocked(fetch).mockResolvedValue({ok: false, status: 499} as Response);
+
+    await attachCatalogDatabase(connector, sampleExploreContext.catalogDatabase, undefined, signal);
+
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:3000/catalog/catalog.duckdb',
+      {credentials: 'same-origin', signal}
+    );
+  });
+
   it('resolves relative catalog URLs against the page URL', () => {
     expect(resolveCatalogUrl('/catalog/catalog.duckdb', 'http://localhost:8080/datasets/test/explore')).toBe(
       'http://localhost:8080/catalog/catalog.duckdb'

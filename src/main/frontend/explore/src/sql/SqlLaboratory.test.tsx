@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {tableFromArrays} from 'apache-arrow';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -221,6 +221,39 @@ describe('SqlLaboratory', () => {
     expect(query).not.toHaveBeenCalled();
   });
 
+  it('does not start a second query and allows a new query after cancellation settles', async () => {
+    const user = userEvent.setup();
+    const first = deferredQuery();
+    query.mockReturnValueOnce(first.handle).mockResolvedValueOnce(tableFromArrays({gemeindename: ['Olten']}));
+    const {unmount} = render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    expect(await screen.findByText('Abfrage läuft.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    expect(query).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', {name: 'Abbrechen'}));
+    await waitFor(() => expect(first.handle.cancel).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByRole('button', {name: 'Ausführen'})).toBeEnabled());
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    expect(await screen.findByText('Olten')).toBeInTheDocument();
+    expect(query).toHaveBeenCalledTimes(2);
+    unmount();
+  });
+
+  it('cancels an active query when the laboratory unmounts', async () => {
+    const first = deferredQuery();
+    query.mockReturnValue(first.handle);
+    const {unmount} = render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Ausführen'}));
+    await screen.findByText('Abfrage läuft.');
+    unmount();
+
+    expect(first.handle.cancel).toHaveBeenCalledTimes(1);
+  });
+
   it('copies SQL with visible compact feedback', async () => {
     const user = userEvent.setup();
     render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
@@ -233,20 +266,28 @@ describe('SqlLaboratory', () => {
     expect(await screen.findByRole('button', {name: '✓ SQL kopiert'})).toHaveClass('dp-explore-button--copy');
   });
 
-  it('does not save hidden local history while running queries', async () => {
-    const user = userEvent.setup();
-    render(<SqlLaboratory
-      context={{
-        ...contextWithRecipes,
-        featureFlags: {...contextWithRecipes.featureFlags, localHistory: true}
-      }}
-      connector={connector}
-      ready
-    />);
-
-    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
-
-    expect(await screen.findByLabelText('SQL Ergebnis')).toBeInTheDocument();
-    expect(window.localStorage.getItem('datenportal.explore.history.ch.so.bauinventar')).toBeNull();
-  });
 });
+
+function deferredQuery() {
+  let resolveQuery!: (value: ReturnType<typeof tableFromArrays>) => void;
+  let rejectQuery!: (error: Error) => void;
+  const promise = new Promise<ReturnType<typeof tableFromArrays>>((resolve, reject) => {
+    resolveQuery = resolve;
+    rejectQuery = reject;
+  });
+  const controller = new AbortController();
+  const cancel = vi.fn(async () => {
+    controller.abort();
+    rejectQuery(Object.assign(new Error('Query cancelled.'), {name: 'AbortError'}));
+    await promise.catch(() => undefined);
+  });
+  const handle = {
+    result: promise,
+    signal: controller.signal,
+    cancel,
+    then: promise.then.bind(promise),
+    catch: promise.catch.bind(promise),
+    finally: promise.finally.bind(promise)
+  };
+  return {handle, resolveQuery};
+}

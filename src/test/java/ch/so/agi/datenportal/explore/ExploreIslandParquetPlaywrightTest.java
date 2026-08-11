@@ -955,28 +955,18 @@ class ExploreIslandParquetPlaywrightTest {
     }
 
     private static void waitForSuggestion(Page page, String label, List<String> browserErrors) {
-        TimeoutError lastError = null;
-        for (int attempt = 0; attempt < 3; attempt++) {
-            page.keyboard().press("Control+Space");
-            try {
-                page.waitForSelector(
-                        ".suggest-widget .monaco-list-row:has-text('" + label + "')",
-                        new Page.WaitForSelectorOptions().setTimeout(5000));
-                return;
-            } catch (TimeoutError error) {
-                lastError = error;
-                page.waitForTimeout(250);
-            }
-        }
-
         try {
-            page.waitForSelector(".suggest-widget .monaco-list-row:has-text('" + label + "')");
+            page.waitForSelector("[data-testid='sql-monaco-editor'][data-autocomplete-ready='true']");
+            page.keyboard().press("Control+Space");
+            page.waitForSelector(
+                    ".suggest-widget .monaco-list-row:has-text('" + label + "')",
+                    new Page.WaitForSelectorOptions().setTimeout(5000));
         } catch (TimeoutError error) {
             String editorText = page.locator("[data-testid='sql-monaco-editor'] .view-lines").textContent();
             String widgetText = String.join(" | ", page.locator(".suggest-widget").allTextContents());
             throw new AssertionError("Expected Monaco suggestion '" + label + "'. Editor text: " + editorText
                     + ". Suggest widget text: " + widgetText + ". Browser errors: " + browserErrors,
-                    lastError == null ? error : lastError);
+                    error);
         }
     }
 

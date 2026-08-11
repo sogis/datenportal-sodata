@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {SqlMonacoEditor, type SqlMonacoEditorProps} from '@sqlrooms/sql-editor';
 import type {DataTable} from '@sqlrooms/duckdb';
 
@@ -22,6 +22,11 @@ export function SqlEditorField({
   const editorRef = useRef<MonacoEditorInstance | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const layoutFrameRef = useRef<number | null>(null);
+  const [editorReady, setEditorReady] = useState(false);
+
+  useEffect(() => {
+    setEditorReady(Boolean(editorRef.current && tableSchemas.length > 0 && getLatestSchemas().tableSchemas.length > 0));
+  }, [getLatestSchemas, tableSchemas]);
 
   const layoutEditor = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -57,8 +62,9 @@ export function SqlEditorField({
 
   const handleEditorMount = useCallback<NonNullable<SqlMonacoEditorProps['onMount']>>((editor) => {
     editorRef.current = editor;
+    setEditorReady(tableSchemas.length > 0 && getLatestSchemas().tableSchemas.length > 0);
     layoutEditor();
-  }, [layoutEditor]);
+  }, [getLatestSchemas, layoutEditor, tableSchemas]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
@@ -70,7 +76,12 @@ export function SqlEditorField({
   return (
     <div className="dp-explore-editor" onKeyDown={handleKeyDown}>
       <label className="dp-visually-hidden" htmlFor="dp-explore-sql-fallback">SQL Fallback bearbeiten</label>
-      <div className="dp-explore-editor__monaco" data-testid="sql-monaco-editor" ref={containerRef}>
+      <div
+        className="dp-explore-editor__monaco"
+        data-testid="sql-monaco-editor"
+        data-autocomplete-ready={editorReady ? 'true' : undefined}
+        ref={containerRef}
+      >
         <SqlMonacoEditor
           value={value}
           onChange={(nextValue) => onChange(nextValue ?? '')}

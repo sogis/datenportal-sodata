@@ -61,6 +61,14 @@ export function SqlLaboratory({
     [context.recipes, selectedRecipeId]
   );
   const activeQuery = useRef<QueryHandle<Table> | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      void activeQuery.current?.cancel();
+    };
+  }, []);
 
   useEffect(() => {
     setSql(initialSql);
@@ -94,6 +102,9 @@ export function SqlLaboratory({
   }
 
   async function runSql(sourceSql = sql, recipeForExecution = selectedRecipe) {
+    if (activeQuery.current) {
+      return;
+    }
     if (!connector || !ready) {
       setResult(errorResult(sourceSql, 'DuckDB ist noch nicht bereit.'));
       return;
@@ -123,10 +134,14 @@ export function SqlLaboratory({
     setExportError(null);
     setResult(runningResult);
 
+    let handle: QueryHandle<Table> | undefined;
     try {
-      const handle = executeDuckDbQuery(connector, executedSql, {signal: timeoutController.signal});
+      handle = executeDuckDbQuery(connector, executedSql, {signal: timeoutController.signal});
       activeQuery.current = handle;
       const table = await handle;
+      if (!mountedRef.current) {
+        return;
+      }
       const durationMs = performance.now() - startedAt;
       const successResult: QueryResultState = {
         ...successfulQueryResult({
@@ -140,7 +155,10 @@ export function SqlLaboratory({
       };
       setResult(successResult);
     } catch (error) {
-      const status = timeoutController.signal.aborted ? 'timeout' : activeQuery.current?.signal?.aborted ? 'cancelled' : 'error';
+      if (!mountedRef.current) {
+        return;
+      }
+      const status = timeoutController.signal.aborted ? 'timeout' : handle?.signal?.aborted ? 'cancelled' : 'error';
       const queryError = status === 'error' ? classifyExploreQueryError(error) : undefined;
       setResult({
         status,
@@ -156,12 +174,18 @@ export function SqlLaboratory({
       });
     } finally {
       window.clearTimeout(timeoutId);
-      activeQuery.current = null;
+      if (activeQuery.current === handle) {
+        activeQuery.current = null;
+      }
     }
   }
 
   async function cancelQuery() {
-    await activeQuery.current?.cancel();
+    const handle = activeQuery.current;
+    if (!handle) {
+      return;
+    }
+    await handle.cancel();
   }
 
   async function copySql() {
