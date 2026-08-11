@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, '../../../../build/generated-resources/explore/static/explore'),
     emptyOutDir: true,
-    sourcemap: true,
+    sourcemap: false,
     rollupOptions: {
       input: resolve(__dirname, 'src/main.tsx'),
       output: {

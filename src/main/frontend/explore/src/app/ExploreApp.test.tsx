@@ -34,6 +34,11 @@ const mocks = vi.hoisted(() => {
   };
 });
 
+const lazyMocks = vi.hoisted(() => ({
+  rPanelLoaded: false,
+  rDataFramePanelLoaded: false
+}));
+
 vi.mock('../duckdb/createExploreRoomStore', () => ({
   createExploreRoomStore: () => ({
     roomStore: {
@@ -64,6 +69,20 @@ vi.mock('../sql/clipboard', () => ({
   copyTextToClipboard: mocks.copyTextToClipboard
 }));
 
+vi.mock('../webr/RPanel', () => {
+  lazyMocks.rPanelLoaded = true;
+  return {
+    RPanel: () => <div data-testid="lazy-r-panel">R-Labor geladen</div>
+  };
+});
+
+vi.mock('../webr/RDataFramePanel', () => {
+  lazyMocks.rDataFramePanelLoaded = true;
+  return {
+    RDataFramePanel: () => <div data-testid="lazy-r-dataframe-panel">R-Datengrundlage geladen</div>
+  };
+});
+
 describe('ExploreApp', () => {
   beforeEach(() => {
     mocks.connector.query.mockReset().mockResolvedValue(tableFromArrays({
@@ -90,6 +109,8 @@ describe('ExploreApp', () => {
     mocks.schemaTrees = sampleSchemaTrees();
     mocks.isRefreshingTableSchemas = false;
     mocks.copyTextToClipboard.mockReset().mockResolvedValue(true);
+    lazyMocks.rPanelLoaded = false;
+    lazyMocks.rDataFramePanelLoaded = false;
   });
 
   it('initializes DuckDB, attaches the catalog and renders the schema explorer workbench', async () => {
@@ -125,7 +146,12 @@ describe('ExploreApp', () => {
       'data-table-columns',
       'egid,gemeindename,schutzstatus'
     );
-    expect(mocks.attachCatalogDatabase).toHaveBeenCalledWith(mocks.connector, sampleExploreContext.catalogDatabase);
+    expect(mocks.attachCatalogDatabase).toHaveBeenCalledWith(
+      mocks.connector,
+      sampleExploreContext.catalogDatabase,
+      undefined,
+      expect.any(AbortSignal)
+    );
     expect(mocks.refreshTableSchemas).toHaveBeenCalledTimes(1);
   });
 
@@ -156,6 +182,39 @@ describe('ExploreApp', () => {
     });
     expect(screen.getByRole('button', {name: 'opendata ausklappen'})).toBeInTheDocument();
     expect(screen.queryByText('schutzstatus')).not.toBeInTheDocument();
+  });
+
+  it('loads and mounts the R modules only after the R tab is activated', async () => {
+    const user = userEvent.setup();
+    render(<ExploreApp context={sampleExploreContext} />);
+
+    expect(screen.queryByTestId('lazy-r-panel')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('lazy-r-dataframe-panel')).not.toBeInTheDocument();
+    expect(lazyMocks.rPanelLoaded).toBe(false);
+    expect(lazyMocks.rDataFramePanelLoaded).toBe(false);
+
+    await user.click(screen.getByRole('tab', {name: 'R-Labor'}));
+
+    expect(await screen.findByTestId('lazy-r-panel')).toBeInTheDocument();
+    expect(await screen.findByTestId('lazy-r-dataframe-panel')).toBeInTheDocument();
+    expect(lazyMocks.rPanelLoaded).toBe(true);
+    expect(lazyMocks.rDataFramePanelLoaded).toBe(true);
+  });
+
+  it('aborts initialization on unmount and destroys DuckDB once after it settles', async () => {
+    let resolveInitialization!: () => void;
+    mocks.initialize.mockReturnValue(new Promise<void>((resolve) => {
+      resolveInitialization = resolve;
+    }));
+    const {unmount} = render(<ExploreApp context={sampleExploreContext} />);
+
+    await waitFor(() => expect(mocks.initialize).toHaveBeenCalledTimes(1));
+    unmount();
+    expect(mocks.destroy).not.toHaveBeenCalled();
+
+    resolveInitialization();
+    await waitFor(() => expect(mocks.destroy).toHaveBeenCalledTimes(1));
+    expect(mocks.attachCatalogDatabase).not.toHaveBeenCalled();
   });
 
   it('refreshes SQLRooms schema trees without opening the catalog schema', async () => {
@@ -266,7 +325,7 @@ describe('ExploreApp', () => {
   });
 
   it('renders an unavailable state without Parquet tables', () => {
-    render(<ExploreApp context={{...sampleExploreContext, tables: [], recipes: [], codeSnippets: []}} />);
+    render(<ExploreApp context={{...sampleExploreContext, tables: [], recipes: []}} />);
 
     expect(screen.getByRole('heading', {name: 'Bauinventar'})).toBeInTheDocument();
     expect(screen.getByText('Erkunden ist für dieses Datenthema noch nicht verfügbar, weil keine Parquet-Datei publiziert ist.')).toBeInTheDocument();

@@ -108,11 +108,28 @@ Verifikation:
 - `git diff --check`: PASS
 - `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 1m 46s`
 
-Commit: wird nach dem Commit eingetragen.
+Commit: `f747965`
 
 ## Phase 7 — Bundle- und JAR-Größe
 
-Status: ausstehend.
+Status: abgeschlossen am 2026-08-11.
+
+Schwerpunkte: ausschließlich MVP-DuckDB-Bundle, keine EH-/COI- oder
+Source-Map-Artefakte im Boot-JAR und lazy geladene R-Komponenten erst nach
+Aktivierung des R-Labors.
+
+Verifikation:
+
+- Vitest: PASS, 23 Dateien / 125 Tests
+- TypeScript: PASS
+- realer WebR-Playwright-Smoke: PASS
+- `./gradlew clean bootJar`: PASS
+- JAR-Inhaltsprüfung: PASS, nur MVP-DuckDB/R-Chunks, keine EH/COI/Maps
+- JAR-Größe: 174.656.030 Bytes, unter 180 MiB; Reduktion 54.323.613 Bytes
+- `git diff --check`: PASS
+- `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 57s`
+
+Commit: wird nach dem Commit eingetragen.
 
 ## Phase 8 — Explore-Kontext V4 und Zukunftscode-Abbau
 

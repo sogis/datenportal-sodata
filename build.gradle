@@ -155,6 +155,7 @@ tasks.register('copyWebRRuntime', Copy) {
     description = 'Copies the WebR runtime into generated same-origin Spring static resources.'
     dependsOn tasks.named('npmInstallExplore')
     from exploreFrontendDir.dir('node_modules/webr/dist')
+    exclude '**/*.map'
     into webRGeneratedResourcesDir.map { it.dir('static/webr/0.6.0') }
 }
 

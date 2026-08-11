@@ -1,15 +1,13 @@
 import {describe, expect, it} from 'vitest';
-import {bundledDuckDbAssetUrls, createLocalDuckDbBundles} from './duckdbBundles';
+import {createLocalDuckDbBundles} from './duckdbBundles';
 
 describe('createLocalDuckDbBundles', () => {
-  it('keeps the runtime on mvp while eh remains available as a bundled asset', () => {
+  it('contains exactly the mvp runtime bundle', () => {
     const bundles = createLocalDuckDbBundles();
 
+    expect(Object.keys(bundles)).toEqual(['mvp']);
     expect(bundles.mvp.mainModule).toContain('duckdb-mvp.wasm');
     expect(bundles.mvp.mainWorker).toContain('duckdb-browser-mvp.worker.js');
-    expect(bundles.eh).toBeUndefined();
-    expect(bundles.coi).toBeUndefined();
-    expect(bundledDuckDbAssetUrls.eh.mainModule).toContain('duckdb-eh.wasm');
-    expect(bundledDuckDbAssetUrls.eh.mainWorker).toContain('duckdb-browser-eh.worker.js');
+    expect(JSON.stringify(bundles)).not.toMatch(/duckdb-(eh|coi)|coi\.pthread/);
   });
 });

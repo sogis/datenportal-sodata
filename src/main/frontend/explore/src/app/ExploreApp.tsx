@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {DataTable, DbSchemaNode, DuckDbConnector} from '@sqlrooms/duckdb';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
 import type {ExploreContextDto, ExploreTableDto} from './ExploreContext';
@@ -13,10 +13,13 @@ import {attachCatalogDatabase, type CatalogDatabaseRegistration} from '../duckdb
 import {createExploreRoomStore} from '../duckdb/createExploreRoomStore';
 import {mergeRuntimeColumns} from '../duckdb/runtimeSchema';
 import {SqlLaboratory} from '../sql/SqlLaboratory';
-import {RDataFramePanel} from '../webr/RDataFramePanel';
-import {RPanel} from '../webr/RPanel';
 import type {RDataFrameInfo} from '../webr/WebRBridge';
 import type {SqlResultSnapshot} from '../results/sqlResultSnapshot';
+
+const LazyRPanel = lazy(() => import('../webr/RPanel').then((module) => ({default: module.RPanel})));
+const LazyRDataFramePanel = lazy(() =>
+  import('../webr/RDataFramePanel').then((module) => ({default: module.RDataFramePanel}))
+);
 
 type RuntimePhase = 'idle' | 'initializing' | 'registering' | 'ready' | 'error';
 type ActiveLab = 'sql' | 'r';
@@ -219,8 +222,10 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
       onRefresh={refreshSchemas}
     />
   );
-  const dataPanel = activeLab === 'r' ? (
-    <RDataFramePanel snapshot={rSnapshot} info={rDataFrameInfo} laboratory={context.rLaboratory} />
+  const dataPanel = activeLab === 'r' && rLabMounted ? (
+    <Suspense fallback={<ExploreLazyFallback label="R-Datengrundlage" />}>
+      <LazyRDataFramePanel snapshot={rSnapshot} info={rDataFrameInfo} laboratory={context.rLaboratory} />
+    </Suspense>
   ) : schemaPanel;
   const laboratoryPanel = (
     <div className="dp-explore-lab-shell">
@@ -269,12 +274,14 @@ export function ExploreApp({context}: {context: ExploreContextDto}) {
             hidden={activeLab !== 'r'}
             className="dp-explore-lab-panel"
           >
-            <RPanel
-              context={runtimeContext}
-              snapshot={rSnapshot}
-              onDataFrameInfoChange={setRDataFrameInfo}
-              onBackToSql={() => setActiveLab('sql')}
-            />
+            <Suspense fallback={<ExploreLazyFallback label="R-Labor" />}>
+              <LazyRPanel
+                context={runtimeContext}
+                snapshot={rSnapshot}
+                onDataFrameInfoChange={setRDataFrameInfo}
+                onBackToSql={() => setActiveLab('sql')}
+              />
+            </Suspense>
           </div>
         )}
       </div>
@@ -387,6 +394,14 @@ function ExploreRuntimeOverlay({phase, error}: {phase: RuntimePhase; error: Expl
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function ExploreLazyFallback({label}: {label: string}) {
+  return (
+    <div className="dp-explore-lazy-fallback" role="status" aria-label={`${label} wird geladen`}>
+      {label} wird geladen
     </div>
   );
 }
