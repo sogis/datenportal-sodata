@@ -12,9 +12,9 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | 3. DuckDB-Wasm Parquet registration | DONE | DuckDB-Wasm starts locally, Parquet views register, same-origin preview fixture passes. |
 | 4. SQL laboratory and generated recipes | DONE | SQL-Labor, generated recipe execution, guarded/limited queries, result table and CSV export implemented. |
 | 5. Charting V1 with Recharts | DONE | Automatic chart inference and Recharts panel from SQL results implemented. |
-| 6. Code snippets and local query history | DONE | Static DuckDB/Python/R snippets and per-dataset local history implemented. |
+| 6. Productive SQL recipes and R laboratory | DONE | Generated SQL recipes and the productive WebR laboratory remain active. |
 | 7. UX hardening and browser checks | DONE | Loading/error states, accessibility, mobile robustness and browser checks documented. |
-| 8. Future hooks for AI/WebR/Vega/Mosaic | DONE | Disabled AI/WebR/Vega/Mosaic/geospatial flags, hidden extension slot, docs and dependency guard implemented. |
+| 8. Productive Explore context V4 | DONE | Prepared future UI, generic flags, manual JSON and local query history were removed; SQL recipes and R remain active. |
 | SQL-Labor redesign | DONE | Full-width compact SQL workbench with schema cards, Monaco editor, red run button and compact result table. |
 | SQL-Labor UI-Nachschliff | DONE | Editable Monaco editor, resizable panels, `Geladen` status, compact toolbar and removed legacy headers/link. |
 | SQL-Labor UI-Nachschliff 2 | DONE | Stable Monaco layout, row-limit selector, CSV/XLSX/Parquet result export and cleaned splitter/schema/result visuals. |
@@ -30,6 +30,402 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | WebR CSP-Fix | DONE | Explore- und WebR-Runtime-Pfade erlauben `unsafe-eval` zusaetzlich zu `wasm-unsafe-eval`, normale Katalogseiten bleiben strenger. |
 | R-Labor UI-Nachschliff | DONE | R-Ausgaben nutzen schlanke Trenner ohne sichtbare Paneltitel; Exporte sitzen in den Output-Kopfzeilen und werden erst bei echten Exportinhalten aktiv. |
 | R-Labor UI-Nachschliff 2 | DONE | Konsole/Plot sind resizable, R startet ohne SQL-Result, und R-Rezepte priorisieren fachliche Messwertspalten mit Schweizer Anfuehrungszeichen. |
+| Code-Quality Remediation Phase 1 | DONE | Explore-Lebenszyklen, Query-Cancel, WebR-Cleanup, Monaco-Ready-Zustand und deterministischer Autocomplete-Smoke sind abgesichert. |
+| Code-Quality Remediation Phase 2 | DONE | Lucene-Suchfehler werden als 503 sichtbar, Java-Filter verarbeiten die vollständige Treffermenge und der Index meldet seine Dokumentzahl transparent. |
+| Code-Quality Remediation Phase 3 | DONE | Produktionssichere Profile, explizite XTF-/DuckDB-Quellen, fail-fast Binding und öffentliche Health-Minimierung sind abgesichert. |
+| Code-Quality Remediation Phase 4 | DONE | UI-Vertrag, Struktur-Badges, Serienzeilen-Interaktion und echte Qualitätsreport-Links sind abgesichert. |
+| Code-Quality Remediation Phase 5 | DONE | ViewModels, Detailtemplates, Starter-Rezepte und weitere vorbereitete Server-UI sind konsolidiert. |
+| Code-Quality Remediation Phase 6 | DONE | XTF, Lucene und DuckDB werden snapshotgebunden und atomar geladen, veröffentlicht und versioniert ausgeliefert. |
+| Code-Quality Remediation Phase 7 | DONE | Nur MVP-DuckDB, produktive Chunks und WebR-Runtime ohne Source-Maps werden im Boot-JAR ausgeliefert. |
+
+## Code-Quality Remediation Phase 1 Entry
+
+Date: 2026-08-11
+
+Goal:
+
+- DuckDB- und WebR-Runtimes bei Abbruch, Timeout, Kontextwechsel und Unmount
+  kontrolliert beenden.
+- Gemeinsame DuckDB-Verbindungen nie gleichzeitig von einer alten und einer
+  neuen Query verwenden.
+- React-States und WebR-Fortschrittsmeldungen veralteter Operationen nicht mehr
+  publizieren.
+- Monaco-Autocomplete über einen beobachtbaren Ready-Zustand deterministisch
+  testen, ohne Retry-Schleife.
+
+Changed files:
+
+- `src/main/frontend/explore/src/app/ExploreApp.tsx` und zugehöriger Test:
+  monotoner Initialisierungs-Generation, AbortController, verzögertes und
+  idempotentes DuckDB-Destroy sowie Schutz später Schemaantworten.
+- `src/main/frontend/explore/src/duckdb/attachCatalogDatabase.ts` und Test:
+  optionales AbortSignal am Fetch.
+- `src/main/frontend/explore/src/duckdb/executeDuckDbQuery.ts` und neuer Test:
+  einmaliges `cancelSent()`, Warten auf das ursprüngliche Query-Ende und
+  unterscheidbare Abort-/Normalfehler.
+- `src/main/frontend/explore/src/sql/SqlLaboratory.tsx` und Test:
+  kein paralleler Start, handle-identisches `finally`, Unmount-Cancel und
+  sichtbare Cancel-/Timeout-Zustände.
+- `src/main/frontend/explore/src/sql/SqlEditorField.tsx` und
+  `src/test/java/ch/so/agi/datenportal/explore/ExploreIslandParquetPlaywrightTest.java`:
+  fachliches `data-autocomplete-ready="true"` und einmaliges Öffnen der
+  Monaco-Completion nach dem Ready-Zustand.
+- `src/main/frontend/explore/src/webr/WebRRuntime.ts`, neuer Runtime-Test und
+  RPanel-Test: geteilte Initialisierung, Retry nach Fehler, idempotentes Close,
+  Timeout-Cleanup und keine späten Fortschrittsmeldungen.
+- `src/main/frontend/explore/src/webr/RPanel.tsx` und Test:
+  Operations-IDs, Unmount-Cleanup und Schutz alter Transfers.
+
+No files were deleted. Deliberately unchanged are the catalog.duckdb creation
+pipeline, data contents, backend publication behavior, and the later artifact
+size and future-code scopes from Phases 6–8.
+
+Definition of Done:
+
+- Keine React-State-Updates oder WebR-Schritte aus veralteten Operationen nach
+  Unmount oder Kontextwechsel.
+- DuckDB `destroy()` und WebR `close()` sind in den beschriebenen Cleanup-Pfaden
+  idempotent und kontrolliert.
+- Eine aktive DuckDB-Query wird vor Abschluss von `cancel()` nicht verlassen;
+  eine zweite Query wird verweigert.
+- Autocomplete öffnet Completion genau einmal nach dem fachlichen Ready-Attribut.
+- Alle fokussierten und vollständigen Tests sowie beide `clean check`-Läufe sind
+  erfolgreich.
+
+The implementation is committed separately per remediation phase; see
+`docs/phase-status.md` for the authoritative commit map.
+
+## Code-Quality Remediation Phase 1 verification
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test -- --run src/app/ExploreApp.test.tsx src/duckdb/attachCatalogDatabase.test.ts src/duckdb/executeDuckDbQuery.test.ts src/sql/SqlLaboratory.test.tsx src/webr/RPanel.test.tsx src/webr/WebRRuntime.test.ts` | PASS, 6 files, 45 tests |
+| `npm --prefix src/main/frontend/explore test -- --run` | PASS, 23 files, 124 tests |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` |
+| `npm --prefix src/main/frontend/explore run build` | PASS, Vite build; existing large DuckDB-Wasm chunk warning remains |
+| `git diff --check` | PASS |
+| `./gradlew clean check` (first run) | PASS, `BUILD SUCCESSFUL in 1m 7s`; frontend 124 tests, typecheck, Vite, backend tests and normal Playwright included |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.ExploreIslandParquetPlaywrightTest.rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult' -Ddatenportal.playwright.webr=true` | PASS, real WebR browser smoke, `BUILD SUCCESSFUL in 9s` |
+| `./gradlew clean check` (second run) | PASS, `BUILD SUCCESSFUL in 57s`; same complete gate |
+
+## Code-Quality Remediation Phase 2 Entry
+
+Date: 2026-08-11
+
+Goal:
+
+- Lucene-Fehler nicht mehr als künstliche Leermenge behandeln.
+- Java-Filter auf die vollständige Lucene-Treffermenge anwenden, ohne eine
+  versteckte Vorabgrenze von 500 Treffern.
+- Snapshot- und Indexzugriffe ausschließlich unter dem bestehenden
+  `withSnapshot()`-Read-Lock ausführen.
+- Fehler für Vollseiten- und HTMX-Suchanfragen als verständlichen 503 sichtbar
+  machen.
+
+Changed files:
+
+- `src/main/java/ch/so/agi/datenportal/search/CatalogSearchIndex.java`,
+  `CatalogSearchException.java`, `EmptyCatalogSearchIndex.java` und
+  `LuceneCatalogSearchIndex.java`: API auf `search`, `documentCount` und
+  `close` reduziert; Lucene-Fehler werden gewrapped; geschlossene Indizes
+  melden kontrolliert einen Fehler.
+- `CatalogSearchService.java` und `SearchProperties.java`: vollständige
+  Trefferverarbeitung vor den bestehenden Java-Filtern; die alte Suchgrenze
+  wurde entfernt.
+- `CatalogSearchIndexHealthIndicator.java`: Vergleich zwischen sichtbaren und
+  indizierten Dokumenten mit `expectedDocuments`/`indexedDocuments`.
+- `CatalogService.java`, `CatalogErrorControllerAdvice.java` und
+  `ErrorPageVmFactory.java`: ungeschütztes `currentSnapshot()` entfernt und
+  eine 503-Fehlerseite inklusive `HX-Refresh` ergänzt.
+- `CatalogSearchFields.java` und `CatalogDocumentMapper.java`: ausschließlich
+  von `buildQuery()` gelesene Indexfelder bleiben erhalten.
+- Such-, Snapshot-, Reload-, Health-, MVC- und Starttests decken die neue API,
+  mehr als 500 Treffer, geschlossene/fehlerhafte Indizes und HTMX ab.
+
+No files were deleted. The catalog data, DuckDB artifact pipeline and the
+later configuration, snapshot-publication and Explore-artifact scopes remain
+unchanged.
+
+Definition of Done:
+
+- Keine alte Vorab-Suchgrenze mehr in produktivem Code, Konfiguration, Tests
+  oder Maintainer-Dokumentation.
+- Keine Suchfehlerbehandlung liefert eine künstliche Leermenge.
+- `currentSnapshot()` existiert nicht mehr.
+- Vollseiten- und HTMX-Suchfehler sind als 503 sichtbar.
+- Die vollständigen fokussierten und globalen Qualitätsprüfungen sind grün.
+
+The implementation is committed separately per remediation phase; see
+`docs/phase-status.md` for the authoritative commit map.
+
+## Code-Quality Remediation Phase 2 verification
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.search.*' --tests 'ch.so.agi.datenportal.catalog.service.CatalogServiceTest' --tests 'ch.so.agi.datenportal.catalog.service.CatalogReloadServiceTest' --tests 'ch.so.agi.datenportal.catalog.service.CatalogSnapshotLoaderTest' --tests 'ch.so.agi.datenportal.admin.actuator.CatalogSearchIndexHealthIndicatorTest' --tests 'ch.so.agi.datenportal.web.CatalogSearchErrorMvcTest' --tests 'ch.so.agi.datenportal.admin.actuator.CatalogActuatorMvcTest' --tests 'ch.so.agi.datenportal.DatenportalApplicationTests'` | PASS, 41 Tests |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 57s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+## Code-Quality Remediation Phase 3 Entry
+
+Date: 2026-08-11
+
+Goal:
+
+- Die Basiskonfiguration ohne explizite Quelle fail-fast machen.
+- Demo-Fixtures, localhost-Downloads und JTE-Development-Mode ausschließlich
+  über das `local`- beziehungsweise `test`-Profil aktivieren.
+- Öffentliche Actuator-Health-Antworten auf den Gesamtstatus begrenzen.
+
+Changed files:
+
+- `src/main/resources/application.yml`: produktionssichere technische
+  Defaults, `gg.jte.development-mode: false`, vorcompilierte JTE-Templates,
+  `show-details: never` und keine implizite Katalog-/DuckDB-Quelle.
+- `src/main/resources/application-local.yml` und
+  `src/main/resources/application-test.yml`: explizite 62-Einträge-XTF-,
+  `catalog.duckdb`-, Download- und JTE-Profilwerte.
+- `CatalogProperties`, `CatalogDuckDbProperties` und
+  `CatalogImportConfiguration`: verpflichtende Quellart und passende
+  Location, frühe HTTP-Schema-Prüfung und direkte `switch`-Erzeugung ohne
+  Legacy-Fallbacks.
+- `CatalogSnapshotHealthIndicator` und `CatalogActuatorMvcTest`: interne
+  Betriebsdetails bleiben intern; öffentlich ist nur der Gesamtstatus sichtbar.
+- Konfigurations-, Profil-, Health- und Indicator-Tests sowie README,
+  Konfigurations-, Betriebs- und Architektur-Dokumentation aktualisiert.
+
+No files were deleted. Die externe Erzeugung und das Laden des fertigen
+DuckDB-Artefakts bleiben getrennt; die Katalogdaten selbst wurden nicht
+verändert.
+
+Definition of Done:
+
+- Start ohne Produktionsquelle scheitert verständlich.
+- Keine Fixture oder localhost-URL ist produktiver Fallback.
+- `SPRING_PROFILES_ACTIVE=local ./gradlew bootRun` ist der lokale Einstieg.
+- Öffentliche Health-Antwort enthält keine Komponenten, Details oder Pfade.
+- Legacy-Quellkonfiguration ist entfernt und die vollständige Prüfung grün.
+
+The implementation is committed separately per remediation phase; see
+`docs/phase-status.md` for the authoritative commit map.
+
+## Code-Quality Remediation Phase 3 verification
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.config.*' --tests 'ch.so.agi.datenportal.admin.actuator.*' --tests 'ch.so.agi.datenportal.DatenportalApplicationTests' --tests 'ch.so.agi.datenportal.web.StaticAssetCachingMvcTest'` | PASS |
+| `./gradlew test --tests 'ch.so.agi.datenportal.config.ConfigurationStartupTest'` | PASS, fünf fail-fast Binding-Fälle |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 55s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+## Code-Quality Remediation Phase 4 Entry
+
+Date: 2026-08-11
+
+Goal:
+
+- Karten-Badges aus `hasStructureInformation()` ableiten und die gemeinsame
+  blaue Info-/Ink-Variante für `Datensatz` und `Datenreihe` dokumentieren.
+- Serien-Root-Zeilen über das bestehende Plus-/Minus-Element per Zeilenklick
+  bedienen, ohne Info-, Download- oder Formelemente abzufangen.
+- Qualitäts-ViewModel und Qualitätskarte auf tatsächlich vorhandene
+  Datenmodell- und `qualitySummary`-Informationen reduzieren.
+
+Changed files:
+
+- `ResultsVmFactory`, `entryRow.jte` und `catalog-filters.js`: fachliches
+  Struktur-Mapping, `data-series-expand-href` und progressive Row-Click-
+  Delegation ohne zusätzlichen Client-State.
+- `QualityVm`, `DetailPageVmFactory` und `qualityCard.jte`: Modell als Text,
+  reale Report-URL, Dateiname aus dem URI-Pfad und verständlicher Fallback;
+  keine Platzhalter-Links `href="#"`.
+- `AGENTS.md`, `datenportal-ui-contract`, `docs/ui-primitives.md` und
+  `docs/ui-implementation-contract.md`: blauer Info-Badge-Vertrag und
+  Row-Click-/Qualitätskarten-Regeln.
+- MVC-, Factory- und Playwright-Tests für Badges, Report-URLs, Fallbacknamen,
+  Zeilenklick sowie geschützte Info-/Download-Klicks.
+
+No files were deleted in this phase. The implementation is committed
+separately per remediation phase; see `docs/phase-status.md`.
+
+Definition of Done:
+
+- Karten setzen `structureDescribed` aus `hasStructureInformation()` und
+  verwenden den dokumentierten Info-/Ink-Badge-Vertrag.
+- Serienzeilen haben einen deklarativen Expand-Link; Row Click toggelt über
+  denselben Link und ignoriert interaktive Nachfahren.
+- Qualitätskarten zeigen nur reale Modell-/Reportdaten und keine `#`-Links.
+- Die fokussierten Tests, `git diff --check` und `./gradlew clean check` sind
+  grün.
+
+## Code-Quality Remediation Phase 4 verification
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.web.DetailPageVmFactoryTest' --tests 'ch.so.agi.datenportal.web.CatalogControllerMvcTest' --tests 'ch.so.agi.datenportal.web.CatalogDetailControllerMvcTest'` | PASS, 74 Tests |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.web.CatalogFiltersPlaywrightTest.seriesRootRowClickTogglesUsingDisclosureLinkAndIgnoresInteractiveChildren'` | PASS |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 55s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+## Code-Quality Remediation Phase 5 verification
+
+| Command | Result |
+|---|---|
+| `./gradlew test` | PASS, 271 Tests |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.web.CatalogFiltersPlaywrightTest'` | PASS, 24 Tests |
+| `rg`-Prüfung auf entfernte ViewModels, Templates und Starter-Assets | PASS, keine Referenzen |
+| `find src/main/java/ch/so/agi/datenportal/web/view -maxdepth 1 -name '*.java'` | PASS, exakt 34 Dateien |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 57s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+## Code-Quality Remediation Phase 6 Entry
+
+Date: 2026-08-11
+
+Goal:
+
+- Fertige XTF- und DuckDB-Artefakte gemeinsam laden und als unveränderlichen
+  Runtime-Stand mit Lucene atomar veröffentlichen.
+- Artefakt-Requests ausschließlich aus dem aktiven Snapshot bedienen.
+- Explore mit einer hash-versionierten DuckDB-URL an denselben Snapshot binden.
+- Reload-Fehler und technische DuckDB-Prüfung kontrolliert dokumentieren.
+
+Changed files:
+
+- `CatalogSnapshot`, `CatalogSnapshotBuilder`, `CatalogSnapshotLoader`
+  und `CatalogReloadService`: beide Quellen werden vor Parse/Index einmal
+  geladen; der DuckDB-Header wird minimal geprüft; Snapshot-Wechsel bleiben
+  atomar.
+- `CatalogArtifactController`: Snapshot-only, InputStreamResource,
+  Content-Length, SHA-256-ETag, 304, 409 sowie versioniertes Caching.
+- `ExploreContextService` und `ExploreContextDto`: keine unversionierte
+  Fallback-URL; Kontext und DuckDB stammen aus demselben Snapshot.
+- Health-, Architektur-, Konfigurations- und Betriebsdokumentation sowie
+  Loader-, Reload-, Artifact- und Explore-Tests.
+
+No files were deleted. Die Anwendung erzeugt oder transformiert
+`catalog.duckdb` nicht. Die fachliche Übereinstimmung von XTF und DuckDB
+bleibt Verantwortung der externen Publishing-Pipeline.
+
+Definition of Done:
+
+- Keine Source wird pro Artifact-GET erneut gelesen.
+- XTF, Lucene und DuckDB werden gemeinsam aktiviert; fehlerhafte Reloads
+  lassen den vollständigen alten Stand aktiv.
+- Explore verwendet `/catalog/catalog.duckdb?v=<sha256>`.
+- ETag, 304, 409, Content-Length und Cache-Control sind getestet.
+- DuckDB wird nur auf Mindestgröße und `DUCK`-Marker geprüft.
+- `git diff --check` und `./gradlew clean check` sind grün.
+
+## Code-Quality Remediation Phase 6 verification
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.catalog.service.*' --tests 'ch.so.agi.datenportal.web.CatalogArtifactControllerMvcTest' --tests 'ch.so.agi.datenportal.explore.ExploreContextServiceTest' --tests 'ch.so.agi.datenportal.explore.ExplorePageControllerMvcTest' --tests 'ch.so.agi.datenportal.admin.actuator.CatalogSnapshotHealthIndicatorTest'` | PASS |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 1m 46s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+## Code-Quality Remediation Phase 7 Entry
+
+Date: 2026-08-11
+
+Goal:
+
+- EH-/COI-DuckDB-Bundles und produktive Source-Maps aus dem Boot-JAR entfernen.
+- RPanel und RDataFramePanel erst nach Aktivierung des R-Labors laden.
+- Die Abnahme direkt am erzeugten Boot-JAR durchführen.
+
+Changed files:
+
+- `duckdbBundles.ts` und Test: ausschließlich der `mvp`-Bundle, keine
+  EH-/COI-URLs.
+- `vite.config.ts` und `copyWebRRuntime`: Produktions-Source-Maps werden
+  nicht erzeugt oder in das JAR kopiert.
+- `ExploreApp.tsx` und Test: React.lazy/Suspense für beide R-Komponenten,
+  Mount erst nach R-Tab-Aktivierung.
+
+JAR-Abnahme mit demselben Task:
+
+- Ausgangswert vor Phase 7: 228.979.643 Bytes.
+- Ergebnis nach Phase 7: 174.656.030 Bytes.
+- Reduktion: 54.323.613 Bytes, rund 51,8 MiB; Ergebnis rund 166,5 MiB.
+- `jar tf` findet keine `duckdb-eh`, `duckdb-coi`, `coi.pthread`
+  oder `.map`-Einträge; MVP und eigene R-Chunks sind vorhanden.
+
+No files were deleted. Die R-Module bleiben produktiv und werden nur
+nachgelagert geladen.
+
+Definition of Done:
+
+- Nur MVP-Wasm wird ausgeliefert.
+- Keine produktiven Source-Maps sind im Boot-JAR.
+- Ein eigener R-Chunk ist vorhanden; der initiale Explore-Chunk enthält keine
+  R-Komponentenimplementierung.
+- SQL- und R-Smokes, `git diff --check` und `./gradlew clean check` sind
+  grün.
+
+## Code-Quality Remediation Phase 7 verification
+
+| Command | Result |
+|---|---|
+| `npm test` | PASS, 23 Dateien, 125 Tests |
+| `npm run typecheck` | PASS |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.ExploreIslandParquetPlaywrightTest.rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult' -Ddatenportal.playwright.webr=true` | PASS, real WebR browser smoke, `BUILD SUCCESSFUL in 14s` |
+| `./gradlew clean bootJar --no-daemon` | PASS |
+| `jar tf build/libs/*.jar` Inhaltsprüfung | PASS, nur MVP-DuckDB, R-Chunks, keine EH/COI/Maps |
+| `git diff --check` | PASS |
+| `./gradlew clean check --no-daemon` | PASS, `BUILD SUCCESSFUL in 57s`; Vitest 125, TypeScript, Vite, Backend-Tests und Playwright |
+
+## Code-Quality Remediation Phase 8 Entry
+
+Date: 2026-08-11
+
+Goal:
+
+- Vorbereiteten Explore-Zukunftscode, generische Feature-Flags und lokale
+  Query-History entfernen.
+- Den gemeinsam ausgelieferten Explore-Kontext auf Version 4 mit direkten
+  chartsEnabled-/webREnabled-Booleans vereinfachen.
+- Jackson als Spring-verwalteten JSON-Serializer verwenden und den
+  Produktionspfad für SQL-Rezepte und das R-Labor erhalten.
+
+Changed files:
+
+- Backend-Kontext: Snippet-/Flag-/manueller-JSON-Code entfernt,
+  ExploreProperties reduziert, optionale DTO-Felder mit
+  JsonInclude.NON_ABSENT versehen und Enumwerte mit JsonValue serialisiert.
+- Frontend-Kontext: Zod akzeptiert ausschließlich V4; SQL und R lesen direkte
+  Booleans.
+- Entfernt wurden die vorbereiteten Zukunfts-, Codebeispiel- und
+  History-Komponenten samt exklusiven Tests sowie der zugehörige
+  Dependency-Guard.
+- Dokumentation und Explore-MVC-/Unit-Tests beschreiben den produktiven
+  V4-Vertrag.
+
+Definition of Done:
+
+- Kein ungenutzter Zukunfts-Slot, keine generische Zukunfts-Flag-Map und kein
+  manueller JSON-Writer.
+- V3 wird im Frontend-Schema kontrolliert abgelehnt.
+- Quotes, Backslashes, Zeilenumbrüche, Unicode, Script-Sequenzen und leere
+  Optionals sind getestet.
+- Produktive SQL-Rezepte und das R-Labor bleiben vorhanden und getestet.
+
+## Code-Quality Remediation Phase 8 verification
+
+| Command | Result |
+|---|---|
+| ./gradlew test --tests 'ch.so.agi.datenportal.explore.*' --no-daemon | PASS |
+| npm test | PASS, 20 Dateien, 114 Tests |
+| npm run typecheck | PASS |
+| rg gelöschte Explore-Typen/Flags/Komponenten in src und docs/erkunden | PASS, keine Referenzen |
+| git diff --check | PASS |
+| ./gradlew clean check --no-daemon | PASS, BUILD SUCCESSFUL in 54s; Vitest 114, TypeScript, Vite, Backend-Tests und Playwright |
+| ./gradlew clean check -Ddatenportal.playwright.webr=true --no-daemon | PASS, BUILD SUCCESSFUL in 59s; WebR-aktivierter Gesamtcheck |
+| ./gradlew playwrightTest --no-daemon --tests 'ch.so.agi.datenportal.explore.ExploreIslandParquetPlaywrightTest.rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult' -Ddatenportal.playwright.webr=true | PASS, real WebR browser smoke, BUILD SUCCESSFUL in 13s |
+| ./gradlew clean check --no-daemon (zweimal abschließend) | PASS, BUILD SUCCESSFUL in 55s und 55s; der fokussierte Autocomplete-Smoke lief nach einem transienten Timeout isoliert in 10s erfolgreich |
+| ./gradlew clean bootJar --no-daemon | PASS, BUILD SUCCESSFUL in 15s; 174.644.557 Bytes, weiterhin unter 180 MiB und rund 54,3 MiB unter dem Phase-7-Ausgangswert |
+| jar tf build/libs/*.jar | PASS, keine EH/COI/COI.pthread/.map-Einträge; MVP-DuckDB und eigene R-Chunks vorhanden |
 
 ## R-Labor UI-Nachschliff 2 Entry
 
@@ -550,7 +946,7 @@ Test evidence:
 Known limitations:
 
 - Charting remains deferred to Phase 5; the `Diagramm` tab still states that charts come from SQL results later.
-- Code snippets and local query history remain deferred to Phase 6.
+- Beispiel- und History-Pfade bleiben ausserhalb des produktiven Vertrags.
 - Query cancellation depends on the SQLRooms/DuckDB-Wasm query handle; the UI exposes cancellation while a query is running, but long-running browser behavior still needs broader Phase-7 hardening.
 - The browser fixture covers same-origin Parquet; external `https://data.so.ch` CORS/Range behavior remains a manual/operational smoke test.
 
@@ -590,7 +986,7 @@ Test evidence:
 
 Known limitations:
 
-- Code snippets and local query history remain deferred to Phase 6.
+- Beispiel- und History-Pfade bleiben ausserhalb des produktiven Vertrags.
 - Broader UX hardening, manual browser matrix checks and real external `https://data.so.ch` Parquet smoke tests remain deferred to Phase 7.
 - Vite still reports expected large DuckDB-Wasm bundle warnings.
 
@@ -602,12 +998,8 @@ Branch: `main`
 
 Scope:
 
-- Added copyable static code snippets in the Explore `Code` tab for DuckDB CLI, Python and R.
-- Hardened backend snippet generation to prefer the primary Parquet table and fall back to the first table.
-- Added browser-local, per-dataset query history for successful SQL executions.
-- Kept history behind `featureFlags.localHistory`; disabled history does not read or write `localStorage`.
-- Stored only SQL and small execution metadata in history; result rows are not persisted.
-- Added clear-history and load-from-history actions in the SQL laboratory.
+- Ein früherer Beispiel- und History-Ausbau ist historisch dokumentiert und
+  wurde in der Code-Quality-Remediation entfernt.
 - Kept WebR execution, server-side SQL execution, saved views and new heavy dependencies out of scope.
 - Updated Phase 6 tracking in the Erkunden MVP specification.
 
@@ -701,12 +1093,8 @@ Branch: `main`
 
 Scope:
 
-- Added additive `geospatial` future flag beside the existing disabled AI, WebR, Vega and Mosaic flags.
-- Added `datenportal.explore.geospatial-enabled=false` to the default configuration.
-- Passed all future flags through backend properties, JSON serialization, frontend validation and frontend sample context.
-- Added a quiet `FutureExtensionSlots` component that renders nothing while future flags are disabled.
-- Added `npm run check:future-deps` to catch direct disabled future dependencies, source imports and built asset markers for AI, WebR, Vega, Mosaic and map runtimes.
-- Documented future extension paths for AI, WebR/r-stats, Vega-Lite, Mosaic crossfilter, geospatial exploration and shareable SQL URLs.
+- Ein früherer Zukunftscode-Ausbau wurde in der Code-Quality-Remediation
+  vollständig entfernt.
 - Updated Phase 8 tracking in the Erkunden MVP specification.
 
 Implementation notes:
@@ -722,7 +1110,6 @@ Test evidence:
 | `npm --prefix src/main/frontend/explore test` | PASS, `Test Files 14 passed (14)`, `Tests 65 passed (65)`, duration `3.40s` |
 | `npm --prefix src/main/frontend/explore run typecheck` | PASS, `tsc --noEmit` without errors |
 | `npm --prefix src/main/frontend/explore run build` | PASS, Vite built Explore and DuckDB-Wasm assets under `/explore/assets/`, `built in 964ms`; expected large DuckDB-Wasm chunk warning remains |
-| `npm --prefix src/main/frontend/explore run check:future-deps` | PASS, `Future dependency check passed: no disabled AI/WebR/Vega/Mosaic/geospatial packages are directly loaded.` |
 | `./gradlew test --tests 'ch.so.agi.datenportal.explore.*'` | PASS, `BUILD SUCCESSFUL in 7s`; included focused Explore backend tests and frontend asset build |
 | `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 52s`; included Vitest, TypeScript, Vite build, backend tests and Playwright |
 

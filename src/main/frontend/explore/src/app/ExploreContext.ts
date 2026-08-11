@@ -54,23 +54,6 @@ export const exploreRecipeSchema = z.object({
   preferredChart: exploreChartConfigSchema.optional()
 });
 
-export const exploreCodeSnippetSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  language: z.enum(['sql', 'python', 'r', 'bash']),
-  code: z.string()
-});
-
-export const exploreFeatureFlagsSchema = z.object({
-  charts: z.boolean(),
-  localHistory: z.boolean(),
-  aiAssistant: z.boolean(),
-  webR: z.boolean(),
-  vega: z.boolean(),
-  mosaic: z.boolean(),
-  geospatial: z.boolean()
-});
-
 export const exploreExecutionSchema = z.object({
   engine: z.literal('duckdb-wasm'),
   mode: z.literal('browser-local'),
@@ -98,7 +81,7 @@ export const exploreRLaboratorySchema = z.object({
 });
 
 export const exploreContextSchema = z.object({
-  version: z.literal(3),
+  version: z.literal(4),
   datasetId: z.string(),
   title: z.string(),
   description: z.string().optional(),
@@ -109,8 +92,8 @@ export const exploreContextSchema = z.object({
   catalogDatabase: exploreCatalogDatabaseSchema,
   tables: z.array(exploreTableSchema),
   recipes: z.array(exploreRecipeSchema),
-  codeSnippets: z.array(exploreCodeSnippetSchema),
-  featureFlags: exploreFeatureFlagsSchema,
+  chartsEnabled: z.boolean(),
+  webREnabled: z.boolean(),
   rLaboratory: exploreRLaboratorySchema
 });
 
@@ -119,8 +102,6 @@ export type ExploreChartConfigDto = z.infer<typeof exploreChartConfigSchema>;
 export type ExploreColumnDto = z.infer<typeof exploreColumnSchema>;
 export type ExploreTableDto = z.infer<typeof exploreTableSchema>;
 export type ExploreRecipeDto = z.infer<typeof exploreRecipeSchema>;
-export type ExploreCodeSnippetDto = z.infer<typeof exploreCodeSnippetSchema>;
-export type ExploreFeatureFlagsDto = z.infer<typeof exploreFeatureFlagsSchema>;
 export type ExploreExecutionDto = z.infer<typeof exploreExecutionSchema>;
 export type ExploreCatalogDatabaseDto = z.infer<typeof exploreCatalogDatabaseSchema>;
 export type ExploreRLaboratoryDto = z.infer<typeof exploreRLaboratorySchema>;

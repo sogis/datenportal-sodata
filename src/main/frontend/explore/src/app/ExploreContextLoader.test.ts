@@ -8,7 +8,7 @@ describe('loadEmbeddedExploreContext', () => {
     documentRef.body.innerHTML = `<script id="datenportal-explore-context" type="application/json">${JSON.stringify(sampleExploreContext)}</script>`;
 
     expect(loadEmbeddedExploreContext(documentRef)).toMatchObject({
-      version: 3,
+      version: 4,
       datasetId: 'ch.so.bauinventar',
       title: 'Bauinventar',
       catalogDatabase: {
@@ -16,13 +16,8 @@ describe('loadEmbeddedExploreContext', () => {
         database: 'catalog',
         schema: 'opendata'
       },
-      featureFlags: {
-        aiAssistant: false,
-        webR: true,
-        vega: false,
-        mosaic: false,
-        geospatial: false
-      },
+      chartsEnabled: true,
+      webREnabled: true,
       rLaboratory: {
         dataFrameName: 'daten',
         runtimeBaseUrl: '/webr/0.6.0/',

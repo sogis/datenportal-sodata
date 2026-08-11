@@ -129,8 +129,28 @@ Verifikation:
 - `git diff --check`: PASS
 - `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 57s`
 
-Commit: wird nach dem Commit eingetragen.
+Commit: `9b727a7`
 
 ## Phase 8 — Explore-Kontext V4 und Zukunftscode-Abbau
 
-Status: ausstehend.
+Status: abgeschlossen am 2026-08-11.
+
+Schwerpunkte: vorbereiteten Zukunftscode, generische Feature-Flags,
+manuellen JSON-Writer, lokale Query-History und den Dependency-Guard entfernen;
+den Explore-Kontext auf V4 mit direkten Booleans und Spring-Jackson halten;
+produktive SQL-Rezepte und das R-Labor erhalten.
+
+Verifikation:
+
+- fokussierte Explore-Gradle-Suite: PASS
+- Vitest: PASS, 20 Dateien / 114 Tests
+- TypeScript: PASS
+- Referenzprüfung auf entfernte Typen, Flags, Komponenten und Guard: PASS
+- `git diff --check`: PASS
+- `./gradlew clean check --no-daemon`: PASS, zweimal abschließend je 55s
+- WebR-aktivierter Gesamtcheck: PASS, 59s
+- realer WebR-Playwright-Smoke: PASS, 13s
+- `./gradlew clean bootJar --no-daemon`: PASS, 15s
+- finales JAR: 174.644.557 Bytes, keine EH/COI/Maps, MVP und R-Chunks vorhanden
+
+Commit: wird nach dem Commit eingetragen.

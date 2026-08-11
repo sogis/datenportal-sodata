@@ -2,7 +2,7 @@
 
 Status: SQL- und R-Labor
 
-Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms-, WebR- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, laedt `catalog.duckdb`, attached sie read-only als `catalog`, setzt `USE "catalog"."opendata"` und rendert daraus den Schema Explorer. SQL wird direkt gegen die attached Catalog-Views ausgefuehrt, damit auch Joins zwischen mehreren Parquet-Dateien moeglich sind. Das SQL-Labor enthaelt Monaco-Editor, roten `Ausfuehren`-Button, kompakte Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporte fuer CSV, XLSX und Parquet. Das R-Labor laedt WebR same-origin und kann auch ohne SQL-Result genutzt werden; ein Dataframe `daten` steht erst nach expliziter Uebernahme aus dem SQL-Labor bereit. Codebeispiele und sichtbare Query-Historie sind im aktuellen Primaerpfad nicht sichtbar. Zukunftsflags fuer AI, Vega, Mosaic und Geodaten bleiben deaktiviert und laden keine schweren Runtime-Pakete.
+Dieses Dokument sammelt bekannte Risikofelder fuer die DuckDB-Wasm-, SQLRooms-, WebR- und Parquet-Phasen. Die React-Insel initialisiert DuckDB-Wasm im Browser, laedt `catalog.duckdb`, attached sie read-only als `catalog`, setzt `USE "catalog"."opendata"` und rendert daraus den Schema Explorer. SQL wird direkt gegen die attached Catalog-Views ausgefuehrt, damit auch Joins zwischen mehreren Parquet-Dateien moeglich sind. Das SQL-Labor enthaelt Monaco-Editor, roten `Ausfuehren`-Button, kompakte Resultattabelle, Diagrammansicht, Row-Limit-Combobox und Exporte fuer CSV, XLSX und Parquet. Das R-Labor laedt WebR same-origin und kann auch ohne SQL-Result genutzt werden; ein Dataframe `daten` steht erst nach expliziter Uebernahme aus dem SQL-Labor bereit. Der Explore-Kontext V4 enthält ausschließlich produktive SQL-, Chart- und WebR-Felder.
 
 ## Phase-2-Island laedt nicht
 
@@ -163,45 +163,13 @@ Verhalten ab Phase 4:
 - Erlaubt sind im MVP `select`, `with`, `describe`, `show` und `pragma table_info`.
 - Blockiert werden offensichtliche Mutations- und Systemkommandos wie `insert`, `update`, `delete`, `drop`, `alter`, `create table`, `copy ... to`, `attach`, `install`, `load`, `call` und `set`.
 
-## Codebeispiele
+## Explore-Kontext V4
 
-Verhalten:
-
-- Backend und Komponenten koennen weiterhin statische Beispiele fuer DuckDB CLI, Python und R erzeugen.
-- Im SQL-Labor-Redesign gibt es keinen sichtbaren Tab `Code`.
-- Die Beispiele werden nicht im Browser ausgefuehrt. Statische R-Codebeispiele laden selbst keine WebR-Laufzeit.
-- Die Beispiele verwenden die primaere Parquet-Tabelle des Datenthemas oder, falls keine primaere Tabelle markiert ist, die erste Parquet-Tabelle.
-- Wenn ein Datenthema keine Parquet-Distribution hat, bleiben `codeSnippets` leer und die Explore-Seite zeigt die Nicht-verfuegbar-Meldung.
-
-## Lokale Query-Historie
-
-Verhalten:
-
-- Der History-Code bleibt fuer spaetere Wiederaufnahme vorhanden, ist in der aktuellen Labor-UI aber nicht sichtbar.
-- Der Schluessel lautet `datenportal.explore.history.<datasetId>`.
-- Es werden maximal 20 Eintraege gespeichert, newest first.
-- Gespeichert werden SQL und kleine Metadaten wie Zeit, Rezepttitel, Zeilenzahl und Dauer. Resultatzeilen werden nicht gespeichert.
-- Wenn `localStorage` nicht verfuegbar ist, voll ist oder ungueltige Daten enthaelt, duerfen SQL-Ausfuehrung, Resultattabelle und Resultat-Export nicht beeintraechtigt werden.
-
-## Zukunftsflags und schwere Pakete
-
-Standardverhalten:
-
-- `datenportal.explore.ai-enabled=false`
-- `datenportal.explore.webr-enabled=true`
-- `datenportal.explore.vega-enabled=false`
-- `datenportal.explore.mosaic-enabled=false`
-- `datenportal.explore.geospatial-enabled=false`
-
-Wenn ein Zukunftsbereich versehentlich sichtbar wird, zuerst die JSON-Flags unter `/datasets/{datasetId}/explore/context.json` pruefen. Bei Standardkonfiguration darf `FutureExtensionSlots` fuer AI, Vega, Mosaic und Geodaten nichts rendern; WebR ist kein Zukunftsflag mehr, sondern das aktive R-Labor.
-
-`npm --prefix src/main/frontend/explore run check:future-deps` prueft:
-
-- keine direkten Zukunftsabhaengigkeiten in `package.json`
-- keine Source-Imports fuer AI, Vega, Mosaic oder Kartenframeworks
-- keine entsprechenden Paketmarker in gebauten Explore-Assets
-
-Das vorhandene transitive `react-mosaic-component` ist eine Abhaengigkeit aktueller SQLRooms Shell-/Editor-Pakete. Es ist kein aktivierter Mosaic-Crossfilter-Modus.
+Der Kontext wird gemeinsam mit Backend und Insel ausgeliefert und muss
+Version `4` sowie die direkten Felder `chartsEnabled` und `webREnabled`
+enthalten. Eine ältere oder generische Flag-Struktur ist kein unterstütztes
+Format. Bei einem Schemafehler erscheint die verständliche
+Kontext-Fehlermeldung; ein Fallback auf einen älteren Vertrag erfolgt nicht.
 
 ## SQLRooms Editor in Tests
 

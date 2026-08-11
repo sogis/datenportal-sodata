@@ -3,6 +3,7 @@ package ch.so.agi.datenportal.search;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
@@ -18,6 +19,7 @@ import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.config.SearchProperties;
 import java.net.URI;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -175,6 +177,37 @@ class CatalogSearchServiceTest {
         assertThat(search("amt finanzen")).containsExactly("steuerfuss-gemeinden");
     }
 
+    @Test
+    void appliesJavaFiltersAfterTheCompleteLuceneHitSet() {
+        List<DatasetEntry> entries = java.util.stream.IntStream.range(0, 501)
+                .mapToObj(index -> new DatasetEntry(
+                        "target-" + index,
+                        "Target entry " + index,
+                        "Searchable target entry.",
+                        AGI,
+                        AGI,
+                        List.of(new Theme(index == 500 ? "wanted" : "other", index == 500 ? "Wanted" : "Other")),
+                        List.of("Target"),
+                        LocalDate.parse("2026-06-01"),
+                        AccessLevel.OPEN,
+                        List.of(new DistributionLink(URI.create("https://example.com/target-" + index), DistributionFormat.CSV))))
+                .toList();
+        var catalog = new Catalog(entries, List.of());
+        var index = new CatalogSearchIndexBuilder(new CatalogDocumentMapper()).build(catalog.topLevelEntries());
+        var snapshot = CatalogSnapshot.of(
+                catalog,
+                Instant.parse("2026-06-15T00:00:00Z"),
+                Duration.ZERO,
+                CatalogTestArtifacts.published("many-hits"),
+                CatalogTestArtifacts.duckDb("many-hits-duckdb"),
+                index);
+        var filters = new SearchFilters(Set.of("wanted"), Set.of(), Optional.empty(), Set.of());
+
+        assertThat(service.search(snapshot, new SearchQuery("Target", filters, SortMode.MODIFIED_DESC)).entries())
+                .extracting(CatalogEntry::identifier)
+                .containsExactly("target-500");
+    }
+
     private List<String> search(String query) {
         return service.search(snapshot(), new SearchQuery(query, SearchFilters.empty(), SortMode.MODIFIED_DESC))
                 .entries().stream()
@@ -185,7 +218,13 @@ class CatalogSearchServiceTest {
     private static CatalogSnapshot snapshot() {
         Catalog catalog = catalog();
         var index = new CatalogSearchIndexBuilder(new CatalogDocumentMapper()).build(catalog.topLevelEntries());
-        return CatalogSnapshot.of(catalog, Instant.parse("2026-06-15T00:00:00Z"), "test", index);
+        return CatalogSnapshot.of(
+                catalog,
+                Instant.parse("2026-06-15T00:00:00Z"),
+                Duration.ZERO,
+                CatalogTestArtifacts.published("test"),
+                CatalogTestArtifacts.duckDb("test-duckdb"),
+                index);
     }
 
     private static Catalog catalog() {

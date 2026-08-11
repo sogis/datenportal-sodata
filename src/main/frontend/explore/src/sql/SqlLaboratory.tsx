@@ -223,8 +223,8 @@ export function SqlLaboratory({
 
   const running = result.status === 'running';
   const canExport = result.status === 'success' && result.rows.length > 0;
-  const canTransferToR = context.featureFlags.webR && result.status === 'success' && result.rows.length > 0;
-  const chartsEnabled = context.featureFlags.charts;
+  const canTransferToR = context.webREnabled && result.status === 'success' && result.rows.length > 0;
+  const chartsEnabled = context.chartsEnabled;
 
   return (
     <PanelGroup

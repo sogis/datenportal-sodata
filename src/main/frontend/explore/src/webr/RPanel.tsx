@@ -43,6 +43,19 @@ export function RPanel({
   const [hasTabularResult, setHasTabularResult] = useState(false);
   const runtimeRef = useRef<WebRRuntime | null>(null);
   const bridgeRef = useRef<WebRBridge | null>(null);
+  const mountedRef = useRef(false);
+  const operationIdRef = useRef(0);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      operationIdRef.current += 1;
+      bridgeRef.current = null;
+      runtimeRef.current?.close();
+      runtimeRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     setSnapshotOverride(undefined);
@@ -54,16 +67,22 @@ export function RPanel({
   }, [recipes]);
 
   useEffect(() => {
-    if (!context.featureFlags.webR) {
+    const operationId = ++operationIdRef.current;
+    const isCurrent = () => mountedRef.current && operationIdRef.current === operationId;
+
+    if (!context.webREnabled) {
       setStatus('error');
       setError('Das R-Labor ist in diesem Kontext nicht aktiviert.');
-      return undefined;
+      return () => {
+        if (operationIdRef.current === operationId) {
+          operationIdRef.current += 1;
+        }
+      };
     }
     if (!activeSnapshot) {
       onDataFrameInfoChange?.(undefined);
-      let active = true;
-      void initializeRuntimeWithoutData().catch((runtimeError) => {
-        if (!active) {
+      void initializeRuntimeWithoutData(operationId).catch((runtimeError) => {
+        if (!isCurrent()) {
           return;
         }
         setStatus('error');
@@ -71,7 +90,9 @@ export function RPanel({
       });
 
       return () => {
-        active = false;
+        if (operationIdRef.current === operationId) {
+          operationIdRef.current += 1;
+        }
       };
     }
     if (!snapshotOverride && activeSnapshot.rowCount > laboratory.recommendedRows) {
@@ -80,12 +101,15 @@ export function RPanel({
         ? `Das SQL-Resultat hat ${formatNumber(activeSnapshot.rowCount)} Zeilen und überschreitet die harte Grenze von ${formatNumber(laboratory.hardRows)} Zeilen.`
         : null);
       onDataFrameInfoChange?.(undefined);
-      return undefined;
+      return () => {
+        if (operationIdRef.current === operationId) {
+          operationIdRef.current += 1;
+        }
+      };
     }
 
-    let active = true;
-    void transferSnapshot(activeSnapshot, snapshotOverride ? snapshot?.rowCount : undefined).catch((transferError) => {
-      if (!active) {
+    void transferSnapshot(operationId, activeSnapshot, snapshotOverride ? snapshot?.rowCount : undefined).catch((transferError) => {
+      if (!isCurrent()) {
         return;
       }
       setStatus('error');
@@ -93,15 +117,27 @@ export function RPanel({
     });
 
     return () => {
-      active = false;
+      if (operationIdRef.current === operationId) {
+        operationIdRef.current += 1;
+      }
     };
-  }, [activeSnapshot, context.featureFlags.webR, laboratory, onDataFrameInfoChange, snapshot?.rowCount, snapshotOverride]);
+  }, [activeSnapshot, context.webREnabled, laboratory, onDataFrameInfoChange, snapshot?.rowCount, snapshotOverride]);
 
-  function updateStep(next: WebRStepState) {
+  function isCurrentOperation(operationId: number): boolean {
+    return mountedRef.current && operationIdRef.current === operationId;
+  }
+
+  function updateStep(operationId: number, next: WebRStepState) {
+    if (!isCurrentOperation(operationId)) {
+      return;
+    }
     setSteps((current) => current.map((state) => state.step === next.step ? next : state));
   }
 
-  async function initializeRuntimeWithoutData() {
+  async function initializeRuntimeWithoutData(operationId: number) {
+    if (!isCurrentOperation(operationId)) {
+      return;
+    }
     setStatus('loading');
     setError(null);
     setConsoleEntries([]);
@@ -109,15 +145,21 @@ export function RPanel({
     setPlotCanvas(null);
     setHasTabularResult(false);
     setSteps(initialWebRSteps());
-    runtimeRef.current ??= new WebRRuntime(laboratory, updateStep);
+    runtimeRef.current ??= new WebRRuntime(laboratory, (next) => updateStep(operationId, next));
     const webR = await runtimeRef.current.initialize();
+    if (!isCurrentOperation(operationId)) {
+      return;
+    }
     bridgeRef.current = new WebRBridge(webR);
-    updateStep({step: 'data', status: 'done'});
+    updateStep(operationId, {step: 'data', status: 'done'});
     setConsoleEntries([{type: 'message', text: 'R ist bereit. Übernimm ein SQL-Result, um den Dataframe daten zu verwenden.'}]);
     setStatus('ready');
   }
 
-  async function transferSnapshot(nextSnapshot: SqlResultSnapshot, limitedFrom?: number) {
+  async function transferSnapshot(operationId: number, nextSnapshot: SqlResultSnapshot, limitedFrom?: number) {
+    if (!isCurrentOperation(operationId)) {
+      return;
+    }
     setStatus('loading');
     setError(null);
     setConsoleEntries([]);
@@ -125,12 +167,18 @@ export function RPanel({
     setPlotCanvas(null);
     setHasTabularResult(false);
     setSteps(initialWebRSteps());
-    runtimeRef.current ??= new WebRRuntime(laboratory, updateStep);
+    runtimeRef.current ??= new WebRRuntime(laboratory, (next) => updateStep(operationId, next));
     const webR = await runtimeRef.current.initialize();
+    if (!isCurrentOperation(operationId)) {
+      return;
+    }
     bridgeRef.current = new WebRBridge(webR);
-    updateStep({step: 'data', status: 'running'});
+    updateStep(operationId, {step: 'data', status: 'running'});
     const info = await bridgeRef.current.loadDataFrame(nextSnapshot, laboratory.dataFrameName, limitedFrom);
-    updateStep({step: 'data', status: 'done'});
+    if (!isCurrentOperation(operationId)) {
+      return;
+    }
+    updateStep(operationId, {step: 'data', status: 'done'});
     onDataFrameInfoChange?.(info);
     setConsoleEntries([{type: 'message', text: `${laboratory.dataFrameName} ist bereit (${formatNumber(info.rowCount)} Zeilen, ${formatNumber(info.columnCount)} Spalten).`}]);
     setStatus('ready');
@@ -142,22 +190,37 @@ export function RPanel({
     }
     setRunning(true);
     setError(null);
+    const operationId = operationIdRef.current;
     try {
       const result = await bridgeRef.current.runR(code, laboratory.plotWidth, laboratory.plotHeight);
+      if (!isCurrentOperation(operationId)) {
+        return;
+      }
       setConsoleEntries(result.entries);
       setLastPlot(result.images.at(-1));
       setHasTabularResult(result.hasTabularResult);
     } catch (runError) {
-      setError(toErrorMessage(runError));
+      if (isCurrentOperation(operationId)) {
+        setError(toErrorMessage(runError));
+      }
     } finally {
-      setRunning(false);
+      if (isCurrentOperation(operationId)) {
+        setRunning(false);
+      }
     }
   }
 
   async function copyR() {
     await copyTextToClipboard(code);
+    if (!mountedRef.current) {
+      return;
+    }
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+    window.setTimeout(() => {
+      if (mountedRef.current) {
+        setCopied(false);
+      }
+    }, 1800);
   }
 
   async function exportTable() {

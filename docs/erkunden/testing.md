@@ -15,9 +15,8 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit Phase 3 prueft Playwright DuckDB-Wasm mit einer same-origin Parquet-Fixture.
 - Seit Phase 4 prueft Playwright SQL-Ausfuehrung, Resultattabelle und CSV-Download mit derselben Fixture.
 - Seit Phase 5 existieren Unit-Tests fuer Diagramm-Inferenz und Diagrammkomponenten; nach dem SQL-Labor-Redesign pruefen Vitest und Playwright Diagramme als lokale Resultatansicht statt als alten Haupt-Tab.
-- Seit Phase 6 existieren Tests fuer statische Codebeispiele und lokale Query-Historie; im SQL-Labor-Redesign bleiben diese Bereiche aus der primaeren UI entfernt.
+- Seit der Code-Quality-Remediation pruefen Backend und Frontend den produktiven V4-Kontext; entfernte Beispiel-, History- und generische Flag-Pfade werden nicht mehr getestet.
 - Seit Phase 7 pruefen Vitest und Playwright zusaetzlich Status-/Fehlerzustaende, fehlende Parquet-Dateien, Browser-Konsole und page-level Mobile-Overflow. Nicht erreichbare Quelldateien werden im Query-Pfad als neutraler Resultatbereich-Alert geprueft, nicht als globaler Runtime-Overlay-Fehler.
-- Seit Phase 8 pruefen Backend-, Frontend- und npm-Guard-Tests deaktivierte Zukunftsflags und verhindern direkte AI/Vega/Mosaic/Karten-Abhaengigkeiten. WebR ist seit dem R-Labor kein Zukunftspaket mehr.
 - Seit dem SQL-Labor-Redesign pruefen MVC, Vitest und Playwright die vollflaechige Explore-Layoutvariante, Schema-Karten, Start-SQL gegen registrierte Views, roten Run-Button, lokale Monaco-Assets, Typ-Badges in Resultat-Headern, fehlende alte Tabs und lokale Tabellen-Scrollflaechen.
 - Seit dem SQL-Labor UI-Nachschliff pruefen Vitest und Playwright zusaetzlich den Schema-Status `Tabelle geladen` statt `Registriert`, entfernte `Abfrage 1`-/`SQL`-/`Resultat`-Header, den Play-Icon-Run-Button, den stabilen `✓ SQL kopiert`-Button, sichtbares/editierbares Monaco-SQL und pointer-bedienbare Resizer-Handles.
 - Seit dem Status-Overlay-Nachschliff pruefen Vitest und Playwright, dass Lade- und Runtime-Fehlerzustaende als zentriertes Overlay erscheinen, Ladezustaende eine Progressbar besitzen, Runtime-Fehlerzustaende keine Progressbar anzeigen, der globale `Bereit`-Badge im Erfolgsfall nicht gerendert wird und die Workbench keine Topbar-Hoehe mehr reserviert, aber den oberen Border direkt am Container behaelt.
@@ -25,11 +24,220 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit dem Resultat-Scrollbar-Nachschliff pruefen Vitest und Playwright zusaetzlich die fokussierbare Resultattabellen-Scrollregion, echte lokale horizontale/vertikale Overflow-Situationen und sichtbare Custom-Scrollbar-Pixel bei Hover, Klick und Tastaturfokus.
 - Seit der Diagramm-Wiederaufnahme pruefen Vitest und Playwright die kompakte Beispielabfrage-Auswahl, den `Tabelle`/`Diagramm`-Umschalter, Recharts-Balken/Punkte/Linien/Histogramm, die erlaubten Zusatzfarben ohne Rot, mehrfarbige Balken sowie Pie/Donut mit Segmentfarben und `Farben neu`.
 - Seit der Serienausgaben-Erweiterung pruefen MVC- und Playwright-Tests, dass Open-Data-Ausgaben einen aktiven Explore-Link zeigen, aktuelle und historische Ausgaben eigene Explore-Kontexte liefern, falsche Dataset-/Serienrouten 404 bleiben und das SQL-Labor auf einer Ausgabe echte Parquet-Daten laden und abfragen kann.
-- Seit dem R-Labor pruefen Backend-Tests den Explore-Kontext Version 3 mit `rLaboratory`, WebR-Featureflag und statischen Asset-/Cache-Regeln fuer `/webr/**` und `/webr-packages/**`.
+- Seit der V4-Umstellung pruefen Backend- und Frontend-Tests den Explore-Kontext
+  Version 4 mit `rLaboratory`, direkten Chart-/WebR-Booleans und statischen
+  Asset-/Cache-Regeln fuer `/webr/**` und `/webr-packages/**`.
 - Vitest prueft DuckDB/Arrow-nahes Type-Mapping, Snapshot-Erzeugung aus SQL-Resultaten, R-Rezeptgenerierung, WebR-Runtime-Ladephasen mit gemocktem `webr`, R-Panel-UI, Limit-Warnungen, Exportbuttons und das Package-Mirror-Script inklusive Dependency-Closure und Lockdatei.
 - Seit dem R-Labor UI-Nachschliff prueft Vitest zusaetzlich, dass R-Exportbuttons in den Outputbereichen statt in der oberen Toolbar sitzen, Paneltitel fuer Konsole/Plot nicht sichtbar gerendert werden, der Resultat-Export erst nach tabellarischem R-Resultat aktiv wird und die Dataframe-Kennzahlen `Anzahl Zeilen`/`Anzahl Spalten` heissen.
 - Seit dem zweiten R-Labor UI-Nachschliff prueft Vitest, dass R ohne SQL-Result startet, Konsole und Plot einen eigenen Resize-Handle haben, die Rezepttitel Schweizer Anfuehrungszeichen verwenden und die Plot-Heuristik Messwerte statt Jahre/Codes priorisiert.
 - Der echte WebR-Browser-Smoke ist opt-in: `./gradlew playwrightTest -Ddatenportal.playwright.webr=true`. Der normale `playwrightTest`-Task ueberspringt ihn, weil WebR die Laufzeit deutlich verlaengert. Bei Aenderungen an CSP, WebR-Runtime, Paketmirror oder R-Transfer muss der gezielte Test `ExploreIslandParquetPlaywrightTest.rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult` zusaetzlich ausgefuehrt werden.
+
+## Code-Quality Remediation Phase 1 am 2026-08-11
+
+Die erste Remediation-Phase prueft die Explore-Lebenszyklen und die
+Testdeterministik:
+
+- `ExploreApp` verwendet Generationen und AbortController; DuckDB wird nach
+  einem abgebrochenen Initialisierungsversuch genau einmal zerstört.
+- `attachCatalogDatabase` propagiert das AbortSignal an `fetch()` und wandelt
+  kontrollierte Fetch-Abbrüche weiterhin in Registrierungsfehler um.
+- `executeDuckDbQuery` wartet nach `cancelSent()` auf das Ende der ursprünglichen
+  Query-Promise; `SqlLaboratory` verhindert parallele Queries und löscht nur den
+  jeweils eigenen aktiven Handle.
+- `WebRRuntime` teilt Initialisierungen, schließt Runtime-Instanzen bei Init- und
+  Paket-Timeouts, erlaubt kontrollierte Retries nach Fehlern und publiziert nach
+  `close()` keine weiteren Fortschritte.
+- `RPanel` schützt Initialisierung und Transfers über Operations-IDs; der
+  Unmount leert Bridge/Runtime und schließt WebR.
+- Monaco erhält `data-autocomplete-ready="true"` erst nach Mount und vorhandenen
+  aktuellen Schemas. Der Playwright-Helfer wartet darauf und öffnet Completion
+  genau einmal.
+
+Testprotokoll:
+
+| Command | Result |
+|---|---|
+| `npm --prefix src/main/frontend/explore test -- --run src/app/ExploreApp.test.tsx src/duckdb/attachCatalogDatabase.test.ts src/duckdb/executeDuckDbQuery.test.ts src/sql/SqlLaboratory.test.tsx src/webr/RPanel.test.tsx src/webr/WebRRuntime.test.ts` | PASS, 6 files, 45 tests |
+| `npm --prefix src/main/frontend/explore test -- --run` | PASS, 23 files, 124 tests |
+| `npm --prefix src/main/frontend/explore run typecheck` | PASS |
+| `npm --prefix src/main/frontend/explore run build` | PASS; existing large DuckDB-Wasm chunk warning remains |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS twice, first `1m 7s`, second `57s` |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.ExploreIslandParquetPlaywrightTest.rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult' -Ddatenportal.playwright.webr=true` | PASS, real WebR browser smoke, `9s` |
+
+Die Remediation-Phasen werden separat committed; die Commit-Zuordnung steht in
+`docs/phase-status.md`.
+
+## Code-Quality Remediation Phase 2 am 2026-08-11
+
+Die zweite Remediation-Phase prueft die Java-Suche und ihre Fehlergrenzen:
+
+- `CatalogSearchIndex` liefert die vollstaendige Lucene-Treffermenge und eine
+  separate `documentCount()`-Diagnose; die alte Ergebnisgrenze und `isEmpty()`
+  sind aus der Index-API entfernt.
+- Geschlossene oder fehlerhafte Lucene-Indizes werfen
+  `CatalogSearchException`; die Suchschicht faengt diese Fehler nicht als
+  leere Resultate ab.
+- Java-Filter werden erst nach der vollstaendigen Textsuche angewendet. Ein
+  Test mit 501 Treffern stellt sicher, dass der Treffer an Position 500 nicht
+  verloren geht.
+- Die Health-Anzeige vergleicht sichtbare und indizierte Dokumentzahl und
+  wird bei Abweichung oder `documentCount()`-Fehler `DOWN`.
+- Vollseiten-Suchfehler liefern eine verstaendliche 503-Fehlerseite;
+  HTMX-Anfragen erhalten zusaetzlich `HX-Refresh: true`.
+- `CatalogService.currentSnapshot()` und ausschließlich geschriebene
+  Lucene-Felder wurden entfernt.
+
+Testprotokoll:
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.search.*' --tests 'ch.so.agi.datenportal.catalog.service.CatalogServiceTest' --tests 'ch.so.agi.datenportal.catalog.service.CatalogReloadServiceTest' --tests 'ch.so.agi.datenportal.catalog.service.CatalogSnapshotLoaderTest' --tests 'ch.so.agi.datenportal.admin.actuator.CatalogSearchIndexHealthIndicatorTest' --tests 'ch.so.agi.datenportal.web.CatalogSearchErrorMvcTest' --tests 'ch.so.agi.datenportal.admin.actuator.CatalogActuatorMvcTest' --tests 'ch.so.agi.datenportal.DatenportalApplicationTests'` | PASS, 41 Tests |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 55s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+Die Remediation-Phasen werden separat committed; die Commit-Zuordnung steht in
+`docs/phase-status.md`.
+
+## Code-Quality Remediation Phase 5 am 2026-08-11
+
+Die fünfte Remediation-Phase reduziert die serverseitige UI auf tatsächlich
+gerenderte Modelle:
+
+- Dataset- und Issue-Detailseiten verwenden gemeinsam `EntryDetailPageVm` und
+  `pages/entryDetail.jte`; `MetadataLineVm` trägt einzelne Text-, HTTP- oder
+  Mail-Zeilen.
+- Result Controls, Serienlisten, Related-Issues und Filtergruppen verwenden
+  direkte Listen-/Boolean-Felder ohne Wrapper-Enums oder Controls-ViewModels.
+- Starter-Rezepte, ihre `#`-Links, JTE-Komponente, Styles und vier PNG-Assets
+  sind entfernt. Der produktive SQL-Rezeptpfad bleibt bestehen.
+- Der Package-Umfang `web/view` liegt bei exakt 34 Java-Dateien.
+
+Testprotokoll:
+
+| Command | Result |
+|---|---|
+| `./gradlew test` | PASS, 271 Tests |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.web.CatalogFiltersPlaywrightTest'` | PASS, 24 Tests |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 57s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+Die Remediation-Phasen werden separat committed; die Commit-Zuordnung steht in
+`docs/phase-status.md`.
+
+## Code-Quality Remediation Phase 6 am 2026-08-11
+
+Die sechste Remediation-Phase bindet fertige XTF- und DuckDB-Artefakte an
+denselben unveränderlichen Runtime-Snapshot:
+
+- Startup und Reload laden beide Quellen genau einmal vor Parse und Indexbau.
+- `CatalogSnapshot` speichert beide Artefakte; `CatalogService` aktiviert
+  sie gemeinsam mit dem Lucene-Index.
+- DuckDB wird ausschließlich technisch auf Mindestgröße und den `DUCK`-
+  Marker an Byteposition 8 bis 11 geprüft.
+- Artifact-GETs lesen ausschließlich aus dem Snapshot und liefern ETag,
+  Content-Length, 304/409 und die spezifizierten Cache-Header.
+- Explore erhält die DuckDB-URL aus dem Hash desselben Snapshots.
+
+Testprotokoll:
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.catalog.service.*' --tests 'ch.so.agi.datenportal.web.CatalogArtifactControllerMvcTest' --tests 'ch.so.agi.datenportal.explore.ExploreContextServiceTest' --tests 'ch.so.agi.datenportal.explore.ExplorePageControllerMvcTest' --tests 'ch.so.agi.datenportal.admin.actuator.CatalogSnapshotHealthIndicatorTest'` | PASS |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 1m 46s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+Die fachliche Übereinstimmung von XTF und DuckDB bleibt Verantwortung der
+externen Publishing-Pipeline; die Anwendung erzeugt oder transformiert die
+DuckDB-Datei nicht.
+
+## Code-Quality Remediation Phase 7 am 2026-08-11
+
+Die siebte Remediation-Phase reduziert das Produktionsartefakt:
+
+- `duckdbBundles.ts` liefert nur noch den MVP-Bundle.
+- Vite und der WebR-Copy-Task legen keine Source-Maps in das Boot-JAR.
+- `RPanel` und `RDataFramePanel` werden mit `React.lazy()` erst nach
+  Aktivierung des R-Labors geladen.
+
+JAR-Abnahme mit `./gradlew clean bootJar --no-daemon`:
+
+- Ausgang: 228.979.643 Bytes.
+- Ergebnis: 174.656.030 Bytes.
+- Reduktion: 54.323.613 Bytes, rund 51,8 MiB; JAR rund 166,5 MiB.
+- `jar tf` findet keine EH-/COI-Bundles, keine `coi.pthread`-Datei und
+  keine `.map`; MVP- und R-Chunks sind vorhanden.
+
+Testprotokoll:
+
+| Command | Result |
+|---|---|
+| `npm test` | PASS, 23 Dateien, 125 Tests |
+| `npm run typecheck` | PASS |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.ExploreIslandParquetPlaywrightTest.rLaboratoryLoadsWebRFromSameOriginAndReceivesSqlResult' -Ddatenportal.playwright.webr=true` | PASS, real WebR browser smoke, `BUILD SUCCESSFUL in 14s` |
+| `./gradlew clean bootJar --no-daemon` | PASS |
+| `git diff --check` | PASS |
+| `./gradlew clean check --no-daemon` | PASS, `BUILD SUCCESSFUL in 57s`; Vitest 125, TypeScript, Vite, Backend-Tests und Playwright |
+
+Die alte Größenmessung und die JAR-Prüfung wurden vor dem vollständigen Gate
+mit demselben `clean bootJar`-Task durchgeführt.
+
+## Code-Quality Remediation Phase 3 am 2026-08-11
+
+Die dritte Remediation-Phase prueft produktionssichere Konfiguration und
+öffentliche Health-Ausgaben:
+
+- `application.yml` enthält keine implizite XTF- oder DuckDB-Fixture, keine
+  localhost-Downloadbasis und keinen JTE-Development-Mode. JTE nutzt im
+  Produktionsmodus vorcompilierte Templates.
+- `application-local.yml` aktiviert die lokalen Fixtures, localhost-Downloads
+  und JTE-Development-Mode explizit; `application-test.yml` enthält die
+  deterministischen Testwerte.
+- `CatalogProperties` und `CatalogDuckDbProperties` verlangen Quellart und
+  die jeweils passende Location. Ungültige HTTP-Schemas und fehlende Werte
+  schlagen beim Binding früh fehl.
+- `CatalogImportConfiguration` baut Quellen über direkte `switch`-Ausdrücke;
+  Legacy-Fallbacks und automatische Quellarterkennung existieren nicht mehr.
+- `/actuator/health` liefert öffentlich nur den Gesamtstatus. Interne Counts,
+  Zeiten und Reload-Informationen bleiben Indicator-/Admin-intern.
+
+Testprotokoll:
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.config.*' --tests 'ch.so.agi.datenportal.admin.actuator.*' --tests 'ch.so.agi.datenportal.DatenportalApplicationTests' --tests 'ch.so.agi.datenportal.web.StaticAssetCachingMvcTest'` | PASS |
+| `./gradlew test --tests 'ch.so.agi.datenportal.config.ConfigurationStartupTest'` | PASS, fünf fail-fast Binding-Fälle |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 55s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+Die Remediation-Phasen werden separat committed; die Commit-Zuordnung steht in
+`docs/phase-status.md`.
+
+## Code-Quality Remediation Phase 4 am 2026-08-11
+
+Die vierte Remediation-Phase synchronisiert den UI-Vertrag mit der fachlichen
+Datenabbildung:
+
+- Karten zeigen `Struktur beschrieben` nur bei Attributen oder Datenmodell;
+  Datensatz-/Datenreihe-Typen verwenden den gemeinsamen Info-/Ink-Badge-Stil.
+- Serien-Root-Zeilen tragen ihr bestehendes Expand-Ziel als Datenattribut.
+  Ein Zeilenklick löst nur den vorhandenen Plus-/Minus-Link aus; interaktive
+  Nachfahren bleiben eigenständig.
+- Qualitätskarten zeigen das Datenmodell als Text und verlinken den Report nur
+  aus `qualitySummary.reportUrl`. Der sichtbare Name kommt aus dem URI-Pfad,
+  mit `Validierungsreport` als Fallback.
+
+Testprotokoll:
+
+| Command | Result |
+|---|---|
+| `./gradlew test --tests 'ch.so.agi.datenportal.web.DetailPageVmFactoryTest' --tests 'ch.so.agi.datenportal.web.CatalogControllerMvcTest' --tests 'ch.so.agi.datenportal.web.CatalogDetailControllerMvcTest'` | PASS, 74 Tests |
+| `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.web.CatalogFiltersPlaywrightTest.seriesRootRowClickTogglesUsingDisclosureLinkAndIgnoresInteractiveChildren'` | PASS |
+| `git diff --check` | PASS |
+| `./gradlew clean check` | PASS, `BUILD SUCCESSFUL in 55s`; Vitest 124, TypeScript, Vite, Backend-Tests und Playwright |
+
+Die Remediation-Phasen werden separat committed; die Commit-Zuordnung steht in
+`docs/phase-status.md`.
 
 ## Baseline am 2026-07-01
 
@@ -270,11 +478,8 @@ Ergebnis: PASS, `BUILD SUCCESSFUL in 40s`; fuehrte Vitest, Typecheck, Vite-Build
 
 Phase 6 ergaenzt:
 
-- Backend-Unit-Tests fuer `ExploreCodeSnippetService`: DuckDB/Python/R-Snippets, primaere Tabelle, Fallback-Tabelle, URL-Escaping und leere Tabellen.
-- Frontend-Unit-Tests fuer `QueryHistory`: dataset-spezifische Keys, maximal 20 Eintraege, newest first, clear, defekte Storage-Daten und keine gespeicherten Resultatzeilen.
-- React-Komponententests fuer `CodeSnippetsPanel`: Tabs, leeren Zustand und Copy-Feedback.
-- Erweiterte SQL-Labor-Tests fuer erfolgreiche History-Speicherung, Laden einer History-Abfrage, Loeschen und deaktiviertes `localHistory`-Flag.
-- Java-Playwright-Test fuer erfolgreiche Query-Historie und statische Codebeispiele im Tab `Code`.
+- Der fruehere Beispiel- und History-Ausbau ist historisch dokumentiert, aber
+  kein Bestandteil des aktuellen Testvertrags.
 
 Ausgefuehrte Befehle:
 
@@ -306,7 +511,7 @@ Ergebnis: PASS, `BUILD SUCCESSFUL in 11s`.
 ./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'
 ```
 
-Ergebnis: PASS, `BUILD SUCCESSFUL in 20s`; umfasst DuckDB-Wasm-Parquet-Registrierung, Preview, Rezeptausfuehrung, CSV-Download, Diagramm-Rendering, lokale Query-Historie und statische Codebeispiele.
+Ergebnis: PASS, `BUILD SUCCESSFUL in 20s`; umfasst DuckDB-Wasm-Parquet-Registrierung, Preview, Rezeptausfuehrung, CSV-Download und Diagramm-Rendering.
 
 ```bash
 ./gradlew clean check
@@ -354,7 +559,7 @@ Ergebnis: PASS, `BUILD SUCCESSFUL in 10s`.
 ./gradlew playwrightTest --tests 'ch.so.agi.datenportal.explore.*'
 ```
 
-Ergebnis: PASS, `BUILD SUCCESSFUL in 24s`; umfasst erfolgreiche DuckDB-Wasm-Parquet-Registrierung, Browser-Konsolencheck, Tastatur-Tabnavigation, fehlende Parquet-Datei, SQL-Resultat, Diagramm, Codebeispiele und mobile Overflow-Checks.
+Ergebnis: PASS, `BUILD SUCCESSFUL in 24s`; umfasst erfolgreiche DuckDB-Wasm-Parquet-Registrierung, Browser-Konsolencheck, Tastatur-Tabnavigation, fehlende Parquet-Datei, SQL-Resultat, Diagramm, produktive SQL-Rezepte und mobile Overflow-Checks.
 
 ```bash
 ./gradlew clean check
@@ -376,11 +581,9 @@ Phase 8 und spaeter:
 
 Phase 8 ergaenzt:
 
-- Backend-Tests fuer deaktivierte Zukunftsflags `aiAssistant`, `webR`, `vega`, `mosaic` und `geospatial`.
-- MVC-/JSON-Tests fuer die serialisierte `featureFlags`-Form.
-- Frontend-Kontext-Parsing fuer `geospatial`.
-- React-Komponententests, dass vorbereitete Erweiterungsslots bei deaktivierten Flags nicht sichtbar sind.
-- `npm run check:future-deps` als Guard gegen direkte Zukunftspakete und Source-/Bundle-Imports fuer AI, WebR, Vega, Mosaic und Kartenframeworks.
+- Der fruehere Zukunftscode-Abschnitt wurde durch die Code-Quality-
+  Remediation entfernt; der aktuelle Testvertrag prueft stattdessen Kontext V4
+  und die weiterhin produktiven SQL-/R-Pfade.
 
 Ausgefuehrte Befehle werden in `docs/erkunden/progress.md` mit exakten Ergebnissen dokumentiert.
 

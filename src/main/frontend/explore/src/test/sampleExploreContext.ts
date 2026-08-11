@@ -1,7 +1,7 @@
 import type {ExploreContextDto} from '../app/ExploreContext';
 
 export const sampleExploreContext: ExploreContextDto = {
-  version: 3,
+  version: 4,
   datasetId: 'ch.so.bauinventar',
   title: 'Bauinventar',
   description: 'Schützenswerte und geschützte Gebäude.',
@@ -52,35 +52,8 @@ export const sampleExploreContext: ExploreContextDto = {
       sql: 'SELECT *\nFROM opendata.ch_so_bauinventar;'
     }
   ],
-  codeSnippets: [
-    {
-      id: 'duckdb-cli',
-      title: 'DuckDB CLI',
-      language: 'sql',
-      code: "select * from read_parquet('https://data.so.ch/download/ch.so.bauinventar.parquet') limit 100;"
-    },
-    {
-      id: 'python-duckdb',
-      title: 'Python mit DuckDB',
-      language: 'python',
-      code: 'import duckdb\n\nurl = "https://data.so.ch/download/ch.so.bauinventar.parquet"'
-    },
-    {
-      id: 'r-duckdb',
-      title: 'R mit duckdb',
-      language: 'r',
-      code: 'library(duckdb)\n\nurl <- "https://data.so.ch/download/ch.so.bauinventar.parquet"'
-    }
-  ],
-  featureFlags: {
-    charts: true,
-    localHistory: true,
-    aiAssistant: false,
-    webR: true,
-    vega: false,
-    mosaic: false,
-    geospatial: false
-  },
+  chartsEnabled: true,
+  webREnabled: true,
   rLaboratory: {
     dataFrameName: 'daten',
     runtimeBaseUrl: '/webr/0.6.0/',

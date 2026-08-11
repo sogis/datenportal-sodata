@@ -10,7 +10,9 @@ Dieses Dokument beschreibt den Ist-Zustand des Repositories, die Backend-Integra
 - Laufzeit: Java 25, Spring Boot 4.1.0, Gradle Groovy DSL.
 - UI: serverseitig gerenderte JTE-Templates mit HTMX als Progressive Enhancement.
 - Header und Breadcrumb: vendorte `so-web-components@0.1.10` unter `src/main/resources/static/vendor/so-web-components/0.1.10/`.
-- Katalogquelle: PublishedCatalog-XTF/XML, standardmaessig `published_catalog_full_62_entries.xtf` vom Classpath.
+- Katalogquelle: PublishedCatalog-XTF/XML, im lokalen `local`- und Testprofil
+  explizit `published_catalog_full_62_entries.xtf` vom Classpath; die
+  Basiskonfiguration startet ohne explizite Quelle nicht.
 - Katalogzustand: immutable `CatalogSnapshot`, atomar austauschbar ueber `CatalogService`.
 - Suche: Lucene-Index im aktiven Snapshot.
 - Statische Assets: CSS/JS unter `src/main/resources/static/css` und `src/main/resources/static/js`, mit Cache-Regeln in `StaticAssetCachingConfiguration`.
@@ -50,7 +52,6 @@ ch.so.agi.datenportal.explore
   ExploreContextService
   ExploreTableService
   ExploreRecipeService
-  ExploreCodeSnippetService
   ExploreProperties
   dto/view records
 ```
@@ -80,11 +81,11 @@ Phase-1-Quellen:
 - Parquet-Tabellen aus `DistributionFormat.PARQUET`.
 - Attribute aus `CatalogEntryMetadata.attributes()`, wenn vorhanden.
 - Generierte Startrezepte aus den bekannten Tabellen und Spaltenrollen.
-- Statische Code-Snippets fuer DuckDB CLI, Python und R.
+- Produktive Startrezepte aus Tabellen- und Spaltenmetadaten.
 
-Wenn ein Datensatz keine Parquet-Distribution hat, rendert die Explore-Seite eine klare Nicht-verfuegbar-Meldung. Der JSON-Kontext bleibt gueltig, enthaelt aber leere `tables`, `recipes` und `codeSnippets`.
+Wenn ein Datensatz keine Parquet-Distribution hat, rendert die Explore-Seite eine klare Nicht-verfuegbar-Meldung. Der JSON-Kontext bleibt gueltig, enthaelt aber leere `tables` und `recipes`.
 
-Der eingebettete JSON-Kontext wird mit einem kleinen projektlokalen Writer erzeugt und fuer das `application/json`-Script-Element gegen `</script>`-Sequenzen abgesichert. Das vermeidet eine neue JSON-Bibliotheksabhaengigkeit im Application Compile Classpath.
+Der eingebettete JSON-Kontext wird durch den von Spring bereitgestellten Jackson-`ObjectMapper` erzeugt und fuer das `application/json`-Script-Element gegen `</script>`, `<!--` und `-->` abgesichert.
 
 ## Frontend-Insel ab Phase 2
 
@@ -94,7 +95,12 @@ Die interaktive Erkunden-Oberflaeche ist als isolierte React/Vite-Insel unter fo
 src/main/frontend/explore/
 ```
 
-Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Sie initialisiert DuckDB-Wasm im Browser, laedt `/catalog/catalog.duckdb`, registriert die Datei im Wasm-Dateisystem, attached sie read-only als Datenbank `catalog`, laedt `httpfs`, setzt `USE "catalog"."opendata"` und aktualisiert daraus die SQLRooms-SchemaTrees. Die Startabfrage verwendet das `opendata`-Schema ohne sichtbares Preview-Limit, zum Beispiel `SELECT * FROM opendata.ch_so_bauinventar;` im Editor auf zwei Zeilen. Die aktuelle UI besteht aus zwei Haupttabs `SQL-Labor` und `R-Labor`. Im SQL-Labor bleibt die linke Spalte der SQLRooms-artige `SCHEMA EXPLORER`; rechts stehen editierbarer Monaco-SQL-Editor, kompakte Beispielabfrage-Auswahl, roter Run-Button mit Play-Icon, SQL-Copy-Button, `Nach R übernehmen` und Export-Splitbutton fuer CSV, XLSX und Parquet. Der Backend-Kontext kann normale Datensaetze und konkrete Serienausgaben liefern; das Labor selbst zeigt dafuer keine separate Serien-UI. Die XTF bleibt Quelle fuer fachliche Metadaten und Datensatzzuordnung, waehrend der DuckDB-Catalog die sichtbaren Catalog-Views, Spalten und die direkt querybaren Views liefert. Die SQL-Ausfuehrung laeuft direkt gegen die attached read-only Catalog-Datenbank; dadurch koennen Nutzerinnen und Nutzer Views aus mehreren Parquet-Dateien in einer Abfrage joinen. Der Catalog-Knoten ist im Schema Explorer initial offen, das Schema `opendata` bleibt geschlossen; nach manuellem Aufklappen wird der aktuell erkundete View markiert, aufgeklappt und mit seiner Zeilenzahl aus dem Explore-Kontext angezeigt. Lade- und Runtime-Fehlerzustaende liegen als zentriertes Overlay absolut ueber der Workbench; Ladezustaende nutzen eine weisse shadowfreie Karte auf dunklem Backdrop mit rotem indeterminiertem Progressbar, Runtime-Fehler bleiben Alerts ohne Progressbar. Nicht erreichbare Parquet-Quelldateien beim Schema-Refresh oder beim Ausfuehren einer Query blockieren die Workbench nicht; die Query zeigt stattdessen im Resultatbereich eine neutrale Hauptmeldung mit nachrangigen technischen Details. Sobald die Runtime bereit ist, verschwindet das Overlay ohne Layout-Sprung und ohne globalen `Bereit`-Badge; der obere Workbench-Border bleibt direkt am Workbench-Container erhalten. Der DuckDB-Connector wird fuer Query-Ausfuehrung, Schema-Refresh und Exporte verwendet, aber nicht an `SqlMonacoEditor` uebergeben, weil SQLRooms `0.28.0` fuer dynamische `duckdb_functions()`-Metadaten einen CSP-blockierten `Function(...)`-Pfad nutzt. Auf Desktop nutzt sie `react-resizable-panels`, um Schema/Labor horizontal sowie Editor/Resultat vertikal pro Kontext-Identifier in `localStorage` zu speichern; versionierte Auto-Save-IDs ignorieren alte defekte Panelgroessen. Auf Mobile bleibt die Ansicht gestapelt und nicht resizable. Der SQL-Resultatbereich hat eine lokale Umschaltung zwischen Tabelle und Diagramm; es gibt weiterhin keine alten Haupt-Tabs `Vorschau`, `Diagramm` und `Code`. Codebeispiel- und lokale History-Komponenten bleiben im Code fuer spaetere Wiederaufnahme, werden im Primaerpfad aber nicht gerendert. Seit dem R-Labor enthaelt die Insel weiterhin stille Erweiterungspunkte fuer spaetere AI-, Vega-, Mosaic- und Geodaten-Funktionen.
+Die Insel liest den eingebetteten JSON-Kontext aus `#datenportal-explore-context`, validiert ihn mit Zod und rendert in `#datenportal-explore-root`. Sie initialisiert DuckDB-Wasm im Browser, laedt `/catalog/catalog.duckdb`, registriert die Datei im Wasm-Dateisystem, attached sie read-only als Datenbank `catalog`, laedt `httpfs`, setzt `USE "catalog"."opendata"` und aktualisiert daraus die SQLRooms-SchemaTrees. Die Startabfrage verwendet das `opendata`-Schema ohne sichtbares Preview-Limit, zum Beispiel `SELECT * FROM opendata.ch_so_bauinventar;` im Editor auf zwei Zeilen. Die aktuelle UI besteht aus zwei Haupttabs `SQL-Labor` und `R-Labor`. Im SQL-Labor bleibt die linke Spalte der SQLRooms-artige `SCHEMA EXPLORER`; rechts stehen editierbarer Monaco-SQL-Editor, kompakte produktive Beispielabfrage-Auswahl, roter Run-Button mit Play-Icon, SQL-Copy-Button, `Nach R übernehmen` und Export-Splitbutton fuer CSV, XLSX und Parquet. Der Backend-Kontext kann normale Datensaetze und konkrete Serienausgaben liefern; das Labor selbst zeigt dafuer keine separate Serien-UI. Die XTF bleibt Quelle fuer fachliche Metadaten und Datensatzzuordnung, waehrend der DuckDB-Catalog die sichtbaren Catalog-Views, Spalten und die direkt querybaren Views liefert. Die SQL-Ausfuehrung laeuft direkt gegen die attached read-only Catalog-Datenbank; dadurch koennen Nutzerinnen und Nutzer Views aus mehreren Parquet-Dateien in einer Abfrage joinen. Der Catalog-Knoten ist im Schema Explorer initial offen, das Schema `opendata` bleibt geschlossen; nach manuellem Aufklappen wird der aktuell erkundete View markiert, aufgeklappt und mit seiner Zeilenzahl aus dem Explore-Kontext angezeigt. Lade- und Runtime-Fehlerzustaende liegen als zentriertes Overlay absolut ueber der Workbench; Ladezustaende nutzen eine weisse shadowfreie Karte auf dunklem Backdrop mit rotem indeterminiertem Progressbar, Runtime-Fehler bleiben Alerts ohne Progressbar. Nicht erreichbare Parquet-Quelldateien beim Schema-Refresh oder beim Ausfuehren einer Query blockieren die Workbench nicht; die Query zeigt stattdessen im Resultatbereich eine neutrale Hauptmeldung mit nachrangigen technischen Details. Sobald die Runtime bereit ist, verschwindet das Overlay ohne Layout-Sprung und ohne globalen `Bereit`-Badge; der obere Workbench-Border bleibt direkt am Workbench-Container erhalten. Der DuckDB-Connector wird fuer Query-Ausfuehrung, Schema-Refresh und Exporte verwendet, aber nicht an `SqlMonacoEditor` uebergeben, weil SQLRooms `0.28.0` fuer dynamische `duckdb_functions()`-Metadaten einen CSP-blockierten `Function(...)`-Pfad nutzt. Auf Desktop nutzt sie `react-resizable-panels`, um Schema/Labor horizontal sowie Editor/Resultat vertikal pro Kontext-Identifier in `localStorage` zu speichern; versionierte Auto-Save-IDs ignorieren alte defekte Panelgroessen. Auf Mobile bleibt die Ansicht gestapelt und nicht resizable. Der SQL-Resultatbereich hat eine lokale Umschaltung zwischen Tabelle und Diagramm; es gibt keine vorbereiteten Code-, History- oder Zukunfts-Slots.
+
+Die URL im Kontext ist snapshotgebunden und enthält den SHA-256-Hash des
+aktiven DuckDB-Artefakts: `/catalog/catalog.duckdb?v=<sha256>`. Dadurch
+kommen Kontext und ausgelieferte Datei aus demselben Runtime-Stand; der
+unversionierte Endpoint bleibt für manuelle Downloads `no-cache`.
 
 Wichtige Dateien:
 
@@ -103,16 +109,12 @@ Wichtige Dateien:
 - `src/main/frontend/explore/src/app/ExploreContextLoader.ts`
 - `src/main/frontend/explore/src/app/ExploreContext.ts`
 - `src/main/frontend/explore/src/app/SchemaExplorerPanel.tsx`
-- `src/main/frontend/explore/src/app/FutureExtensionSlots.tsx`
 - `src/main/frontend/explore/src/duckdb/attachCatalogDatabase.ts`
 - `src/main/frontend/explore/src/sql/SqlLaboratory.tsx`
-- `src/main/frontend/explore/src/recipes/RecipeList.tsx`
 - `src/main/frontend/explore/src/results/ResultPanel.tsx`
 - `src/main/frontend/explore/src/results/sqlResultSnapshot.ts`
 - `src/main/frontend/explore/src/charts/ChartPanel.tsx`
 - `src/main/frontend/explore/src/charts/chartInference.ts`
-- `src/main/frontend/explore/src/code/CodeSnippetsPanel.tsx`
-- `src/main/frontend/explore/src/sql/QueryHistory.ts`
 - `src/main/frontend/explore/src/webr/WebRRuntime.ts`
 - `src/main/frontend/explore/src/webr/WebRBridge.ts`
 - `src/main/frontend/explore/src/webr/RPanel.tsx`
@@ -235,18 +237,16 @@ ORDER BY "jahr";
 - DuckDB `count(*)` liefert im Browser BigInt-Werte. Fuer Recharts werden nur die Diagrammzeilen in plain JavaScript-Zahlen/Strings normalisiert; Resultattabelle und CSV-Export behalten die originalen Resultatwerte.
 - Vitest mockt `@sqlrooms/recharts`, weil das Paket wie `@sqlrooms/sql-editor` extensionless interne ESM-Imports enthaelt, die der Test-Runner nicht direkt aufloest. Typecheck, Vite-Build und Playwright pruefen den echten Produktionspfad.
 
-## Codebeispiele und lokale Historie ab Phase 6
+## Explore-Kontext V4
 
-- `ExploreCodeSnippetService` generiert statische Beispiele fuer DuckDB CLI, Python mit DuckDB und R mit `duckdb`.
-- Bei mehreren Parquet-Tabellen verwenden die Codebeispiele die primaere Tabelle; ohne markierte primaere Tabelle wird die erste Tabelle verwendet.
-- `CodeSnippetsPanel` bleibt im Code, ist im SQL-Labor-Redesign aber nicht sichtbar. Diese statischen Codebeispiele laden selbst keine WebR-Laufzeit.
-- `QueryHistory.ts` speichert erfolgreiche lokale SQL-Ausfuehrungen pro Datenthema unter `datenportal.explore.history.<datasetId>` in `localStorage`.
-- Gespeichert werden SQL, Ausfuehrungszeitpunkt und optionale Metadaten wie Rezepttitel, Zeilenzahl und Dauer. Resultatzeilen werden nie gespeichert.
-- Die Historie ist auf 20 Eintraege begrenzt, newest first, bleibt aber im redesignierten Primaerpfad unsichtbar. Fehler beim Lesen oder Schreiben von `localStorage` duerfen die SQL-Ausfuehrung nicht unterbrechen.
+Der gemeinsam ausgelieferte Kontext akzeptiert ausschließlich Version `4`.
+Neben den Metadaten, Tabellen und produktiven SQL-Rezepten enthält er die
+direkten Booleans `chartsEnabled` und `webREnabled`. Es gibt keine generische
+Flag-Map, keine Snippet-Liste und keine lokale Query-Historie.
 
 ## R-Labor mit WebR
 
-Der Explore-Kontext ist Version `3` und enthaelt `rLaboratory`. Standardwerte:
+Der Explore-Kontext ist Version `4` und enthaelt `rLaboratory`. Standardwerte:
 
 - Dataframe-Name in R: `daten`
 - WebR Runtime: `/webr/0.6.0/`
@@ -264,31 +264,12 @@ Die R-Ausgabe folgt der kompakten SQL-Labor-Flaechenlogik: Konsole und Plot werd
 
 Das R-Labor kann ohne vorherige SQL-Ausfuehrung starten. In diesem Zustand wird WebR initialisiert, ein eigenstaendiges R-Beispiel angeboten und die linke Datenbasis-Spalte weist nur darauf hin, dass noch kein SQL-Resultat als `daten` uebernommen wurde. Nach einer Uebernahme werden datenbezogene Rezepte generiert. Die Rezeptauswahl bevorzugt fachliche Messwertspalten gegenueber Jahren, IDs, Nummern und Codes; Plotrezepte begrenzen Rohdatenplots intern auf 10'000 Zeilen und setzen Spaltennamen in Titeln mit Schweizer Anfuehrungszeichen.
 
-## Zukunfts-Hooks ab Phase 8
+## Explore-Erweiterungen
 
-Der Kontext enthaelt deaktivierte Feature Flags fuer spaetere Erweiterungen:
-
-```json
-{
-  "aiAssistant": false,
-  "webR": true,
-  "vega": false,
-  "mosaic": false,
-  "geospatial": false
-}
-```
-
-Die Flags werden ueber `datenportal.explore.*-enabled` konfiguriert. WebR ist seit dem R-Labor standardmaessig aktiv; AI, Vega, Mosaic und Geospatial bleiben standardmaessig `false`. `FutureExtensionSlots` rendert bei deaktivierten Zukunftsflags nichts und importiert keine Zukunftspakete.
-
-Geplante Anschlussstellen:
-
-- AI: spaeter nur hinter Flag, mit begrenztem Kontext, Nutzerfreigabe vor SQL-Ausfuehrung und denselben Query-Guards wie manuelles SQL.
-- Vega-Lite: spaeter als erweiterter Chartmodus nach Recharts V1, nicht als Default.
-- Mosaic: spaeter als Advanced-Crossfilter-Labor, weil es Produkt- und Performance-Erwartungen veraendert.
-- Geospatial: spaeter zuerst Geometrieprofil und kleine Karten-Vorschau, bevor schwere Kartenframeworks geprueft werden.
-- Shareable SQL URLs: spaeter nur SQL und optionale Chart-Konfiguration im URL-Hash, nie Resultatzeilen.
-
-`npm run check:future-deps` prueft, dass keine direkten Zukunftsabhaengigkeiten oder Source-/Bundle-Imports fuer AI, Vega, Mosaic oder Kartenframeworks aktiv sind. WebR ist davon ausgenommen, weil es inzwischen produktiver Bestandteil des R-Labors ist. Das vorhandene transitive `react-mosaic-component` stammt aus den bestehenden SQLRooms Shell-/Editor-Abhaengigkeiten und ist nicht `@sqlrooms/mosaic`.
+Nicht implementierte Erweiterungen sind kein Bestandteil des Kontextes oder des
+Produktionsartefakts. Neue Fähigkeiten benötigen einen konkreten produktiven
+Anwendungsfall und einen eigenen Vertrag; der aktuelle Pfad bleibt auf SQL,
+Charts und das WebR-Labor begrenzt.
 
 ## UX-Hardening ab Phase 7
 
@@ -347,4 +328,3 @@ Wichtige Leitplanken:
 - SQLRooms transitive Peer-Warnings mit React 19, insbesondere `react-virtual` und `react-dnd-multi-backend`.
 - Das installierte `@sqlrooms/sql-editor@0.28.0` exportiert `SqlMonacoEditor`, aber nicht den in neueren SQLRooms-Dokumenten beschriebenen `SqlCodeMirrorEditor`.
 - Vitest kann die extensionless ESM-Internals von `@sqlrooms/sql-editor` und `@sqlrooms/recharts` nicht direkt aufloesen; die Tests mocken diese UI-Pakete und testen die Datenportal-Query- und Chartlogik separat.
-- Zukunftsflags sind nur vorbereitete Anschlussstellen. Das Aktivieren eines Flags implementiert noch keine produktive AI-, Vega-, Mosaic- oder Kartenfunktion.

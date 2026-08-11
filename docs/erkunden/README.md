@@ -4,7 +4,12 @@ Status: SQL- und R-Labor with catalog-backed Schema Explorer implemented
 
 Erkunden ist ein lokales SQL-Labor pro Datenthema. Die Abfragen laufen im Browser mit DuckDB-Wasm gegen Views aus dem Open-Data-DuckDB-Catalog.
 
-Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Der aktuelle Stand rendert Explore-Seiten fuer normale Datensaetze und konkrete Serienausgaben als vollflaechiges, kompaktes SQL- und R-Labor direkt unter Header und Breadcrumb. Die React/Vite-Insel lädt `/catalog/catalog.duckdb`, registriert die Datei in DuckDB-Wasm, attached sie read-only als Datenbank `catalog`, lädt `httpfs`, setzt `USE "catalog"."opendata"` und aktualisiert daraus die SQLRooms-SchemaTrees. Links wird daraus ein lokaler `SCHEMA EXPLORER` im Stil des SQLRooms-Beispiels gerendert; der Catalog-Knoten ist initial offen, das Schema `opendata` bleibt geschlossen, und nach manuellem Aufklappen wird der aktuell erkundete View markiert und mit Spalten angezeigt. Die SQL-Ausfuehrung laeuft direkt gegen die attached Catalog-Datenbank, damit auch Joins zwischen Views verschiedener Parquet-Dateien moeglich sind. Der SQL-Editor verwendet weiterhin SQLRooms-Schema-Autocomplete, rotem `Ausfuehren`-Button, kompakter Beispielabfrage-Auswahl und Exporten fuer CSV, XLSX und Parquet. Der Resultatbereich schaltet zwischen Tabelle und Diagramm; Diagramme verwenden `@sqlrooms/recharts` und visualisieren ausschliesslich das aktuelle SQL-Resultat. Das R-Labor startet auch ohne uebernommenes SQL-Resultat mit einem eigenstaendigen R-Beispiel; nach einer Uebernahme steht das SQL-Resultat als `daten`-Dataframe bereit. Resultat- und Plot-Exporte sitzen direkt in den jeweiligen Output-Kopfzeilen und werden erst bei echtem tabellarischem R-Resultat beziehungsweise erzeugtem Plot aktiv. Konsole und Plot sind auch untereinander resizable. Ladezustaende erscheinen als weisses, shadowfreies Overlay-Fenster mit abgedunkeltem Hintergrund und rotem indeterminiertem Ladebalken; Fehlerzustaende erscheinen im gleichen Overlay als Alert ohne Ladebalken. Ein globaler `Bereit`-Badge wird im Erfolgsfall nicht mehr gerendert. Linker Schema Explorer sowie Editor/Resultat sind auf Desktop resizable und werden pro Kontext-Identifier im Browser gespeichert. Codebeispiel- und Query-Historie-Code bleibt fuer spaetere Wiederaufnahme vorhanden, ist in der primaeren Labor-UI aber nicht sichtbar.
+Diese Dokumentation begleitet die Umsetzung des SQLRooms-MVP aus `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`. Der aktuelle Stand rendert Explore-Seiten fuer normale Datensaetze und konkrete Serienausgaben als vollflaechiges, kompaktes SQL- und R-Labor direkt unter Header und Breadcrumb. Die React/Vite-Insel lädt `/catalog/catalog.duckdb`, registriert die Datei in DuckDB-Wasm, attached sie read-only als Datenbank `catalog`, lädt `httpfs`, setzt `USE "catalog"."opendata"` und aktualisiert daraus die SQLRooms-SchemaTrees. Links wird daraus ein lokaler `SCHEMA EXPLORER` im Stil des SQLRooms-Beispiels gerendert; der Catalog-Knoten ist initial offen, das Schema `opendata` bleibt geschlossen, und nach manuellem Aufklappen wird der aktuell erkundete View markiert und mit Spalten angezeigt. Die SQL-Ausfuehrung laeuft direkt gegen die attached Catalog-Datenbank, damit auch Joins zwischen Views verschiedener Parquet-Dateien moeglich sind. Der SQL-Editor verwendet SQLRooms-Schema-Autocomplete, einen roten `Ausfuehren`-Button, kompakte produktive Beispielabfragen und Exporte fuer CSV, XLSX und Parquet. Der Resultatbereich schaltet zwischen Tabelle und Diagramm; Diagramme verwenden `@sqlrooms/recharts` und visualisieren ausschliesslich das aktuelle SQL-Resultat. Das R-Labor startet auch ohne uebernommenes SQL-Resultat mit einem eigenstaendigen R-Beispiel; nach einer Uebernahme steht das SQL-Resultat als `daten`-Dataframe bereit. Resultat- und Plot-Exporte sitzen direkt in den jeweiligen Output-Kopfzeilen und werden erst bei echtem tabellarischem R-Resultat beziehungsweise erzeugtem Plot aktiv. Konsole und Plot sind auch untereinander resizable. Ladezustaende erscheinen als weisses, shadowfreies Overlay-Fenster mit abgedunkeltem Hintergrund und rotem indeterminiertem Ladebalken; Fehlerzustaende erscheinen im gleichen Overlay als Alert ohne Ladebalken. Ein globaler `Bereit`-Badge wird im Erfolgsfall nicht mehr gerendert. Linker Schema Explorer sowie Editor/Resultat sind auf Desktop resizable und werden pro Kontext-Identifier im Browser gespeichert. Der Kontext V4 beschreibt ausschließlich produktive SQL-, Chart- und WebR-Fähigkeiten.
+
+Die Anwendung liefert für Explore keine geratenen oder unversionierten
+DuckDB-URLs aus. Der Backend-Kontext versioniert die Datei mit ihrem
+SHA-256-Hash; der Browser lädt diesen URL-Wert read-only und erhält bei einem
+veralteten Hash keine stillschweigend andere Datei.
 
 ## Produktidee
 
@@ -23,7 +28,7 @@ Die Seite soll pro Datenthema eine kleine, nuetzliche Explorationsflaeche anbiet
 - Resultate koennen als CSV, XLSX und Parquet exportiert werden; exportiert wird nur das aktuell gelieferte Query-Resultat. CSV bleibt wegen Semikolon/CRLF clientseitig, XLSX und Parquet werden per DuckDB-Wasm `COPY` erzeugt.
 - Codebeispiele und sichtbare Query-Historie sind aktuell aus der primaeren UI entfernt.
 - Lade-, Catalog-, Parquet- und Query-Fehler werden sichtbar und ohne serverseitige SQL-Ausfuehrung behandelt.
-- Zukunftsfunktionen bleiben standardmaessig deaktiviert und laden keine schweren Runtime-Pakete.
+- Der Kontext enthält nur die produktiven Schalter `chartsEnabled` und `webREnabled`; generische Zukunftsflags gibt es nicht.
 - Es gibt keine serverseitige SQL-Ausfuehrung und keine gespeicherten Sessions.
 
 ## Benennung
@@ -48,7 +53,7 @@ Nicht Teil des MVP:
 - Notebook- oder Jupyter-Ersatz
 - serverseitige SQL-API
 - AI-Assistent in Produktion
-- WebR-Ausfuehrung
+- weitere R-Laufzeit- und Paketfunktionen ausserhalb des produktiven R-Labors
 - Vega-Lite-Spec-Editor
 - Mosaic-Crossfilter-Labor
 - Karten- oder Geodatenviewer
