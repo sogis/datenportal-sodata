@@ -153,4 +153,4 @@ Verifikation:
 - `./gradlew clean bootJar --no-daemon`: PASS, 15s
 - finales JAR: 174.644.557 Bytes, keine EH/COI/Maps, MVP und R-Chunks vorhanden
 
-Commit: wird nach dem Commit eingetragen.
+Commit: `9bb7957`
