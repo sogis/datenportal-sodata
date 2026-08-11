@@ -886,66 +886,6 @@
   background: transparent;
 }
 
-.dp-usage-recipes {
-  font-size: 18px;
-}
-
-.dp-usage-recipe-list {
-  display: grid;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--dp-color-border);
-}
-
-.dp-usage-recipe {
-  display: grid;
-  grid-template-columns: minmax(17rem, 20rem) minmax(0, 1fr) auto;
-  gap: var(--dp-space-4);
-  align-items: center;
-  padding: var(--dp-space-3) 0;
-  border-bottom: 1px solid var(--dp-color-border);
-  color: var(--dp-color-text);
-}
-
-.dp-usage-recipe__name {
-  font-weight: 400;
-}
-
-.dp-usage-recipe__title,
-.dp-usage-recipe__link {
-  display: inline-flex;
-  gap: var(--dp-space-2);
-  align-items: center;
-}
-
-.dp-usage-recipe__title {
-  white-space: nowrap;
-}
-
-.dp-usage-recipe__icon {
-  display: inline-flex;
-  color: var(--dp-color-text);
-  line-height: 0;
-}
-
-.dp-usage-recipe__icon img {
-  display: block;
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.dp-usage-recipe__icon svg,
-.dp-usage-recipe__link svg {
-  flex: 0 0 auto;
-}
-
-.dp-usage-recipe__link {
-  justify-self: end;
-  color: var(--dp-color-accent);
-}
-
 @media (max-width: 900px) {
   .dp-detail-summary-layout,
   .dp-detail-layout,
@@ -990,11 +930,6 @@
 
   .dp-usage-layout {
     grid-template-columns: 1fr;
-  }
-
-  .dp-usage-recipe {
-    grid-template-columns: 1fr;
-    gap: var(--dp-space-2);
   }
 
   .dp-metadata-item {

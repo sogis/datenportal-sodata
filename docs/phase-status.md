@@ -72,11 +72,26 @@ Verifikation:
 - `git diff --check`: PASS
 - `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 55s`
 
-Commit: wird nach dem Commit eingetragen.
+Commit: `c57dbd8`
 
 ## Phase 5 — ViewModel- und Template-Konsolidierung
 
-Status: ausstehend.
+Status: abgeschlossen am 2026-08-11.
+
+Schwerpunkte: ungenutzte Server-ViewModels, alte Detail-Templates, die
+vorbereiteten Starter-Rezepte und die zugehörigen PNG-Assets entfernen;
+produktive SQL-Rezepte und das R-Labor bleiben erhalten.
+
+Verifikation:
+
+- `./gradlew test`: PASS, 271 Tests
+- `./gradlew playwrightTest --tests 'ch.so.agi.datenportal.web.CatalogFiltersPlaywrightTest'`: PASS, 24 Tests
+- Referenzprüfung auf entfernte Typen/Templates/Assets: PASS
+- exakt 34 Java-ViewModels im konsolidierten View-Paket: PASS
+- `git diff --check`: PASS
+- `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 57s`
+
+Commit: wird nach dem Commit eingetragen.
 
 ## Phase 6 — Atomarer Katalog-Snapshot und Artefakte
 
