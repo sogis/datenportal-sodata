@@ -69,9 +69,8 @@ class SecurityHeadersConfigurationTest {
 
     private static CatalogProperties catalogProperties(String downloadUrl) {
         return new CatalogProperties(
-                null,
-                null,
-                null,
+                CatalogProperties.SourceType.CLASSPATH,
+                "catalog.xtf",
                 null,
                 null,
                 null,

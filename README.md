@@ -11,7 +11,7 @@ Enthalten:
 - Java 25
 - Spring Boot 4.1.0
 - Gradle Groovy DSL
-- JTE-Templates im Development-Mode
+- JTE-Templates mit produktionssicherem Standard und explizitem Local-Mode
 - lokal vendortes HTMX
 - lokal vendortes `so-web-components@0.1.10`
 - Katalogseite auf `/` und `/datasets`
@@ -45,7 +45,7 @@ Der Build verwendet den Gradle Wrapper; eine lokale Gradle-Installation ist nich
 ## Starten
 
 ```bash
-./gradlew bootRun
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
 Danach erreichbar:
@@ -58,7 +58,7 @@ Danach erreichbar:
 Bei belegtem Port:
 
 ```bash
-./gradlew bootRun --args='--server.port=8081'
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8081'
 ```
 
 ## Dokumentationslandkarte
@@ -78,7 +78,7 @@ Die Dokumentation ist nach Zweck getrennt, damit Einstieg, Laufzeit, Betrieb und
 
 ## Konfiguration
 
-Standardkonfiguration in `src/main/resources/application.yml`:
+Lokale Konfiguration in `src/main/resources/application-local.yml`:
 
 ```yaml
 datenportal:
@@ -92,8 +92,7 @@ datenportal:
   admin:
     reload-token: ${DATENPORTAL_ADMIN_RELOAD_TOKEN:}
   search:
-    max-results: 500
-    default-page-size: 20
+    default-page-size: 10
     max-page-size: 100
   web-components:
     enabled: true
@@ -102,7 +101,11 @@ datenportal:
     use-cdn: false
 ```
 
-Die Dateien `spec/fixtures/published_catalog_full_62_entries.xtf` und `spec/fixtures/catalog.duckdb` sind als Main-Resources auf dem Classpath eingebunden.
+Die Basiskonfiguration enthält absichtlich keine Katalogquelle. Ein Start ohne
+explizites Profil oder externe Quellkonfiguration schlägt früh fehl. Die
+Dateien `spec/fixtures/published_catalog_full_62_entries.xtf` und
+`spec/fixtures/catalog.duckdb` sind als Main-Resources auf dem Classpath
+eingebunden und werden nur über `local` beziehungsweise `test` aktiviert.
 
 Weitere Details:
 
@@ -147,7 +150,7 @@ sequenceDiagram
 
 ```bash
 export DATENPORTAL_ADMIN_RELOAD_TOKEN='change-me'
-./gradlew bootRun
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
 ```bash

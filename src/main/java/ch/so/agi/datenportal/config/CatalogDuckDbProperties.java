@@ -17,7 +17,6 @@ public record CatalogDuckDbProperties(
         DataSize maxSize,
         String schema) {
 
-    private static final String DEFAULT_CLASSPATH_LOCATION = "catalog.duckdb";
     private static final Duration DEFAULT_HTTP_CONNECT_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration DEFAULT_HTTP_READ_TIMEOUT = Duration.ofSeconds(30);
     private static final DataSize DEFAULT_MAX_SIZE = DataSize.ofMegabytes(50);
@@ -27,7 +26,7 @@ public record CatalogDuckDbProperties(
         classpathLocation = blankToNull(classpathLocation);
         schema = blankToNull(schema);
         if (sourceType == null) {
-            sourceType = CatalogProperties.SourceType.CLASSPATH;
+            throw new IllegalArgumentException("datenportal.catalog.duckdb.source-type must be set");
         }
         if (httpConnectTimeout == null) {
             httpConnectTimeout = DEFAULT_HTTP_CONNECT_TIMEOUT;
@@ -50,38 +49,40 @@ public record CatalogDuckDbProperties(
         if (maxSize.toBytes() <= 0) {
             throw new IllegalArgumentException("datenportal.catalog.duckdb.max-size must be greater than zero");
         }
-    }
-
-    public CatalogProperties.SourceType effectiveSourceType() {
-        return sourceType;
+        switch (sourceType) {
+            case CLASSPATH -> requireClasspathLocation(classpathLocation);
+            case FILE -> {
+                if (fileLocation == null) {
+                    throw new IllegalArgumentException(
+                            "datenportal.catalog.duckdb.file-location must be set for file sources");
+                }
+            }
+            case HTTP -> validateHttpUrl(httpUrl);
+        }
     }
 
     public boolean isClasspathSource() {
-        return effectiveSourceType() == CatalogProperties.SourceType.CLASSPATH;
+        return sourceType == CatalogProperties.SourceType.CLASSPATH;
     }
 
     public boolean isFileSource() {
-        return effectiveSourceType() == CatalogProperties.SourceType.FILE;
+        return sourceType == CatalogProperties.SourceType.FILE;
     }
 
     public boolean isHttpSource() {
-        return effectiveSourceType() == CatalogProperties.SourceType.HTTP;
+        return sourceType == CatalogProperties.SourceType.HTTP;
     }
 
     public String classpathLocation() {
         if (!isClasspathSource()) {
             throw new IllegalStateException("DuckDB catalog source is not a classpath source.");
         }
-        String location = classpathLocation == null ? DEFAULT_CLASSPATH_LOCATION : classpathLocation;
-        return location.startsWith("/") ? location.substring(1) : location;
+        return classpathLocation.startsWith("/") ? classpathLocation.substring(1) : classpathLocation;
     }
 
     public Path fileLocation() {
         if (!isFileSource()) {
             throw new IllegalStateException("DuckDB catalog source is not a file source.");
-        }
-        if (fileLocation == null) {
-            throw new IllegalArgumentException("datenportal.catalog.duckdb.file-location must be set for file sources");
         }
         return fileLocation;
     }
@@ -89,13 +90,6 @@ public record CatalogDuckDbProperties(
     public URI httpUrl() {
         if (!isHttpSource()) {
             throw new IllegalStateException("DuckDB catalog source is not an HTTP source.");
-        }
-        if (httpUrl == null) {
-            throw new IllegalArgumentException("datenportal.catalog.duckdb.http-url must be set for HTTP sources");
-        }
-        String scheme = httpUrl.getScheme();
-        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
-            throw new IllegalArgumentException("datenportal.catalog.duckdb.http-url must use http or https");
         }
         return httpUrl;
     }
@@ -106,5 +100,22 @@ public record CatalogDuckDbProperties(
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static void requireClasspathLocation(String location) {
+        if (location == null) {
+            throw new IllegalArgumentException(
+                    "datenportal.catalog.duckdb.classpath-location must be set for classpath sources");
+        }
+    }
+
+    private static void validateHttpUrl(URI uri) {
+        if (uri == null) {
+            throw new IllegalArgumentException("datenportal.catalog.duckdb.http-url must be set for HTTP sources");
+        }
+        String scheme = uri.getScheme();
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            throw new IllegalArgumentException("datenportal.catalog.duckdb.http-url must use http or https");
+        }
     }
 }

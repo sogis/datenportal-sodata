@@ -38,11 +38,24 @@ Verifikation:
 - `git diff --check`: PASS
 - `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 57s`
 
-Commit: wird nach dem Commit eingetragen.
+Commit: `6b0db07`
 
 ## Phase 3 — Produktionssichere Konfiguration
 
-Status: ausstehend.
+Status: abgeschlossen am 2026-08-11.
+
+Schwerpunkte: fail-fast Quellenbindung, explizite `local`-/`test`-Profile,
+produktionssichere JTE- und Health-Defaults, keine Fixture-/localhost-
+Fallbacks und keine internen Health-Details in der öffentlichen Antwort.
+
+Verifikation:
+
+- Konfigurations-, Profil-, Actuator- und Starttests: PASS
+- fünf fail-fast Binding-Fälle in `ConfigurationStartupTest`: PASS
+- `git diff --check`: PASS
+- `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 55s`
+
+Commit: wird nach dem Commit eingetragen.
 
 ## Phase 4 — UI-Vertrag und Interaktion
 

@@ -1,0 +1,19 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+gg:
+  jte:
+    development-mode: true
+    use-precompiled-templates: false
+
+datenportal:
+  catalog:
+    source-type: classpath
+    classpath-location: published_catalog_full_62_entries.xtf
+    download-url: http://localhost:8081/ch.so.datenportal/downloads
+    duckdb:
+      source-type: classpath
+      classpath-location: catalog.duckdb
+      schema: opendata

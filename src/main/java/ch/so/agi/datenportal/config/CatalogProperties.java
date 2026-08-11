@@ -4,13 +4,11 @@ import ch.so.agi.datenportal.catalog.importxtf.CatalogDownloadUrlPlaceholderReso
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
 
 @ConfigurationProperties(prefix = "datenportal.catalog")
 public record CatalogProperties(
-        String source,
         SourceType sourceType,
         String classpathLocation,
         Path fileLocation,
@@ -20,14 +18,14 @@ public record CatalogProperties(
         DataSize maxSize,
         String downloadUrl) {
 
-    private static final String DEFAULT_CLASSPATH_LOCATION = "published_catalog_full_62_entries.xtf";
     private static final Duration DEFAULT_HTTP_CONNECT_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration DEFAULT_HTTP_READ_TIMEOUT = Duration.ofSeconds(30);
     private static final DataSize DEFAULT_MAX_SIZE = DataSize.ofMegabytes(50);
-    private static final String DEFAULT_DOWNLOAD_URL = "http://localhost:8081/ch.so.datenportal/downloads";
 
     public CatalogProperties {
-        source = blankToNull(source);
+        if (sourceType == null) {
+            throw new IllegalArgumentException("datenportal.catalog.source-type must be set");
+        }
         classpathLocation = blankToNull(classpathLocation);
         downloadUrl = normalizeDownloadUrl(downloadUrl);
         if (httpConnectTimeout == null) {
@@ -48,6 +46,16 @@ public record CatalogProperties(
         if (maxSize.toBytes() <= 0) {
             throw new IllegalArgumentException("datenportal.catalog.max-size must be greater than zero");
         }
+        switch (sourceType) {
+            case CLASSPATH -> requireClasspathLocation(classpathLocation);
+            case FILE -> {
+                if (fileLocation == null) {
+                    throw new IllegalArgumentException(
+                            "datenportal.catalog.file-location must be set for file catalog sources");
+                }
+            }
+            case HTTP -> validateHttpUrl(httpUrl, "datenportal.catalog.http-url");
+        }
     }
 
     public enum SourceType {
@@ -56,35 +64,16 @@ public record CatalogProperties(
         HTTP
     }
 
-    public SourceType effectiveSourceType() {
-        if (sourceType != null) {
-            return sourceType;
-        }
-        if (source == null) {
-            return SourceType.CLASSPATH;
-        }
-        if (source.startsWith("classpath:") || !source.contains(":")) {
-            return SourceType.CLASSPATH;
-        }
-        if (source.startsWith("file:")) {
-            return SourceType.FILE;
-        }
-        if (source.startsWith("http://") || source.startsWith("https://")) {
-            return SourceType.HTTP;
-        }
-        throw new IllegalStateException("Unsupported catalog source: " + source);
-    }
-
     public boolean isClasspathSource() {
-        return effectiveSourceType() == SourceType.CLASSPATH;
+        return sourceType == SourceType.CLASSPATH;
     }
 
     public boolean isFileSource() {
-        return effectiveSourceType() == SourceType.FILE;
+        return sourceType == SourceType.FILE;
     }
 
     public boolean isHttpSource() {
-        return effectiveSourceType() == SourceType.HTTP;
+        return sourceType == SourceType.HTTP;
     }
 
     public String classpathLocation() {
@@ -92,13 +81,7 @@ public record CatalogProperties(
             throw new IllegalStateException("Catalog source is not a classpath source.");
         }
 
-        String location = sourceType == null && source != null
-                ? (source.startsWith("classpath:") ? source.substring("classpath:".length()) : source)
-                : classpathLocation;
-        if (location == null) {
-            location = DEFAULT_CLASSPATH_LOCATION;
-        }
-        return location.startsWith("/") ? location.substring(1) : location;
+        return classpathLocation.startsWith("/") ? classpathLocation.substring(1) : classpathLocation;
     }
 
     public Path fileLocation() {
@@ -106,16 +89,6 @@ public record CatalogProperties(
             throw new IllegalStateException("Catalog source is not a file source.");
         }
 
-        if (sourceType == null && source != null && source.startsWith("file:")) {
-            String location = source.substring("file:".length()).trim();
-            if (location.isEmpty()) {
-                throw new IllegalArgumentException("datenportal.catalog.source file location must not be blank");
-            }
-            return Path.of(location);
-        }
-        if (fileLocation == null) {
-            throw new IllegalArgumentException("datenportal.catalog.file-location must be set for file catalog sources");
-        }
         return fileLocation;
     }
 
@@ -124,21 +97,11 @@ public record CatalogProperties(
             throw new IllegalStateException("Catalog source is not an HTTP source.");
         }
 
-        URI uri = sourceType == null && source != null ? URI.create(source) : httpUrl;
-        if (uri == null) {
-            throw new IllegalArgumentException("datenportal.catalog.http-url must be set for HTTP catalog sources");
-        }
-        String scheme = uri.getScheme();
-        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
-            throw new IllegalArgumentException("datenportal.catalog.http-url must use http or https");
-        }
-        return uri;
+        return httpUrl;
     }
 
     private static String normalizeDownloadUrl(String value) {
-        String normalized = value == null
-                ? DEFAULT_DOWNLOAD_URL
-                : CatalogDownloadUrlPlaceholderResolver.normalizeDownloadUrl(value);
+        String normalized = CatalogDownloadUrlPlaceholderResolver.normalizeDownloadUrl(value);
         if (normalized == null) {
             return null;
         }
@@ -163,5 +126,22 @@ public record CatalogProperties(
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static void requireClasspathLocation(String location) {
+        if (location == null) {
+            throw new IllegalArgumentException(
+                    "datenportal.catalog.classpath-location must be set for classpath catalog sources");
+        }
+    }
+
+    private static void validateHttpUrl(URI uri, String propertyName) {
+        if (uri == null) {
+            throw new IllegalArgumentException(propertyName + " must be set for HTTP catalog sources");
+        }
+        String scheme = uri.getScheme();
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            throw new IllegalArgumentException(propertyName + " must use http or https");
+        }
     }
 }

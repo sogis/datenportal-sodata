@@ -1,7 +1,7 @@
 package ch.so.agi.datenportal.admin.actuator;
 
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,19 +20,12 @@ class CatalogActuatorMvcTest {
     private MockMvc mockMvc;
 
     @Test
-    void healthEndpointContainsCatalogComponents() throws Exception {
+    void healthEndpointExposesOnlyOverallStatus() throws Exception {
         mockMvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"))
-                .andExpect(jsonPath("$.components.catalogSnapshot.status").value("UP"))
-                .andExpect(jsonPath("$.components.catalogSnapshot.details.visibleEntries").value(62))
-                .andExpect(jsonPath("$.components.catalogSnapshot.details.loadedAt", not(emptyOrNullString())))
-                .andExpect(jsonPath("$.components.catalogReload.status").value("UP"))
-                .andExpect(jsonPath("$.components.catalogReload.details.running").value(false))
-                .andExpect(jsonPath("$.components.catalogReload.details.lastSuccessfulReloadAt", not(emptyOrNullString())))
-                .andExpect(jsonPath("$.components.catalogSearchIndex.status").value("UP"))
-                .andExpect(jsonPath("$.components.catalogSearchIndex.details.available").value(true))
-                .andExpect(jsonPath("$.components.diskSpace").doesNotExist());
+                .andExpect(jsonPath("$.components").doesNotExist())
+                .andExpect(jsonPath("$.details").doesNotExist());
     }
 
     @Test

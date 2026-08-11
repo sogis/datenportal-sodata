@@ -37,21 +37,17 @@ public class CatalogImportConfiguration {
     @Bean
     @Primary
     CatalogSource catalogSource(CatalogProperties properties, ResourceLoader resourceLoader, Clock clock) {
-        CatalogSource source;
-        if (properties.isClasspathSource()) {
-            source = new ClasspathCatalogSource(resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
-        } else if (properties.isFileSource()) {
-            source = new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
-        } else if (properties.isHttpSource()) {
-            source = new HttpCatalogSource(
+        CatalogSource source = switch (properties.sourceType()) {
+            case CLASSPATH -> new ClasspathCatalogSource(
+                    resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
+            case FILE -> new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
+            case HTTP -> new HttpCatalogSource(
                     properties.httpUrl(),
                     properties.httpConnectTimeout(),
                     properties.httpReadTimeout(),
                     properties.maxSize(),
                     clock);
-        } else {
-            throw new IllegalStateException("Unsupported catalog source: " + properties.effectiveSourceType());
-        }
+        };
         return new DownloadUrlPlaceholderCatalogSource(
                 source,
                 new CatalogDownloadUrlPlaceholderResolver(),
@@ -60,21 +56,17 @@ public class CatalogImportConfiguration {
 
     @Bean
     CatalogSource catalogDuckDbSource(CatalogDuckDbProperties properties, ResourceLoader resourceLoader, Clock clock) {
-        if (properties.isClasspathSource()) {
-            return new ClasspathCatalogSource(resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
-        }
-        if (properties.isFileSource()) {
-            return new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
-        }
-        if (properties.isHttpSource()) {
-            return new HttpCatalogSource(
+        return switch (properties.sourceType()) {
+            case CLASSPATH -> new ClasspathCatalogSource(
+                    resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
+            case FILE -> new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
+            case HTTP -> new HttpCatalogSource(
                     properties.httpUrl(),
                     properties.httpConnectTimeout(),
                     properties.httpReadTimeout(),
                     properties.maxSize(),
                     clock);
-        }
-        throw new IllegalStateException("Unsupported DuckDB catalog source: " + properties.effectiveSourceType());
+        };
     }
 
     @Bean

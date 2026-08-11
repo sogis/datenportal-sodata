@@ -10,10 +10,12 @@ Dieses Dokument ist nur noch eine kompakte Orientierung. Für den aktuellen MVP-
 ## Lokaler Start
 
 ```bash
-./gradlew bootRun
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
-Die Anwendung lädt standardmässig `published_catalog_full_62_entries.xtf` vom Classpath.
+Das Profil `local` lädt ausdrücklich `published_catalog_full_62_entries.xtf`
+und `catalog.duckdb` vom Classpath. `./gradlew bootRun` ohne Profil startet
+nicht mit Demo-Daten, sondern schlägt wegen der fehlenden Katalogquelle fehl.
 
 ## Alternative Katalogquellen
 
@@ -33,7 +35,7 @@ HTTP:
 
 ```bash
 export DATENPORTAL_ADMIN_RELOAD_TOKEN='change-me'
-./gradlew bootRun
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
 ```bash

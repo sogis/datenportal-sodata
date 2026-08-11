@@ -12,11 +12,25 @@ import org.springframework.util.unit.DataSize;
 class CatalogPropertiesTest {
 
     @Test
-    void legacyClasspathSourceRemainsSupported() {
+    void sourceTypeIsRequired() {
+        assertThatThrownBy(() -> new CatalogProperties(
+                        null,
+                        "catalog.xtf",
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("source-type");
+    }
+
+    @Test
+    void explicitClasspathSourceRequiresAndUsesClasspathLocation() {
         var properties = new CatalogProperties(
-                "classpath:published_catalog_full_54_entries.xtf",
-                null,
-                null,
+                CatalogProperties.SourceType.CLASSPATH,
+                "published_catalog_full_54_entries.xtf",
                 null,
                 null,
                 null,
@@ -24,18 +38,31 @@ class CatalogPropertiesTest {
                 null,
                 null);
 
-        assertThat(properties.effectiveSourceType()).isEqualTo(CatalogProperties.SourceType.CLASSPATH);
         assertThat(properties.classpathLocation()).isEqualTo("published_catalog_full_54_entries.xtf");
         assertThat(properties.maxSize()).isEqualTo(DataSize.ofMegabytes(50));
-        assertThat(properties.downloadUrl()).isEqualTo("http://localhost:8081/ch.so.datenportal/downloads");
+        assertThat(properties.downloadUrl()).isNull();
     }
 
     @Test
-    void explicitSourceTypeWinsOverLegacySource() {
+    void classpathSourceRequiresLocation() {
+        assertThatThrownBy(() -> new CatalogProperties(
+                        CatalogProperties.SourceType.CLASSPATH,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("classpath-location");
+    }
+
+    @Test
+    void explicitHttpSourceUsesHttpUrlAndTimeouts() {
         var properties = new CatalogProperties(
-                "classpath:legacy.xtf",
                 CatalogProperties.SourceType.HTTP,
-                "ignored.xtf",
+                null,
                 null,
                 URI.create("https://example.com/catalog.xtf"),
                 Duration.ofSeconds(2),
@@ -43,7 +70,6 @@ class CatalogPropertiesTest {
                 DataSize.ofMegabytes(10),
                 "https://download.example.org/files/");
 
-        assertThat(properties.effectiveSourceType()).isEqualTo(CatalogProperties.SourceType.HTTP);
         assertThat(properties.httpUrl()).isEqualTo(URI.create("https://example.com/catalog.xtf"));
         assertThat(properties.httpConnectTimeout()).isEqualTo(Duration.ofSeconds(2));
         assertThat(properties.httpReadTimeout()).isEqualTo(Duration.ofSeconds(3));
@@ -51,27 +77,35 @@ class CatalogPropertiesTest {
     }
 
     @Test
-    void fileSourceRequiresLocationWhenExplicitlySelected() {
-        var properties = new CatalogProperties(
-                null,
-                CatalogProperties.SourceType.FILE,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
-
-        assertThatThrownBy(properties::fileLocation)
+    void httpSourceRequiresHttpUrlAndRejectsUnsupportedSchemes() {
+        assertThatThrownBy(() -> new CatalogProperties(
+                        CatalogProperties.SourceType.HTTP,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("file-location");
+                .hasMessageContaining("http-url");
+
+        assertThatThrownBy(() -> new CatalogProperties(
+                        CatalogProperties.SourceType.HTTP,
+                        null,
+                        null,
+                        URI.create("ftp://example.com/catalog.xtf"),
+                        null,
+                        null,
+                        null,
+                        null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("http or https");
     }
 
     @Test
-    void explicitFileSourceUsesFileLocation() {
+    void explicitFileSourceUsesFileLocationAndRequiresIt() {
         var properties = new CatalogProperties(
-                null,
                 CatalogProperties.SourceType.FILE,
                 null,
                 Path.of("catalog.xtf"),
@@ -82,15 +116,26 @@ class CatalogPropertiesTest {
                 null);
 
         assertThat(properties.fileLocation()).isEqualTo(Path.of("catalog.xtf"));
+
+        assertThatThrownBy(() -> new CatalogProperties(
+                        CatalogProperties.SourceType.FILE,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("file-location");
     }
 
     @Test
-    void blankDownloadUrlRemainsUnsetForExplicitBlankConfiguration() {
+    void blankDownloadUrlRemainsUnset() {
         var properties = new CatalogProperties(
+                CatalogProperties.SourceType.FILE,
                 null,
-                null,
-                null,
-                null,
+                Path.of("catalog.xtf"),
                 null,
                 null,
                 null,
@@ -103,10 +148,9 @@ class CatalogPropertiesTest {
     @Test
     void rootRelativeDownloadUrlIsSupportedAndNormalized() {
         var properties = new CatalogProperties(
+                CatalogProperties.SourceType.FILE,
                 null,
-                null,
-                null,
-                null,
+                Path.of("catalog.xtf"),
                 null,
                 null,
                 null,
@@ -119,10 +163,9 @@ class CatalogPropertiesTest {
     @Test
     void downloadUrlMustBeAbsoluteHttpUrlOrRootRelativePath() {
         assertThatThrownBy(() -> new CatalogProperties(
+                        CatalogProperties.SourceType.FILE,
                         null,
-                        null,
-                        null,
-                        null,
+                        Path.of("catalog.xtf"),
                         null,
                         null,
                         null,
