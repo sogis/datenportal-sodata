@@ -91,11 +91,24 @@ Verifikation:
 - `git diff --check`: PASS
 - `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 57s`
 
-Commit: wird nach dem Commit eingetragen.
+Commit: `7a1e744`
 
 ## Phase 6 — Atomarer Katalog-Snapshot und Artefakte
 
-Status: ausstehend.
+Status: abgeschlossen am 2026-08-11.
+
+Schwerpunkte: gemeinsam geladene XTF-/DuckDB-Artefakte, atomare Snapshot-
+Veröffentlichung mit Lucene, Snapshot-only-Artefakt-Requests, Hash-
+Versionierung, ETag/304/409, Content-Length und derselbe Stand im Explore-
+Kontext.
+
+Verifikation:
+
+- Katalog-, Reload-, Artefakt-, Explore- und Health-Suites: PASS
+- `git diff --check`: PASS
+- `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 1m 46s`
+
+Commit: wird nach dem Commit eingetragen.
 
 ## Phase 7 — Bundle- und JAR-Größe
 

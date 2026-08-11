@@ -24,7 +24,8 @@ public final class CatalogReloadService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogReloadService.class);
 
-    private final CatalogSource catalogSource;
+    private final CatalogSource publishedCatalogSource;
+    private final CatalogSource duckDbCatalogSource;
     private final CatalogSnapshotBuilder snapshotBuilder;
     private final CatalogService catalogService;
     private final Clock clock;
@@ -33,11 +34,13 @@ public final class CatalogReloadService {
     private final AtomicReference<ReloadResult> lastFailedReload = new AtomicReference<>();
 
     public CatalogReloadService(
-            CatalogSource catalogSource,
+            CatalogSource publishedCatalogSource,
+            @org.springframework.beans.factory.annotation.Qualifier("catalogDuckDbSource") CatalogSource duckDbCatalogSource,
             CatalogSnapshotBuilder snapshotBuilder,
             CatalogService catalogService,
             Clock clock) {
-        this.catalogSource = Objects.requireNonNull(catalogSource, "catalogSource must not be null");
+        this.publishedCatalogSource = Objects.requireNonNull(publishedCatalogSource, "publishedCatalogSource must not be null");
+        this.duckDbCatalogSource = Objects.requireNonNull(duckDbCatalogSource, "duckDbCatalogSource must not be null");
         this.snapshotBuilder = Objects.requireNonNull(snapshotBuilder, "snapshotBuilder must not be null");
         this.catalogService = Objects.requireNonNull(catalogService, "catalogService must not be null");
         this.clock = Objects.requireNonNull(clock, "clock must not be null");
@@ -58,16 +61,23 @@ public final class CatalogReloadService {
             return conflict;
         }
 
-        LOGGER.info("Catalog reload {} started from source {}.", attemptId, catalogSource.description());
+        LOGGER.info("Catalog reload {} started from source {}.", attemptId, publishedCatalogSource.description());
         try {
-            var bytes = catalogSource.load();
+            var publishedCatalog = publishedCatalogSource.load();
             LOGGER.info(
                     "Catalog reload {} downloaded {} bytes from {}.",
                     attemptId,
-                    bytes.sizeInBytes(),
-                    bytes.sourceDescription());
+                    publishedCatalog.sizeInBytes(),
+                    publishedCatalog.sourceDescription());
 
-            CatalogBuildResult buildResult = snapshotBuilder.build(bytes);
+            var duckDbCatalog = duckDbCatalogSource.load();
+            LOGGER.info(
+                    "Catalog reload {} downloaded {} bytes from {}.",
+                    attemptId,
+                    duckDbCatalog.sizeInBytes(),
+                    duckDbCatalog.sourceDescription());
+
+            CatalogBuildResult buildResult = snapshotBuilder.build(publishedCatalog, duckDbCatalog);
             CatalogSnapshot newSnapshot = buildResult.snapshot();
             boolean published = false;
             try {

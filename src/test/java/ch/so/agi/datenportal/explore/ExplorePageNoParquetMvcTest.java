@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
@@ -18,6 +19,7 @@ import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.DatenportalApplication;
 import java.net.URI;
 import java.time.Instant;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +52,8 @@ class ExplorePageNoParquetMvcTest {
                 .andExpect(jsonPath("$.datasetId").value("csv-only"))
                 .andExpect(jsonPath("$.tables").isEmpty())
                 .andExpect(jsonPath("$.recipes").isEmpty())
-                .andExpect(jsonPath("$.codeSnippets").isEmpty());
+                .andExpect(jsonPath("$.chartsEnabled").value(true))
+                .andExpect(jsonPath("$.webREnabled").value(true));
     }
 
     @TestConfiguration
@@ -62,7 +65,10 @@ class ExplorePageNoParquetMvcTest {
             return CatalogSnapshot.of(
                     new Catalog(List.of(csvOnlyDataset()), List.of()),
                     Instant.parse("2026-07-01T08:00:00Z"),
-                    "no-parquet-test");
+                    Duration.ZERO,
+                    CatalogTestArtifacts.published("no-parquet-test"),
+                    CatalogTestArtifacts.duckDb("no-parquet-test-duckdb"),
+                    ch.so.agi.datenportal.search.CatalogSearchIndex.empty());
         }
 
         private static DatasetEntry csvOnlyDataset() {

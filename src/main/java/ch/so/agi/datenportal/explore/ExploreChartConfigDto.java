@@ -1,12 +1,17 @@
 package ch.so.agi.datenportal.explore;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Optional;
 
 public record ExploreChartConfigDto(
         ExploreChartType type,
+        @JsonInclude(JsonInclude.Include.NON_ABSENT)
         Optional<String> x,
+        @JsonInclude(JsonInclude.Include.NON_ABSENT)
         Optional<String> y,
+        @JsonInclude(JsonInclude.Include.NON_ABSENT)
         Optional<String> color,
+        @JsonInclude(JsonInclude.Include.NON_ABSENT)
         Optional<String> title) {
 
     public ExploreChartConfigDto {

@@ -3,6 +3,7 @@ package ch.so.agi.datenportal.catalog.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.so.agi.datenportal.admin.reload.ReloadFailureType;
+import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
@@ -20,6 +21,7 @@ import ch.so.agi.datenportal.catalog.importxtf.PublishedCatalogParser;
 import ch.so.agi.datenportal.catalog.importxtf.XtfElementPath;
 import ch.so.agi.datenportal.catalog.importxtf.XtfParseException;
 import ch.so.agi.datenportal.search.CatalogDocumentMapper;
+import ch.so.agi.datenportal.search.CatalogSearchIndexBuildException;
 import ch.so.agi.datenportal.search.CatalogSearchIndexBuilder;
 import ch.so.agi.datenportal.search.SearchHit;
 import java.net.URI;
@@ -51,7 +53,7 @@ class CatalogReloadServiceTest {
                 source(() -> bytes("replacement")),
                 (inputStream, sourceDescription) -> catalog("replacement", "Replacement"));
 
-        List<SearchHit> initialHits = catalogService.withSnapshot(snapshot -> snapshot.searchIndex().search("Replacement", 10));
+        List<SearchHit> initialHits = catalogService.withSnapshot(snapshot -> snapshot.searchIndex().search("Replacement"));
         assertThat(initialHits).isEmpty();
 
         var result = service.reload();
@@ -60,7 +62,7 @@ class CatalogReloadServiceTest {
         assertThat(result.contentHash()).isEqualTo(bytes("replacement").contentHash());
         assertThat(catalogService.findVisibleEntry("replacement")).isPresent();
         assertThat(catalogService.findVisibleEntry("initial")).isEmpty();
-        List<SearchHit> replacementHits = catalogService.withSnapshot(snapshot -> snapshot.searchIndex().search("Replacement", 10));
+        List<SearchHit> replacementHits = catalogService.withSnapshot(snapshot -> snapshot.searchIndex().search("Replacement"));
         assertThat(replacementHits)
                 .extracting(SearchHit::entryId)
                 .containsExactly("replacement");
@@ -120,6 +122,43 @@ class CatalogReloadServiceTest {
     }
 
     @Test
+    void duckDbFailureKeepsOldSnapshotAndDuckDbActive() {
+        CatalogService catalogService = new CatalogService(snapshot(catalog("initial", "Initial"), "initial", "initial-hash"));
+        var service = reloadService(
+                catalogService,
+                source(() -> bytes("replacement")),
+                source(() -> new CatalogBytes(new byte[12], "invalid-duckdb")),
+                (inputStream, sourceDescription) -> catalog("replacement", "Replacement"));
+
+        var result = service.reload();
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.failureType()).isEqualTo(ReloadFailureType.SOURCE);
+        assertThat(catalogService.findVisibleEntry("initial")).isPresent();
+        String activeDuckDb = catalogService.withSnapshot(snapshot -> snapshot.duckDbCatalog().sourceDescription());
+        assertThat(activeDuckDb).isEqualTo("initial-duckdb");
+    }
+
+    @Test
+    void indexFailureKeepsOldSnapshotAndDuckDbActive() {
+        CatalogService catalogService = new CatalogService(snapshot(catalog("initial", "Initial"), "initial", "initial-hash"));
+        var service = reloadService(
+                catalogService,
+                source(() -> bytes("replacement")),
+                source(() -> CatalogTestArtifacts.duckDb("replacement-duckdb")),
+                (inputStream, sourceDescription) -> catalog("replacement", "Replacement"),
+                new FailingSearchIndexBuilder());
+
+        var result = service.reload();
+
+        assertThat(result.success()).isFalse();
+        assertThat(result.failureType()).isEqualTo(ReloadFailureType.INDEX);
+        assertThat(catalogService.findVisibleEntry("initial")).isPresent();
+        String activeDuckDb = catalogService.withSnapshot(snapshot -> snapshot.duckDbCatalog().sourceDescription());
+        assertThat(activeDuckDb).isEqualTo("initial-duckdb");
+    }
+
+    @Test
     void parallelReloadIsRejectedAndStatusTracksSuccessAndFailure() throws Exception {
         CatalogService catalogService = new CatalogService(snapshot(catalog("initial", "Initial"), "initial", "initial-hash"));
         CountDownLatch sourceEntered = new CountDownLatch(1);
@@ -163,12 +202,40 @@ class CatalogReloadServiceTest {
             CatalogService catalogService,
             CatalogSource source,
             PublishedCatalogParser parser) {
+        return reloadService(
+                catalogService,
+                source,
+                source(() -> CatalogTestArtifacts.duckDb("duckdb")),
+                parser,
+                new CatalogSearchIndexBuilder(new CatalogDocumentMapper()));
+    }
+
+    private static CatalogReloadService reloadService(
+            CatalogService catalogService,
+            CatalogSource source,
+            CatalogSource duckDbSource,
+            PublishedCatalogParser parser) {
+        return reloadService(
+                catalogService,
+                source,
+                duckDbSource,
+                parser,
+                new CatalogSearchIndexBuilder(new CatalogDocumentMapper()));
+    }
+
+    private static CatalogReloadService reloadService(
+            CatalogService catalogService,
+            CatalogSource source,
+            CatalogSource duckDbSource,
+            PublishedCatalogParser parser,
+            CatalogSearchIndexBuilder indexBuilder) {
         return new CatalogReloadService(
                 source,
+                duckDbSource,
                 new CatalogSnapshotBuilder(
                         parser,
                         new CatalogValidator(),
-                        new CatalogSearchIndexBuilder(new CatalogDocumentMapper()),
+                        indexBuilder,
                         CLOCK),
                 catalogService,
                 CLOCK);
@@ -190,7 +257,13 @@ class CatalogReloadServiceTest {
 
     private static CatalogSnapshot snapshot(Catalog catalog, String sourceDescription, String contentHash) {
         var index = new CatalogSearchIndexBuilder(new CatalogDocumentMapper()).build(catalog.topLevelEntries());
-        return CatalogSnapshot.of(catalog, CLOCK.instant(), sourceDescription, contentHash, index);
+        return CatalogSnapshot.of(
+                catalog,
+                CLOCK.instant(),
+                java.time.Duration.ZERO,
+                CatalogTestArtifacts.published(sourceDescription, contentHash),
+                CatalogTestArtifacts.duckDb(sourceDescription + "-duckdb"),
+                index);
     }
 
     private static Catalog catalog(String identifier, String title) {
@@ -215,5 +288,16 @@ class CatalogReloadServiceTest {
                 "test",
                 Integer.toHexString(value.hashCode()),
                 CLOCK.instant());
+    }
+
+    private static final class FailingSearchIndexBuilder extends CatalogSearchIndexBuilder {
+        private FailingSearchIndexBuilder() {
+            super(new CatalogDocumentMapper());
+        }
+
+        @Override
+        public ch.so.agi.datenportal.search.CatalogSearchIndex build(List<CatalogEntry> visibleEntries) {
+            throw new CatalogSearchIndexBuildException("boom", new IllegalStateException("boom"));
+        }
     }
 }

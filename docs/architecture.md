@@ -8,7 +8,8 @@ Die zentrale Architekturidee ist ein vollständiger, atomar austauschbarer `Cata
 
 ```mermaid
 flowchart LR
-    source["CatalogSource<br/>Classpath / File / HTTP"]
+    xtf["PublishedCatalog CatalogSource<br/>Classpath / File / HTTP"]
+    duckdb["DuckDB CatalogSource<br/>Classpath / File / HTTP"]
     parser["Parser / Validator<br/>XTF nach Domain"]
     builder["CatalogSnapshotBuilder"]
     snapshot["CatalogSnapshot<br/>Read-Model + Lookup-Maps"]
@@ -20,7 +21,8 @@ flowchart LR
     browser["Browser"]
     admin["Admin Reload"]
 
-    source --> parser
+    xtf --> parser
+    duckdb --> builder
     parser --> builder
     builder --> lucene
     builder --> snapshot
@@ -36,7 +38,12 @@ flowchart LR
 
 ## Laufzeitmodell
 
-Beim Start oder Reload wird die PublishedCatalog-XTF/XML-Quelle vollständig geladen, sicher geparst, validiert, in ein Domain-Read-Model überführt und mit einem vollständig neu gebauten Lucene-Index als `CatalogSnapshot` veröffentlicht.
+Beim Start oder Reload werden die PublishedCatalog-XTF/XML-Quelle und die
+fertige DuckDB-Datei jeweils genau einmal geladen. XTF wird sicher geparst und
+validiert, der Lucene-Index wird vollständig neu gebaut, und erst danach
+werden beide Artefakte gemeinsam mit dem Domain-Read-Model als
+`CatalogSnapshot` veröffentlicht. Die Anwendung erzeugt oder transformiert
+`catalog.duckdb` nicht.
 
 Der aktive Snapshot enthält:
 
@@ -45,7 +52,8 @@ Der aktive Snapshot enthält:
 - Ausgaben von Datenreihen
 - sichtbare Top-Level-Einträge
 - Lookup-Maps für Detailseiten
-- Ladezeitpunkt, Source-Beschreibung und Content-Hash
+- unveränderliche `publishedCatalog`- und `duckDbCatalog`-Bytes
+- Ladezeitpunkt, Ladezeit, Source-Beschreibung und XTF-Content-Hash
 - aktiven `CatalogSearchIndex`
 
 `CatalogService` hält den Snapshot in-memory und tauscht ihn atomar unter einem Read/Write-Lock. Öffentliche Controller verwenden `withSnapshot(...)`, damit Suche, Facetten und ViewModel-Aufbau konsistent denselben Katalogstand sehen.
@@ -79,12 +87,13 @@ Wichtige Verantwortlichkeiten:
 ## Startup
 
 1. Spring bindet `datenportal.catalog.*`.
-2. `CatalogSource` lädt die vollständigen Katalogbytes.
-3. `XtfPublishedCatalogParser` parst namespace-aware und XXE-sicher, inklusive exakter `accessRights` sowie strukturbezogener Metadaten (`attributes`, `model`).
-4. `CatalogValidator` prüft Pflichtregeln.
-5. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index.
-6. `CatalogSnapshotBuilder` erzeugt den immutable `CatalogSnapshot`.
-7. `CatalogService` stellt den Snapshot für Web, Suche und Actuator bereit.
+2. Die XTF- und DuckDB-`CatalogSource` laden ihre vollständigen Bytes jeweils einmal.
+3. Der DuckDB-Header wird technisch auf mindestens zwölf Bytes und `DUCK` an Byteposition 8 bis 11 geprüft.
+4. `XtfPublishedCatalogParser` parst namespace-aware und XXE-sicher, inklusive exakter `accessRights` sowie strukturbezogener Metadaten (`attributes`, `model`).
+5. `CatalogValidator` prüft Pflichtregeln.
+6. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index.
+7. `CatalogSnapshotBuilder` erzeugt den immutable `CatalogSnapshot` mit beiden Artefakten.
+8. `CatalogService` stellt den Snapshot für Web, Suche, Explore, Artefakte und Actuator bereit.
 
 Fehlschläge beim initialen Laden sind fail-fast. Die Anwendung startet nicht still mit leerem Katalog.
 
@@ -94,14 +103,31 @@ Fehlschläge beim initialen Laden sind fail-fast. Die Anwendung startet nicht st
 
 Reload-Ablauf:
 
-1. Quelle laden.
-2. Kandidat parsen.
-3. Kandidat validieren.
-4. Kandidaten-Index bauen.
-5. Kandidaten-Snapshot erzeugen.
-6. Snapshot und Index atomar veröffentlichen.
+1. XTF- und DuckDB-Quelle laden.
+2. DuckDB minimal technisch prüfen.
+3. XTF-Kandidat parsen.
+4. Kandidat validieren.
+5. Kandidaten-Index bauen.
+6. Kandidaten-Snapshot mit beiden Artefakten erzeugen.
+7. Snapshot, Index und Artefakte atomar veröffentlichen.
 
-Bei Fehlern bleibt der alte Snapshot samt altem Lucene-Index aktiv. Parallel laufende Reloads werden mit `409 Conflict` abgelehnt.
+Bei Fehlern bleibt der alte Snapshot samt altem Lucene-Index und alter
+DuckDB-Datei aktiv. Parallel laufende Reloads werden mit `409 Conflict`
+abgelehnt. Die Anwendung garantiert die atomare Aktivierung der gemeinsam
+geladenen Artefakte, kann ohne externes Release-Manifest aber nicht beweisen,
+dass XTF und DuckDB fachlich denselben Datenstand enthalten; dafür ist die
+externe Publishing-Pipeline verantwortlich.
+
+## Katalog-Artefakte und Explore-Versionierung
+
+`CatalogArtifactController` liest beide ausgelieferten Dateien ausschließlich
+aus dem aktiven Snapshot. Er lädt keine Source pro HTTP-Request, verwendet den
+SHA-256-Hash als ETag und liefert die gespeicherte Content-Length. Ein
+unversionierter DuckDB-Aufruf bleibt `no-cache`; ein Aufruf mit
+`?v=<sha256>` erhält `public, immutable`-Caching. Veraltete Versionsparameter
+werden mit `409 Conflict` abgewiesen, ein passendes `If-None-Match` liefert
+`304 Not Modified`. Der Explore-Kontext erzeugt die DuckDB-URL aus genau dem
+Hash desselben Snapshots.
 
 ## Detaillierter Datenfluss vom XTF bis ins GUI
 
@@ -186,8 +212,8 @@ sequenceDiagram
     DetailCtl->>Snapshot: findAnyEntry(identifier)
     Snapshot-->>DetailCtl: DatasetEntry
     DetailCtl->>DetailVm: dataset(datasetEntry)
-    DetailVm-->>DetailCtl: DatasetDetailPageVm
-    DetailCtl->>JTE: render pages/datasetDetail
+    DetailVm-->>DetailCtl: EntryDetailPageVm
+    DetailCtl->>JTE: render pages/entryDetail
     JTE-->>Browser: HTML
 ```
 

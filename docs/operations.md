@@ -3,13 +3,13 @@
 ## Lokal starten
 
 ```bash
-./gradlew bootRun
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
 Bei belegtem Port:
 
 ```bash
-./gradlew bootRun --args='--server.port=8081'
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8081'
 ```
 
 Standard-URLs:
@@ -26,11 +26,10 @@ curl http://localhost:8080/actuator/health
 curl http://localhost:8080/actuator/info
 ```
 
-Health zeigt:
-
-- `catalogSnapshot`: aktiver Snapshot, Ladezeitpunkt und Counts.
-- `catalogReload`: Reload-Laufstatus, letzter erfolgreicher Reload oder initialer Load, letzter Fehler falls vorhanden.
-- `catalogSearchIndex`: Verfügbarkeit des aktiven Lucene-Index.
+Health zeigt öffentlich nur den Gesamtstatus. Die internen Komponenten
+`catalogSnapshot`, `catalogReload` und `catalogSearchIndex` sowie ihre Counts
+und Zeitpunkte sind nicht Teil der öffentlichen Health-Antwort. Der geschützte
+Admin-Status ist für detaillierte Reload-Diagnose vorgesehen.
 
 Wenn Gradle-Build-Informationen vorhanden sind, bezieht die Anwendung die Footer-Build-Kennung aus `META-INF/build-info.properties`. Der Commit-Anteil wird beim Build als 12-stelliger Git-Hash geschrieben.
 
@@ -44,7 +43,7 @@ Token setzen:
 
 ```bash
 export DATENPORTAL_ADMIN_RELOAD_TOKEN='change-me'
-./gradlew bootRun
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
 Reload:
@@ -73,6 +72,9 @@ Fehlercodes:
 - `500 Internal Server Error`: unerwarteter Fehler oder Lucene-Reindexing fehlgeschlagen.
 
 Bei jedem Fehler bleibt der bisherige `CatalogSnapshot` samt bisherigem Lucene-Index aktiv.
+Das gilt ebenso für das bisherige DuckDB-Artefakt: Ein nicht lesbares,
+zu kleines oder technisch ungültiges DuckDB-Artefakt, ein XTF-Fehler oder ein
+Lucene-Fehler veröffentlicht keinen Teilstand.
 
 ## Fehlerdiagnose
 
@@ -92,6 +94,19 @@ curl -I http://localhost:8080/vendor/so-web-components/0.1.10/styles/FrutigerLTW
 
 Erwartet wird ein `Cache-Control`-Header. Versionierte Web-Component-Assets haben eine lange TTL, CSS hat eine kurze TTL, weil die Pfade nicht fingerprinted sind.
 
+Katalog-Artefakte:
+
+```bash
+curl -i http://localhost:8080/catalog/catalog.duckdb
+curl -i http://localhost:8080/datasets/ch.so.bauinventar/explore/context.json
+```
+
+Die JSON-Antwort enthält eine URL der Form
+`/catalog/catalog.duckdb?v=<sha256>`. Diese URL muss `public, immutable`
+liefern. Ohne `v` bleibt DuckDB `no-cache`; ein falscher Hash ergibt `409`.
+Der ETag aus einer erfolgreichen Antwort kann mit `If-None-Match` für eine
+`304 Not Modified`-Antwort wiederverwendet werden.
+
 ## Smoke-Test
 
 Nach Änderungen an Betrieb, UI oder Reload:
@@ -100,7 +115,7 @@ Nach Änderungen an Betrieb, UI oder Reload:
 ./gradlew test
 ./gradlew playwrightTest
 ./gradlew check
-./gradlew bootRun
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
 Hinweis zu Playwright:

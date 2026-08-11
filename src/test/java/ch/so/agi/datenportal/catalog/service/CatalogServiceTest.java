@@ -2,6 +2,7 @@ package ch.so.agi.datenportal.catalog.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
@@ -15,6 +16,7 @@ import ch.so.agi.datenportal.search.SearchHit;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -59,7 +61,10 @@ class CatalogServiceTest {
                                 List.of(new DistributionLink(URI.create("https://example.com/replacement.csv"), DistributionFormat.CSV)))),
                         List.of()),
                 Instant.parse("2026-06-14T09:00:00Z"),
-                "replacement");
+                Duration.ZERO,
+                CatalogTestArtifacts.published("replacement"),
+                CatalogTestArtifacts.duckDb("replacement-duckdb"),
+                CatalogSearchIndex.empty());
 
         catalogService.replaceSnapshot(replacement);
 
@@ -76,8 +81,9 @@ class CatalogServiceTest {
         CatalogSnapshot initial = CatalogSnapshot.of(
                 createInitialSnapshot().catalog(),
                 Instant.parse("2026-06-14T08:00:00Z"),
-                "initial",
-                "initial-hash",
+                Duration.ZERO,
+                CatalogTestArtifacts.published("initial", "initial-hash"),
+                CatalogTestArtifacts.duckDb("initial-duckdb"),
                 oldIndex);
         CatalogService catalogService = new CatalogService(initial);
         CatalogSnapshot replacement = CatalogSnapshot.of(
@@ -95,7 +101,10 @@ class CatalogServiceTest {
                                 List.of(new DistributionLink(URI.create("https://example.com/new.csv"), DistributionFormat.CSV)))),
                         List.of()),
                 Instant.parse("2026-06-14T09:00:00Z"),
-                "replacement");
+                Duration.ZERO,
+                CatalogTestArtifacts.published("replacement"),
+                CatalogTestArtifacts.duckDb("replacement-duckdb"),
+                CatalogSearchIndex.empty());
 
         CountDownLatch readerStarted = new CountDownLatch(1);
         CountDownLatch releaseReader = new CountDownLatch(1);
@@ -167,7 +176,10 @@ class CatalogServiceTest {
                                         "2026",
                                         true))))),
                 Instant.parse("2026-06-14T08:00:00Z"),
-                "initial");
+                Duration.ZERO,
+                CatalogTestArtifacts.published("initial"),
+                CatalogTestArtifacts.duckDb("initial-duckdb"),
+                CatalogSearchIndex.empty());
     }
 
     private static final class CloseTrackingSearchIndex implements CatalogSearchIndex {

@@ -1,5 +1,7 @@
 package ch.so.agi.datenportal.explore;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ExploreChartType {
     BAR("bar"),
     LINE("line"),
@@ -14,6 +16,7 @@ public enum ExploreChartType {
         this.value = value;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }

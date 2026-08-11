@@ -51,7 +51,7 @@ public final class ExplorePageController {
     public String explorePage(@PathVariable Map<String, String> pathVariables, Model model) {
         return catalogService.withSnapshot(snapshot -> {
             ExploreTarget target = resolveTarget(snapshot, pathVariables);
-            ExploreContextDto context = contextService.buildContext(target.entry(), target.canonicalUrl());
+            ExploreContextDto context = contextService.buildContext(snapshot, target.entry(), target.canonicalUrl());
             boolean available = !context.tables().isEmpty();
             model.addAttribute("page", new ExplorePageVm(
                     target.chrome(),
@@ -77,7 +77,7 @@ public final class ExplorePageController {
     public ResponseEntity<String> exploreContext(@PathVariable Map<String, String> pathVariables) {
         return catalogService.withSnapshot(snapshot -> {
             ExploreTarget target = resolveTarget(snapshot, pathVariables);
-            String contextJson = contextService.buildContextJson(target.entry(), target.canonicalUrl());
+            String contextJson = contextService.buildContextJson(snapshot, target.entry(), target.canonicalUrl());
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .cacheControl(CacheControl.noCache().cachePrivate())

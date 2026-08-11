@@ -3,6 +3,9 @@ package ch.so.agi.datenportal.catalog.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
+import ch.so.agi.datenportal.search.CatalogSearchIndex;
+import java.time.Duration;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -23,7 +26,10 @@ class CatalogSnapshotTest {
                         List.of(dataset("dataset", "Datensatz A", LocalDate.parse("2026-04-01"))),
                         List.of(series("series", "Datenreihe", issue))),
                 Instant.parse("2026-06-14T08:00:00Z"),
-                "test");
+                Duration.ZERO,
+                CatalogTestArtifacts.published("test"),
+                CatalogTestArtifacts.duckDb("duckdb"),
+                CatalogSearchIndex.empty());
 
         assertThat(snapshot.visibleEntries())
                 .extracting(CatalogEntry::identifier)
@@ -47,7 +53,10 @@ class CatalogSnapshotTest {
         assertThatThrownBy(() -> CatalogSnapshot.of(
                 new Catalog(List.of(dataset), List.of(series)),
                 Instant.parse("2026-06-14T08:00:00Z"),
-                "test"))
+                Duration.ZERO,
+                CatalogTestArtifacts.published("test"),
+                CatalogTestArtifacts.duckDb("duckdb"),
+                CatalogSearchIndex.empty()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Duplicate catalog identifier");
     }
@@ -64,7 +73,10 @@ class CatalogSnapshotTest {
         CatalogSnapshot snapshot = CatalogSnapshot.of(
                 new Catalog(List.of(datasetB, datasetA), List.of(series)),
                 Instant.parse("2026-06-14T08:00:00Z"),
-                "test");
+                Duration.ZERO,
+                CatalogTestArtifacts.published("test"),
+                CatalogTestArtifacts.duckDb("duckdb"),
+                CatalogSearchIndex.empty());
 
         assertThat(snapshot.visibleEntries())
                 .extracting(CatalogEntry::identifier)

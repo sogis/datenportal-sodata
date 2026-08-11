@@ -3,6 +3,7 @@ package ch.so.agi.datenportal.explore;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.so.agi.datenportal.config.CatalogDuckDbProperties;
+import ch.so.agi.datenportal.config.CatalogProperties;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -185,10 +186,11 @@ class ExploreRecipeServiceTest {
     }
 
     private static ExploreProperties properties() {
-        return new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, false, false, false, false);
+        return new ExploreProperties(true, 100, 10_000, 30_000, true, false);
     }
 
     private static CatalogDuckDbProperties duckDbProperties() {
-        return new CatalogDuckDbProperties(null, null, null, null, null, null, null, null);
+        return new CatalogDuckDbProperties(
+                CatalogProperties.SourceType.CLASSPATH, "catalog.duckdb", null, null, null, null, null, null);
     }
 }

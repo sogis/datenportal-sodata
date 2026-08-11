@@ -1,5 +1,7 @@
 package ch.so.agi.datenportal.explore;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ExploreColumnRole {
     IDENTIFIER("identifier"),
     LABEL("label"),
@@ -17,6 +19,7 @@ public enum ExploreColumnRole {
         this.value = value;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }

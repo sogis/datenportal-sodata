@@ -22,11 +22,14 @@ public final class CatalogSnapshotHealthIndicator implements HealthIndicator {
                 var builder = snapshot.isEmpty() ? Health.down() : Health.up();
                 return builder
                         .withDetail("loadedAt", snapshot.loadedAt())
-                        .withDetail("sourceDescription", snapshot.sourceDescription())
                         .withDetail("visibleEntries", snapshot.visibleEntries().size())
                         .withDetail("visibleDatasets", snapshot.catalog().datasetCount())
                         .withDetail("visibleSeries", snapshot.catalog().seriesCount())
                         .withDetail("visibleIssues", snapshot.catalog().issueCount())
+                        .withDetail("publishedCatalogHash", snapshot.publishedCatalog().contentHash())
+                        .withDetail("duckDbCatalogHash", snapshot.duckDbCatalog().contentHash())
+                        .withDetail("duckDbCatalogSizeBytes", snapshot.duckDbCatalog().sizeInBytes())
+                        .withDetail("loadDurationMs", snapshot.loadDuration().toMillis())
                         .build();
             });
         } catch (RuntimeException ex) {

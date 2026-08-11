@@ -3,11 +3,15 @@ package ch.so.agi.datenportal.catalog.service;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogBytes;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogSourceException;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogValidator;
 import ch.so.agi.datenportal.catalog.importxtf.PublishedCatalogParser;
 import ch.so.agi.datenportal.search.CatalogSearchIndex;
 import ch.so.agi.datenportal.search.CatalogSearchIndexBuilder;
 import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.io.IOException;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +38,17 @@ public final class CatalogSnapshotBuilder {
         this.clock = Objects.requireNonNull(clock, "clock must not be null");
     }
 
-    public CatalogBuildResult build(CatalogBytes bytes) {
-        Objects.requireNonNull(bytes, "bytes must not be null");
+    public CatalogBuildResult build(CatalogBytes publishedCatalog, CatalogBytes duckDbCatalog) {
+        Objects.requireNonNull(publishedCatalog, "publishedCatalog must not be null");
+        Objects.requireNonNull(duckDbCatalog, "duckDbCatalog must not be null");
+        Instant startedAt = clock.instant();
+        validateDuckDb(duckDbCatalog);
 
-        LOGGER.info("Parsing catalog source {}.", bytes.sourceDescription());
-        Catalog catalog = parser.parse(bytes.inputStream(), bytes.sourceDescription());
+        LOGGER.info("Parsing catalog source {}.", publishedCatalog.sourceDescription());
+        Catalog catalog = parser.parse(publishedCatalog.inputStream(), publishedCatalog.sourceDescription());
         LOGGER.info(
                 "Parsed catalog source {} with {} datasets and {} dataset series.",
-                bytes.sourceDescription(),
+                publishedCatalog.sourceDescription(),
                 catalog.datasetCount(),
                 catalog.seriesCount());
 
@@ -49,21 +56,54 @@ public final class CatalogSnapshotBuilder {
         validation.throwIfInvalid();
         LOGGER.info(
                 "Validated catalog source {} with {} warnings.",
-                bytes.sourceDescription(),
+                publishedCatalog.sourceDescription(),
                 validation.warnings().size());
 
         CatalogSearchIndex searchIndex = searchIndexBuilder.build(catalog.topLevelEntries());
         try {
+            Instant loadedAt = clock.instant();
             var snapshot = CatalogSnapshot.of(
                     catalog,
-                    clock.instant(),
-                    bytes.sourceDescription(),
-                    bytes.contentHash(),
+                    loadedAt,
+                    Duration.between(startedAt, loadedAt),
+                    publishedCatalog,
+                    duckDbCatalog,
                     searchIndex);
             return new CatalogBuildResult(snapshot, validation.warnings());
         } catch (RuntimeException ex) {
             searchIndex.close();
             throw ex;
         }
+    }
+
+    private static void validateDuckDb(CatalogBytes duckDbCatalog) {
+        if (duckDbCatalog.sizeInBytes() < 12) {
+            throw new CatalogSourceException(
+                    "DuckDB catalog source " + duckDbCatalog.sourceDescription() + " must contain at least 12 bytes.");
+        }
+
+        byte[] header = new byte[12];
+        try (var inputStream = duckDbCatalog.inputStream()) {
+            int offset = 0;
+            while (offset < header.length) {
+                int read = inputStream.read(header, offset, header.length - offset);
+                if (read < 0) {
+                    throw invalidDuckDb(duckDbCatalog);
+                }
+                offset += read;
+            }
+        } catch (IOException ex) {
+            throw new CatalogSourceException(
+                    "Failed to inspect DuckDB catalog source " + duckDbCatalog.sourceDescription() + ".", ex);
+        }
+
+        if (header[8] != 'D' || header[9] != 'U' || header[10] != 'C' || header[11] != 'K') {
+            throw invalidDuckDb(duckDbCatalog);
+        }
+    }
+
+    private static CatalogSourceException invalidDuckDb(CatalogBytes duckDbCatalog) {
+        return new CatalogSourceException(
+                "DuckDB catalog source " + duckDbCatalog.sourceDescription() + " has no DUCK marker at byte 8.");
     }
 }

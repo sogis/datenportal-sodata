@@ -10,12 +10,7 @@ public record ExploreProperties(
         int maxResultRows,
         int queryTimeoutMs,
         boolean chartsEnabled,
-        boolean localHistoryEnabled,
-        boolean aiEnabled,
-        boolean webrEnabled,
-        boolean vegaEnabled,
-        boolean mosaicEnabled,
-        boolean geospatialEnabled) {
+        boolean webrEnabled) {
 
     private static final int DEFAULT_MAX_PREVIEW_ROWS = 100;
     private static final int DEFAULT_MAX_RESULT_ROWS = 10_000;
@@ -44,17 +39,6 @@ public record ExploreProperties(
                 maxPreviewRows,
                 maxResultRows,
                 queryTimeoutMs);
-    }
-
-    public ExploreFeatureFlagsDto featureFlags() {
-        return new ExploreFeatureFlagsDto(
-                chartsEnabled,
-                localHistoryEnabled,
-                aiEnabled,
-                webrEnabled,
-                vegaEnabled,
-                mosaicEnabled,
-                geospatialEnabled);
     }
 
     public ExploreRLaboratoryDto rLaboratory() {

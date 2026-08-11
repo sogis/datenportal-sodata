@@ -3,10 +3,12 @@ package ch.so.agi.datenportal.explore;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.so.agi.datenportal.DatenportalApplication;
+import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogBytes;
 import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
@@ -32,7 +34,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -975,11 +979,22 @@ class ExploreIslandParquetPlaywrightTest {
 
         @Bean
         @Primary
-        CatalogSnapshot exploreFixtureCatalogSnapshot() {
+        CatalogSnapshot exploreFixtureCatalogSnapshot() throws IOException {
+            CatalogBytes duckDbCatalog;
+            try {
+                duckDbCatalog = new CatalogBytes(
+                        Files.readAllBytes(Path.of("spec/fixtures/explore_fixture_catalog.duckdb")),
+                        "file:spec/fixtures/explore_fixture_catalog.duckdb");
+            } catch (IOException ex) {
+                throw new IllegalStateException("Failed to load Explore DuckDB fixture.", ex);
+            }
             return CatalogSnapshot.of(
                     new Catalog(List.of(fixtureDataset(), brokenParquetDataset()), List.of(fixtureSeries())),
                     Instant.parse("2026-07-01T08:00:00Z"),
-                    "explore-parquet-fixture");
+                    Duration.ZERO,
+                    CatalogTestArtifacts.published("explore-parquet-fixture"),
+                    duckDbCatalog,
+                    ch.so.agi.datenportal.search.CatalogSearchIndex.empty());
         }
 
         private static DatasetEntry fixtureDataset() {

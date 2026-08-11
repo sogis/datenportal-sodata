@@ -2,6 +2,7 @@ package ch.so.agi.datenportal.explore;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
@@ -16,18 +17,21 @@ import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.catalog.service.CatalogService;
 import ch.so.agi.datenportal.config.CatalogDuckDbProperties;
+import ch.so.agi.datenportal.config.CatalogProperties;
 import ch.so.agi.datenportal.web.CatalogUrlFactory;
 import java.net.URI;
 import java.time.Instant;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 class ExploreContextServiceTest {
 
     @Test
-    void contextContainsTablesRecipesSnippetsAndFlags() {
+    void contextContainsTablesRecipesAndActiveCapabilities() {
         var service = service(dataset(
                 "ch.so.gemeinden",
                 "Gemeinden",
@@ -36,10 +40,11 @@ class ExploreContextServiceTest {
 
         ExploreContextDto context = service.buildContext("ch.so.gemeinden");
 
-        assertThat(context.version()).isEqualTo(3);
+        assertThat(context.version()).isEqualTo(4);
         assertThat(context.datasetId()).isEqualTo("ch.so.gemeinden");
         assertThat(context.canonicalUrl()).isEqualTo("/datasets/ch.so.gemeinden");
-        assertThat(context.catalogDatabase().url()).isEqualTo("/catalog/catalog.duckdb");
+        assertThat(context.catalogDatabase().url())
+                .isEqualTo("/catalog/catalog.duckdb?v=" + CatalogTestArtifacts.duckDb("test-duckdb").contentHash());
         assertThat(context.catalogDatabase().database()).isEqualTo("catalog");
         assertThat(context.catalogDatabase().schema()).isEqualTo("opendata");
         assertThat(context.tables()).hasSize(1);
@@ -48,19 +53,15 @@ class ExploreContextServiceTest {
                 .contains("bfs_nr", "gemeindename", "flaeche_ha");
         assertThat(context.recipes()).isNotEmpty();
         assertThat(context.recipes().getFirst().sql()).isEqualTo("SELECT *\nFROM opendata.ch_so_gemeinden;");
-        assertThat(context.codeSnippets()).extracting(ExploreCodeSnippetDto::language)
-                .contains(ExploreSnippetLanguage.SQL, ExploreSnippetLanguage.PYTHON, ExploreSnippetLanguage.R);
-        assertThat(context.featureFlags().charts()).isTrue();
-        assertThat(context.featureFlags().aiAssistant()).isFalse();
-        assertThat(context.featureFlags().webR()).isTrue();
-        assertThat(context.featureFlags().geospatial()).isFalse();
+        assertThat(context.chartsEnabled()).isTrue();
+        assertThat(context.webREnabled()).isTrue();
         assertThat(context.rLaboratory().dataFrameName()).isEqualTo("daten");
         assertThat(context.rLaboratory().runtimeBaseUrl()).isEqualTo("/webr/0.6.0/");
         assertThat(context.rLaboratory().packageRepoUrl()).isEqualTo("/webr-packages/");
     }
 
     @Test
-    void datasetWithoutParquetReturnsEmptyTablesRecipesAndSnippets() {
+    void datasetWithoutParquetReturnsEmptyTablesAndRecipes() {
         var service = service(dataset(
                 "csv-only",
                 "CSV only",
@@ -71,7 +72,6 @@ class ExploreContextServiceTest {
 
         assertThat(context.tables()).isEmpty();
         assertThat(context.recipes()).isEmpty();
-        assertThat(context.codeSnippets()).isEmpty();
     }
 
     @Test
@@ -101,9 +101,12 @@ class ExploreContextServiceTest {
                 AccessLevel.OPEN,
                 CatalogEntryMetadata.empty(),
                 List.of(currentIssue, historicalIssue));
-        var service = service(new Catalog(List.of(), List.of(series)));
+        var issueCatalog = new Catalog(List.of(), List.of(series));
+        var service = service(issueCatalog);
+        var snapshot = snapshot(issueCatalog);
 
         ExploreContextDto context = service.buildContext(
+                snapshot,
                 currentIssue,
                 "/series/ch.so.gemeinden/issues/current");
 
@@ -122,7 +125,7 @@ class ExploreContextServiceTest {
     void embeddedJsonEscapesScriptBreakingSequences() {
         var service = service(dataset(
                 "script",
-                "</script><!--",
+                "</script><!-- " + "\"" + " \\\\ \n ä",
                 List.of(distribution(DistributionFormat.PARQUET)),
                 CatalogEntryMetadata.empty()));
 
@@ -131,7 +134,14 @@ class ExploreContextServiceTest {
         assertThat(json)
                 .contains("<\\/script>")
                 .contains("\\u003C!--")
-                .doesNotContain("</script>");
+                .contains("\\\"")
+                .contains("\\\\")
+                .contains("\\n")
+                .contains("ä")
+                .doesNotContain("</script>")
+                .doesNotContain("\\\"license\\\":null")
+                .doesNotContain("\"sizeBytes\"")
+                .doesNotContain("\"preferredChart\"");
     }
 
     private static ExploreContextService service(DatasetEntry dataset) {
@@ -139,27 +149,34 @@ class ExploreContextServiceTest {
     }
 
     private static ExploreContextService service(Catalog catalog) {
-        var catalogService = new CatalogService(CatalogSnapshot.of(
-                catalog,
-                Instant.parse("2026-07-01T08:00:00Z"),
-                "test"));
+        var catalogService = new CatalogService(snapshot(catalog));
         var sanitizer = new ExploreSqlNameSanitizer();
         var roleDetector = new ExploreColumnRoleDetector();
-        var properties = new ExploreProperties(true, 100, 10_000, 30_000, true, true, false, true, false, false, false);
+        var properties = new ExploreProperties(true, 100, 10_000, 30_000, true, true);
         var duckDbProperties = duckDbProperties();
         return new ExploreContextService(
                 catalogService,
                 new ExploreTableService(sanitizer, roleDetector),
                 new ExploreRecipeService(sanitizer, properties, duckDbProperties),
-                new ExploreCodeSnippetService(),
                 properties,
                 duckDbProperties,
                 new CatalogUrlFactory(),
-                new ExploreContextJsonWriter());
+                new ObjectMapper());
+    }
+
+    private static CatalogSnapshot snapshot(Catalog catalog) {
+        return CatalogSnapshot.of(
+                catalog,
+                Instant.parse("2026-07-01T08:00:00Z"),
+                Duration.ZERO,
+                CatalogTestArtifacts.published("test"),
+                CatalogTestArtifacts.duckDb("test-duckdb"),
+                ch.so.agi.datenportal.search.CatalogSearchIndex.empty());
     }
 
     private static CatalogDuckDbProperties duckDbProperties() {
-        return new CatalogDuckDbProperties(null, null, null, null, null, null, null, null);
+        return new CatalogDuckDbProperties(
+                CatalogProperties.SourceType.CLASSPATH, "catalog.duckdb", null, null, null, null, null, null);
     }
 
     private static DatasetEntry dataset(

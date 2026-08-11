@@ -1,5 +1,7 @@
 package ch.so.agi.datenportal.explore;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ExploreRecipeCategory {
     PREVIEW("preview"),
     PROFILE("profile"),
@@ -15,6 +17,7 @@ public enum ExploreRecipeCategory {
         this.value = value;
     }
 
+    @JsonValue
     public String value() {
         return value;
     }

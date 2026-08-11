@@ -2,6 +2,38 @@
 
 Diese Datei beschreibt die produktionsnahen Laufzeit-Properties des Datenportals. Secrets werden immer über Umgebung oder externe Konfiguration gesetzt und nie ins Repository geschrieben.
 
+## Profile und Startmodi
+
+`src/main/resources/application.yml` enthält nur sichere technische Defaults.
+Es enthält weder eine Katalogquelle noch einen DuckDB-Ort, keine
+localhost-Downloadbasis und keinen JTE-Development-Mode. Ein Start ohne
+explizite Quelle schlägt deshalb früh mit einer verständlichen
+Konfigurationsmeldung fehl.
+
+Für die lokale Entwicklung wird das Profil `local` verwendet:
+
+```bash
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
+```
+
+`application-local.yml` aktiviert ausdrücklich die 62-Einträge-Fixture, die
+fertige `catalog.duckdb`, die lokale Downloadbasis und den JTE-Development-Mode.
+Das Testprofil `test` aktiviert dieselben deterministischen Fixtures, aber mit
+deaktiviertem JTE-Development-Mode; es wird für Tests über
+`src/test/resources/application.properties` automatisch aktiviert.
+
+In Produktion muss die Quellart samt passendem Ort über externe
+Konfiguration gesetzt werden. Zulässige Quellarten sind `classpath`, `file`
+und `http`. Secrets und Umgebungsvariablen gehören nicht in das Repository.
+
+Wichtige Umgebungsvariablen:
+
+- `SPRING_PROFILES_ACTIVE`: typischerweise `local` lokal; in Produktion ein
+  eigenes externes Profil oder externe Properties.
+- `DATENPORTAL_ADMIN_RELOAD_TOKEN`: Token für geschützten Reload und Status.
+- `DOWNLOAD_URL`: optionale Basis für `${DOWNLOAD_URL}` in XTF-Dateien; ohne
+  Wert bleibt `download-url` ungesetzt.
+
 ## Katalogquelle
 
 Bevorzugte Konfiguration:
@@ -16,20 +48,15 @@ datenportal:
     http-connect-timeout: 5s
     http-read-timeout: 30s
     max-size: 50MB
-    download-url: ${DOWNLOAD_URL:http://localhost:8081/ch.so.datenportal/downloads}
+    download-url: ${DOWNLOAD_URL:}
 ```
 
-`source-type=classpath` ist der lokale Standard. `source-type=http` lädt die vollständige PublishedCatalog-XTF/XML-Datei per HTTP GET. `source-type=file` ist für lokale Entwicklung und Tests vorgesehen.
-
-Die Legacy-Property bleibt vorerst gültig:
-
-```yaml
-datenportal:
-  catalog:
-    source: classpath:published_catalog_full_62_entries.xtf
-```
-
-Wenn `source-type` gesetzt ist, gewinnt die neue Konfiguration gegenüber `source`.
+`source-type` ist verpflichtend. Für `classpath` muss
+`classpath-location`, für `file` muss `file-location` und für `http` muss
+`http-url` gesetzt sein. Nicht zur gewählten Quellart gehörende Orte dürfen
+leer bleiben. `source-type=http` lädt die vollständige PublishedCatalog-XTF/XML-
+Datei per HTTP GET; `source-type=file` ist für lokale Entwicklung,
+Tests und extern gemountete Artefakte vorgesehen.
 
 HTTP-Quellen:
 
@@ -49,8 +76,8 @@ Download-URL-Platzhalter:
 
 Öffentliche Katalog-Artefakte:
 
-- `GET /catalog/published-catalog.xtf` liefert die aktuell konfigurierte PublishedCatalog-XTF-Datei aus. Der `${DOWNLOAD_URL}`-Platzhalter ist dabei bereits ersetzt.
-- `GET /catalog/catalog.duckdb` liefert den aktuell konfigurierten DuckDB-View-Catalog fuer den Explore-Schema-Explorer aus.
+- `GET /catalog/published-catalog.xtf` liefert das im aktiven Snapshot gespeicherte PublishedCatalog-XTF-Artefakt aus. Der `${DOWNLOAD_URL}`-Platzhalter ist dabei bereits ersetzt; ETag, Content-Length und `If-None-Match` werden unterstützt.
+- `GET /catalog/catalog.duckdb` liefert das im aktiven Snapshot gespeicherte DuckDB-View-Catalog-Artefakt aus. Ohne Versionsparameter bleibt die Antwort `no-cache); Explore verwendet `?v=<sha256>`, womit `public, immutable`-Caching aktiviert wird. Eine veraltete Version wird mit `409 Conflict` abgewiesen, statt still die aktuelle Datei zu liefern.
 
 ## DuckDB-Catalog fuer Erkunden
 
@@ -74,10 +101,11 @@ datenportal:
       schema: opendata
 ```
 
-`source-type=classpath` ist der lokale Standard. `source-type=http` lädt die
-DuckDB-Datei per HTTP GET; `source-type=file` ist fuer lokale Entwicklung,
-Tests und extern gemountete Artefakte vorgesehen. Timeouts, `max-size` und die
-sichere Source-Beschreibung folgen derselben Logik wie bei der XTF-Quelle.
+`source-type` ist auch für DuckDB verpflichtend. Für die gewählte Quellart
+muss der passende Ort gesetzt sein. `source-type=http` lädt die DuckDB-Datei
+per HTTP GET; `source-type=file` ist fuer lokale Entwicklung, Tests und extern
+gemountete Artefakte vorgesehen. Timeouts, `max-size` und die sichere
+Source-Beschreibung folgen derselben Logik wie bei der XTF-Quelle.
 
 Das Schema `opendata` wird im Explore-Kontext an den Browser geliefert. Der
 Browser attached die Datei read-only als Datenbank `catalog`, lädt `httpfs`,
@@ -86,6 +114,15 @@ SQLRooms-SchemaTrees fuer den Schema Explorer. Die eigentliche SQL-Ausfuehrung
 läuft direkt gegen diese attached Catalog-Datenbank. Dadurch koennen Abfragen
 auch Views aus mehreren Parquet-Dateien joinen, solange sie im Catalog-Artefakt
 enthalten sind.
+
+Beim Start und bei einem Reload werden XTF und DuckDB jeweils einmal geladen
+und erst nach erfolgreichem XTF-Parse, Validierung und Lucene-Indexbau als ein
+Snapshot aktiviert. Die Anwendung prüft bei DuckDB nur die technische
+Signatur (mindestens zwölf Bytes, `DUCK` an Byteposition 8 bis 11); sie
+erzeugt, repariert oder fachlich analysiert die Datei nicht. Die externe
+Publishing-Pipeline muss daher sicherstellen, dass XTF und DuckDB zueinander
+passen. Ohne externes Release-Manifest kann die Anwendung diese semantische
+Gleichheit nicht beweisen.
 
 ## WebR fuer Erkunden
 
@@ -143,7 +180,6 @@ Regeln:
 ```yaml
 datenportal:
   search:
-    max-results: 500
     default-page-size: 10
     max-page-size: 100
 ```
@@ -185,12 +221,16 @@ management:
         include: health,info
   endpoint:
     health:
-      show-details: always
+      show-details: never
     info:
       enabled: true
 ```
 
-Health enthält nicht geheime Betriebsdetails zu `catalogSnapshot`, `catalogReload` und `catalogSearchIndex`. Der Info-Endpunkt enthält App-Name, Package-Basis, Java-Version und, falls vorhanden, Gradle-Build-Informationen.
+`/actuator/health` zeigt öffentlich nur den Gesamtstatus. Interne Details zu
+`catalogSnapshot`, `catalogReload` und `catalogSearchIndex` sind nicht Teil der
+öffentlichen Antwort. Der geschützte Admin-Status liefert die für den Betrieb
+notwendigen Details. Der Info-Endpunkt enthält App-Name, Package-Basis,
+Java-Version und, falls vorhanden, Gradle-Build-Informationen.
 
 Der Standard-`diskSpace`-Health-Contributor ist deaktiviert, damit keine lokalen Serverpfade über Health-Details ausgegeben werden:
 

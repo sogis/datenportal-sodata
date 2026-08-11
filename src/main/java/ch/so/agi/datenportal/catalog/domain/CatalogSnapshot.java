@@ -1,6 +1,8 @@
 package ch.so.agi.datenportal.catalog.domain;
 
 import ch.so.agi.datenportal.search.CatalogSearchIndex;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogBytes;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -15,8 +17,9 @@ public record CatalogSnapshot(
         Map<String, CatalogEntry> visibleEntriesByIdentifier,
         Map<String, CatalogEntry> allEntriesByIdentifier,
         Instant loadedAt,
-        String sourceDescription,
-        String contentHash,
+        Duration loadDuration,
+        CatalogBytes publishedCatalog,
+        CatalogBytes duckDbCatalog,
         CatalogSearchIndex searchIndex) implements AutoCloseable {
 
     private static final Comparator<CatalogEntry> VISIBLE_ENTRY_ORDER =
@@ -30,33 +33,24 @@ public record CatalogSnapshot(
         visibleEntriesByIdentifier = Map.copyOf(visibleEntriesByIdentifier);
         allEntriesByIdentifier = Map.copyOf(allEntriesByIdentifier);
         Objects.requireNonNull(loadedAt, "loadedAt must not be null");
-        Objects.requireNonNull(sourceDescription, "sourceDescription must not be null");
-        Objects.requireNonNull(contentHash, "contentHash must not be null");
+        Objects.requireNonNull(loadDuration, "loadDuration must not be null");
+        Objects.requireNonNull(publishedCatalog, "publishedCatalog must not be null");
+        Objects.requireNonNull(duckDbCatalog, "duckDbCatalog must not be null");
         Objects.requireNonNull(searchIndex, "searchIndex must not be null");
     }
 
-    public static CatalogSnapshot of(Catalog catalog, Instant loadedAt, String sourceDescription) {
-        return of(catalog, loadedAt, sourceDescription, "", CatalogSearchIndex.empty());
-    }
-
     public static CatalogSnapshot of(
             Catalog catalog,
             Instant loadedAt,
-            String sourceDescription,
-            CatalogSearchIndex searchIndex) {
-        return of(catalog, loadedAt, sourceDescription, "", searchIndex);
-    }
-
-    public static CatalogSnapshot of(
-            Catalog catalog,
-            Instant loadedAt,
-            String sourceDescription,
-            String contentHash,
+            Duration loadDuration,
+            CatalogBytes publishedCatalog,
+            CatalogBytes duckDbCatalog,
             CatalogSearchIndex searchIndex) {
         Objects.requireNonNull(catalog, "catalog must not be null");
         Objects.requireNonNull(loadedAt, "loadedAt must not be null");
-        Objects.requireNonNull(sourceDescription, "sourceDescription must not be null");
-        Objects.requireNonNull(contentHash, "contentHash must not be null");
+        Objects.requireNonNull(loadDuration, "loadDuration must not be null");
+        Objects.requireNonNull(publishedCatalog, "publishedCatalog must not be null");
+        Objects.requireNonNull(duckDbCatalog, "duckDbCatalog must not be null");
         Objects.requireNonNull(searchIndex, "searchIndex must not be null");
 
         var visibleEntries = catalog.topLevelEntries().stream()
@@ -79,9 +73,18 @@ public record CatalogSnapshot(
                 visibleEntriesByIdentifier,
                 allEntriesByIdentifier,
                 loadedAt,
-                sourceDescription,
-                contentHash,
+                loadDuration,
+                publishedCatalog,
+                duckDbCatalog,
                 searchIndex);
+    }
+
+    public String sourceDescription() {
+        return publishedCatalog.sourceDescription();
+    }
+
+    public String contentHash() {
+        return publishedCatalog.contentHash();
     }
 
     public Optional<CatalogEntry> findVisibleEntry(String identifier) {
