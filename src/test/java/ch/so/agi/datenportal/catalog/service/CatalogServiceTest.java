@@ -30,7 +30,8 @@ class CatalogServiceTest {
     void returnsInitialSnapshotAndReadAccessors() {
         CatalogService catalogService = new CatalogService(createInitialSnapshot());
 
-        assertThat(catalogService.currentSnapshot().sourceDescription()).isEqualTo("initial");
+        String initialSource = catalogService.withSnapshot(CatalogSnapshot::sourceDescription);
+        assertThat(initialSource).isEqualTo("initial");
         assertThat(catalogService.visibleEntries())
                 .extracting(entry -> entry.identifier())
                 .containsExactly(
@@ -62,7 +63,8 @@ class CatalogServiceTest {
 
         catalogService.replaceSnapshot(replacement);
 
-        assertThat(catalogService.currentSnapshot().sourceDescription()).isEqualTo("replacement");
+        String replacementSource = catalogService.withSnapshot(CatalogSnapshot::sourceDescription);
+        assertThat(replacementSource).isEqualTo("replacement");
         assertThat(catalogService.visibleEntries())
                 .extracting(entry -> entry.identifier())
                 .containsExactly("replacement-dataset");
@@ -121,7 +123,8 @@ class CatalogServiceTest {
             assertThat(reader.get(2, TimeUnit.SECONDS)).isEqualTo("initial");
             writer.get(2, TimeUnit.SECONDS);
             assertThat(oldIndex.closed()).isTrue();
-            assertThat(catalogService.currentSnapshot().sourceDescription()).isEqualTo("replacement");
+            String replacementSource = catalogService.withSnapshot(CatalogSnapshot::sourceDescription);
+            assertThat(replacementSource).isEqualTo("replacement");
         } finally {
             executor.shutdownNow();
         }
@@ -172,13 +175,13 @@ class CatalogServiceTest {
         private final AtomicBoolean closed = new AtomicBoolean();
 
         @Override
-        public List<SearchHit> search(String userQuery, int maxResults) {
+        public List<SearchHit> search(String userQuery) {
             return List.of();
         }
 
         @Override
-        public boolean isEmpty() {
-            return false;
+        public int documentCount() {
+            return 1;
         }
 
         @Override

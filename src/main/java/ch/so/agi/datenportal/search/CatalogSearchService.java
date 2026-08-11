@@ -58,7 +58,7 @@ public final class CatalogSearchService {
             CatalogSnapshot snapshot,
             SearchQuery query,
             Map<String, SearchHit> hitsById) {
-        var hits = snapshot.searchIndex().search(query.q(), properties.maxResults());
+        var hits = snapshot.searchIndex().search(query.q());
         hits.forEach(hit -> hitsById.put(hit.entryId(), hit));
         return hits.stream()
                 .map(hit -> snapshot.findVisibleEntry(hit.entryId()))

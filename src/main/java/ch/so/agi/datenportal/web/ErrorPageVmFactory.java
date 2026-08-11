@@ -36,6 +36,16 @@ public final class ErrorPageVmFactory {
                 CATALOG_LABEL);
     }
 
+    public ErrorPageVm serviceUnavailable(String message) {
+        return new ErrorPageVm(
+                pageChromeFactory.errorPage("Suchdienst nicht verfügbar | Datenportal", "Suchdienst nicht verfügbar"),
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Suchdienst nicht verfügbar",
+                message,
+                CATALOG_HREF,
+                CATALOG_LABEL);
+    }
+
     public ErrorPageVm forStatus(int statusCode) {
         if (statusCode == HttpStatus.NOT_FOUND.value()) {
             return notFound("Die angeforderte Seite konnte nicht gefunden werden.");

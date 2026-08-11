@@ -20,16 +20,6 @@ public final class CatalogService {
         this.snapshotReference = new AtomicReference<>(Objects.requireNonNull(initialSnapshot, "initialSnapshot must not be null"));
     }
 
-    public CatalogSnapshot currentSnapshot() {
-        var readLock = snapshotLock.readLock();
-        readLock.lock();
-        try {
-            return snapshotReference.get();
-        } finally {
-            readLock.unlock();
-        }
-    }
-
     public <T> T withSnapshot(Function<CatalogSnapshot, T> reader) {
         Objects.requireNonNull(reader, "reader must not be null");
         var readLock = snapshotLock.readLock();

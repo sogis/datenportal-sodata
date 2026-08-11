@@ -22,11 +22,23 @@ Verifikation:
 - `./gradlew clean check`: PASS, einschließlich Frontend, Backend und Playwright
 - realer WebR-Playwright-Smoke: PASS
 
-Commit: wird nach dem Commit eingetragen.
+Commit: `c8a895e`
 
 ## Phase 2 — Suchfehler und vollständige Treffermenge
 
-Status: ausstehend.
+Status: abgeschlossen am 2026-08-11.
+
+Schwerpunkte: Lucene-Fehler als sichtbarer 503 statt künstlicher Leermenge,
+vollständige Treffermenge vor Java-Filtern, Snapshot-Lock-Nutzung und
+transparente Index-Dokumentzahl.
+
+Verifikation:
+
+- fokussierte Gradle-Suite: PASS, 41 Tests
+- `git diff --check`: PASS
+- `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 57s`
+
+Commit: wird nach dem Commit eingetragen.
 
 ## Phase 3 — Produktionssichere Konfiguration
 

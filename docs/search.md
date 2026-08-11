@@ -47,3 +47,14 @@ Sie beschreibt bewusst nicht in jedem Punkt das aktuelle Ist-Verhalten der Anwen
 Diese fachliche Soll-Definition orientiert sich für Substring-Matching sowie für `AND zwischen Tokens` und `OR zwischen Feldern` an der Suchsemantik von `../sodata-ng`.
 
 Substring wird bewusst nicht als gleich starke Hauptregel auf Beschreibungen, Themen oder Fachstellen ausgedehnt, damit die Suche fachlich präzise und für die Resultatqualität kontrollierbar bleibt.
+
+## Betriebsverhalten bei Fehlern
+
+Die Textsuche liest die vollständige Lucene-Treffermenge, bevor die
+fachlichen Java-Filter angewendet werden. Dadurch kann ein passender Treffer
+nicht durch eine versteckte Vorabgrenze verloren gehen.
+
+Wenn der Suchindex geschlossen ist oder ein Lucene-Fehler auftritt, wird dies
+nicht als „keine Treffer“ behandelt. Die Anwendung zeigt stattdessen eine
+verständliche HTTP-503-Fehlerseite; bei HTMX-Anfragen wird mit
+`HX-Refresh: true` ein vollständiger Seitenaufbau angefordert.

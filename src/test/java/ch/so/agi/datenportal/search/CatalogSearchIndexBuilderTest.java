@@ -27,11 +27,11 @@ class CatalogSearchIndexBuilderTest {
         CatalogSearchIndex first = builder.build(List.of(dataset("old-entry", "Alte Grenzen")));
         CatalogSearchIndex second = builder.build(List.of(dataset("new-entry", "Neue Zonen")));
 
-        assertThat(first.search("Alte", 10))
+        assertThat(first.search("Alte"))
                 .extracting(SearchHit::entryId)
                 .containsExactly("old-entry");
-        assertThat(second.search("Alte", 10)).isEmpty();
-        assertThat(second.search("Neue", 10))
+        assertThat(second.search("Alte")).isEmpty();
+        assertThat(second.search("Neue"))
                 .extracting(SearchHit::entryId)
                 .containsExactly("new-entry");
 

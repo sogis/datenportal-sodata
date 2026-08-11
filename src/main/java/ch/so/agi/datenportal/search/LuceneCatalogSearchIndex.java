@@ -40,14 +40,15 @@ public final class LuceneCatalogSearchIndex implements CatalogSearchIndex {
     }
 
     @Override
-    public List<SearchHit> search(String userQuery, int maxResults) {
-        if (closed.get() || maxResults <= 0 || userQuery == null || userQuery.isBlank()) {
+    public List<SearchHit> search(String userQuery) {
+        ensureOpen();
+        if (userQuery == null || userQuery.isBlank()) {
             return List.of();
         }
 
         try {
             var query = buildQuery(userQuery);
-            var topDocs = searcher.search(query, maxResults);
+            var topDocs = searcher.search(query, reader.numDocs());
             var seen = new LinkedHashSet<String>();
             var hits = new java.util.ArrayList<SearchHit>();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
@@ -58,15 +59,24 @@ public final class LuceneCatalogSearchIndex implements CatalogSearchIndex {
                 }
             }
             return List.copyOf(hits);
-        } catch (IOException | RuntimeException ex) {
-            LOGGER.warn("Lucene catalog search failed; returning no text-search results.", ex);
-            return List.of();
+        } catch (IOException ex) {
+            throw new CatalogSearchException("Lucene catalog search failed.", ex);
+        } catch (RuntimeException ex) {
+            if (ex instanceof CatalogSearchException) {
+                throw ex;
+            }
+            throw new CatalogSearchException("Lucene catalog search failed.", ex);
         }
     }
 
     @Override
-    public boolean isEmpty() {
-        return reader.numDocs() == 0;
+    public int documentCount() {
+        ensureOpen();
+        try {
+            return reader.numDocs();
+        } catch (RuntimeException ex) {
+            throw new CatalogSearchException("Lucene catalog document count failed.", ex);
+        }
     }
 
     @Override
@@ -84,6 +94,12 @@ public final class LuceneCatalogSearchIndex implements CatalogSearchIndex {
             directory.close();
         } catch (IOException ex) {
             LOGGER.warn("Could not close Lucene index directory.", ex);
+        }
+    }
+
+    private void ensureOpen() {
+        if (closed.get()) {
+            throw new CatalogSearchException("Lucene catalog search index is closed.");
         }
     }
 

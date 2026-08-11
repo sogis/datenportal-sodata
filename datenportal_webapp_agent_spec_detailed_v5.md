@@ -252,7 +252,6 @@ datenportal:
     enabled: true
     token: ${DATENPORTAL_RELOAD_TOKEN:dev-token-change-me}
   search:
-    max-results: 500
     default-page-size: 10
     max-page-size: 100
     default-sort: modified-desc
@@ -318,7 +317,6 @@ Akzeptanz:
 ```java
 @ConfigurationProperties(prefix = "datenportal.search")
 public record SearchProperties(
-    int maxResults,
     int defaultPageSize,
     int maxPageSize,
     SortMode defaultSort
@@ -1269,7 +1267,7 @@ public final class LuceneSearchIndex implements SearchIndex {
     public LuceneSearchIndex(Directory directory, IndexSearcher searcher, Map<String, CatalogEntry> entriesByIdentifier);
 
     @Override
-    public List<SearchResultItem> search(String userQuery, int maxResults);
+    public List<SearchResultItem> search(String userQuery);
 
     @Override
     public void close();

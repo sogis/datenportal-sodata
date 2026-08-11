@@ -2,6 +2,7 @@ package ch.so.agi.datenportal.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
@@ -32,7 +33,7 @@ class LuceneCatalogSearchIndexTest {
     @Test
     void exactIdentifierRanksAheadOfOtherMatches() {
         try (CatalogSearchIndex index = index()) {
-            assertThat(index.search("gemeindegrenzen", 10))
+            assertThat(index.search("gemeindegrenzen"))
                     .extracting(SearchHit::entryId)
                     .first()
                     .isEqualTo("gemeindegrenzen");
@@ -42,13 +43,13 @@ class LuceneCatalogSearchIndexTest {
     @Test
     void guaranteedSubstringFieldsMatchPartialTokens() {
         try (CatalogSearchIndex index = index()) {
-            assertThat(index.search("zaehl", 10))
+            assertThat(index.search("zaehl"))
                     .extracting(SearchHit::entryId)
                     .containsExactly("verkehrszaehlstellen");
-            assertThat(index.search("steue", 10))
+            assertThat(index.search("steue"))
                     .extracting(SearchHit::entryId)
                     .containsExactly("steuerfuss-gemeinden");
-            assertThat(index.search("apri", 10))
+            assertThat(index.search("apri"))
                     .extracting(SearchHit::entryId)
                     .containsExactly("gemeindegrenzen");
         }
@@ -57,26 +58,26 @@ class LuceneCatalogSearchIndexTest {
     @Test
     void queryUsesAndAcrossTokensAndOrAcrossFields() {
         try (CatalogSearchIndex index = index()) {
-            assertThat(index.search("grenzen april", 10))
+            assertThat(index.search("grenzen april"))
                     .extracting(SearchHit::entryId)
                     .containsExactly("gemeindegrenzen");
-            assertThat(index.search("steuerfuss finanzen", 10))
+            assertThat(index.search("steuerfuss finanzen"))
                     .extracting(SearchHit::entryId)
                     .containsExactly("steuerfuss-gemeinden");
-            assertThat(index.search("grenzen statistik", 10)).isEmpty();
+            assertThat(index.search("grenzen statistik")).isEmpty();
         }
     }
 
     @Test
     void secondaryFieldsRemainSearchable() {
         try (CatalogSearchIndex index = index()) {
-            assertThat(index.search("verwaltungsdaten", 10))
+            assertThat(index.search("verwaltungsdaten"))
                     .extracting(SearchHit::entryId)
                     .containsExactly("archiv");
-            assertThat(index.search("raum umwelt", 10))
+            assertThat(index.search("raum umwelt"))
                     .extracting(SearchHit::entryId)
                     .contains("gemeindegrenzen", "verkehrszaehlstellen");
-            assertThat(index.search("amt finanzen", 10))
+            assertThat(index.search("amt finanzen"))
                     .extracting(SearchHit::entryId)
                     .containsExactly("steuerfuss-gemeinden");
         }
@@ -85,9 +86,20 @@ class LuceneCatalogSearchIndexTest {
     @Test
     void specialCharactersDoNotCrashAndPureDescriptionSubstringIsNotGuaranteed() {
         try (CatalogSearchIndex index = index()) {
-            assertThatCode(() -> index.search("+:/( wasser", 10)).doesNotThrowAnyException();
-            assertThat(index.search("waltungsdat", 10)).isEmpty();
+            assertThatCode(() -> index.search("+:/( wasser")).doesNotThrowAnyException();
+            assertThat(index.search("waltungsdat")).isEmpty();
         }
+    }
+
+    @Test
+    void closedIndexReportsSearchFailureInsteadOfReturningNoResults() {
+        CatalogSearchIndex index = index();
+        index.close();
+
+        assertThatThrownBy(() -> index.search("gemeindegrenzen"))
+                .isInstanceOf(CatalogSearchException.class);
+        assertThatThrownBy(index::documentCount)
+                .isInstanceOf(CatalogSearchException.class);
     }
 
     private CatalogSearchIndex index() {

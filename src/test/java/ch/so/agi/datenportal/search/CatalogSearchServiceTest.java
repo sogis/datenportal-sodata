@@ -36,7 +36,7 @@ class CatalogSearchServiceTest {
     private static final Theme ECON = new Theme("ECON", "Wirtschaft und Finanzen");
     private static final Theme GOVE = new Theme("GOVE", "Regierung und Verwaltung");
 
-    private final CatalogSearchService service = new CatalogSearchService(new SearchProperties(500, 10, 100), CLOCK);
+    private final CatalogSearchService service = new CatalogSearchService(new SearchProperties(10, 100), CLOCK);
 
     @Test
     void emptyQueryReturnsAllEntriesSortedByModifiedDescending() {

@@ -8,9 +8,9 @@ public interface CatalogSearchIndex extends AutoCloseable {
         return EmptyCatalogSearchIndex.INSTANCE;
     }
 
-    List<SearchHit> search(String userQuery, int maxResults);
+    List<SearchHit> search(String userQuery);
 
-    boolean isEmpty();
+    int documentCount();
 
     @Override
     void close();

@@ -19,11 +19,12 @@ public final class CatalogSearchIndexHealthIndicator implements HealthIndicator 
     public Health health() {
         try {
             return catalogService.withSnapshot(snapshot -> {
-                boolean emptyIndex = snapshot.searchIndex().isEmpty();
-                var builder = emptyIndex ? Health.down() : Health.up();
+                int expectedDocuments = snapshot.visibleEntries().size();
+                int indexedDocuments = snapshot.searchIndex().documentCount();
+                var builder = expectedDocuments == indexedDocuments ? Health.up() : Health.down();
                 return builder
-                        .withDetail("available", !emptyIndex)
-                        .withDetail("visibleEntries", snapshot.visibleEntries().size())
+                        .withDetail("expectedDocuments", expectedDocuments)
+                        .withDetail("indexedDocuments", indexedDocuments)
                         .withDetail("loadedAt", snapshot.loadedAt())
                         .build();
             });

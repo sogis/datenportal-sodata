@@ -28,17 +28,14 @@ class CatalogDocumentMapperTest {
         Document document = mapper.toDocument(dataset());
 
         assertThat(document.get(CatalogSearchFields.ENTRY_ID)).isEqualTo("verkehrszaehlstellen");
-        assertThat(document.get(CatalogSearchFields.ENTRY_TYPE)).isEqualTo("dataset");
         assertThat(document.get(CatalogSearchFields.IDENTIFIER_EXACT)).isEqualTo("verkehrszaehlstellen");
-        assertThat(document.get(CatalogSearchFields.TITLE)).contains("Verkehrszählstellen");
-        assertThat(document.get(CatalogSearchFields.DESCRIPTION)).contains("Standorte");
-        assertThat(hasField(document, CatalogSearchFields.KEYWORDS)).isTrue();
-        assertThat(hasField(document, CatalogSearchFields.THEME_TEXT)).isTrue();
-        assertThat(hasField(document, CatalogSearchFields.OFFICE_TEXT)).isTrue();
-        assertThat(hasField(document, CatalogSearchFields.FORMATS)).isTrue();
-        assertThat(hasField(document, CatalogSearchFields.MODIFIED_DATE_EPOCH_DAY)).isTrue();
-        assertThat(document.get(CatalogSearchFields.OPEN_DATA)).isEqualTo("true");
-        assertThat(document.get(CatalogSearchFields.STRUCTURE_DESCRIBED)).isEqualTo("false");
+        assertThat(document.get(CatalogSearchFields.TITLE_EXACT)).isEqualTo("verkehrszahlstellen");
+        assertThat(hasField(document, CatalogSearchFields.DESCRIPTION_TERMS)).isTrue();
+        assertThat(hasField(document, CatalogSearchFields.KEYWORD_SUBSTRING)).isTrue();
+        assertThat(hasField(document, CatalogSearchFields.THEME_TERMS)).isTrue();
+        assertThat(hasField(document, CatalogSearchFields.OFFICE_TERMS)).isTrue();
+        assertThat(hasField(document, CatalogSearchFields.FORMAT_TERMS)).isTrue();
+        assertThat(document.get("structure_described")).isNull();
     }
 
     @Test
@@ -46,9 +43,10 @@ class CatalogDocumentMapperTest {
         Document document = mapper.toDocument(series());
 
         assertThat(document.get(CatalogSearchFields.ENTRY_ID)).isEqualTo("gemeindegrenzen");
-        assertThat(document.get(CatalogSearchFields.ENTRY_TYPE)).isEqualTo("series");
-        assertThat(hasField(document, CatalogSearchFields.ISSUE_YEARS)).isTrue();
-        assertThat(hasField(document, CatalogSearchFields.ISSUE_TEXT)).isTrue();
+        assertThat(hasField(document, CatalogSearchFields.ISSUE_IDENTIFIER_SUBSTRING)).isTrue();
+        assertThat(hasField(document, CatalogSearchFields.ISSUE_TITLE_SUBSTRING)).isTrue();
+        assertThat(hasField(document, CatalogSearchFields.ISSUE_LABEL_SUBSTRING)).isTrue();
+        assertThat(hasField(document, CatalogSearchFields.ISSUE_DESCRIPTION_TERMS)).isTrue();
         assertThat(document.getFields(CatalogSearchFields.ENTRY_ID)).hasSize(1);
     }
 

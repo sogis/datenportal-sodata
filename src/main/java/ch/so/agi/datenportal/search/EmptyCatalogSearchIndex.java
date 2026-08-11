@@ -6,13 +6,13 @@ enum EmptyCatalogSearchIndex implements CatalogSearchIndex {
     INSTANCE;
 
     @Override
-    public List<SearchHit> search(String userQuery, int maxResults) {
+    public List<SearchHit> search(String userQuery) {
         return List.of();
     }
 
     @Override
-    public boolean isEmpty() {
-        return true;
+    public int documentCount() {
+        return 0;
     }
 
     @Override
