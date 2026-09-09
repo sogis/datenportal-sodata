@@ -12,6 +12,29 @@ public record Catalog(
         datasetSeries = List.copyOf(datasetSeries);
     }
 
+    /** Build the public view only after validating the complete source catalog. */
+    public Catalog publishedView() {
+        var visibleSeries = new ArrayList<DatasetSeriesEntry>();
+        for (var series : datasetSeries) {
+            if (!isPublished(series.metadata())) {
+                continue;
+            }
+            var issues = series.issues().stream()
+                    .filter(issue -> isPublished(issue.metadata())).toList();
+            if (!issues.isEmpty()) {
+                visibleSeries.add(new DatasetSeriesEntry(series.identifier(), series.title(),
+                        series.description(), series.publisher(), series.creator(), series.themes(),
+                        series.keywords(), series.accessLevel(), series.metadata(), issues));
+            }
+        }
+        return new Catalog(datasets.stream().filter(dataset -> isPublished(dataset.metadata())).toList(),
+                visibleSeries);
+    }
+
+    private static boolean isPublished(CatalogEntryMetadata metadata) {
+        return metadata.publicationStatus().map("published"::equals).orElse(false);
+    }
+
     public List<CatalogEntry> topLevelEntries() {
         var entries = new ArrayList<CatalogEntry>(datasets.size() + datasetSeries.size());
         entries.addAll(datasets);

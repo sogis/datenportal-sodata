@@ -186,3 +186,13 @@ Für den lokalen Smoke-Test siehe `docs/operations.md`.
 - `docs/configuration.md`
 - `docs/operations.md`
 - `docs/web-components.md`
+
+Der PublishedCatalog darf `draft`, `in_review`, `published` und `archived`
+enthalten. Der vollständige Eingang wird zuerst validiert; unbekannte Statuswerte
+bleiben Fehler. Anschliessend übernimmt die öffentliche Sicht nur veröffentlichte
+Datensätze sowie Ausgaben, deren Serie ebenfalls veröffentlicht ist. Serien ohne
+sichtbare Ausgabe entfallen. Suche, Zähler, Detailzugriffe und Auswahl der aktuellen
+Ausgabe verwenden ausschliesslich diese Sicht. Ein gültiger vollständig
+zurückgehaltener Katalog führt zu einer leeren öffentlichen Sicht.
+Die vollständige Quelldatei bleibt unverändert und kann über den Katalog-Download
+weiterhin auch zurückgehaltene Einträge offenlegen.

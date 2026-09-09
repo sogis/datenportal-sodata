@@ -406,6 +406,108 @@ class XtfPublishedCatalogParserTest {
                 """.formatted(accessLevel))).datasets().getFirst();
     }
 
+    @Test
+    void acceptsModelStatusesButExcludesThemFromPublicView() throws Exception {
+        String xml = new ClassPathResource("published_catalog_full_62_entries.xtf")
+                .getContentAsString(StandardCharsets.UTF_8).replace("${DOWNLOAD_URL}", "https://example.test/downloads");
+        for (String status : List.of("draft", "in_review", "archived")) {
+            Catalog full = parseXml(xml.replace("<publicationStatus>published</publicationStatus>",
+                    "<publicationStatus>" + status + "</publicationStatus>"));
+            new CatalogValidator().validateOrThrow(full);
+            assertThat(full.publishedView().topLevelEntries()).isEmpty();
+            try (var snapshot = buildSnapshot(xml.replace("<publicationStatus>published</publicationStatus>",
+                    "<publicationStatus>" + status + "</publicationStatus>"))) {
+                assertThat(snapshot.isEmpty()).isTrue();
+                assertThat(snapshot.searchIndex().documentCount()).isZero();
+                assertThat(snapshot.allEntriesByIdentifier()).isEmpty();
+                assertThat(snapshot.publishedCatalog().sizeInBytes()).isPositive();
+            }
+        }
+        assertThatThrownBy(() -> parseXml(xml.replaceFirst("<publicationStatus>published</publicationStatus>",
+                "<publicationStatus>invalid</publicationStatus>")))
+                .hasMessageContaining("Unknown publicationStatus");
+    }
+
+    @Test
+    void filtersIssuesBeforeSelectingCurrentIssueAndDoesNotChangeSource() throws Exception {
+        String xml = new ClassPathResource("published_catalog_full_62_entries.xtf")
+                .getContentAsString(StandardCharsets.UTF_8).replace("${DOWNLOAD_URL}", "https://example.test/downloads");
+        // Hide every issue marked current; the public view must select among the remaining issues.
+        var document = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+        var nodes = document.getElementsByTagName("DatasetIssue");
+        var hidden = new java.util.HashSet<String>();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            var issue = (org.w3c.dom.Element) nodes.item(i);
+            if ("true".equals(issue.getElementsByTagName("isCurrentIssue").item(0).getTextContent())) {
+                hidden.add(issue.getElementsByTagName("identifier").item(0).getTextContent());
+                issue.getElementsByTagName("publicationStatus").item(0).setTextContent("in_review");
+            }
+        }
+        var output = new java.io.StringWriter();
+        javax.xml.transform.TransformerFactory.newInstance().newTransformer().transform(
+                new javax.xml.transform.dom.DOMSource(document), new javax.xml.transform.stream.StreamResult(output));
+        Catalog full = parseXml(output.toString());
+        new CatalogValidator().validateOrThrow(full);
+        Catalog visible = full.publishedView();
+        assertThat(hidden).isNotEmpty();
+        assertThat(full.issueCount()).isEqualTo(111);
+        assertThat(visible.issueCount()).isEqualTo(111 - hidden.size());
+        try (var snapshot = buildSnapshot(output.toString())) {
+            for (String identifier : hidden) {
+                assertThat(snapshot.findAnyEntry(identifier)).isEmpty();
+                assertThat(snapshot.findVisibleEntry(identifier)).isEmpty();
+                assertThat(snapshot.searchIndex().search(identifier)).noneMatch(hit -> hidden.contains(hit.entryId()));
+            }
+            assertThat(snapshot.catalog().issueCount()).isEqualTo(visible.issueCount());
+        }
+        for (var series : visible.datasetSeries()) {
+            assertThat(series.issues()).allMatch(issue -> !hidden.contains(issue.identifier()));
+            assertThat(hidden).doesNotContain(series.currentIssueOrThrow().identifier());
+        }
+    }
+
+    @Test
+    void importsRealGretlDeliveryWithRetainedAndReleasedIssues() throws Exception {
+        // Exported by the offline GRETL integration test with model revision 2bd8046b03ea04d202056b05c62fa953e3ddfff5.
+        String xml = new ClassPathResource("published_catalog_gretl_delivery.xtf")
+                .getContentAsString(StandardCharsets.UTF_8);
+        Catalog full = parseXml(xml);
+        new CatalogValidator().validateOrThrow(full);
+        assertThat(full.seriesCount()).isEqualTo(1);
+        assertThat(full.issueCount()).isEqualTo(3);
+        try (var snapshot = buildSnapshot(xml)) {
+            assertThat(snapshot.catalog().issueCount()).isEqualTo(1);
+            assertThat(snapshot.catalog().datasetSeries().getFirst().currentIssueOrThrow().identifier())
+                    .isEqualTo("ch.so.bevoelkerung.altersstruktur_2030");
+            assertThat(snapshot.findAnyEntry("ch.so.bevoelkerung.altersstruktur_2025")).isEmpty();
+        }
+    }
+
+    @Test
+    void publishedIssueOfWithheldSeriesIsNotAccessible() throws Exception {
+        String xml = new ClassPathResource("published_catalog_gretl_delivery.xtf")
+                .getContentAsString(StandardCharsets.UTF_8)
+                .replaceFirst("<publicationStatus>published</publicationStatus>",
+                        "<publicationStatus>draft</publicationStatus>");
+        assertThat(parseXml(xml).datasetSeries().getFirst().issues())
+                .anyMatch(issue -> issue.metadata().publicationStatus().orElse("").equals("published"));
+        try (var snapshot = buildSnapshot(xml)) {
+            assertThat(snapshot.isEmpty()).isTrue();
+            assertThat(snapshot.allEntriesByIdentifier()).isEmpty();
+            assertThat(snapshot.searchIndex().documentCount()).isZero();
+        }
+    }
+
+    private static ch.so.agi.datenportal.catalog.domain.CatalogSnapshot buildSnapshot(String xml) {
+        var builder = new ch.so.agi.datenportal.catalog.service.CatalogSnapshotBuilder(
+                PARSER, new CatalogValidator(),
+                new ch.so.agi.datenportal.search.CatalogSearchIndexBuilder(
+                        new ch.so.agi.datenportal.search.CatalogDocumentMapper()), java.time.Clock.systemUTC());
+        return builder.build(new CatalogBytes(xml.getBytes(StandardCharsets.UTF_8), "statuses-test"),
+                ch.so.agi.datenportal.catalog.CatalogTestArtifacts.duckDb("test")).snapshot();
+    }
+
     private static Catalog parseXml(String xml) {
         return PARSER.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)), "inline-test.xml");
     }

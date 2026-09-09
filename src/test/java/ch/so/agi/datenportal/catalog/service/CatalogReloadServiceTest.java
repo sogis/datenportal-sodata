@@ -6,6 +6,7 @@ import ch.so.agi.datenportal.admin.reload.ReloadFailureType;
 import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
@@ -278,6 +279,8 @@ class CatalogReloadServiceTest {
                         List.of(title),
                         LocalDate.parse("2026-06-01"),
                         AccessLevel.OPEN,
+                        new CatalogEntryMetadata(null, null, null, null, null, Optional.of("published"),
+                                null, null, List.of(), null),
                         List.of(new DistributionLink(URI.create("https://example.com/" + identifier + ".csv"), DistributionFormat.CSV)))),
                 List.of());
     }

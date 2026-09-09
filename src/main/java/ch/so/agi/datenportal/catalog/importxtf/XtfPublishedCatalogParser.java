@@ -992,9 +992,9 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
             if (publicationStatus == null || publicationStatus.isBlank()) {
                 throw validationError(path.push("publicationStatus"), "Required field is missing.");
             }
-            if (!"published".equalsIgnoreCase(publicationStatus.trim())) {
+            if (!java.util.Set.of("draft", "in_review", "published", "archived").contains(publicationStatus)) {
                 throw validationError(path.push("publicationStatus"),
-                        "Only publicationStatus 'published' is supported in Phase 2.");
+                        "Unknown publicationStatus: " + publicationStatus + "");
             }
         }
 

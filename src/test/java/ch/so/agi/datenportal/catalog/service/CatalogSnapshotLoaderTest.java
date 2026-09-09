@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import ch.so.agi.datenportal.catalog.CatalogTestArtifacts;
 import ch.so.agi.datenportal.catalog.domain.AccessLevel;
 import ch.so.agi.datenportal.catalog.domain.Catalog;
+import ch.so.agi.datenportal.catalog.domain.CatalogEntryMetadata;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
@@ -135,6 +136,8 @@ class CatalogSnapshotLoaderTest {
                         List.of("Bauen"),
                         LocalDate.parse("2026-05-14"),
                         AccessLevel.OPEN,
+                        new CatalogEntryMetadata(null, null, null, null, null, Optional.of("published"),
+                                null, null, List.of(), null),
                         List.of(new DistributionLink(URI.create("https://example.com/bauinventar.csv"), DistributionFormat.CSV)))),
                 List.of());
     }

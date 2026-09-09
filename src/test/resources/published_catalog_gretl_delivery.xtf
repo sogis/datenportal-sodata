@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/SO_AGI_DataCatalog_PublishedCatalog_20260602" xmlns:base="http://www.interlis.ch/xtf/2.4/SO_AGI_DataCatalog_Base_20260529">
+  <ili:headersection>
+    <ili:models>
+      <ili:model>SO_AGI_DataCatalog_PublishedCatalog_20260602</ili:model>
+      <ili:model>SO_AGI_DataCatalog_Base_20260529</ili:model>
+    </ili:models>
+    <ili:sender>datenportal-gretl</ili:sender>
+  </ili:headersection>
+  <ili:datasection>
+    <Publication ili:bid="b_652f55016243bf1b9f1bbea4">
+      <Catalog ili:tid="catalog">
+        <catalogUri>https://data.so.ch/catalog</catalogUri>
+        <title>Datenportal Kanton Solothurn</title>
+        <description>Datensätze und Datenserien des Kantons Solothurn</description>
+        <publisher>
+          <Office>
+            <officeUri>https://data.so.ch/agent/ch.so.agi</officeUri>
+            <name>Amt für Geoinformation</name>
+            <abbreviation>AGI</abbreviation>
+            <email>mailto:agi@bd.so.ch</email>
+            <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
+          </Office>
+        </publisher>
+        <homepage>https://data.so.ch</homepage>
+        <modified>2026-09-09</modified>
+        <agents>
+          <Office>
+            <officeUri>https://data.so.ch/agent/ch.so.abmh</officeUri>
+            <name>Amt für Berufsbildung, Mittel- und Hochschulen</name>
+            <abbreviation>ABMH</abbreviation>
+            <email>mailto:abmh@dbk.so.ch</email>
+            <officeAtWeb>https://so.ch/verwaltung/departement-fuer-bildung-kultur-und-sport/amt-fuer-berufsbildung-mittel-und-hochschulen/</officeAtWeb>
+          </Office>
+          <Office>
+            <officeUri>https://data.so.ch/agent/ch.so.afin</officeUri>
+            <name>Amt für Finanzen</name>
+            <abbreviation>AFIN</abbreviation>
+            <email>mailto:afin@fd.so.ch</email>
+            <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
+          </Office>
+          <Office>
+            <officeUri>https://data.so.ch/agent/ch.so.afu</officeUri>
+            <name>Amt für Umwelt</name>
+            <abbreviation>AfU</abbreviation>
+            <email>mailto:afu@bd.so.ch</email>
+            <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-umwelt/</officeAtWeb>
+          </Office>
+          <Office>
+            <officeUri>https://data.so.ch/agent/ch.so.agi</officeUri>
+            <name>Amt für Geoinformation</name>
+            <abbreviation>AGI</abbreviation>
+            <email>mailto:agi@bd.so.ch</email>
+            <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
+          </Office>
+          <Office>
+            <officeUri>https://data.so.ch/agent/ch.so.arp</officeUri>
+            <name>Amt für Raumplanung</name>
+            <abbreviation>ARP</abbreviation>
+            <email>mailto:arp@bd.so.ch</email>
+            <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-raumplanung/ueber-uns/</officeAtWeb>
+          </Office>
+          <Office>
+            <officeUri>https://data.so.ch/agent/ch.so.ksta</officeUri>
+            <name>Steueramt</name>
+            <abbreviation>KSTA</abbreviation>
+            <email>mailto:steueramt.so@fd.so.ch</email>
+            <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/steueramt/</officeAtWeb>
+          </Office>
+          <Office>
+            <officeUri>https://data.so.ch/agent/ch.so.mfk</officeUri>
+            <name>Motorfahrzeugkontrolle</name>
+            <abbreviation>MFK</abbreviation>
+            <email>mailto:mfk@mfk.so.ch</email>
+            <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/motorfahrzeugkontrolle/</officeAtWeb>
+          </Office>
+        </agents>
+        <datasetSeries>
+          <DatasetSeries>
+            <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur</resourceUri>
+            <identifier>ch.so.bevoelkerung.altersstruktur</identifier>
+            <title>Altersstruktur der Wohnbevölkerung nach Geschlecht (Schweizer/Ausländer)</title>
+            <description>Ständige Wohnbevölkerung des Gesamtkantons Solothurn nach Jahrgang (Einzeljahre), gegliedert nach Geschlecht und Staatsangehörigkeit (Schweizer/Schweizerinnen, Ausländer/Ausländerinnen) sowie Total je Jahrgang. Grundlage u. a. für die Alterspyramide. Projektzweck: Kantonale Bevölkerungsstatistik als Grundlage für Planung, Berichterstattung und Verteilentscheide.</description>
+            <publisher>
+              <Office>
+                <officeUri>https://data.so.ch/agent/ch.so.agi</officeUri>
+                <name>Amt für Geoinformation</name>
+                <abbreviation>AGI</abbreviation>
+                <email>mailto:agi@bd.so.ch</email>
+                <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
+              </Office>
+            </publisher>
+            <creator>
+              <Office>
+                <officeUri>https://data.so.ch/agent/ch.so.afin</officeUri>
+                <name>Amt für Finanzen</name>
+                <abbreviation>AFIN</abbreviation>
+                <email>mailto:afin@fd.so.ch</email>
+                <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
+              </Office>
+            </creator>
+            <contactPoint>
+              <base:ContactPoint>
+                <base:name>Patrick Balles</base:name>
+                <base:organizationUnit>Statistik</base:organizationUnit>
+                <base:email>mailto:patrick.balles@fd.so.ch</base:email>
+              </base:ContactPoint>
+            </contactPoint>
+            <themes>
+              <ThemeAssignment>
+                <localTheme>Bevoelkerung</localTheme>
+                <themeUri>http://publications.europa.eu/resource/authority/data-theme/SOCI</themeUri>
+              </ThemeAssignment>
+            </themes>
+            <keywords>Bevölkerung</keywords>
+            <keywords>Altersstruktur</keywords>
+            <keywords>Jahrgang</keywords>
+            <keywords>Alterspyramide</keywords>
+            <keywords>Geschlecht</keywords>
+            <keywords>Nationalität</keywords>
+            <keywords>Solothurn</keywords>
+            <landingPage>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur</landingPage>
+            <issued>2026-09-09</issued>
+            <modified>2026-09-09</modified>
+            <accessRights>
+              <AccessRights>
+                <localAccessLevel>open</localAccessLevel>
+                <accessRightsUri>http://publications.europa.eu/resource/authority/access-right/PUBLIC</accessRightsUri>
+              </AccessRights>
+            </accessRights>
+            <publicationStatus>published</publicationStatus>
+            <accrualPeriodicity>
+              <AccrualPeriodicity>
+                <localFrequency>annually</localFrequency>
+                <frequencyUri>http://publications.europa.eu/resource/authority/frequency/ANNUAL</frequencyUri>
+              </AccrualPeriodicity>
+            </accrualPeriodicity>
+            <temporalCoverage>
+              <base:TemporalCoverage>
+                <base:referenceDate>2025-12-31</base:referenceDate>
+              </base:TemporalCoverage>
+            </temporalCoverage>
+            <attributes>
+              <base:DatasetAttribute>
+                <base:name>Jahrgang</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Geburtsjahr</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+              <base:DatasetAttribute>
+                <base:name>Auslaender</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Männer ausländische Staatsangehörigkeit</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+              <base:DatasetAttribute>
+                <base:name>Auslaenderinnen</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Frauen ausländische Staatsangehörigkeit</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+              <base:DatasetAttribute>
+                <base:name>Schweizer</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Männer schweizerische Staatsangehörigkeit</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+              <base:DatasetAttribute>
+                <base:name>Schweizerinnen</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Frauen schweizerische Staatsangehörigkeit</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+              <base:DatasetAttribute>
+                <base:name>Total</base:name>
+                <base:dataType>INTEGER</base:dataType>
+                <base:description>Gesamtbevölkerung je Jahrgang</base:description>
+                <base:mandatory>true</base:mandatory>
+              </base:DatasetAttribute>
+            </attributes>
+            <surveyMethod>Vollerhebung (Registerauswertung) aus dem harmonisierten Einwohnerregister des Kantons Solothurn (Abbild der Gemeinderegister). Stichtagsbestand. Beobachtungseinheit: Person (AHV-Nr.), aggregiert auf Jahrgang.</surveyMethod>
+            <dataAvailableFrom>2024</dataAvailableFrom>
+            <structureSummary>
+              <StructureSummary>
+                <objectCount>106</objectCount>
+                <attributeCount>6</attributeCount>
+              </StructureSummary>
+            </structureSummary>
+            <issues>
+              <DatasetIssue>
+                <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025</resourceUri>
+                <identifier>ch.so.bevoelkerung.altersstruktur_2025</identifier>
+                <title>Altersstruktur der Wohnbevölkerung nach Geschlecht (Schweizer/Ausländer) 2025</title>
+                <description>Ständige Wohnbevölkerung des Gesamtkantons Solothurn nach Jahrgang (Einzeljahre), gegliedert nach Geschlecht und Staatsangehörigkeit (Schweizer/Schweizerinnen, Ausländer/Ausländerinnen) sowie Total je Jahrgang. Grundlage u. a. für die Alterspyramide. Projektzweck: Kantonale Bevölkerungsstatistik als Grundlage für Planung, Berichterstattung und Verteilentscheide.</description>
+                <publisher>
+                  <Office>
+                    <officeUri>https://data.so.ch/agent/ch.so.agi</officeUri>
+                    <name>Amt für Geoinformation</name>
+                    <abbreviation>AGI</abbreviation>
+                    <email>mailto:agi@bd.so.ch</email>
+                    <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
+                  </Office>
+                </publisher>
+                <creator>
+                  <Office>
+                    <officeUri>https://data.so.ch/agent/ch.so.afin</officeUri>
+                    <name>Amt für Finanzen</name>
+                    <abbreviation>AFIN</abbreviation>
+                    <email>mailto:afin@fd.so.ch</email>
+                    <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
+                  </Office>
+                </creator>
+                <contactPoint>
+                  <base:ContactPoint>
+                    <base:name>Patrick Balles</base:name>
+                    <base:organizationUnit>Statistik</base:organizationUnit>
+                    <base:email>mailto:patrick.balles@fd.so.ch</base:email>
+                  </base:ContactPoint>
+                </contactPoint>
+                <themes>
+                  <ThemeAssignment>
+                    <localTheme>Bevoelkerung</localTheme>
+                    <themeUri>http://publications.europa.eu/resource/authority/data-theme/SOCI</themeUri>
+                  </ThemeAssignment>
+                </themes>
+                <keywords>Bevölkerung</keywords>
+                <keywords>Altersstruktur</keywords>
+                <keywords>Jahrgang</keywords>
+                <keywords>Alterspyramide</keywords>
+                <keywords>Geschlecht</keywords>
+                <keywords>Nationalität</keywords>
+                <keywords>Solothurn</keywords>
+                <landingPage>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_2025</landingPage>
+                <issued>2026-09-09</issued>
+                <modified>2026-09-09</modified>
+                <accessRights>
+                  <AccessRights>
+                    <localAccessLevel>open</localAccessLevel>
+                    <accessRightsUri>http://publications.europa.eu/resource/authority/access-right/PUBLIC</accessRightsUri>
+                  </AccessRights>
+                </accessRights>
+                <publicationStatus>in_review</publicationStatus>
+                <accrualPeriodicity>
+                  <AccrualPeriodicity>
+                    <localFrequency>annually</localFrequency>
+                    <frequencyUri>http://publications.europa.eu/resource/authority/frequency/ANNUAL</frequencyUri>
+                  </AccrualPeriodicity>
+                </accrualPeriodicity>
+                <temporalCoverage>
+                  <base:TemporalCoverage>
+                    <base:referenceDate>2025-12-31</base:referenceDate>
+                  </base:TemporalCoverage>
+                </temporalCoverage>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>Jahrgang</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Geburtsjahr</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Auslaender</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Männer ausländische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Auslaenderinnen</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Frauen ausländische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Schweizer</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Männer schweizerische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Schweizerinnen</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Frauen schweizerische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Total</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Gesamtbevölkerung je Jahrgang</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <surveyMethod>Vollerhebung (Registerauswertung) aus dem harmonisierten Einwohnerregister des Kantons Solothurn (Abbild der Gemeinderegister). Stichtagsbestand. Beobachtungseinheit: Person (AHV-Nr.), aggregiert auf Jahrgang.</surveyMethod>
+                <dataAvailableFrom>2024</dataAvailableFrom>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>106</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
+                <distributions>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025/distribution/csv</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_2025</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2025.csv</downloadURL>
+                    <format>csv</format>
+                  </Distribution>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025/distribution/xlsx</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_2025</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2025.xlsx</downloadURL>
+                    <format>xlsx</format>
+                  </Distribution>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2025/distribution/parquet</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_2025</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2025.parquet</downloadURL>
+                    <format>parquet</format>
+                  </Distribution>
+                </distributions>
+                <issueLabel>2025</issueLabel>
+                <isCurrentIssue>false</isCurrentIssue>
+              </DatasetIssue>
+              <DatasetIssue>
+                <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2030</resourceUri>
+                <identifier>ch.so.bevoelkerung.altersstruktur_2030</identifier>
+                <title>Altersstruktur der Wohnbevölkerung nach Geschlecht (Schweizer/Ausländer) 2025</title>
+                <description>Ständige Wohnbevölkerung des Gesamtkantons Solothurn nach Jahrgang (Einzeljahre), gegliedert nach Geschlecht und Staatsangehörigkeit (Schweizer/Schweizerinnen, Ausländer/Ausländerinnen) sowie Total je Jahrgang. Grundlage u. a. für die Alterspyramide. Projektzweck: Kantonale Bevölkerungsstatistik als Grundlage für Planung, Berichterstattung und Verteilentscheide.</description>
+                <publisher>
+                  <Office>
+                    <officeUri>https://data.so.ch/agent/ch.so.agi</officeUri>
+                    <name>Amt für Geoinformation</name>
+                    <abbreviation>AGI</abbreviation>
+                    <email>mailto:agi@bd.so.ch</email>
+                    <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
+                  </Office>
+                </publisher>
+                <creator>
+                  <Office>
+                    <officeUri>https://data.so.ch/agent/ch.so.afin</officeUri>
+                    <name>Amt für Finanzen</name>
+                    <abbreviation>AFIN</abbreviation>
+                    <email>mailto:afin@fd.so.ch</email>
+                    <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
+                  </Office>
+                </creator>
+                <contactPoint>
+                  <base:ContactPoint>
+                    <base:name>Patrick Balles</base:name>
+                    <base:organizationUnit>Statistik</base:organizationUnit>
+                    <base:email>mailto:patrick.balles@fd.so.ch</base:email>
+                  </base:ContactPoint>
+                </contactPoint>
+                <themes>
+                  <ThemeAssignment>
+                    <localTheme>Bevoelkerung</localTheme>
+                    <themeUri>http://publications.europa.eu/resource/authority/data-theme/SOCI</themeUri>
+                  </ThemeAssignment>
+                </themes>
+                <keywords>Bevölkerung</keywords>
+                <keywords>Altersstruktur</keywords>
+                <keywords>Jahrgang</keywords>
+                <keywords>Alterspyramide</keywords>
+                <keywords>Geschlecht</keywords>
+                <keywords>Nationalität</keywords>
+                <keywords>Solothurn</keywords>
+                <landingPage>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_2030</landingPage>
+                <issued>2026-09-09</issued>
+                <modified>2026-09-09</modified>
+                <accessRights>
+                  <AccessRights>
+                    <localAccessLevel>open</localAccessLevel>
+                    <accessRightsUri>http://publications.europa.eu/resource/authority/access-right/PUBLIC</accessRightsUri>
+                  </AccessRights>
+                </accessRights>
+                <publicationStatus>published</publicationStatus>
+                <accrualPeriodicity>
+                  <AccrualPeriodicity>
+                    <localFrequency>annually</localFrequency>
+                    <frequencyUri>http://publications.europa.eu/resource/authority/frequency/ANNUAL</frequencyUri>
+                  </AccrualPeriodicity>
+                </accrualPeriodicity>
+                <temporalCoverage>
+                  <base:TemporalCoverage>
+                    <base:referenceDate>2025-12-31</base:referenceDate>
+                  </base:TemporalCoverage>
+                </temporalCoverage>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>Jahrgang</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Geburtsjahr</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Auslaender</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Männer ausländische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Auslaenderinnen</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Frauen ausländische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Schweizer</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Männer schweizerische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Schweizerinnen</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Frauen schweizerische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Total</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Gesamtbevölkerung je Jahrgang</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <surveyMethod>Vollerhebung (Registerauswertung) aus dem harmonisierten Einwohnerregister des Kantons Solothurn (Abbild der Gemeinderegister). Stichtagsbestand. Beobachtungseinheit: Person (AHV-Nr.), aggregiert auf Jahrgang.</surveyMethod>
+                <dataAvailableFrom>2024</dataAvailableFrom>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>106</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
+                <distributions>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2030/distribution/csv</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_2030</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2030.csv</downloadURL>
+                    <format>csv</format>
+                  </Distribution>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2030/distribution/xlsx</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_2030</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2030.xlsx</downloadURL>
+                    <format>xlsx</format>
+                  </Distribution>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_2030/distribution/parquet</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_2030</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2030.parquet</downloadURL>
+                    <format>parquet</format>
+                  </Distribution>
+                </distributions>
+                <issueLabel>2030</issueLabel>
+                <isCurrentIssue>true</isCurrentIssue>
+              </DatasetIssue>
+              <DatasetIssue>
+                <resourceUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51</resourceUri>
+                <identifier>ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51</identifier>
+                <title>Altersstruktur der Wohnbevölkerung nach Geschlecht (Schweizer/Ausländer) 2031 / Spezial's</title>
+                <description>Ständige Wohnbevölkerung des Gesamtkantons Solothurn nach Jahrgang (Einzeljahre), gegliedert nach Geschlecht und Staatsangehörigkeit (Schweizer/Schweizerinnen, Ausländer/Ausländerinnen) sowie Total je Jahrgang. Grundlage u. a. für die Alterspyramide. Projektzweck: Kantonale Bevölkerungsstatistik als Grundlage für Planung, Berichterstattung und Verteilentscheide.</description>
+                <publisher>
+                  <Office>
+                    <officeUri>https://data.so.ch/agent/ch.so.agi</officeUri>
+                    <name>Amt für Geoinformation</name>
+                    <abbreviation>AGI</abbreviation>
+                    <email>mailto:agi@bd.so.ch</email>
+                    <officeAtWeb>https://so.ch/verwaltung/bau-und-justizdepartement/amt-fuer-geoinformation/</officeAtWeb>
+                  </Office>
+                </publisher>
+                <creator>
+                  <Office>
+                    <officeUri>https://data.so.ch/agent/ch.so.afin</officeUri>
+                    <name>Amt für Finanzen</name>
+                    <abbreviation>AFIN</abbreviation>
+                    <email>mailto:afin@fd.so.ch</email>
+                    <officeAtWeb>https://so.ch/verwaltung/finanzdepartement/amt-fuer-finanzen/</officeAtWeb>
+                  </Office>
+                </creator>
+                <contactPoint>
+                  <base:ContactPoint>
+                    <base:name>Patrick Balles</base:name>
+                    <base:organizationUnit>Statistik</base:organizationUnit>
+                    <base:email>mailto:patrick.balles@fd.so.ch</base:email>
+                  </base:ContactPoint>
+                </contactPoint>
+                <themes>
+                  <ThemeAssignment>
+                    <localTheme>Bevoelkerung</localTheme>
+                    <themeUri>http://publications.europa.eu/resource/authority/data-theme/SOCI</themeUri>
+                  </ThemeAssignment>
+                </themes>
+                <keywords>Bevölkerung</keywords>
+                <keywords>Altersstruktur</keywords>
+                <keywords>Jahrgang</keywords>
+                <keywords>Alterspyramide</keywords>
+                <keywords>Geschlecht</keywords>
+                <keywords>Nationalität</keywords>
+                <keywords>Solothurn</keywords>
+                <landingPage>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51</landingPage>
+                <issued>2026-09-09</issued>
+                <modified>2026-09-09</modified>
+                <accessRights>
+                  <AccessRights>
+                    <localAccessLevel>open</localAccessLevel>
+                    <accessRightsUri>http://publications.europa.eu/resource/authority/access-right/PUBLIC</accessRightsUri>
+                  </AccessRights>
+                </accessRights>
+                <publicationStatus>in_review</publicationStatus>
+                <accrualPeriodicity>
+                  <AccrualPeriodicity>
+                    <localFrequency>annually</localFrequency>
+                    <frequencyUri>http://publications.europa.eu/resource/authority/frequency/ANNUAL</frequencyUri>
+                  </AccrualPeriodicity>
+                </accrualPeriodicity>
+                <temporalCoverage>
+                  <base:TemporalCoverage>
+                    <base:referenceDate>2025-12-31</base:referenceDate>
+                  </base:TemporalCoverage>
+                </temporalCoverage>
+                <attributes>
+                  <base:DatasetAttribute>
+                    <base:name>Jahrgang</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Geburtsjahr</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Auslaender</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Männer ausländische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Auslaenderinnen</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Frauen ausländische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Schweizer</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Männer schweizerische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Schweizerinnen</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Frauen schweizerische Staatsangehörigkeit</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                  <base:DatasetAttribute>
+                    <base:name>Total</base:name>
+                    <base:dataType>INTEGER</base:dataType>
+                    <base:description>Gesamtbevölkerung je Jahrgang</base:description>
+                    <base:mandatory>true</base:mandatory>
+                  </base:DatasetAttribute>
+                </attributes>
+                <surveyMethod>Vollerhebung (Registerauswertung) aus dem harmonisierten Einwohnerregister des Kantons Solothurn (Abbild der Gemeinderegister). Stichtagsbestand. Beobachtungseinheit: Person (AHV-Nr.), aggregiert auf Jahrgang.</surveyMethod>
+                <dataAvailableFrom>2024</dataAvailableFrom>
+                <structureSummary>
+                  <StructureSummary>
+                    <objectCount>5</objectCount>
+                    <attributeCount>6</attributeCount>
+                  </StructureSummary>
+                </structureSummary>
+                <distributions>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51/distribution/csv</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2031%2520%252F%2520Spezial%2527s.csv</downloadURL>
+                    <format>csv</format>
+                  </Distribution>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51/distribution/xlsx</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2031%2520%252F%2520Spezial%2527s.xlsx</downloadURL>
+                    <format>xlsx</format>
+                  </Distribution>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51/distribution/parquet</distributionUri>
+                    <accessURL>https://data.so.ch/series/ch.so.bevoelkerung.altersstruktur/issues/ch.so.bevoelkerung.altersstruktur_issue_f8acf8b84efe96e9df410f51</accessURL>
+                    <downloadURL>https://s3.geo.so.ch/datenportal/ch.so.bevoelkerung.altersstruktur_2031%2520%252F%2520Spezial%2527s.parquet</downloadURL>
+                    <format>parquet</format>
+                  </Distribution>
+                </distributions>
+                <issueLabel>2031 / Spezial's</issueLabel>
+                <isCurrentIssue>false</isCurrentIssue>
+              </DatasetIssue>
+            </issues>
+          </DatasetSeries>
+        </datasetSeries>
+      </Catalog>
+    </Publication>
+  </ili:datasection>
+</ili:transfer>

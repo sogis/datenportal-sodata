@@ -59,6 +59,7 @@ public final class CatalogSnapshotBuilder {
                 publishedCatalog.sourceDescription(),
                 validation.warnings().size());
 
+        catalog = catalog.publishedView();
         CatalogSearchIndex searchIndex = searchIndexBuilder.build(catalog.topLevelEntries());
         try {
             Instant loadedAt = clock.instant();
