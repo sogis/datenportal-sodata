@@ -24,7 +24,8 @@ deaktiviertem JTE-Development-Mode; es wird für Tests über
 
 In Produktion muss die Quellart samt passendem Ort über externe
 Konfiguration gesetzt werden. Zulässige Quellarten sind `classpath`, `file`
-und `http`. Secrets und Umgebungsvariablen gehören nicht in das Repository.
+sowie `http` und `manifest` für XTF. DuckDB unterstützt weiterhin `classpath`,
+`file` und `http`. Secrets und Umgebungsvariablen gehören nicht in das Repository.
 
 Wichtige Umgebungsvariablen:
 
@@ -52,10 +53,11 @@ datenportal:
 ```
 
 `source-type` ist verpflichtend. Für `classpath` muss
-`classpath-location`, für `file` muss `file-location` und für `http` muss
+`classpath-location`, für `file` muss `file-location` und für `http` oder `manifest` muss
 `http-url` gesetzt sein. Nicht zur gewählten Quellart gehörende Orte dürfen
 leer bleiben. `source-type=http` lädt die vollständige PublishedCatalog-XTF/XML-
-Datei per HTTP GET; `source-type=file` ist für lokale Entwicklung,
+Datei per HTTP GET; `source-type=manifest` löst zunächst `current.json` auf
+und lädt daraus die Katalogdatei. `source-type=file` ist für lokale Entwicklung,
 Tests und extern gemountete Artefakte vorgesehen.
 
 HTTP-Quellen:
@@ -63,6 +65,8 @@ HTTP-Quellen:
 - `http-connect-timeout` begrenzt den Verbindungsaufbau.
 - `http-read-timeout` begrenzt den vollständigen HTTP-Request.
 - `max-size` begrenzt die eingelesenen Katalogbytes für alle Quellen.
+- Bei `manifest` ist der Verweis selbst auf 64 KiB begrenzt; für die referenzierte
+  XTF gilt `max-size`. Verbindungs- und Request-Timeouts gelten je HTTP-Abruf.
 - HTTP-Status ausserhalb `2xx` führen zu einem kontrollierten Reload-Fehler.
 - Die Source-Beschreibung enthält Schema, Host, Port und Pfad, aber keine Userinfo, Query-Parameter oder Fragments.
 
@@ -77,7 +81,28 @@ Download-URL-Platzhalter:
 Öffentliche Katalog-Artefakte:
 
 - `GET /catalog/published-catalog.xtf` liefert das im aktiven Snapshot gespeicherte PublishedCatalog-XTF-Artefakt aus. Der `${DOWNLOAD_URL}`-Platzhalter ist dabei bereits ersetzt; ETag, Content-Length und `If-None-Match` werden unterstützt.
-- `GET /catalog/catalog.duckdb` liefert das im aktiven Snapshot gespeicherte DuckDB-View-Catalog-Artefakt aus. Ohne Versionsparameter bleibt die Antwort `no-cache); Explore verwendet `?v=<sha256>`, womit `public, immutable`-Caching aktiviert wird. Eine veraltete Version wird mit `409 Conflict` abgewiesen, statt still die aktuelle Datei zu liefern.
+- `GET /catalog/catalog.duckdb` liefert das im aktiven Snapshot gespeicherte DuckDB-View-Catalog-Artefakt aus. Ohne Versionsparameter bleibt die Antwort `no-cache`; Explore verwendet `?v=<sha256>`, womit `public, immutable`-Caching aktiviert wird. Eine veraltete Version wird mit `409 Conflict` abgewiesen, statt still die aktuelle Datei zu liefern.
+
+## Veröffentlichungsverweis auf S3
+
+Mit `DATENPORTAL_CATALOG_SOURCE_TYPE=manifest` und
+`DATENPORTAL_CATALOG_HTTP_URL=https://downloads.example.org/current.json` liest die
+Anwendung je Start/Reload genau einen Veröffentlichungsverweis und danach dessen
+Katalog-XTF. Es wird kein S3-SDK benötigt. Der Manifestvertrag ist im
+[Themenrepo](https://codeberg.org/edigonzales/datenportal-themenrepo/src/branch/main/docs/biblios/entwicklung/lieferverarbeitung.adoc)
+definiert: `schemaVersion: 1`, `releaseId`, `datasheets` und `catalog`; Dateinamen
+müssen zur Kennung passen und dürfen keine fremden URLs oder Pfadwechsel enthalten.
+
+`catalog: null` ist ein gültiger Zustand vor der ersten Datenlieferung: leere
+öffentliche Sicht und Suchindex, Health `UP` bei ansonsten gesunden Komponenten,
+404 unter `/catalog/published-catalog.xtf`.
+Der interne Snapshot-Health führt `catalogState=awaiting-first-delivery`;
+die öffentliche Health-Antwort blendet Details aus. Der geschützte Admin-Status
+zeigt Quelle und Eintragszahlen. Es wird keine künstliche XTF erzeugt.
+Eine fehlende referenzierte Datei oder ein ungültiger Verweis bleibt dagegen ein
+Fehler. Fehlgeschlagene Reloads erhalten den bisherigen Snapshot und Suchindex.
+Die bestehende separat konfigurierte `catalog.duckdb` bleibt erforderlich; ihre
+Erzeugung und Synchronisierung mit dem Verweis erfolgt in einem späteren Schritt.
 
 ## DuckDB-Catalog fuer Erkunden
 
@@ -121,8 +146,10 @@ Snapshot aktiviert. Die Anwendung prüft bei DuckDB nur die technische
 Signatur (mindestens zwölf Bytes, `DUCK` an Byteposition 8 bis 11); sie
 erzeugt, repariert oder fachlich analysiert die Datei nicht. Die externe
 Publishing-Pipeline muss daher sicherstellen, dass XTF und DuckDB zueinander
-passen. Ohne externes Release-Manifest kann die Anwendung diese semantische
-Gleichheit nicht beweisen.
+passen. Der aktuelle `current.json`-Vertrag umfasst nur die beiden Gesamt-XTF,
+keine DuckDB. Er bestätigt daher keine semantische Gleichheit zwischen Katalog
+und DuckDB. Eine gültige separate DuckDB-Quelle bleibt auch bei `catalog: null`
+erforderlich; Erzeugung und Synchronisierung sind noch nicht implementiert.
 
 ## WebR fuer Erkunden
 
@@ -298,21 +325,3 @@ datenportal:
 ```
 
 Bei `include-catalog-download-origin=true` wird die Origin aus `datenportal.catalog.download-url` automatisch ergänzt, sofern `download-url` eine absolute `http(s)`-URL ist. Für den lokalen Standard bedeutet das zusätzlich `http://localhost:8081`.
-
-## Veröffentlichungsverweis auf S3
-
-Mit `DATENPORTAL_CATALOG_SOURCE_TYPE=manifest` und
-`DATENPORTAL_CATALOG_HTTP_URL=https://downloads.example.org/current.json` liest die
-Anwendung je Start/Reload genau einen Veröffentlichungsverweis und danach dessen
-Katalog-XTF. Es wird kein S3-SDK benötigt. Der Manifestvertrag ist im
-[Themenrepo](https://codeberg.org/edigonzales/datenportal-themenrepo/src/branch/main/docs/biblios/entwicklung/lieferverarbeitung.adoc)
-definiert: `schemaVersion: 1`, `releaseId`, `datasheets` und `catalog`; Dateinamen
-müssen zur Kennung passen und dürfen keine fremden URLs oder Pfadwechsel enthalten.
-
-`catalog: null` ist ein gültiger Zustand vor der ersten Datenlieferung: leere
-öffentliche Sicht und Suchindex, Health `UP` mit `catalogState=awaiting-first-delivery`,
-404 unter `/catalog/published-catalog.xtf`. Es wird keine künstliche XTF erzeugt.
-Eine fehlende referenzierte Datei oder ein ungültiger Verweis bleibt dagegen ein
-Fehler. Fehlgeschlagene Reloads erhalten den bisherigen Snapshot und Suchindex.
-Die bestehende separat konfigurierte `catalog.duckdb` bleibt erforderlich; ihre
-Erzeugung und Synchronisierung mit dem Verweis erfolgt in einem späteren Schritt.

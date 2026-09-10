@@ -1,6 +1,6 @@
 # Betrieb
 
-## Lokal starten
+## Lokal mit Fixtures starten
 
 ```bash
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
@@ -9,7 +9,7 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 Bei belegtem Port:
 
 ```bash
-SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8081'
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082'
 ```
 
 Standard-URLs:
@@ -18,6 +18,40 @@ Standard-URLs:
 - `http://localhost:8080/datasets`
 - `http://localhost:8080/actuator/health`
 - `http://localhost:8080/actuator/info`
+
+## An den lokalen Dev-Stack anschliessen
+
+Zuerst Garage/Jenkins initialisieren, sodass `current.json` öffentlich lesbar
+ist. Die vollständige Reihenfolge steht in der
+[Stack-Inbetriebnahme](https://codeberg.org/edigonzales/datenportal-dev-stack/src/branch/main/docs/biblios/entwicklung/inbetriebnahme.adoc).
+Im Portal-Repository mit JDK 25 starten:
+
+```bash
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082 --datenportal.catalog.source-type=manifest --datenportal.catalog.http-url=http://localhost:8081/ch.so.daten/current.json --datenportal.catalog.download-url=http://localhost:8081/ch.so.daten --datenportal.catalog.duckdb.source-type=classpath --datenportal.catalog.duckdb.classpath-location=catalog.duckdb'
+```
+
+Port 8080 gehört im Stack Jenkins, 8081 den Downloads. Das Portal verwendet
+8082 und bleibt ein separater Hostprozess. Die Quelle wird bei Start und jedem
+Reload einmal aufgelöst. Die ausdrücklich separat gewählte DuckDB ist hier die
+gebündelte Fixture; für «Erkunden» mit neuen Lieferungen ist eine dazu passende
+DuckDB erforderlich. Der Standardjob erzeugt oder synchronisiert sie noch nicht.
+Auch ein Null-Katalog benötigt eine gültige DuckDB-Quelle.
+
+Bei `catalog: null` sind leere Trefferlisten und ein leerer Suchindex korrekt;
+`/catalog/published-catalog.xtf` liefert 404, da keine XTF vorliegt. Ein gültiger
+Katalog ausschliesslich mit zurückgehaltenen Einträgen ergibt ebenfalls eine
+leere Sicht, hat aber weiterhin eine herunterladbare vollständige Quelldatei.
+Fehlendes Manifest, ungültiges JSON oder fehlende referenzierte Dateien sind
+Ladefehler, keine leere Sicht. Beim Erststart kann dann kein Snapshot aufgebaut
+werden; bei Reload bleibt der alte Zustand erhalten.
+
+Für Reload denselben externen Secret-Wert auf dem Host als
+`DATENPORTAL_ADMIN_RELOAD_TOKEN` und in Jenkins als
+`DATENPORTAL_PORTAL_RELOAD_TOKEN` konfigurieren. Unter Docker Desktop verwendet
+Jenkins `http://host.docker.internal:8082/admin/catalog/reload`; andere
+Docker-Installationen benötigen eine explizit erreichbare Hostadresse. Der
+Reload ändert weder Quellkonfiguration noch Startport. Die folgenden
+Standalone-Beispiele verwenden Port 8080; im Stack entsprechend 8082 einsetzen.
 
 ## Health und Info
 
@@ -42,7 +76,8 @@ Der Standard-`diskSpace`-Health-Contributor ist deaktiviert, damit keine lokalen
 Token setzen:
 
 ```bash
-export DATENPORTAL_ADMIN_RELOAD_TOKEN='change-me'
+: "${DATENPORTAL_ADMIN_RELOAD_TOKEN:?Externes Reload-Secret bereitstellen}"
+export DATENPORTAL_ADMIN_RELOAD_TOKEN
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
@@ -67,11 +102,14 @@ Fehlercodes:
 - `401 Unauthorized`: Token fehlt oder ist falsch.
 - `503 Service Unavailable`: Reload-Token ist nicht konfiguriert.
 - `409 Conflict`: Ein Reload läuft bereits.
-- `502 Bad Gateway`: HTTP-Quelle konnte nicht geladen werden oder lieferte keinen `2xx`-Status.
+- `502 Bad Gateway`: Quellenladefehler, etwa HTTP ohne `2xx`, ungültiger Manifestverweis oder fehlende referenzierte Datei.
 - `422 Unprocessable Entity`: XML/XTF ist ungültig oder die Katalogvalidierung schlägt fehl.
 - `500 Internal Server Error`: unerwarteter Fehler oder Lucene-Reindexing fehlgeschlagen.
 
-Bei jedem Fehler bleibt der bisherige `CatalogSnapshot` samt bisherigem Lucene-Index aktiv.
+Bei jedem Reloadfehler bleibt der bisherige `CatalogSnapshot` samt bisherigem Lucene-Index aktiv.
+Eine bereits angenommene S3-Veröffentlichung wird dadurch nicht zurückgerollt;
+Jenkins kann deshalb eine angenommene Veröffentlichung mit fehlgeschlagenem
+Reload melden. Nach Beheben der Ursache den Reload bewusst erneut auslösen.
 Das gilt ebenso für das bisherige DuckDB-Artefakt: Ein nicht lesbares,
 zu kleines oder technisch ungültiges DuckDB-Artefakt, ein XTF-Fehler oder ein
 Lucene-Fehler veröffentlicht keinen Teilstand.

@@ -29,18 +29,21 @@ Enthalten:
 
 Nicht enthalten:
 
-- Datenbank
+- serverseitige Datenbank für veränderliche Anwendungsdaten
 - Login-System
 - Admin-UI
 - Docker-/Kubernetes-Deployment
 - CI/CD-Pipeline
-- Datenvorschau
+- Erzeugung und automatische Aktualisierung der separat benötigten `catalog.duckdb`
 
 ## Voraussetzungen
 
 - JDK 25
+- Node.js und npm im `PATH` für den von Gradle gestarteten Explore-Build;
+  der gesperrte Vite-Stand benötigt Node `^20.19.0 || >=22.12.0`.
 
 Der Build verwendet den Gradle Wrapper; eine lokale Gradle-Installation ist nicht erforderlich.
+Beim ersten Build werden Gradle-/npm-Abhängigkeiten und WebR-Artefakte geladen.
 
 ## Starten
 
@@ -58,8 +61,12 @@ Danach erreichbar:
 Bei belegtem Port:
 
 ```bash
-SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8081'
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082'
 ```
+
+Der Standardstart verwendet gebündelte Fixtures. Für den lokalen Gesamtstack
+läuft das Portal auf **8082** mit Manifestquelle; der vollständige Aufruf und
+die separate DuckDB-Konfiguration stehen in [Betrieb](docs/operations.md#an-den-lokalen-dev-stack-anschliessen).
 
 ## Dokumentationslandkarte
 
@@ -116,6 +123,21 @@ Weitere Details:
 
 ## Wie Daten ins GUI kommen
 
+Der PublishedCatalog darf `draft`, `in_review`, `published` und `archived`
+enthalten. Der vollständige Eingang wird zuerst validiert; unbekannte Statuswerte
+bleiben Fehler. Anschliessend übernimmt die öffentliche Sicht nur veröffentlichte
+Datensätze sowie Ausgaben, deren Serie ebenfalls veröffentlicht ist. Serien ohne
+sichtbare Ausgabe entfallen. Suche, Zähler, Detailzugriffe und Auswahl der aktuellen
+Ausgabe verwenden ausschliesslich diese Sicht. Ein gültiger vollständig
+zurückgehaltener Katalog führt zu einer leeren öffentlichen Sicht.
+Die vollständige Quelldatei bleibt unverändert und kann über den Katalog-Download
+weiterhin auch zurückgehaltene Einträge offenlegen.
+
+Die Quelle `datenportal.catalog.source-type=manifest` löst eine unter
+`datenportal.catalog.http-url` konfigurierte `current.json` auf. Details zu
+Erstinitialisierung ohne Katalog und zur getrennten DuckDB-Konfiguration stehen
+in [Konfiguration](docs/configuration.md#veröffentlichungsverweis-auf-s3).
+
 Die Anwendung liest das PublishedCatalog-XTF vollständig ein, überführt es in ein internes Read-Model und rendert daraus sowohl die Suchresultate als auch die Detailseiten. Lucene dient dabei der Katalogsuche; Detailseiten lesen ihren Eintrag direkt aus dem aktiven Snapshot.
 
 ```mermaid
@@ -149,7 +171,8 @@ sequenceDiagram
 ## Reload
 
 ```bash
-export DATENPORTAL_ADMIN_RELOAD_TOKEN='change-me'
+: "${DATENPORTAL_ADMIN_RELOAD_TOKEN:?Externes Reload-Secret bereitstellen}"
+export DATENPORTAL_ADMIN_RELOAD_TOKEN
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
@@ -186,18 +209,3 @@ Für den lokalen Smoke-Test siehe `docs/operations.md`.
 - `docs/configuration.md`
 - `docs/operations.md`
 - `docs/web-components.md`
-
-Der PublishedCatalog darf `draft`, `in_review`, `published` und `archived`
-enthalten. Der vollständige Eingang wird zuerst validiert; unbekannte Statuswerte
-bleiben Fehler. Anschliessend übernimmt die öffentliche Sicht nur veröffentlichte
-Datensätze sowie Ausgaben, deren Serie ebenfalls veröffentlicht ist. Serien ohne
-sichtbare Ausgabe entfallen. Suche, Zähler, Detailzugriffe und Auswahl der aktuellen
-Ausgabe verwenden ausschliesslich diese Sicht. Ein gültiger vollständig
-zurückgehaltener Katalog führt zu einer leeren öffentlichen Sicht.
-Die vollständige Quelldatei bleibt unverändert und kann über den Katalog-Download
-weiterhin auch zurückgehaltene Einträge offenlegen.
-
-Die Quelle `datenportal.catalog.source-type=manifest` löst eine unter
-`datenportal.catalog.http-url` konfigurierte `current.json` auf. Details zu
-Erstinitialisierung ohne Katalog und zur getrennten DuckDB-Konfiguration stehen
-in [Konfiguration](docs/configuration.md#veröffentlichungsverweis-auf-s3).
