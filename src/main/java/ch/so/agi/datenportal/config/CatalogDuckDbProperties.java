@@ -58,6 +58,7 @@ public record CatalogDuckDbProperties(
                 }
             }
             case HTTP -> validateHttpUrl(httpUrl);
+            case MANIFEST -> throw new IllegalArgumentException("DuckDB remains a separately configured source.");
         }
     }
 

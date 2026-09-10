@@ -19,7 +19,8 @@ public final class DownloadUrlPlaceholderCatalogSource implements CatalogSource 
 
     @Override
     public CatalogBytes load() throws CatalogSourceException {
-        return resolver.resolve(delegate.load(), downloadUrl);
+        CatalogBytes bytes = delegate.load();
+        return bytes.absent() ? bytes : resolver.resolve(bytes, downloadUrl);
     }
 
     @Override

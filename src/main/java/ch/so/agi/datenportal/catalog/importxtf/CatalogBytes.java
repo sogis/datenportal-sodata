@@ -9,7 +9,16 @@ import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Objects;
 
-public record CatalogBytes(byte[] bytes, String sourceDescription, String contentHash, Instant fetchedAt) {
+public record CatalogBytes(byte[] bytes, String sourceDescription, String contentHash, Instant fetchedAt, boolean absent) {
+
+    public CatalogBytes(byte[] bytes, String sourceDescription, String contentHash, Instant fetchedAt) {
+        this(bytes, sourceDescription, contentHash, fetchedAt, false);
+    }
+
+    public static CatalogBytes absent(CatalogBytes manifest) {
+        return new CatalogBytes(new byte[0], manifest.sourceDescription() + " (catalog: null)",
+                manifest.contentHash(), manifest.fetchedAt(), true);
+    }
 
     public CatalogBytes(byte[] bytes, String sourceDescription) {
         this(bytes, sourceDescription, sha256(bytes), Instant.EPOCH);

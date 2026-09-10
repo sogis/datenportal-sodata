@@ -55,6 +55,7 @@ public final class CatalogArtifactController {
             MediaType mediaType,
             String version,
             String ifNoneMatch) {
+        if (artifact.absent()) return ResponseEntity.notFound().build();
         String etag = quotedEtag(artifact.contentHash());
         if (version != null && !version.isBlank() && !version.equals(artifact.contentHash())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)

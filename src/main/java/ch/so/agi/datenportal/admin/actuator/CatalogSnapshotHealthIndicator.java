@@ -19,8 +19,9 @@ public final class CatalogSnapshotHealthIndicator implements HealthIndicator {
     public Health health() {
         try {
             return catalogService.withSnapshot(snapshot -> {
-                var builder = snapshot.isEmpty() ? Health.down() : Health.up();
+                var builder = Health.up();
                 return builder
+                        .withDetail("catalogState", snapshot.publishedCatalog().absent() ? "awaiting-first-delivery" : "loaded")
                         .withDetail("loadedAt", snapshot.loadedAt())
                         .withDetail("visibleEntries", snapshot.visibleEntries().size())
                         .withDetail("visibleDatasets", snapshot.catalog().datasetCount())

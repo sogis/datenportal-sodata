@@ -7,6 +7,7 @@ import ch.so.agi.datenportal.catalog.importxtf.ClasspathCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.DownloadUrlPlaceholderCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.FileCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.HttpCatalogSource;
+import ch.so.agi.datenportal.catalog.importxtf.ManifestCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.PublishedCatalogParser;
 import ch.so.agi.datenportal.catalog.importxtf.XtfPublishedCatalogParser;
 import ch.so.agi.datenportal.catalog.service.CatalogSnapshotLoader;
@@ -41,6 +42,8 @@ public class CatalogImportConfiguration {
             case CLASSPATH -> new ClasspathCatalogSource(
                     resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
             case FILE -> new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
+            case MANIFEST -> new ManifestCatalogSource(properties.httpUrl(), properties.httpConnectTimeout(),
+                    properties.httpReadTimeout(), properties.maxSize(), clock);
             case HTTP -> new HttpCatalogSource(
                     properties.httpUrl(),
                     properties.httpConnectTimeout(),
@@ -60,6 +63,7 @@ public class CatalogImportConfiguration {
             case CLASSPATH -> new ClasspathCatalogSource(
                     resourceLoader, properties.classpathLocation(), properties.maxSize(), clock);
             case FILE -> new FileCatalogSource(properties.fileLocation(), properties.maxSize(), clock);
+            case MANIFEST -> throw new IllegalArgumentException("Manifest sources do not configure catalog.duckdb.");
             case HTTP -> new HttpCatalogSource(
                     properties.httpUrl(),
                     properties.httpConnectTimeout(),

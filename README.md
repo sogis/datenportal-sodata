@@ -18,7 +18,7 @@ Enthalten:
 - Lucene-backed Suche, Sortierung und Filter
 - Listenansicht, Kartenansicht und Datenreihen-Expansion
 - Detailseiten für Datensätze, Datenreihen und Ausgaben
-- Classpath-, Datei- und HTTP-Katalogquelle
+- Classpath-, Datei-, HTTP- und Manifest-Katalogquelle
 - Explore-Schema-Explorer mit DuckDB-Catalog-Artefakt
 - geschützter Runtime-Reload unter `/admin/catalog/reload`
 - Status unter `/admin/catalog/status`
@@ -196,3 +196,8 @@ Ausgabe verwenden ausschliesslich diese Sicht. Ein gültiger vollständig
 zurückgehaltener Katalog führt zu einer leeren öffentlichen Sicht.
 Die vollständige Quelldatei bleibt unverändert und kann über den Katalog-Download
 weiterhin auch zurückgehaltene Einträge offenlegen.
+
+Die Quelle `datenportal.catalog.source-type=manifest` löst eine unter
+`datenportal.catalog.http-url` konfigurierte `current.json` auf. Details zu
+Erstinitialisierung ohne Katalog und zur getrennten DuckDB-Konfiguration stehen
+in [Konfiguration](docs/configuration.md#veröffentlichungsverweis-auf-s3).

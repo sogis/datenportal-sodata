@@ -38,6 +38,23 @@ class CatalogSnapshotLoaderTest {
     private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-06-15T00:00:00Z"), ZoneOffset.UTC);
 
     @Test
+    void absentCatalogBuildsEmptyHealthySnapshotAndHasNoXtfArtifact() {
+        var builder = new CatalogSnapshotBuilder(
+                (input, description) -> { throw new AssertionError("No XML must be parsed for catalog: null"); },
+                new CatalogValidator(), new CatalogSearchIndexBuilder(new CatalogDocumentMapper()), CLOCK);
+        try (var snapshot = builder.build(CatalogBytes.absent(new CatalogBytes("{}".getBytes(StandardCharsets.UTF_8), "manifest")),
+                CatalogTestArtifacts.duckDb("duckdb")).snapshot()) {
+            assertThat(snapshot.visibleEntries()).isEmpty();
+            assertThat(snapshot.searchIndex().documentCount()).isZero();
+            var service = new CatalogService(snapshot);
+            var health = new ch.so.agi.datenportal.admin.actuator.CatalogSnapshotHealthIndicator(service).health();
+            assertThat(health.getStatus()).isEqualTo(org.springframework.boot.health.contributor.Status.UP);
+            assertThat(health.getDetails()).containsEntry("catalogState", "awaiting-first-delivery");
+            assertThat(new ch.so.agi.datenportal.web.CatalogArtifactController(service).publishedCatalog(null).getStatusCode().value()).isEqualTo(404);
+        }
+    }
+
+    @Test
     void loadedSnapshotContainsBuiltSearchIndex() {
         var loader = new CatalogSnapshotLoader(
                 source(),

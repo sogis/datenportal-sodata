@@ -55,7 +55,8 @@ public final class HttpCatalogSource implements CatalogSource {
     public CatalogBytes load() {
         HttpRequest request = HttpRequest.newBuilder(uri)
                 .timeout(readTimeout)
-                .header("Accept", "application/xml,text/xml,*/*")
+                .header("Accept", "application/json,application/xml,text/xml,*/*")
+                .header("Cache-Control", "no-cache, no-store")
                 .GET()
                 .build();
 

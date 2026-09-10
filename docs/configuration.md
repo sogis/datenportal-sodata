@@ -41,7 +41,7 @@ Bevorzugte Konfiguration:
 ```yaml
 datenportal:
   catalog:
-    source-type: classpath # classpath | http | file
+    source-type: classpath # classpath | http | file | manifest
     classpath-location: published_catalog_full_62_entries.xtf
     file-location: ./config/catalog.xtf
     http-url: https://example.org/published_catalog.xtf
@@ -298,3 +298,21 @@ datenportal:
 ```
 
 Bei `include-catalog-download-origin=true` wird die Origin aus `datenportal.catalog.download-url` automatisch ergänzt, sofern `download-url` eine absolute `http(s)`-URL ist. Für den lokalen Standard bedeutet das zusätzlich `http://localhost:8081`.
+
+## Veröffentlichungsverweis auf S3
+
+Mit `DATENPORTAL_CATALOG_SOURCE_TYPE=manifest` und
+`DATENPORTAL_CATALOG_HTTP_URL=https://downloads.example.org/current.json` liest die
+Anwendung je Start/Reload genau einen Veröffentlichungsverweis und danach dessen
+Katalog-XTF. Es wird kein S3-SDK benötigt. Der Manifestvertrag ist im
+[Themenrepo](https://codeberg.org/edigonzales/datenportal-themenrepo/src/branch/main/docs/biblios/entwicklung/lieferverarbeitung.adoc)
+definiert: `schemaVersion: 1`, `releaseId`, `datasheets` und `catalog`; Dateinamen
+müssen zur Kennung passen und dürfen keine fremden URLs oder Pfadwechsel enthalten.
+
+`catalog: null` ist ein gültiger Zustand vor der ersten Datenlieferung: leere
+öffentliche Sicht und Suchindex, Health `UP` mit `catalogState=awaiting-first-delivery`,
+404 unter `/catalog/published-catalog.xtf`. Es wird keine künstliche XTF erzeugt.
+Eine fehlende referenzierte Datei oder ein ungültiger Verweis bleibt dagegen ein
+Fehler. Fehlgeschlagene Reloads erhalten den bisherigen Snapshot und Suchindex.
+Die bestehende separat konfigurierte `catalog.duckdb` bleibt erforderlich; ihre
+Erzeugung und Synchronisierung mit dem Verweis erfolgt in einem späteren Schritt.

@@ -45,14 +45,17 @@ public final class CatalogSnapshotBuilder {
         validateDuckDb(duckDbCatalog);
 
         LOGGER.info("Parsing catalog source {}.", publishedCatalog.sourceDescription());
-        Catalog catalog = parser.parse(publishedCatalog.inputStream(), publishedCatalog.sourceDescription());
+        Catalog catalog = publishedCatalog.absent() ? new Catalog(java.util.List.of(), java.util.List.of())
+                : parser.parse(publishedCatalog.inputStream(), publishedCatalog.sourceDescription());
         LOGGER.info(
                 "Parsed catalog source {} with {} datasets and {} dataset series.",
                 publishedCatalog.sourceDescription(),
                 catalog.datasetCount(),
                 catalog.seriesCount());
 
-        var validation = validator.validate(catalog);
+        var validation = publishedCatalog.absent()
+                ? new ch.so.agi.datenportal.catalog.importxtf.CatalogValidationResult(java.util.List.of(), java.util.List.of())
+                : validator.validate(catalog);
         validation.throwIfInvalid();
         LOGGER.info(
                 "Validated catalog source {} with {} warnings.",

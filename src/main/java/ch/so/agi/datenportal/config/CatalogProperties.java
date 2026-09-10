@@ -54,14 +54,15 @@ public record CatalogProperties(
                             "datenportal.catalog.file-location must be set for file catalog sources");
                 }
             }
-            case HTTP -> validateHttpUrl(httpUrl, "datenportal.catalog.http-url");
+            case HTTP, MANIFEST -> validateHttpUrl(httpUrl, "datenportal.catalog.http-url");
         }
     }
 
     public enum SourceType {
         CLASSPATH,
         FILE,
-        HTTP
+        HTTP,
+        MANIFEST
     }
 
     public boolean isClasspathSource() {
@@ -73,7 +74,7 @@ public record CatalogProperties(
     }
 
     public boolean isHttpSource() {
-        return sourceType == SourceType.HTTP;
+        return sourceType == SourceType.HTTP || sourceType == SourceType.MANIFEST;
     }
 
     public String classpathLocation() {
