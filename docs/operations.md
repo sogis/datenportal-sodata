@@ -23,7 +23,7 @@ Standard-URLs:
 
 Zuerst Garage/Jenkins initialisieren, sodass `current.json` öffentlich lesbar
 ist. Die vollständige Reihenfolge steht in der
-[Stack-Inbetriebnahme](https://codeberg.org/edigonzales/datenportal-dev-stack/src/branch/main/docs/biblios/entwicklung/inbetriebnahme.adoc).
+[Stack-Inbetriebnahme](https://codeberg.org/edigonzales/datenportal-dev-stack/src/branch/main/docs/biblios/inbetriebnahme.adoc).
 Im Portal-Repository mit JDK 25 starten:
 
 ```bash

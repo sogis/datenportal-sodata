@@ -89,7 +89,7 @@ Mit `DATENPORTAL_CATALOG_SOURCE_TYPE=manifest` und
 `DATENPORTAL_CATALOG_HTTP_URL=https://downloads.example.org/current.json` liest die
 Anwendung je Start/Reload genau einen Veröffentlichungsverweis und danach dessen
 Katalog-XTF. Es wird kein S3-SDK benötigt. Der Manifestvertrag ist im
-[Themenrepo](https://codeberg.org/edigonzales/datenportal-themenrepo/src/branch/main/docs/biblios/entwicklung/lieferverarbeitung.adoc)
+[Themenrepo](https://codeberg.org/edigonzales/datenportal-themenrepo/src/branch/main/docs/biblios/lieferverarbeitung.adoc)
 definiert: `schemaVersion: 1`, `releaseId`, `datasheets` und `catalog`; Dateinamen
 müssen zur Kennung passen und dürfen keine fremden URLs oder Pfadwechsel enthalten.
 
