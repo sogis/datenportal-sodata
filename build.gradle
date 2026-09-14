@@ -55,6 +55,11 @@ try {
 } catch (Exception ignored) {
 }
 
+// Container-Builds kopieren kein .git; der Commit kann per -PgitCommit uebergeben werden.
+if (project.hasProperty('gitCommit') && project.gitCommit.toString().isBlank() == false) {
+    gitCommit = project.gitCommit.toString()
+}
+
 def gitCommitProvider = providers.provider {
     gitCommit
 }

@@ -24,18 +24,29 @@ Standard-URLs:
 Zuerst Garage/Jenkins initialisieren, sodass `current.json` öffentlich lesbar
 ist. Die vollständige Reihenfolge steht in der
 [Stack-Inbetriebnahme](https://codeberg.org/edigonzales/datenportal-dev-stack/src/branch/main/docs/biblios/inbetriebnahme.adoc).
-Im Portal-Repository mit JDK 25 starten:
 
-```bash
-SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082 --datenportal.catalog.source-type=manifest --datenportal.catalog.http-url=http://localhost:8081/ch.so.daten/current.json --datenportal.catalog.download-url=http://localhost:8081/ch.so.daten --datenportal.catalog.duckdb.source-type=classpath --datenportal.catalog.duckdb.classpath-location=catalog.duckdb'
-```
+Im Dev-Stack läuft das Portal als Compose-Service `sodata` auf Host-Port 8082:
 
-Port 8080 gehört im Stack Jenkins, 8081 den Downloads. Das Portal verwendet
-8082 und bleibt ein separater Hostprozess. Die Quelle wird bei Start und jedem
-Reload einmal aufgelöst. Die ausdrücklich separat gewählte DuckDB ist hier die
-gebündelte Fixture; für «Erkunden» mit neuen Lieferungen ist eine dazu passende
-DuckDB erforderlich. Der Standardjob erzeugt oder synchronisiert sie noch nicht.
-Auch ein Null-Katalog benötigt eine gültige DuckDB-Quelle.
+- Der Stack baut das Image lokal aus diesem Repository
+  (`./scripts/up.sh --local-sodata`) oder verwendet ein Registry-Image mit
+  lokalem Fallback.
+- Compose setzt die Manifestadresse intern (`http://downloads:8081/...`), die
+  öffentliche Downloadbasis auf dem Host-Port sowie die gebündelte
+  DuckDB-Fixture (`source-type=classpath`).
+- Derselbe `.env`-Wert `DATENPORTAL_PORTAL_RELOAD_TOKEN` versorgt Jenkins und
+  den Portal-Container; die frühere Host-Gateway-Adresse entfällt.
+- Vor der ersten Veröffentlichung fehlt `current.json`. Die Anwendung startet
+  dann nicht; der Container startet gemäss Restart-Policy neu, bis die Datei
+  existiert. Nach der administrativen Initialpublikation genügt
+  `docker compose restart sodata`.
+
+Details und Grenzen: [Container-Deployment](container-deployment.md).
+
+Die Quelle wird bei Start und jedem Reload einmal aufgelöst. Die derzeit
+verwendete DuckDB ist die gebündelte Fixture; für «Erkunden» mit neuen
+Lieferungen ist eine dazu passende DuckDB erforderlich. Der Standardjob erzeugt
+oder synchronisiert sie noch nicht. Auch ein Null-Katalog benötigt eine gültige
+DuckDB-Quelle.
 
 Bei `catalog: null` sind leere Trefferlisten und ein leerer Suchindex korrekt;
 `/catalog/published-catalog.xtf` liefert 404, da keine XTF vorliegt. Ein gültiger
@@ -45,11 +56,17 @@ Fehlendes Manifest, ungültiges JSON oder fehlende referenzierte Dateien sind
 Ladefehler, keine leere Sicht. Beim Erststart kann dann kein Snapshot aufgebaut
 werden; bei Reload bleibt der alte Zustand erhalten.
 
-Für Reload denselben externen Secret-Wert auf dem Host als
-`DATENPORTAL_ADMIN_RELOAD_TOKEN` und in Jenkins als
-`DATENPORTAL_PORTAL_RELOAD_TOKEN` konfigurieren. Unter Docker Desktop verwendet
-Jenkins `http://host.docker.internal:8082/admin/catalog/reload`; andere
-Docker-Installationen benötigen eine explizit erreichbare Hostadresse. Der
+### Alternative: Start als Hostprozess
+
+Ohne Container und mit JDK 25 im Portal-Repository starten (Port 8082 darf dann
+nicht durch den Compose-Service belegt sein):
+
+```bash
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082 --datenportal.catalog.source-type=manifest --datenportal.catalog.http-url=http://localhost:8081/ch.so.daten/current.json --datenportal.catalog.download-url=http://localhost:8081/ch.so.daten --datenportal.catalog.duckdb.source-type=classpath --datenportal.catalog.duckdb.classpath-location=catalog.duckdb'
+```
+
+Dann muss der Reload-Token weiterhin extern als `DATENPORTAL_ADMIN_RELOAD_TOKEN`
+gesetzt und Jenkins auf eine erreichbare Hostadresse konfiguriert werden. Der
 Reload ändert weder Quellkonfiguration noch Startport. Die folgenden
 Standalone-Beispiele verwenden Port 8080; im Stack entsprechend 8082 einsetzen.
 

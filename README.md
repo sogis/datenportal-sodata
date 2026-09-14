@@ -32,9 +32,12 @@ Nicht enthalten:
 - serverseitige Datenbank für veränderliche Anwendungsdaten
 - Login-System
 - Admin-UI
-- Docker-/Kubernetes-Deployment
+- Kubernetes-Deployment und Publish-Workflow für Containerimages
 - CI/CD-Pipeline
 - Erzeugung und automatische Aktualisierung der separat benötigten `catalog.duckdb`
+
+Für den lokalen JVM-Betrieb als Container existiert ein Dockerfile im
+Repository; Details stehen in [Container-Deployment](docs/container-deployment.md).
 
 ## Voraussetzungen
 
@@ -64,9 +67,26 @@ Bei belegtem Port:
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082'
 ```
 
-Der Standardstart verwendet gebündelte Fixtures. Für den lokalen Gesamtstack
-läuft das Portal auf **8082** mit Manifestquelle; der vollständige Aufruf und
-die separate DuckDB-Konfiguration stehen in [Betrieb](docs/operations.md#an-den-lokalen-dev-stack-anschliessen).
+Der Standardstart verwendet gebündelte Fixtures. Im lokalen Gesamtstack
+(`datenportal-dev-stack`) läuft das Portal als Container auf **8082** mit
+Manifestquelle und gebündelter DuckDB-Fixture; der Stack baut und startet das
+Image aus diesem Repository. Die Host-Variante bleibt als Alternative
+dokumentiert in [Betrieb](docs/operations.md#an-den-lokalen-dev-stack-anschliessen).
+
+Container-Schnellstart mit den gebündelten Fixtures:
+
+```bash
+docker build -t datenportal-sodata:local .
+docker run --rm -p 18082:8080 \
+  -e DATENPORTAL_CATALOG_SOURCE_TYPE=classpath \
+  -e DATENPORTAL_CATALOG_CLASSPATH_LOCATION=published_catalog_full_62_entries.xtf \
+  -e DATENPORTAL_CATALOG_DUCKDB_SOURCE_TYPE=classpath \
+  -e DATENPORTAL_CATALOG_DUCKDB_CLASSPATH_LOCATION=catalog.duckdb \
+  datenportal-sodata:local
+```
+
+Das Profil `local` ist für den Host-`bootRun` gedacht; im Container werden die
+vorkompilierten Templates und die explizit konfigurierten Fixtures verwendet.
 
 ## Dokumentationslandkarte
 
@@ -76,6 +96,7 @@ Die Dokumentation ist nach Zweck getrennt, damit Einstieg, Laufzeit, Betrieb und
 - `docs/architecture.md`: technischer Laufzeitaufbau, Datenfluss vom XTF bis ins Rendering und atomarer Reload.
 - `docs/configuration.md`: Laufzeit-Properties, Katalogquellen, Reload-Token, Actuator, Cache und Security-Header.
 - `docs/operations.md`: lokaler Betrieb, Reload, Health/Info, Fehlerdiagnose und Smoke-Tests.
+- `docs/container-deployment.md`: JVM-Containerimage, Build, Laufzeitkonfiguration, Dev-Stack-Betrieb und Ausblick GraalVM Native.
 - `docs/search.md`: fachliche Soll-Semantik der Suche und Filter.
 - `docs/ui-implementation-contract.md`: verbindlicher UI-Vertrag für Katalog-, Karten- und Detailseiten.
 - `docs/ui-primitives.md`: Source of truth für Chips, Badges und Action Pills.
