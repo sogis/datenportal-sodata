@@ -50,11 +50,11 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 |---|---|---|---|
 | Datensatz-/Ausgabendetail | `pages/entryDetail.jte` | `EntryDetailPageVm` | gemeinsames Detail-ViewModel und Template, keine Datenvorschau |
 | Datenreihendetail | `pages/seriesDetail.jte` | `SeriesDetailPageVm` | vereinfachte Serienübersicht mit unframed Ausgabenliste |
-| Ausgabendetail | `pages/entryDetail.jte` | `EntryDetailPageVm` | Serien-Kicker, aktuelles-Ausgabe-Badge, unframed Datenmerkmale-/Download-Strip, unframed Metadatenbereiche, Seitenpanel `Daten nutzen` und Card `Weitere Ausgaben` |
+| Ausgabendetail | `pages/entryDetail.jte` | `EntryDetailPageVm` | Serien-Kicker, aktuelles-Ausgabe-Badge, unframed Bereiche `Downloads` und `Datenmerkmale` untereinander, unframed Metadatenbereiche, Seitenpanel `Daten nutzen` und Card `Weitere Ausgaben` |
 | Struktur, Qualität und Herkunft | `pages/structureQualityOrigin.jte`, `components/structureKpis.jte`, `components/attributeTable.jte`, `components/qualityCard.jte`, `components/metadataSection.jte` | `StructureQualityOriginPageVm`, `KpiVm`, `AttributeRowVm`, `QualityVm`, `MetadataSectionVm`, `MetadataLineVm` | Datensatz- und Ausgabe-Routen, neutrale KPI-Reihe, Attribute als Tabelle, unframed Qualität sowie `Herkunft & Verwendung` optional |
 | Daten verwenden | `pages/usage.jte`, `components/usageDirectAccess.jte`, `components/usageCodeExamples.jte` | `UsagePageVm`, `DirectAccessRowVm`, `CodeExampleVm` | Datensatz- und Ausgabe-Routen, Direktzugriff ohne Inhalt-Spalte, Format-Badges, Copy-Feedback, Codebeispiel-Tabs, keine vorbereiteten Starter-Rezepte |
-| Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `AccessStateVm`, `DownloadLinkVm` | unframed Datenmerkmale-/Download-Strip, mobile gestapelt |
-| Datensatz-Übersicht | `components/metadataSection.jte` | `EntryDetailPageVm.overview` | unframed Metadatenbereich unterhalb Datenmerkmale/Downloads |
+| Datensatz-Datenmerkmale | `components/detailFeatureDownloadStrip.jte` | `DetailFeatureVm`, `AccessStateVm`, `DownloadLinkVm` | ungerahmte Bereiche `Downloads` und `Datenmerkmale` in dieser Reihenfolge untereinander, ohne Card-Padding analog zu `Übersicht` |
+| Datensatz-Übersicht | `components/metadataSection.jte` | `EntryDetailPageVm.overview` | unframed Metadatenbereich unterhalb Downloads und Datenmerkmale |
 | Datensatz-Zeitliche Abdeckung | `components/metadataSection.jte` | `EntryDetailPageVm.temporalCoverage` | unframed Metadatenbereich mit Stichtag oder Zeitraum |
 | Datensatz-Themen und Schlagworte | `components/metadataSection.jte` | `EntryDetailPageVm.topics` | unframed Metadatenbereich, Themen und Schlagworte komma-separiert |
 | Datensatz-Zuständigkeiten und Kontakt | `components/metadataSection.jte` | `EntryDetailPageVm.responsibilitiesContact`, `MetadataLineVm` | unframed Metadatenbereich, Datenproduzent, Kontakt und Herausgeber mehrzeilig mit Links |

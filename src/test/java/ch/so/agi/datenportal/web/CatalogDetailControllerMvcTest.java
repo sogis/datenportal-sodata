@@ -34,6 +34,8 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("Bauinventar")))
                 .andExpect(content().string(containsString("Inventar schützenswerter und erhaltenswerter Bauten.")))
                 .andExpect(content().string(containsString("Open Data")))
+                .andExpect(content().string(containsString("<section class=\"dp-detail-downloads\" aria-labelledby=\"detail-downloads-title\">")))
+                .andExpect(content().string(containsString("<section class=\"dp-detail-features\" aria-labelledby=\"detail-features-title\">")))
                 .andExpect(content().string(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.bauinventar.csv\"")))
                 .andExpect(content().string(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.bauinventar.xlsx\"")))
                 .andExpect(content().string(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.bauinventar.parquet\"")))
@@ -106,7 +108,16 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(not(containsString("DCAT-Thema"))))
                 .andExpect(content().string(not(containsString("dp-preview"))))
                 .andExpect(content().string(not(containsString("chart"))))
-                .andExpect(content().string(not(containsString("row-disclosure"))));
+                .andExpect(content().string(not(containsString("row-disclosure"))))
+                .andExpect(result -> {
+                    String html = result.getResponse().getContentAsString();
+                    int downloads = html.indexOf("class=\"dp-detail-downloads\"");
+                    int features = html.indexOf("class=\"dp-detail-features\"");
+                    int overview = html.indexOf("id=\"metadata-overview\"");
+                    assertThat(downloads).isGreaterThanOrEqualTo(0);
+                    assertThat(features).isGreaterThan(downloads);
+                    assertThat(overview).isGreaterThan(features);
+                });
     }
 
     @Test

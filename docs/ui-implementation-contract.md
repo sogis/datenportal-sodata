@@ -677,7 +677,7 @@ Pflichtbereiche:
 2. Titel
 3. Der Hero der normalen Datensatz-Detailseite rendert aktuell keine Badge-Zeile.
 4. Kurzbeschreibung/Abstract
-5. Datenmerkmale-/Download-Zeile mit `Open Data`, `Attribute beschrieben`, `Daten validiert` sowie `CSV`, `XLSX`, `Parquet`; nicht offene Eintraege zeigen stattdessen ein Schloss
+5. Vertikale, ungerahmte Bereiche `Downloads` und danach `Datenmerkmale`, ohne Card-Hintergrund, Border, Radius oder Padding und mit derselben Abschnittslogik wie `Übersicht`; `Datenmerkmale` enthält `Open Data`, `Attribute beschrieben` und `Daten validiert`, `Downloads` enthält `CSV`, `XLSX` und `Parquet`; nicht offene Eintraege zeigen stattdessen ein Schloss
 6. Metadatenbereiche:
    - Übersicht
    - Zeitliche Abdeckung
@@ -687,7 +687,7 @@ Pflichtbereiche:
 
 Temporäre Umsetzungsnotiz:
 
-- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, einer Datenmerkmale-/Download-Zeile, den ersten drei Metadatenkarten (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und einem rechten vertikalen Seitenpanel `Daten nutzen` (`Struktur, Qualität und Herkunft`, `Erkunden`, `Verwenden`) mit sekundären Textlinks.
+- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, die vertikal gestapelten, ungerahmten Bereiche `Downloads` und `Datenmerkmale` ohne zusätzliches Padding, die ersten drei ungerahmten Metadatenbereiche (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und ein rechtes vertikales Seitenpanel `Daten nutzen` (`Struktur, Qualität und Herkunft`, `Erkunden`, `Verwenden`) mit sekundären Textlinks. Downloads, Datenmerkmale und Übersicht folgen derselben Abschnittslogik; das Seitenpanel beginnt auf Desktop auf derselben Höhe wie `Downloads`.
 - Die Datenmerkmale `Open Data`, `Attribute beschrieben` und `Daten validiert` verwenden Feature-Status-Icons: verfuegbare Merkmale nutzen `var(--dp-color-status-ok-circle)`, nicht verfuegbare Merkmale nutzen `var(--dp-color-status-negative-circle)`. Diese Icons sind keine Status-Badges; Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` duerfen nicht als Icon-Farbe verwendet werden.
 - Zusätzlich zeigt die normale Datensatz-Detailseite die Card `Zuständigkeiten und Kontakt` direkt nach `Themen und Schlagworte`. Sie verwendet dieselben Metadaten-Card-Styles und enthält `Datenproduzent`, `Kontakt` und `Herausgeber`.
 - Die frühere Card `Übrige Informationen` wird auf Datensatz- und Ausgabe-Detailseiten nicht mehr gerendert. `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab` gehören zur Subseite `Struktur, Qualität und Herkunft`.
@@ -736,7 +736,7 @@ Die Detailseite einer Ausgabe zeigt den Serienkontext nur im oberen Kicker und �
 - Kicker `Datenreihe: <Titel>` mit Link zur Serienübersicht
 - Titel der Ausgabe, bei der aktuellen Ausgabe mit Info-Badge `Aktuelle Ausgabe` als Titel-Suffix
 - Beschreibung der Ausgabe
-- Datenmerkmale-/Download-Zeile der konkreten Ausgabe
+- Vertikale, ungerahmte Bereiche `Downloads` und danach `Datenmerkmale` der konkreten Ausgabe, ohne Card-Hintergrund, Border, Radius oder Padding analog zu `Übersicht`
 - Metadaten-Cards analog zur normalen Datensatz-Detailseite
 - Card `Weitere Ausgaben` als schlanke Linkliste ohne Downloads; die verlinkten Ausgabentitel sind rote Textlinks analog zu Metadatenlinks wie `Lizenz`
 - rechtes Seitenpanel `Daten nutzen` analog zur normalen Datensatz-Detailseite

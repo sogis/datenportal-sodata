@@ -264,10 +264,8 @@
 
 .dp-dataset-detail-page .dp-metadata-section,
 .dp-dataset-detail-page .dp-detail-actions,
-.dp-dataset-detail-page .dp-detail-feature-downloads,
 .dp-issue-detail-page .dp-metadata-section,
-.dp-issue-detail-page .dp-detail-actions,
-.dp-issue-detail-page .dp-detail-feature-downloads {
+.dp-issue-detail-page .dp-detail-actions {
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -280,7 +278,9 @@
   border-radius: 0;
 }
 
-.dp-detail-panel h2 {
+.dp-detail-panel h2,
+.dp-detail-downloads h2,
+.dp-detail-features h2 {
   margin: 0 0 var(--dp-space-3);
   font-size: 18px;
   /*line-height: 1.25;*/
@@ -295,29 +295,6 @@
 
 .dp-detail-panel p {
   margin: 0 0 var(--dp-space-3);
-}
-
-.dp-detail-feature-downloads {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--dp-space-8);
-  align-items: start;
-}
-
-.dp-detail-feature-downloads__features,
-.dp-detail-feature-downloads__downloads {
-  min-width: 0;
-}
-
-.dp-detail-feature-downloads__downloads {
-  padding-left: var(--dp-space-5);
-  border-left: 1px solid var(--dp-color-border);
-}
-
-.dp-dataset-detail-page .dp-detail-feature-downloads__downloads,
-.dp-issue-detail-page .dp-detail-feature-downloads__downloads {
-  padding-left: 0;
-  border-left: 0;
 }
 
 .dp-detail-feature-list {
@@ -904,24 +881,6 @@
 
   .dp-detail-teaser + .dp-detail-teaser {
     border-left: 0;
-  }
-
-  .dp-detail-feature-downloads {
-    grid-template-columns: 1fr;
-    gap: var(--dp-space-4);
-  }
-
-  .dp-detail-feature-downloads__downloads {
-    padding-top: var(--dp-space-4);
-    padding-left: 0;
-    border-top: 1px solid var(--dp-color-border);
-    border-left: 0;
-  }
-
-  .dp-dataset-detail-page .dp-detail-feature-downloads__downloads,
-  .dp-issue-detail-page .dp-detail-feature-downloads__downloads {
-    padding-top: 0;
-    border-top: 0;
   }
 
   .dp-structure-kpis {
