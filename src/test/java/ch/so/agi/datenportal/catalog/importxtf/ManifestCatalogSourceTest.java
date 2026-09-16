@@ -28,6 +28,10 @@ class ManifestCatalogSourceTest {
             exchange.getResponseBody().write(body);
             exchange.close();
         });
+        server.createContext("/missing-current.json", exchange -> {
+            exchange.sendResponseHeaders(404, -1);
+            exchange.close();
+        });
         server.createContext("/published-catalog-a.xtf", exchange -> {
             byte[] body = "<example/>".getBytes(StandardCharsets.UTF_8);
             manifest = "{}"; // A changed pointer must not trigger another lookup during this load.
@@ -39,7 +43,10 @@ class ManifestCatalogSourceTest {
     }
     @AfterEach void stop() { server.stop(0); }
     private ManifestCatalogSource source() {
-        return new ManifestCatalogSource(URI.create("http://127.0.0.1:"+server.getAddress().getPort()+"/current.json"),
+        return source("current.json");
+    }
+    private ManifestCatalogSource source(String path) {
+        return new ManifestCatalogSource(URI.create("http://127.0.0.1:"+server.getAddress().getPort()+"/"+path),
                 Duration.ofSeconds(1), Duration.ofSeconds(2), DataSize.ofMegabytes(1), Clock.systemUTC());
     }
     private String manifest(String catalog) {
@@ -57,6 +64,11 @@ class ManifestCatalogSourceTest {
         assertThat(bytes.bytes()).isEmpty();
         assertThat(bytes.contentHash()).hasSize(64);
         assertThat(reads.get()).isEqualTo(1);
+    }
+    @Test void missingManifestIsNotAnEmptyCatalog() {
+        assertThatThrownBy(() -> source("missing-current.json").load())
+                .isInstanceOf(CatalogSourceException.class)
+                .hasMessageContaining("404");
     }
     @ParameterizedTest @ValueSource(strings={"{}", "broken", "{\"schemaVersion\":2}",
             "{\"schemaVersion\":1,\"releaseId\":\"a\",\"datasheets\":\"../evil.xtf\",\"catalog\":null}"})

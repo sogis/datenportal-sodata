@@ -15,8 +15,10 @@ aber keine eigene Kopie der Buildlogik.
 - non-root-Benutzer, kein TLS im Container
 - Katalog- und DuckDB-Quelle werden beim Start und bei jedem Reload gelesen;
   ohne gültige Quelle startet die Anwendung nicht
-- der Healthcheck prüft `/actuator/health`; die öffentliche Antwort zeigt nur
-  den Gesamtstatus
+- ein Manifest mit `catalog: null` ist eine gültige, leere Erstlieferung;
+  ein fehlendes oder ungültiges `current.json` bleibt ein Fehler
+- der Container-Healthcheck prüft `/actuator/health/liveness`; die öffentliche
+  Antwort zeigt nur den Gesamtstatus
 - `catalog.duckdb` liegt als Fixture über `spec/fixtures` im Jar und wird mit
   `source-type=classpath` gelesen; Erzeugung und Synchronisierung mit neuen
   Lieferungen sind noch nicht implementiert
@@ -129,22 +131,61 @@ Der Dev-Stack startet die Anwendung als Compose-Service `sodata`:
 - Manifest intern über `http://downloads:8081/...`, öffentliche Downloadbasis
   über den Host-Port
 - Reload-Token kommt aus derselben lokalen `.env` wie der Jenkins-Aufruf
-- vor der ersten Veröffentlichung ist `current.json` nicht vorhanden; der
-  Container startet dann gemäss Restart-Policy neu, bis die Datei existiert
+- vor der ersten Veröffentlichung startet der Dev-Stack den Sodata-Container
+  nicht, wenn `current.json` mit HTTP 404 fehlt; die Erstpublikation muss zuerst
+  über den dokumentierten Jenkins-/Bootstrap-Ablauf erfolgen
+- nach der Erstpublikation wird Sodata mit denselben Compose-Overrides explizit
+  gestartet und auf seinen Healthcheck geprüft
 
 Details, Startoptionen und die Reihenfolge nach der Erstpublikation stehen in
 der Stack-Dokumentation
 (`datenportal-dev-stack/README.md` und `docs/biblios/inbetriebnahme.adoc`).
 
-## Health und Neustart
+## Health, Probes und Neustart
 
-Der Healthcheck läuft im Image gegen `/actuator/health`. Ein Container, der
-wegen fehlender Quelle neu startet, ist kein Defekt, sondern der Zustand vor
-der ersten Publikation. Nach der administrativen Initialpublikation:
+Das Image und OpenShift verwenden getrennte Zustände:
+
+- `/actuator/health/liveness` prüft ausschließlich, ob der Prozess intern lebt.
+  Dieser Check darf nicht von Garage, `current.json` oder anderen externen
+  Diensten abhängen.
+- `/actuator/health/readiness` prüft den aktiven Snapshot und den Suchindex.
+  Ein gültiges Manifest mit `catalog: null` ist dabei bereit und liefert eine
+  leere öffentliche Sicht.
+- `/actuator/health` bleibt der allgemeine öffentliche Gesamtstatus.
+
+Die Anwendung erzeugt kein `current.json`. Vor einem OpenShift-Deployment muss
+ein vorgelagerter Bootstrap-Job oder die Deployment-Pipeline ein gültiges
+Manifest bereitstellen. Dadurch wird ein erwarteter Erstzustand nicht als
+Container-Crash behandelt. Ein fehlendes oder beschädigtes Manifest bleibt
+hingegen ein echter Konfigurations-/Datenfehler.
+
+Für OpenShift sind die Probes sinngemäss so zu verdrahten:
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8080
+startupProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
+```
+
+Die konkreten Deployment-, Secret-, Registry- und Zeitparameter gehören in
+das zuständige OpenShift-/Inbetriebnahme-Repository. Dieses Repository liefert
+keine konkreten OpenShift-Manifeste.
+
+Nach der administrativen Initialpublikation kann ein laufender lokaler
+Container so geprüft werden:
 
 ```bash
-docker compose restart sodata
-curl -fS http://localhost:8082/actuator/health
+curl -fS http://localhost:8082/actuator/health/liveness
+curl -fS http://localhost:8082/actuator/health/readiness
 ```
 
 ## Ausblick GraalVM Native
@@ -160,7 +201,7 @@ wechseln.
 | Symptom | Prüfung |
 |---|---|
 | Container startet wiederholt neu | Manifestadresse und `current.json` prüfen; Logs mit `docker compose logs sodata` bzw. `docker logs <container>` |
-| Healthcheck bleibt `unhealthy`, Anwendung läuft | Startzeit verkürzen/`start-period` prüfen; `/actuator/health` direkt mit `curl` testen |
+| Healthcheck bleibt `unhealthy`, Anwendung läuft | Startzeit verkürzen/`start-period` prüfen; `/actuator/health/liveness` direkt mit `curl` testen |
 | Port belegt | Host-Port `8082` frei machen oder `SODATA_PORT` ändern |
 | Reload `503` | `DATENPORTAL_ADMIN_RELOAD_TOKEN` im Container leer |
 | Reload `401` | Token stimmt nicht mit Jenkins `DATENPORTAL_PORTAL_RELOAD_TOKEN` überein |

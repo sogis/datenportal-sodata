@@ -69,6 +69,6 @@ ENV TZ=Europe/Zurich \
     JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75.0"
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=12 \
-    CMD curl -fsS http://127.0.0.1:8080/actuator/health >/dev/null || exit 1
+    CMD curl -fsS http://127.0.0.1:8080/actuator/health/liveness >/dev/null || exit 1
 
 ENTRYPOINT ["java", "-jar", "/opt/datenportal/app.jar"]

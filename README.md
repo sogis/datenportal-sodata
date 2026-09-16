@@ -59,6 +59,8 @@ Danach erreichbar:
 - `http://localhost:8080/`
 - `http://localhost:8080/datasets`
 - `http://localhost:8080/actuator/health`
+- `http://localhost:8080/actuator/health/liveness`
+- `http://localhost:8080/actuator/health/readiness`
 - `http://localhost:8080/actuator/info`
 
 Bei belegtem Port:

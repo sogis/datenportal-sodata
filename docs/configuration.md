@@ -235,6 +235,8 @@ Exponiert sind nur:
 
 ```text
 /actuator/health
+/actuator/health/liveness
+/actuator/health/readiness
 /actuator/info
 ```
 
@@ -249,15 +251,25 @@ management:
   endpoint:
     health:
       show-details: never
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,catalogSnapshot,catalogReload,catalogSearchIndex
     info:
       enabled: true
 ```
 
 `/actuator/health` zeigt öffentlich nur den Gesamtstatus. Interne Details zu
 `catalogSnapshot`, `catalogReload` und `catalogSearchIndex` sind nicht Teil der
-öffentlichen Antwort. Der geschützte Admin-Status liefert die für den Betrieb
-notwendigen Details. Der Info-Endpunkt enthält App-Name, Package-Basis,
-Java-Version und, falls vorhanden, Gradle-Build-Informationen.
+öffentlichen Antwort. `/actuator/health/liveness` enthält ausschließlich den
+internen Prozesszustand. `/actuator/health/readiness` berücksichtigt zusätzlich
+den aktiven Katalog-Snapshot und den Suchindex, gibt aber ebenfalls keine Details
+aus. Der geschützte Admin-Status liefert die für den Betrieb notwendigen Details.
+Der Info-Endpunkt enthält App-Name, Package-Basis, Java-Version und, falls
+vorhanden, Gradle-Build-Informationen.
 
 Der Standard-`diskSpace`-Health-Contributor ist deaktiviert, damit keine lokalen Serverpfade über Health-Details ausgegeben werden:
 

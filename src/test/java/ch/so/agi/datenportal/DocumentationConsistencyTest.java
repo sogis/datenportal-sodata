@@ -17,6 +17,8 @@ class DocumentationConsistencyTest {
                 .contains("DATENPORTAL_ADMIN_RELOAD_TOKEN")
                 .contains("X-Reload-Token")
                 .contains("/actuator/health")
+                .contains("/actuator/health/liveness")
+                .contains("/actuator/health/readiness")
                 .contains("/actuator/info")
                 .contains("server.error.include-stacktrace")
                 .contains("X-Content-Type-Options")

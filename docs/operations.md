@@ -35,10 +35,9 @@ Im Dev-Stack läuft das Portal als Compose-Service `sodata` auf Host-Port 8082:
   DuckDB-Fixture (`source-type=classpath`).
 - Derselbe `.env`-Wert `DATENPORTAL_PORTAL_RELOAD_TOKEN` versorgt Jenkins und
   den Portal-Container; die frühere Host-Gateway-Adresse entfällt.
-- Vor der ersten Veröffentlichung fehlt `current.json`. Die Anwendung startet
-  dann nicht; der Container startet gemäss Restart-Policy neu, bis die Datei
-  existiert. Nach der administrativen Initialpublikation genügt
-  `docker compose restart sodata`.
+- Vor der ersten Veröffentlichung fehlt `current.json`. Der Dev-Stack startet
+  Sodata in diesem Zustand nicht. Nach der administrativen Erstpublikation wird
+  der Container mit den lokalen Compose-Overrides gestartet.
 
 Details und Grenzen: [Container-Deployment](container-deployment.md).
 
@@ -74,6 +73,8 @@ Standalone-Beispiele verwenden Port 8080; im Stack entsprechend 8082 einsetzen.
 
 ```bash
 curl http://localhost:8080/actuator/health
+curl http://localhost:8080/actuator/health/liveness
+curl http://localhost:8080/actuator/health/readiness
 curl http://localhost:8080/actuator/info
 ```
 

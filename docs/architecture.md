@@ -247,8 +247,14 @@ Exponiert sind nur:
 
 ```text
 /actuator/health
+/actuator/health/liveness
+/actuator/health/readiness
 /actuator/info
 ```
+
+Der Liveness-Endpunkt enthält ausschließlich den Prozess-/JVM-Zustand. Der
+Readiness-Endpunkt berücksichtigt zusätzlich den aktiven Katalogsnapshot, den
+Reload-Status und den Suchindex.
 
 Eigene Health-Komponenten:
 

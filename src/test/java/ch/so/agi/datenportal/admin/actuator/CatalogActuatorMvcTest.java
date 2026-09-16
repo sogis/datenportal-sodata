@@ -29,6 +29,24 @@ class CatalogActuatorMvcTest {
     }
 
     @Test
+    void livenessProbeExposesOnlyOverallStatus() throws Exception {
+        mockMvc.perform(get("/actuator/health/liveness"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.components").doesNotExist())
+                .andExpect(jsonPath("$.details").doesNotExist());
+    }
+
+    @Test
+    void readinessProbeExposesOnlyOverallStatus() throws Exception {
+        mockMvc.perform(get("/actuator/health/readiness"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.components").doesNotExist())
+                .andExpect(jsonPath("$.details").doesNotExist());
+    }
+
+    @Test
     void infoEndpointContainsAppBasics() throws Exception {
         mockMvc.perform(get("/actuator/info"))
                 .andExpect(status().isOk())

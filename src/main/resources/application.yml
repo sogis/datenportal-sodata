@@ -21,7 +21,12 @@ management:
     health:
       show-details: never
       probes:
-        enabled: false
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,catalogSnapshot,catalogReload,catalogSearchIndex
     info:
       enabled: true
   info:
