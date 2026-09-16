@@ -334,7 +334,7 @@
 }
 
 .dp-detail-feature--unavailable .dp-detail-feature__icon {
-  color: var(--dp-color-status-negative-circle);
+  color: var(--dp-color-text-muted);
 }
 
 .dp-detail-actions {

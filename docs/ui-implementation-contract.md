@@ -688,7 +688,7 @@ Pflichtbereiche:
 Temporäre Umsetzungsnotiz:
 
 - Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, die vertikal gestapelten, ungerahmten Bereiche `Downloads` und `Datenmerkmale` ohne zusätzliches Padding, die ersten drei ungerahmten Metadatenbereiche (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und ein rechtes vertikales Seitenpanel `Daten nutzen` (`Struktur, Qualität und Herkunft`, `Erkunden`, `Verwenden`) mit sekundären Textlinks. Downloads, Datenmerkmale und Übersicht folgen derselben Abschnittslogik; das Seitenpanel beginnt auf Desktop auf derselben Höhe wie `Downloads`.
-- Die Datenmerkmale `Open Data`, `Attribute beschrieben` und `Daten validiert` verwenden Feature-Status-Icons: verfuegbare Merkmale nutzen `var(--dp-color-status-ok-circle)`, nicht verfuegbare Merkmale nutzen `var(--dp-color-status-negative-circle)`. Diese Icons sind keine Status-Badges; Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` duerfen nicht als Icon-Farbe verwendet werden.
+- Die Datenmerkmale `Open Data`, `Attribute beschrieben` und `Daten validiert` verwenden Feature-Status-Icons: verfuegbare Merkmale nutzen `var(--dp-color-status-ok-circle)`, nicht verfuegbare Merkmale nutzen den gedämpften Grauton `var(--dp-color-text-muted)`. Diese Icons sind keine Status-Badges; Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` sowie rote oder gelbe Warning-Farben duerfen nicht als Icon-Farbe verwendet werden.
 - Zusätzlich zeigt die normale Datensatz-Detailseite die Card `Zuständigkeiten und Kontakt` direkt nach `Themen und Schlagworte`. Sie verwendet dieselben Metadaten-Card-Styles und enthält `Datenproduzent`, `Kontakt` und `Herausgeber`.
 - Die frühere Card `Übrige Informationen` wird auf Datensatz- und Ausgabe-Detailseiten nicht mehr gerendert. `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab` gehören zur Subseite `Struktur, Qualität und Herkunft`.
 - Die tieferen Metadatenbereiche unterhalb dieser Cards sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.
@@ -741,7 +741,7 @@ Die Detailseite einer Ausgabe zeigt den Serienkontext nur im oberen Kicker und �
 - Card `Weitere Ausgaben` als schlanke Linkliste ohne Downloads; die verlinkten Ausgabentitel sind rote Textlinks analog zu Metadatenlinks wie `Lizenz`
 - rechtes Seitenpanel `Daten nutzen` analog zur normalen Datensatz-Detailseite
 
-Auch auf Ausgaben-Detailseiten gilt fuer die Datenmerkmale: verfuegbare Feature-Icons verwenden `var(--dp-color-status-ok-circle)`, nicht verfuegbare Feature-Icons verwenden `var(--dp-color-status-negative-circle)`. Badge-Background-Tokens bleiben Status-Badges vorbehalten und duerfen nicht fuer diese Circle-Icon-Farben eingesetzt werden.
+Auch auf Ausgaben-Detailseiten gilt fuer die Datenmerkmale: verfuegbare Feature-Icons verwenden `var(--dp-color-status-ok-circle)`, nicht verfuegbare Feature-Icons verwenden `var(--dp-color-text-muted)`. Badge-Background-Tokens bleiben Status-Badges vorbehalten und duerfen nicht fuer diese Icon-Farben eingesetzt werden.
 
 Die Ausgaben-Detailseite zeigt keinen separaten Hinweis `Diese Ausgabe ist aktuell`, keine Download-Duplikate in `Weitere Ausgaben` und keine generische Metadatenliste unterhalb der Ausgabenliste. Falls es keine andere Ausgabe derselben Reihe gibt, zeigt die Card den Hinweis `Zu dieser Datenreihe sind keine weiteren Ausgaben verfügbar.`
 

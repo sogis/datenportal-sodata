@@ -116,8 +116,8 @@ Beispiele:
 Regeln:
 
 - verfuegbare Features verwenden als Icon-Farbe `var(--dp-color-status-ok-circle)`
-- nicht verfuegbare Features verwenden als Icon-Farbe `var(--dp-color-status-negative-circle)`
-- die Status-Circle-Tokens werden nur fuer Icon-Farben verwendet, nicht als Badge-Hintergrund
+- nicht verfuegbare Features verwenden als Icon-Farbe `var(--dp-color-text-muted)`
+- der positive Status-Circle-Token wird nur fuer Icon-Farben verwendet, nicht als Badge-Hintergrund
 
 Nicht verwenden:
 
@@ -144,7 +144,7 @@ Pflicht:
 - `Open Data` verwendet eine positive Badge-Variante
 - nicht offene Zugriffsrechte verwenden eine gelbe Warning-Badge-Variante
 - `Aktuelle Ausgabe` verwendet eine sachliche Info-/Ink-Variante
-- Feature-Status-Icons verwenden `var(--dp-color-status-ok-circle)` und `var(--dp-color-status-negative-circle)` als Icon-Farben
+- Feature-Status-Icons verwenden `var(--dp-color-status-ok-circle)` fuer verfuegbare und `var(--dp-color-text-muted)` fuer nicht verfuegbare Merkmale
 
 Nicht erlaubt:
 
@@ -162,7 +162,7 @@ Nicht erlaubt:
 - `Aktuelle Ausgabe` = Info-Status-Badge
 - `CSV`, `XLSX`, `Parquet` = Action Pills
 - Keyword-/Themen-Labels auf Cards = neutrale Status-Badge-Familie mit lokaler `14px`-Typografie-Ausnahme
-- Datenmerkmale `Open Data`, `Attribute beschrieben`, `Daten validiert` = Feature-Status-Icons mit Status-Circle-Farben
+- Datenmerkmale `Open Data`, `Attribute beschrieben`, `Daten validiert` = Feature-Status-Icons mit positivem Gruen bzw. gedämpftem Text-Grauton
 
 ## 4. Benennung im Code
 

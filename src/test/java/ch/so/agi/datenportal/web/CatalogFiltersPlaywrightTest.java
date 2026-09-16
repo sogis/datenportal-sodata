@@ -346,6 +346,20 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
+    void unavailableFeatureIconUsesMutedGray() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets/ch.so.wasserqualitaet_grundwasser"));
+
+            Locator unavailableFeatureIcon = page.locator(".dp-detail-feature--unavailable .dp-detail-feature__icon svg").first();
+
+            assertThat(unavailableFeatureIcon.count()).isEqualTo(1);
+            assertThat(cssValue(unavailableFeatureIcon, "color")).isEqualTo("rgb(83, 103, 121)");
+            assertThat(cssValue(unavailableFeatureIcon, "color")).isNotEqualTo("rgb(217, 72, 15)");
+        }
+    }
+
+    @Test
     void issueDetailRelatedIssueTitlesUseAccentLinkColor() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();
