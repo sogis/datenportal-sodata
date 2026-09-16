@@ -281,10 +281,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "qualitySummary" -> dataset.qualitySummary = parseQualitySummaryContainer(reader, childPath).orElse(null);
                     case "structureSummary" -> dataset.structureSummary = parseStructureSummaryContainer(reader, childPath).orElse(null);
                     case "distributions" -> {
-                        RawDistribution distribution = parseDistributionContainer(reader, childPath);
-                        if (distribution != null) {
-                            dataset.distributions.add(distribution);
-                        }
+                        dataset.distributions.addAll(parseDistributionContainer(reader, childPath));
                     }
                     default -> skipElement(reader);
                 }
@@ -367,10 +364,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "qualitySummary" -> issue.qualitySummary = parseQualitySummaryContainer(reader, childPath).orElse(null);
                     case "structureSummary" -> issue.structureSummary = parseStructureSummaryContainer(reader, childPath).orElse(null);
                     case "distributions" -> {
-                        RawDistribution distribution = parseDistributionContainer(reader, childPath);
-                        if (distribution != null) {
-                            issue.distributions.add(distribution);
-                        }
+                        issue.distributions.addAll(parseDistributionContainer(reader, childPath));
                     }
                     case "issueLabel" -> issue.issueLabel = readRequiredText(reader, childPath);
                     case "isCurrentIssue" -> issue.currentIssue = parseRequiredBoolean(reader, childPath);
@@ -659,19 +653,23 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         throw new XMLStreamException("TemporalCoverage element is not closed");
     }
 
-    private RawDistribution parseDistributionContainer(XMLStreamReader reader, XtfElementPath path) throws XMLStreamException {
+    private List<RawDistribution> parseDistributionContainer(XMLStreamReader reader, XtfElementPath path)
+            throws XMLStreamException {
+        List<RawDistribution> distributions = new ArrayList<>();
+
         while (reader.hasNext()) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
                 if ("Distribution".equals(reader.getLocalName())) {
-                    return parseDistribution(reader, path.push("Distribution"));
+                    distributions.add(parseDistribution(reader, path.push("Distribution")));
+                    continue;
                 }
                 skipElement(reader);
                 continue;
             }
 
             if (event == XMLStreamConstants.END_ELEMENT && "distributions".equals(reader.getLocalName())) {
-                return null;
+                return distributions;
             }
         }
 

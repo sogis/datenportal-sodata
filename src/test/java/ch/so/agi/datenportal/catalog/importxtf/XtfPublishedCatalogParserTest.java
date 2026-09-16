@@ -31,6 +31,48 @@ class XtfPublishedCatalogParserTest {
     }
 
     @Test
+    void parsesAllDistributionsWithinOneContainer() {
+        DatasetEntry dataset = parseXml(datasetTransferXml("""
+                <accessRights>
+                  <AccessRights>
+                    <localAccessLevel>open</localAccessLevel>
+                  </AccessRights>
+                </accessRights>
+                """, """
+                <distributions>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/test/distribution/csv</distributionUri>
+                    <accessURL>https://data.so.ch/dataset/test</accessURL>
+                    <downloadURL>http://localhost:8081/ch.so.datenportal/downloads/test.csv</downloadURL>
+                    <format>csv</format>
+                  </Distribution>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/test/distribution/xlsx</distributionUri>
+                    <accessURL>https://data.so.ch/dataset/test</accessURL>
+                    <downloadURL>http://localhost:8081/ch.so.datenportal/downloads/test.xlsx</downloadURL>
+                    <format>xlsx</format>
+                  </Distribution>
+                  <Distribution>
+                    <distributionUri>https://data.so.ch/dataset/test/distribution/parquet</distributionUri>
+                    <accessURL>https://data.so.ch/dataset/test</accessURL>
+                    <downloadURL>http://localhost:8081/ch.so.datenportal/downloads/test.parquet</downloadURL>
+                    <format>parquet</format>
+                  </Distribution>
+                </distributions>
+                """)).datasets().getFirst();
+
+        assertThat(dataset.primaryDistributions())
+                .extracting(distribution -> distribution.format())
+                .containsExactly(DistributionFormat.CSV, DistributionFormat.XLSX, DistributionFormat.PARQUET);
+        assertThat(dataset.primaryDistributions())
+                .extracting(distribution -> distribution.preferredHref().toString())
+                .containsExactly(
+                        "http://localhost:8081/ch.so.datenportal/downloads/test.csv",
+                        "http://localhost:8081/ch.so.datenportal/downloads/test.xlsx",
+                        "http://localhost:8081/ch.so.datenportal/downloads/test.parquet");
+    }
+
+    @Test
     void mapsDatasetsThemesOfficesKeywordsFormatsAndStructureMetadata() throws Exception {
         DatasetEntry dataset = parseFixture().datasets().stream()
                 .filter(entry -> entry.identifier().equals("ch.so.wasserqualitaet_grundwasser"))
@@ -536,6 +578,19 @@ class XtfPublishedCatalogParserTest {
     }
 
     private static String datasetTransferXml(String extraBody) {
+        return datasetTransferXml(extraBody, """
+                      <distributions>
+                        <Distribution>
+                          <distributionUri>https://data.so.ch/dataset/test/distribution/csv</distributionUri>
+                          <accessURL>https://data.so.ch/dataset/test</accessURL>
+                          <downloadURL>http://localhost:8081/ch.so.datenportal/downloads/test.csv</downloadURL>
+                          <format>csv</format>
+                        </Distribution>
+                      </distributions>
+                """);
+    }
+
+    private static String datasetTransferXml(String extraBody, String distributions) {
         return transferXml("""
                   <datasets>
                     <Dataset>
@@ -557,14 +612,7 @@ class XtfPublishedCatalogParserTest {
                       <modified>2026-05-19</modified>
                 """ + extraBody + """
                       <publicationStatus>published</publicationStatus>
-                      <distributions>
-                        <Distribution>
-                          <distributionUri>https://data.so.ch/dataset/test/distribution/csv</distributionUri>
-                          <accessURL>https://data.so.ch/dataset/test</accessURL>
-                          <downloadURL>http://localhost:8081/ch.so.datenportal/downloads/test.csv</downloadURL>
-                          <format>csv</format>
-                        </Distribution>
-                      </distributions>
+                """ + distributions + """
                     </Dataset>
                   </datasets>
                 """);
