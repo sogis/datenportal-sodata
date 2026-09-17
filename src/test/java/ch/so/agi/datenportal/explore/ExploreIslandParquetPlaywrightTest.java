@@ -308,6 +308,8 @@ class ExploreIslandParquetPlaywrightTest {
             var result = page.locator("[aria-label='SQL Ergebnis']");
             assertThat(result.locator("text=gemeinde").count()).isGreaterThanOrEqualTo(1);
             assertThat(result.locator(".dp-explore-result-table__type").count()).isGreaterThanOrEqualTo(1);
+            assertThat(page.locator("[aria-label='SQL Resultat'] .dp-explore-result-export").count()).isEqualTo(1);
+            assertThat(page.locator("[aria-label='SQL Aktionen'] .dp-explore-sql-toolbar__export").count()).isZero();
 
             Download download = downloadExport(page, "CSV");
             assertThat(download.suggestedFilename()).isEqualTo("datenportal-explore-fixture-result.csv");
@@ -602,7 +604,7 @@ class ExploreIslandParquetPlaywrightTest {
     }
 
     @Test
-    void resultChartViewRendersRechartsAndPieColors() {
+    void resultChartViewRendersRechartsAndPieColors() throws IOException {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
             Page page = context.newPage();
             List<String> browserErrors = collectBrowserErrors(page);
@@ -630,6 +632,16 @@ class ExploreIslandParquetPlaywrightTest {
             page.waitForSelector("[aria-label='Diagramm aus Resultat']");
             page.waitForSelector("[aria-label='Diagrammsteuerung']");
             page.waitForSelector("[data-chart-type='bar']");
+            assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Diagramm als PNG herunterladen")).isEnabled()).isTrue();
+            assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("CSV")).count()).isZero();
+
+            Download pngDownload = page.waitForDownload(() -> page.getByRole(
+                    com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Diagramm als PNG herunterladen")).click());
+            assertThat(pngDownload.suggestedFilename()).isEqualTo("datenportal-explore-fixture-diagramm.png");
+            assertThat(Files.size(pngDownload.path())).isGreaterThan(0);
 
             var defaultBarFills = normalizedFillAttributes(page.locator("[data-chart-type='bar']"));
             assertThat(defaultBarFills).contains("#104e8b");

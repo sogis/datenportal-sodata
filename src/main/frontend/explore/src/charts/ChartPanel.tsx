@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ExploreChartConfigDto} from '../app/ExploreContext';
 import type {QueryResultState} from '../results/queryResultTypes';
 import {BarResultChart} from './BarResultChart';
@@ -37,26 +37,37 @@ import {ScatterResultChart} from './ScatterResultChart';
 
 export function ChartPanel({
   result,
-  preferred
+  preferred,
+  onExportTargetChange
 }: {
   result: QueryResultState;
   preferred?: ExploreChartConfigDto;
+  onExportTargetChange?: (element: HTMLElement | null) => void;
 }) {
   if (result.status !== 'success') {
     return <p className="dp-explore-muted">Noch kein SQL-Resultat für ein Diagramm verfügbar.</p>;
   }
 
-  return <SuccessfulChartPanel rows={result.rows} columns={result.columns} preferred={preferred} />;
+  return (
+    <SuccessfulChartPanel
+      rows={result.rows}
+      columns={result.columns}
+      preferred={preferred}
+      onExportTargetChange={onExportTargetChange}
+    />
+  );
 }
 
 function SuccessfulChartPanel({
   rows,
   columns,
-  preferred
+  preferred,
+  onExportTargetChange
 }: {
   rows: Array<Record<string, unknown>>;
   columns: string[];
   preferred?: ExploreChartConfigDto;
+  onExportTargetChange?: (element: HTMLElement | null) => void;
 }) {
   const resultColumns = useMemo(() => inferResultColumns(columns, rows), [columns, rows]);
   const suggestion = useMemo(() => inferChartSuggestion(resultColumns, rows, preferred), [preferred, resultColumns, rows]);
@@ -67,6 +78,7 @@ function SuccessfulChartPanel({
   const [rowLimit, setRowLimit] = useState<number>(DEFAULT_CHART_ROW_LIMIT);
   const stableColorSeed = useMemo(() => buildStableColorSeed(columns, rows), [columns, rows]);
   const [colorSeedVersion, setColorSeedVersion] = useState(0);
+  const chartRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setType(suggestion?.type ?? 'bar');
@@ -83,6 +95,18 @@ function SuccessfulChartPanel({
     }
   }, [color, type]);
 
+  const compatibleXColumns = suggestion ? xColumns(type, resultColumns, rows) : [];
+  const compatibleYColumns = suggestion ? yColumns(type, resultColumns) : [];
+  const safeX = selectSafeColumn(x, compatibleXColumns);
+  const safeY = selectSafeColumn(y, compatibleYColumns);
+  const limitedRows = rows.slice(0, rowLimit);
+  const canRender = Boolean(suggestion) && canRenderChart(type, safeX, safeY, limitedRows);
+
+  useEffect(() => {
+    onExportTargetChange?.(canRender ? chartRef.current : null);
+    return () => onExportTargetChange?.(null);
+  }, [canRender, onExportTargetChange]);
+
   if (!suggestion) {
     return (
       <div className="dp-explore-chart" aria-label="Diagramm aus Resultat">
@@ -91,12 +115,6 @@ function SuccessfulChartPanel({
     );
   }
 
-  const compatibleXColumns = xColumns(type, resultColumns, rows);
-  const compatibleYColumns = yColumns(type, resultColumns);
-  const safeX = selectSafeColumn(x, compatibleXColumns);
-  const safeY = selectSafeColumn(y, compatibleYColumns);
-  const limitedRows = rows.slice(0, rowLimit);
-  const canRender = canRenderChart(type, safeX, safeY, limitedRows);
   const chartColor = chartColorHex(color);
   const isMultiColor = color === MULTI_CHART_COLOR_VALUE && chartTypeSupportsMultiColor(type);
   const colorSeed = isMultiColor ? `${stableColorSeed}:${colorSeedVersion}` : undefined;
@@ -106,16 +124,17 @@ function SuccessfulChartPanel({
     : undefined;
 
   return (
-    <div className="dp-explore-chart" aria-label="Diagramm aus Resultat">
+    <div ref={chartRef} className="dp-explore-chart" aria-label="Diagramm aus Resultat">
       <div className="dp-explore-chart__header">
         <div>
           <h4>Diagramm aus Resultat</h4>
-          <p>{suggestion.reason}</p>
+          <p data-export-ignore="true">{suggestion.reason}</p>
         </div>
         {isMultiColor && (
           <button
             type="button"
             className="dp-explore-button dp-explore-button--secondary dp-explore-chart__palette-button"
+            data-export-ignore="true"
             onClick={() => setColorSeedVersion((version) => version + 1)}
           >
             Farben neu
@@ -123,7 +142,7 @@ function SuccessfulChartPanel({
         )}
       </div>
 
-      <div className="dp-explore-chart__controls" aria-label="Diagrammsteuerung">
+      <div className="dp-explore-chart__controls" aria-label="Diagrammsteuerung" data-export-ignore="true">
         <label>
           <span>Typ</span>
           <select value={type} onChange={(event) => setType(event.target.value as ResultChartType)}>
@@ -181,10 +200,12 @@ function SuccessfulChartPanel({
         </label>
       </div>
 
-      {suggestion.warning && <p className="dp-explore-chart__warning">{suggestion.warning}</p>}
-      {segmentWarning && <p className="dp-explore-chart__warning">{segmentWarning}</p>}
+      {suggestion.warning && <p className="dp-explore-chart__warning" data-export-ignore="true">{suggestion.warning}</p>}
+      {segmentWarning && <p className="dp-explore-chart__warning" data-export-ignore="true">{segmentWarning}</p>}
       {rows.length > rowLimit && (
-        <p className="dp-explore-muted">Diagramm zeigt {formatSwissNumber(rowLimit)} von {formatSwissNumber(rows.length)} Resultatzeilen.</p>
+        <p className="dp-explore-muted" data-export-ignore="true">
+          Diagramm zeigt {formatSwissNumber(rowLimit)} von {formatSwissNumber(rows.length)} Resultatzeilen.
+        </p>
       )}
 
       {canRender ? (

@@ -29,6 +29,41 @@ describe('ChartPanel', () => {
     expect(document.querySelector('[data-chart-type="bar"]')).toBeInTheDocument();
   });
 
+  it('reports only a renderable chart as the PNG export target', () => {
+    let exportTarget: HTMLElement | null | undefined;
+    render(
+      <ChartPanel
+        result={successResult(['gemeinde', 'anzahl'], [
+          {gemeinde: 'Solothurn', anzahl: 1},
+          {gemeinde: 'Olten', anzahl: 2}
+        ])}
+        onExportTargetChange={(element) => {
+          exportTarget = element;
+        }}
+      />
+    );
+
+    expect(exportTarget).toBeInstanceOf(HTMLElement);
+    expect(exportTarget?.querySelector('h4')).toHaveTextContent('Diagramm aus Resultat');
+    expect(exportTarget?.querySelector('[data-chart-type="bar"]')).toBeInTheDocument();
+    expect(exportTarget?.querySelector('[data-export-ignore]')).toBeInTheDocument();
+    expect(exportTarget?.querySelector('.dp-explore-chart__controls')).toHaveAttribute('data-export-ignore', 'true');
+  });
+
+  it('does not report a target when no chart can be rendered', () => {
+    let exportTarget: HTMLElement | null | undefined;
+    render(
+      <ChartPanel
+        result={successResult(['gemeinde'], [{gemeinde: 'Solothurn'}, {gemeinde: 'Olten'}])}
+        onExportTargetChange={(element) => {
+          exportTarget = element;
+        }}
+      />
+    );
+
+    expect(exportTarget).toBeNull();
+  });
+
   it('offers only the configured additional colors as single colors', async () => {
     const user = userEvent.setup();
     render(<ChartPanel result={successResult(['gemeinde', 'anzahl'], [

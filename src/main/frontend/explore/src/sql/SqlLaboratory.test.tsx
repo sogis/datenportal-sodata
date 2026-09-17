@@ -5,6 +5,11 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {DuckDbConnector} from '@sqlrooms/duckdb';
 import {SqlLaboratory} from './SqlLaboratory';
 import {sampleExploreContext} from '../test/sampleExploreContext';
+import {exportChartAsPng} from '../results/ChartExport';
+
+vi.mock('../results/ChartExport', () => ({
+  exportChartAsPng: vi.fn().mockResolvedValue(undefined)
+}));
 
 const contextWithRecipes = {
   ...sampleExploreContext,
@@ -47,6 +52,7 @@ describe('SqlLaboratory', () => {
       gemeindename: ['Solothurn', 'Olten'],
       anzahl: [1, 1]
     }));
+    vi.mocked(exportChartAsPng).mockClear();
   });
 
   it('renders the initial registered-view query without secondary panels', () => {
@@ -64,7 +70,9 @@ describe('SqlLaboratory', () => {
     expect(screen.queryByRole('heading', {name: 'Resultat'})).not.toBeInTheDocument();
     expect(screen.getByLabelText('SQL-Editor und Resultattabelle Grösse anpassen')).toBeInTheDocument();
     expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__actions')).toBeInTheDocument();
-    expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__export')).toBeInTheDocument();
+    expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__export')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('SQL Resultat').querySelector('.dp-explore-result-export')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'CSV'})).toBeDisabled();
     expect(screen.getByLabelText('SQL Aktionen').querySelector('.dp-explore-sql-toolbar__leading')).toBeInTheDocument();
     expect(screen.getByLabelText('Beispielabfrage auswählen')).toHaveValue('ch_so_bauinventar-preview');
     expect(screen.getByRole('option', {name: 'Nach «gemeindename» gruppieren'})).toBeInTheDocument();
@@ -92,6 +100,14 @@ describe('SqlLaboratory', () => {
     render(<SqlLaboratory context={{...contextWithRecipes, recipes: []}} connector={connector} ready />);
 
     expect(screen.getByLabelText('SQL bearbeiten')).toHaveValue('SELECT *\nFROM opendata.ch_so_bauinventar;');
+  });
+
+  it('keeps the table export in the result header when charts are disabled', () => {
+    render(<SqlLaboratory context={{...contextWithRecipes, chartsEnabled: false}} connector={connector} ready />);
+
+    const resultPane = screen.getByLabelText('SQL Resultat');
+    expect(resultPane.querySelector('.dp-explore-result-export')).toBeInTheDocument();
+    expect(screen.queryByRole('group', {name: 'Resultatansicht'})).not.toBeInTheDocument();
   });
 
   it('renders a red run button with the Bootstrap play icon', () => {
@@ -166,7 +182,23 @@ describe('SqlLaboratory', () => {
     expect(screen.getByRole('button', {name: 'Diagramm'})).toHaveAttribute('aria-pressed', 'true');
     expect(await screen.findByLabelText('Diagramm aus Resultat')).toBeInTheDocument();
     expect(document.querySelector('[data-chart-type="bar"]')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Diagramm als PNG herunterladen'})).toBeEnabled();
+    expect(screen.queryByRole('button', {name: 'CSV'})).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Diagramm als PNG herunterladen'}));
+    expect(exportChartAsPng).toHaveBeenCalledWith(expect.any(HTMLElement), contextWithRecipes.datasetId);
     expect(query).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables PNG when the result cannot be rendered as a chart', async () => {
+    const user = userEvent.setup();
+    query.mockResolvedValueOnce(tableFromArrays({gemeindename: ['Solothurn', 'Olten']}));
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    await screen.findByLabelText('SQL Ergebnis');
+    await user.click(screen.getByRole('button', {name: 'Diagramm'}));
+
+    expect(screen.getByRole('button', {name: 'Diagramm als PNG herunterladen'})).toBeDisabled();
   });
 
   it('uses a preferred chart only for unchanged selected recipe SQL', async () => {
@@ -207,6 +239,20 @@ describe('SqlLaboratory', () => {
 
     expect(screen.getByRole('menu', {name: 'Exportformate'})).toBeInTheDocument();
     expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual(['CSV', 'XLSX', 'Parquet']);
+  });
+
+  it('shows export errors in the result header', async () => {
+    const user = userEvent.setup();
+    render(<SqlLaboratory context={contextWithRecipes} connector={connector} ready />);
+
+    await user.click(screen.getByRole('button', {name: 'Ausführen'}));
+    await screen.findByLabelText('SQL Ergebnis');
+    await user.click(screen.getByRole('button', {name: 'Exportformat auswählen'}));
+    await user.click(screen.getByRole('menuitem', {name: 'XLSX'}));
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Export konnte nicht erstellt werden');
+    expect(screen.getByLabelText('SQL Resultat').contains(alert)).toBe(true);
   });
 
   it('shows query guard errors for blocked SQL', async () => {

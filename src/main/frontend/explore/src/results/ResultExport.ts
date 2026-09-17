@@ -119,17 +119,32 @@ export function sanitizeCsvFilename(filename: string): string {
 }
 
 export function sanitizeResultFilename(filename: string, extension: ResultExportFormat): string {
+  return sanitizeDownloadFilename(filename, extension, `datenportal-result.${extension}`, ['csv', 'xlsx', 'parquet']);
+}
+
+export function sanitizeDownloadFilename(
+  filename: string,
+  extension: string,
+  fallback = `download.${extension}`,
+  knownExtensions: string[] = [extension]
+): string {
   const sanitized = filename
     .normalize('NFKD')
     .replace(/[^\w.-]+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
-  const fallback = `datenportal-result.${extension}`;
   if (!sanitized) {
     return fallback;
   }
-  const withoutKnownExtension = sanitized.replace(/\.(csv|xlsx|parquet)$/i, '');
+  const withoutKnownExtension = sanitized.replace(
+    new RegExp(`\\.(${knownExtensions.map(escapeRegExp).join('|')})$`, 'i'),
+    ''
+  );
   return `${withoutKnownExtension}.${extension}`;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function escapeCsvValue(value: string): string {

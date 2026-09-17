@@ -513,7 +513,7 @@
 
 .dp-explore-sql-toolbar__actions,
 .dp-explore-sql-toolbar__leading,
-.dp-explore-sql-toolbar__export {
+.dp-explore-result-pane__actions {
   display: flex;
   gap: 0.4rem;
   align-items: center;
@@ -528,9 +528,8 @@
   flex: 1 1 auto;
 }
 
-.dp-explore-sql-toolbar__export {
+.dp-explore-result-pane__actions {
   flex: 0 0 auto;
-  justify-content: flex-end;
 }
 
 .dp-explore-recipe-picker {
@@ -773,18 +772,31 @@
 }
 
 .dp-explore-result-pane--table-only {
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .dp-explore-result-pane__header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  display: grid;
+  gap: 0.35rem;
   min-width: 0;
   min-height: 2.35rem;
   padding: 0 0.75rem;
   border-bottom: 1px solid var(--dp-explore-border);
   background: var(--dp-explore-header);
+}
+
+.dp-explore-result-pane__header-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  min-height: 2.35rem;
+}
+
+.dp-explore-result-export {
+  display: flex;
+  min-width: 0;
 }
 
 .dp-explore-result-pane__body {
@@ -1052,6 +1064,20 @@
   padding: 0.75rem;
   overflow: auto;
   background: #ffffff;
+}
+
+.dp-explore-chart--export {
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: visible;
+}
+
+.dp-explore-chart--export .dp-explore-chart__header {
+  justify-content: flex-start;
+}
+
+.dp-explore-chart--export .dp-explore-chart__legend {
+  max-height: none;
+  overflow: visible;
 }
 
 .dp-explore-chart__header {
@@ -1856,7 +1882,18 @@
 
 @media (max-width: 30rem) {
   .dp-explore-result-pane__header {
+    padding-inline: 0.5rem;
+  }
+
+  .dp-explore-result-pane__header-row {
+    flex-wrap: wrap;
     justify-content: flex-start;
+    min-height: 0;
+    padding-block: 0.25rem;
+  }
+
+  .dp-explore-result-pane__actions {
+    flex: 1 1 auto;
   }
 
   .dp-explore-result-view-toggle {

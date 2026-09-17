@@ -10,7 +10,9 @@ import {hasResultLimitApplied, normalizeSqlForExecution, queryTimeoutMessage} fr
 import {ResultPanel} from '../results/ResultPanel';
 import {idleQueryResult, type QueryResultState} from '../results/queryResultTypes';
 import {successfulQueryResult} from '../results/arrowResult';
+import {exportChartAsPng} from '../results/ChartExport';
 import {exportQueryResult, type ResultExportFormat} from '../results/ResultExport';
+import {ResultExportControl} from '../results/ResultExportControl';
 import {sqlResultSnapshotFromQueryResult, type SqlResultSnapshot} from '../results/sqlResultSnapshot';
 import {copyTextToClipboard} from './clipboard';
 import {SqlEditorField} from './SqlEditorField';
@@ -50,7 +52,9 @@ export function SqlLaboratory({
   const [copied, setCopied] = useState(false);
   const [rowLimit, setRowLimit] = useState(Math.min(DEFAULT_ROW_LIMIT, context.execution.maxResultRows));
   const [exportingFormat, setExportingFormat] = useState<ResultExportFormat | null>(null);
+  const [exportingChart, setExportingChart] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [chartExportTarget, setChartExportTarget] = useState<HTMLElement | null>(null);
   const tableSchemas = useMemo(
     () => context.tables.map((table) => toSqlRoomsDataTable(table, context.catalogDatabase)),
     [context.catalogDatabase, context.tables]
@@ -75,6 +79,7 @@ export function SqlLaboratory({
     setSelectedRecipeId(initialRecipe?.id);
     setResult(idleQueryResult);
     setResultView('table');
+    setChartExportTarget(null);
   }, [initialRecipe?.id, initialSql]);
 
   useEffect(() => {
@@ -132,6 +137,7 @@ export function SqlLaboratory({
       maxRowsApplied
     };
     setExportError(null);
+    setChartExportTarget(null);
     setResult(runningResult);
 
     let handle: QueryHandle<Table> | undefined;
@@ -210,6 +216,22 @@ export function SqlLaboratory({
     }
   }
 
+  async function exportChart() {
+    if (result.status !== 'success' || result.rows.length === 0 || !chartExportTarget) {
+      return;
+    }
+    setExportingChart(true);
+    setExportError(null);
+    try {
+      await exportChartAsPng(chartExportTarget, context.datasetId);
+    } catch (error) {
+      console.error('Explore chart export failed', error);
+      setExportError(`Export konnte nicht erstellt werden: ${toErrorMessage(error)}`);
+    } finally {
+      setExportingChart(false);
+    }
+  }
+
   function transferToR() {
     if (result.status !== 'success') {
       return;
@@ -258,22 +280,14 @@ export function SqlLaboratory({
               running={running}
               canRun={ready && sql.trim().length > 0}
               canCancel={running}
-              canExport={canExport}
               canTransferToR={canTransferToR}
-              exportingFormat={exportingFormat}
               onRun={() => void runSql()}
               onCancel={() => void cancelQuery()}
               onCopy={() => void copySql()}
-              onExport={(format) => void exportResult(format)}
               onTransferToR={onTransferToR ? transferToR : undefined}
               copied={copied}
             />
           </div>
-          {exportError && (
-            <p className="dp-explore-export-error" role="alert">
-              {exportError}
-            </p>
-          )}
         </div>
         <SqlEditorField
           value={sql}
@@ -296,12 +310,42 @@ export function SqlLaboratory({
         tagName="section"
         aria-label="SQL Resultat"
       >
-        {chartsEnabled && (
-          <ResultViewToggle view={resultView} onChange={setResultView} />
-        )}
+        <div className="dp-explore-result-pane__header">
+          <div className="dp-explore-result-pane__header-row">
+            <div className="dp-explore-result-pane__actions">
+              {chartsEnabled && resultView === 'chart' ? (
+                <button
+                  type="button"
+                  className="dp-explore-button dp-explore-button--secondary"
+                  disabled={!canExport || !chartExportTarget || exportingChart || Boolean(exportingFormat)}
+                  aria-label="Diagramm als PNG herunterladen"
+                  onClick={() => void exportChart()}
+                >
+                  PNG
+                </button>
+              ) : (
+                <ResultExportControl
+                  canExport={canExport}
+                  exportingFormat={exportingFormat}
+                  onExport={(format) => void exportResult(format)}
+                />
+              )}
+            </div>
+            {chartsEnabled && <ResultViewToggle view={resultView} onChange={setResultView} />}
+          </div>
+          {exportError && (
+            <p className="dp-explore-export-error" role="alert">
+              {exportError}
+            </p>
+          )}
+        </div>
         <div className="dp-explore-result-pane__body">
           {chartsEnabled && resultView === 'chart' ? (
-            <ChartPanel result={result} preferred={result.preferredChart} />
+            <ChartPanel
+              result={result}
+              preferred={result.preferredChart}
+              onExportTargetChange={setChartExportTarget}
+            />
           ) : (
             <ResultPanel
               result={result}
@@ -358,25 +402,23 @@ function ResultViewToggle({
   onChange: (view: ResultView) => void;
 }) {
   return (
-    <div className="dp-explore-result-pane__header">
-      <div className="dp-explore-result-view-toggle" role="group" aria-label="Resultatansicht">
-        <button
-          type="button"
-          className={view === 'table' ? 'is-active' : undefined}
-          aria-pressed={view === 'table'}
-          onClick={() => onChange('table')}
-        >
-          Tabelle
-        </button>
-        <button
-          type="button"
-          className={view === 'chart' ? 'is-active' : undefined}
-          aria-pressed={view === 'chart'}
-          onClick={() => onChange('chart')}
-        >
-          Diagramm
-        </button>
-      </div>
+    <div className="dp-explore-result-view-toggle" role="group" aria-label="Resultatansicht">
+      <button
+        type="button"
+        className={view === 'table' ? 'is-active' : undefined}
+        aria-pressed={view === 'table'}
+        onClick={() => onChange('table')}
+      >
+        Tabelle
+      </button>
+      <button
+        type="button"
+        className={view === 'chart' ? 'is-active' : undefined}
+        aria-pressed={view === 'chart'}
+        onClick={() => onChange('chart')}
+      >
+        Diagramm
+      </button>
     </div>
   );
 }
