@@ -608,7 +608,7 @@ class ExploreIslandParquetPlaywrightTest {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {
             Page page = context.newPage();
             List<String> browserErrors = collectBrowserErrors(page);
-            page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+            page.navigate(baseUrl("/series/explore-series/issues/current/explore"));
 
             waitForExploreReady(page);
             page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
@@ -640,8 +640,14 @@ class ExploreIslandParquetPlaywrightTest {
             Download pngDownload = page.waitForDownload(() -> page.getByRole(
                     com.microsoft.playwright.options.AriaRole.BUTTON,
                     new Page.GetByRoleOptions().setName("Diagramm als PNG herunterladen")).click());
-            assertThat(pngDownload.suggestedFilename()).isEqualTo("datenportal-explore-fixture-diagramm.png");
-            assertThat(Files.size(pngDownload.path())).isGreaterThan(0);
+            assertThat(pngDownload.suggestedFilename()).isEqualTo("datenportal-explore-series-2026-diagramm.png");
+            byte[] pngBytes = Files.readAllBytes(pngDownload.path());
+            assertThat(pngBytes).startsWith(new byte[] { (byte) 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a });
+            assertThat(ImageIO.read(new ByteArrayInputStream(pngBytes))).isNotNull();
+            assertThat(page.locator(".dp-explore-export-error").count()).isZero();
+            assertThat(browserErrors)
+                    .noneMatch(error -> error.contains("Error loading remote css")
+                            || error.contains("Explore chart export failed"));
 
             var defaultBarFills = normalizedFillAttributes(page.locator("[data-chart-type='bar']"));
             assertThat(defaultBarFills).contains("#104e8b");

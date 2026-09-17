@@ -26,7 +26,7 @@ describe('ChartExport', () => {
       expect(clone.querySelector('h4')?.textContent).toBe('Diagramm aus Resultat');
       expect(clone.querySelector('.dp-explore-chart__legend')?.textContent).toContain('Solothurn');
       expect(clone.querySelector('[data-export-ignore]')).toBeNull();
-      expect(options).toMatchObject({backgroundColor: '#ffffff', cacheBust: true, pixelRatio: 2});
+      expect(options).toMatchObject({backgroundColor: '#ffffff', cacheBust: true, pixelRatio: 2, skipFonts: true});
       return 'data:image/png;base64,UE5H';
     });
 

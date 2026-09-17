@@ -123,7 +123,7 @@ Wichtige Dateien:
 
 Das Frontend nutzt npm, React 19, Vite 8, TypeScript, Vitest und Testing Library. SQLRooms DuckDB- und SQL-Editor-Pakete werden fuer DuckDB-Wasm und den SQL-Editor verwendet. Phase 5 verwendet `@sqlrooms/recharts@0.28.0` fuer Recharts-Primitive und SQLRooms-Chart-Wrappers; die Styles bleiben Datenportal-eigene CSS-Tokens. `react-resizable-panels@3.0.6` ist direkte Explore-Abhaengigkeit fuer die SQLRooms-aehnlichen Griffleisten. `@radix-ui/react-scroll-area@1.2.13` ist direkte Explore-Abhaengigkeit fuer die Resultat-Scrollbars, weil native Overlay-Scrollbars Hover auf macOS/Chromium nicht verlaesslich sichtbar machen. `@sqlrooms/ui` wird nicht direkt in Datenportal-Komponenten eingebunden, weil die Datenportal-UI eigene Design-Tokens nutzt.
 
-Der PNG-Export verwendet `html-to-image@1.11.13` ausschliesslich im Browser. Die Abhängigkeit erzeugt keine zusätzlichen Backend- oder Kontext-Verträge.
+Der PNG-Export verwendet `html-to-image@1.11.13` ausschliesslich im Browser. Der Aufruf deaktiviert die Font-Einbettung (`skipFonts: true`), weil die globale App-CSS relative Font-URLs importiert, die der Font-Inliner browserabhängig nicht zuverlässig auflösen kann. Die Diagrammtexte werden weiterhin aus den berechneten Elementstilen gerendert; Titel, Grafik und Legende bleiben unverändert. Die Abhängigkeit erzeugt keine zusätzlichen Backend- oder Kontext-Verträge.
 
 ## SQL-Labor ab Phase 4
 
@@ -237,7 +237,7 @@ ORDER BY "jahr";
 - `ChartPanel` wird ueber die lokale Resultatansicht `Diagramm` angezeigt. Es gibt keinen alten Haupt-`Diagramm`-Tab, keinen Dashboard-Builder und keinen Spec-Editor.
 - Diagrammfarben kommen aus den definierten Zusatzfarben `Dunkelblau`, `Hellblau`, `Orange`, `Gold`, `Dunkelgrün` und `Hellgrün`; Rot wird nicht angeboten. `Mehrfarbig` verwendet diese Farben plus passende Blau-, Gruen-, Gelb- und Orange-Ergaenzungen stabil pro Resultat. `Farben neu` mischt die stabile Palette fuer mehrfarbige Balken, Histogramme, Pie und Donut neu. Bei vielen Pie-/Donut-Segmenten wird ein Hinweis angezeigt.
 - DuckDB `count(*)` liefert im Browser BigInt-Werte. Fuer Recharts werden nur die Diagrammzeilen in plain JavaScript-Zahlen/Strings normalisiert; Resultattabelle und CSV-Export behalten die originalen Resultatwerte.
-- Ein renderbares Diagramm kann aus dem Ergebnis-Header als PNG exportiert werden. Der Export klont den Diagrammbereich, behält Titel, Grafik und Pie-/Donut-Legende auf weißem Hintergrund bei, entfernt Steuerfelder, Warnungen, Zeilenlimit-Hinweise und `Farben neu`, verwendet `pixelRatio: 2` und bereinigt den temporären DOM-Klon auch bei Fehlern.
+- Ein renderbares Diagramm kann aus dem Ergebnis-Header als PNG exportiert werden. Der Export klont den Diagrammbereich, behält Titel, Grafik und Pie-/Donut-Legende auf weißem Hintergrund bei, entfernt Steuerfelder, Warnungen, Zeilenlimit-Hinweise und `Farben neu`, verwendet `pixelRatio: 2`, überspringt die browserabhängige Einbettung globaler Fonts und bereinigt den temporären DOM-Klon auch bei Fehlern.
 - Vitest mockt `@sqlrooms/recharts`, weil das Paket wie `@sqlrooms/sql-editor` extensionless interne ESM-Imports enthaelt, die der Test-Runner nicht direkt aufloest. Typecheck, Vite-Build und Playwright pruefen den echten Produktionspfad.
 
 ## Explore-Kontext V4

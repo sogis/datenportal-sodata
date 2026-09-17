@@ -25,7 +25,10 @@ export async function exportChartAsPng(
     const dataUrl = await toPng(clone, {
       backgroundColor: '#ffffff',
       cacheBust: true,
-      pixelRatio: 2
+      pixelRatio: 2,
+      // The page imports vendor font CSS with relative URLs. html-to-image's
+      // font inliner cannot resolve those URLs consistently across browsers.
+      skipFonts: true
     });
     downloadBlob(dataUrlToBlob(dataUrl), chartExportFilename(datasetId), documentRef);
   } finally {

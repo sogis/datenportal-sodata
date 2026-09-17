@@ -125,6 +125,10 @@ Phase-7-Fund:
 
 ## Safari und WebAssembly
 
+### PNG-Export und Fonts
+
+Der Diagramm-PNG-Export verwendet `html-to-image` ohne globale Font-Einbettung. Die App-CSS importiert lokal vendorte Fonts mit relativen URLs; der Font-Inliner von `html-to-image@1.11.13` kann diese URLs insbesondere in Firefox nicht zuverlässig auflösen und bricht anschließend mit `can't access property "trim", e is undefined` ab. Wenn ein PNG-Export fehlschlägt, zuerst den aktuellen Explore-Build laden und im Ergebnis-Header auf einen aktiven PNG-Button sowie eine gültige PNG-Datei prüfen. Die exportierten Texte verwenden bei Bedarf den Browser-Fallback, während Titel, Diagramm und Legende erhalten bleiben.
+
 Automatisiert geprueft:
 
 - Chromium Headless via Java Playwright fuer DuckDB-Wasm-Initialisierung, same-origin Parquet, lokales Monaco, SQL-Ausfuehrung, Resultat-Export, fehlende sichtbare Diagramme, Fehlerzustand und mobile Overflow-Checks.
