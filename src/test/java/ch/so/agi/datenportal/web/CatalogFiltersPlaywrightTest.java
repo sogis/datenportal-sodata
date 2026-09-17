@@ -597,12 +597,10 @@ class CatalogFiltersPlaywrightTest {
             Locator cardDescription = page.locator(".dp-result-card .dp-result-card__description").first();
             Locator actionPill = page.locator(".dp-download-link.dp-action-pill").first();
             Locator typeBadge = page.locator(".dp-result-card__type-badge:has-text('Datensatz')").first();
-            Locator openDataBadge = page.locator(".dp-result-card .dp-status-badge--positive").first();
             Locator keywordBadge = page.locator(".dp-result-card .dp-keyword-list li").first();
 
             String searchBackground = cssValue(searchSurface, "background-color");
             String neutralBackground = cssValue(filterChip, "background-color");
-            String positiveBackground = cssValue(openDataBadge, "background-color");
 
             assertThat(searchBackground).isEqualTo("rgb(244, 247, 249)");
             assertThat(cssValue(searchInput, "background-color")).isEqualTo(searchBackground);
@@ -636,11 +634,9 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(keywordBadge, "padding-left")).isEqualTo("6px");
             assertThat(cssValue(keywordBadge, "padding-right")).isEqualTo("6px");
             assertThat(cssValue(keywordBadge, "min-height")).isEqualTo("25.6px");
-
-            assertThat(fontSize(openDataBadge)).isEqualTo("16px");
-            assertThat(cssValue(openDataBadge, "font-weight")).isEqualTo("400");
-            assertThat(cssValue(openDataBadge, "border-top-width")).isEqualTo("0px");
-            assertThat(positiveBackground).isNotEqualTo(neutralBackground);
+            assertThat(page.locator(".dp-result-card .dp-status-badge--positive").count()).isZero();
+            assertThat(page.locator(".dp-result-card .dp-status-badge--warning").count()).isZero();
+            assertThat(page.locator(".dp-result-card .dp-status-badge--neutral").count()).isZero();
 
             page.navigate(baseUrl("/datasets?view=cards"));
 
@@ -659,10 +655,7 @@ class CatalogFiltersPlaywrightTest {
             Locator lockedCardDownload = page.locator(".dp-result-card .dp-access-lock").first();
             Locator lockedCardDownloadIcon = lockedCardDownload.locator("svg");
 
-            assertThat(fontSize(warningBadge)).isEqualTo("16px");
-            assertThat(cssValue(warningBadge, "font-weight")).isEqualTo("400");
-            assertThat(cssValue(warningBadge, "border-top-width")).isEqualTo("0px");
-            assertThat(cssValue(warningBadge, "background-color")).isEqualTo("rgb(254, 241, 222)");
+            assertThat(warningBadge.count()).isZero();
             assertThat(page.locator(".dp-result-card .dp-download-link").count()).isZero();
             assertThat(cssValue(lockedCardDownloadIcon, "width")).isEqualTo("24px");
             assertThat(cssValue(lockedCardDownloadIcon, "height")).isEqualTo("24px");
@@ -693,7 +686,6 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(currentIssueBadge, "border-top-width")).isEqualTo("0px");
             assertThat(cssValue(currentIssueBadge, "background-color")).isEqualTo("rgb(228, 240, 251)");
             assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(neutralBackground);
-            assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(positiveBackground);
             assertThat(cssValue(seriesIssueMeta, "color")).isEqualTo("rgb(47, 72, 88)");
             assertThat(fontSize(seriesIssueDetailLink)).isEqualTo("18px");
             assertThat(seriesIssueDetailLink.getAttribute("href")).isEqualTo("/series/ch.so.abstimmungsresultate/issues/current");

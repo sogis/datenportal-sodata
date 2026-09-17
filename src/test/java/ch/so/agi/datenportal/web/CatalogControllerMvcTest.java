@@ -192,14 +192,14 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void cardViewRendersCardsAndOpenDataBadges() throws Exception {
+    void cardViewRendersCardsWithTypeBadgesOnly() throws Exception {
         mockMvc.perform(get("/datasets").param("view", "cards"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("dp-card-grid")))
                 .andExpect(content().string(containsString("dp-result-card")))
-                .andExpect(content().string(containsString("Open Data")))
                 .andExpect(content().string(containsString("dp-status-badge--info")))
-                .andExpect(content().string(containsString("Struktur beschrieben")))
+                .andExpect(content().string(not(containsString(">Open Data</span>"))))
+                .andExpect(content().string(not(containsString(">Struktur beschrieben</span>"))))
                 .andExpect(content().string(containsString("href=\"/series/ch.so.abstimmungsresultate\"")))
                 .andExpect(content().string(not(containsString("(aktuelle Ausgabe)"))))
                 .andExpect(content().string(not(containsString("dp-entry-table-wrapper"))));
@@ -230,14 +230,14 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void nonOpenCardsShowAccessBadgeAndLockInsteadOfOpenDataDownloads() throws Exception {
+    void nonOpenCardsShowLockInsteadOfAccessBadgeAndDownloads() throws Exception {
         mockMvc.perform(get("/datasets")
                         .param("view", "cards")
                         .param("q", "Baumkataster"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Baumkataster")))
-                .andExpect(content().string(containsString("dp-status-badge dp-status-badge--warning")))
-                .andExpect(content().string(containsString(">Öffentlich mit Bedingungen</span>")))
+                .andExpect(content().string(not(containsString("dp-status-badge--warning"))))
+                .andExpect(content().string(not(containsString(">Öffentlich mit Bedingungen</span>"))))
                 .andExpect(content().string(containsString("class=\"bi bi-lock\"")))
                 .andExpect(content().string(not(containsString(">Open Data</span>"))))
                 .andExpect(content().string(not(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.2581.baumkataster.csv\""))));

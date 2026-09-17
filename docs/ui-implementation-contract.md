@@ -603,8 +603,7 @@ Pflicht je Card:
 
 - blaues Info-Typ-Badge `Datensatz` oder `Datenreihe`, im gemeinsamen `dp-status-badge--info`-Stil
 - der Typ-Badge in Cards zeigt als Prefix ein Datei-Icon fuer `Datensatz` und ein Collection-Icon fuer `Datenreihe`, vertikal mittig zum Text ausgerichtet
-- Badge `Open Data` nur fuer offene Eintraege; nicht offene Eintraege zeigen stattdessen ein gelbes Badge mit dem lesbaren Zugriffstext
-- zusätzlicher Badge `Struktur beschrieben`, wenn Attribute beschrieben sind oder ein Datenmodell vorhanden ist
+- keine zusätzlichen Access- oder Struktur-Badges; nicht offene Eintraege signalisieren fehlende Downloads weiterhin durch ein Schloss im Downloadbereich
 - Titel `18px` und Beschreibung `18px` wie im Screenshot
 - graue Keyword-/Themen-Badges mit `14px`
 - Formate als kompakte Textlinks oder Buttons
@@ -613,29 +612,7 @@ Pflicht je Card:
 - Aktualisierungs-/Publikationsdatum unten links
 - roter Pfeil/Link unten rechts zur Detailseite
 
-### 7.2 Badge `Struktur beschrieben`
-
-Name: `Struktur beschrieben`
-
-Bedeutung:
-
-- Es existiert ein Datenmodell, oder
-- Attribute/Spalten/Strukturinformationen sind im Modell beschrieben.
-
-Falls fachlich unterschieden werden soll, kann der Tooltip oder `title`-Text lauten:
-
-```text
-Attribute beschrieben oder Datenmodell vorhanden
-```
-
-Nicht verwenden:
-
-- `Verfügbar`
-- `Metadaten komplett`
-
-Begründung: `Verfügbar` sagt nichts über Struktur/Attribute aus. `Metadaten komplett` wäre zu stark und müsste validiert werden.
-
-### 7.3 Card-ViewModel
+### 7.2 Card-ViewModel
 
 ```java
 public record EntryCardVm(
@@ -644,7 +621,6 @@ public record EntryCardVm(
     String description,
     String typeLabel,
     AccessStateVm accessState,
-    boolean structureDescribed,
     List<String> keywords,
     List<DownloadLinkVm> downloads,
     String dateLabel,
@@ -652,7 +628,7 @@ public record EntryCardVm(
 ) {}
 ```
 
-### 7.4 JTE-Komponenten
+### 7.3 JTE-Komponenten
 
 ```text
 src/main/jte/components/entryCardGrid.jte
@@ -1043,7 +1019,7 @@ Pflichttests:
 - Datenreihe-Root-Zeile enthält Plus-/Minus-Button mit `aria-expanded`.
 - Datenreihe-Root-Zeile enthält Downloads der aktuellen Ausgabe ohne Zusatz im Pill-Label.
 - Aufgeklappte Datenreihe rendert Ausgabezeilen ebenfalls ohne Zusatz `aktuelle Ausgabe`.
-- Kartenansicht rendert `dp-type-badge`, bei offenen Eintraegen `Open Data`, bei nicht offenen Eintraegen den Zugriffstext und `Struktur beschrieben` dort, wo fachlich zutreffend.
+- Kartenansicht rendert ausschließlich `dp-type-badge`; Access- und Struktur-Badges werden nicht angezeigt. Nicht offene Eintraege zeigen im Downloadbereich weiterhin ein Schloss.
 - Detailseite enthält keine Datenvorschau.
 - Detailseite einer Serienausgabe zeigt Serien-Kicker, aktuelles-Ausgabe-Badge im Titel, Dataset-Detail-Cards, `Weitere Ausgaben` und das Seitenpanel `Daten nutzen`.
 
@@ -1092,8 +1068,7 @@ Keine Screenshot-Pixelvergleiche im MVP. Stattdessen HTML-Struktur, Klassen, ARI
 ### Phase UI-4: Kartenansicht
 
 - Cards gemäss `cards.png`.
-- `Open Data` wird nur fuer offene Eintraege angezeigt; nicht offene Eintraege zeigen stattdessen den lesbaren Zugriffstext und ein Schloss statt Downloadlinks.
-- `Struktur beschrieben`-Badge.
+- Access- und Struktur-Badges werden nicht gerendert; nicht offene Eintraege zeigen ein Schloss statt Downloadlinks.
 - Ansichttoggle und Zustandserhalt.
 - Tests.
 

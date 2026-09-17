@@ -38,8 +38,8 @@ Die Kartenansicht ist eine alternative Ansicht der Start-/Katalogseite. Die verb
 ## Kartenansicht
 
 - `Datensatz` und `Datenreihe` verwenden denselben grauen Typ-Badge.
-- Badge `Open Data` wird im MVP hardcodiert angezeigt.
-- Badge `Struktur beschrieben` wird angezeigt, wenn Attribute beschrieben sind oder ein Datenmodell vorhanden ist.
+- Die Kartenansicht zeigt neben dem Typ-Badge keine zusätzlichen Access- oder Struktur-Badges.
+- Nicht offene Eintraege zeigen im Downloadbereich ein Schloss statt Downloadlinks.
 - Titel, Beschreibung, Keyword-Chips, Datum und Pfeil/Link zur Detailseite folgen `cards.png`.
 
 ## Detailseiten

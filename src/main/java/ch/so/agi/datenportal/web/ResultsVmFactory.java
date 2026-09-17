@@ -86,7 +86,6 @@ public final class ResultsVmFactory {
                 entry.description(),
                 entry.type().label(),
                 accessState(entry),
-                entry.metadata().hasStructureInformation(),
                 keywords(entry),
                 entry.distributionsForListing().stream()
                         .map(link -> download(entry.title(), link))

@@ -41,7 +41,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | UI-Bereich | JTE | Java | Tests |
 |---|---|---|---|
 | Grid | `components/entryCardGrid.jte` | `ResultsVm.cards` | `view=cards` rendert Grid |
-| Card | `components/entryCard.jte` | `EntryCardVm` | Typ-Badge, Access-Badge, Struktur beschrieben |
+| Card | `components/entryCard.jte` | `EntryCardVm` | ausschließlich Typ-Badge; Zugang wird bei nicht offenen Downloads durch ein Schloss signalisiert |
 | Chips | `components/chipList.jte` | `EntryCardVm.keywords` | Keywords als neutrale Status-Badge-Familie gerendert |
 
 ## Detailseiten

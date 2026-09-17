@@ -8,7 +8,6 @@ public record EntryCardVm(
         String description,
         String typeLabel,
         AccessStateVm accessState,
-        boolean structureDescribed,
         List<String> keywords,
         List<DownloadLinkVm> downloads,
         String dateLabel,

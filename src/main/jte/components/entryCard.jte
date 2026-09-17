@@ -14,10 +14,6 @@
       @endif
       <span>${card.typeLabel()}</span>
     </span>
-    @template.components.accessBadge(accessState = card.accessState())
-    @if(card.structureDescribed())
-      <span class="dp-status-badge dp-status-badge--neutral">Struktur beschrieben</span>
-    @endif
   </div>
   <h2 class="dp-result-card__title">
     <a href="${card.detailHref()}">${card.title()}</a>
