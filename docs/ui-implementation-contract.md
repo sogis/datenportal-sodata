@@ -677,7 +677,7 @@ Pflichtbereiche:
 2. Titel
 3. Der Hero der normalen Datensatz-Detailseite rendert aktuell keine Badge-Zeile.
 4. Kurzbeschreibung/Abstract
-5. Vertikale, ungerahmte Bereiche `Downloads` und danach `Datenmerkmale`, ohne Card-Hintergrund, Border, Radius oder Padding und mit derselben Abschnittslogik wie `Übersicht`; `Datenmerkmale` enthält `Open Data`, `Attribute beschrieben` und `Daten validiert`, `Downloads` enthält `CSV`, `XLSX` und `Parquet`; nicht offene Eintraege zeigen stattdessen ein Schloss
+5. Vertikale, ungerahmte Bereiche `Downloads` und danach `Datenmerkmale`, ohne Card-Hintergrund, Border, Radius oder Padding und mit derselben Abschnittslogik wie `Übersicht`; `Datenmerkmale` enthält `Open Data`, `Attribute beschrieben` und `Datenmodell vorhanden`, `Downloads` enthält `CSV`, `XLSX` und `Parquet`; nicht offene Eintraege zeigen stattdessen ein Schloss
 6. Metadatenbereiche:
    - Übersicht
    - Zeitliche Abdeckung
@@ -687,8 +687,9 @@ Pflichtbereiche:
 
 Temporäre Umsetzungsnotiz:
 
-- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, die vertikal gestapelten, ungerahmten Bereiche `Downloads` und `Datenmerkmale` ohne zusätzliches Padding, die ersten drei ungerahmten Metadatenbereiche (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und ein rechtes vertikales Seitenpanel `Daten nutzen` (`Struktur, Qualität und Herkunft`, `Erkunden`, `Verwenden`) mit sekundären Textlinks. Downloads, Datenmerkmale und Übersicht folgen derselben Abschnittslogik; das Seitenpanel beginnt auf Desktop auf derselben Höhe wie `Downloads`.
-- Die Datenmerkmale `Open Data`, `Attribute beschrieben` und `Daten validiert` verwenden Feature-Status-Icons: verfuegbare Merkmale nutzen `var(--dp-color-status-ok-circle)`, nicht verfuegbare Merkmale nutzen den gedämpften Grauton `var(--dp-color-text-muted)`. Diese Icons sind keine Status-Badges; Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` sowie rote oder gelbe Warning-Farben duerfen nicht als Icon-Farbe verwendet werden.
+- Die aktuelle MVP-Iteration zeigt auf der normalen Datensatz-Detailseite den oberen Bereich mit Hero, die vertikal gestapelten, ungerahmten Bereiche `Downloads` und `Datenmerkmale` ohne zusätzliches Padding, die ersten drei ungerahmten Metadatenbereiche (`Übersicht`, `Zeitliche Abdeckung`, `Themen und Schlagworte`) und ein rechtes vertikales Seitenpanel `Daten nutzen` (`Struktur, Qualität und Herkunft`, `Verwenden`, `Erkunden`) mit sekundären Textlinks. Downloads, Datenmerkmale und Übersicht folgen derselben Abschnittslogik; das Seitenpanel beginnt auf Desktop auf derselben Höhe wie `Downloads`.
+- `Datenmodell vorhanden` zeigt ausschliesslich `metadata.model().isPresent()` an. Ein Qualitätsreport ohne Datenmodell aktiviert das Merkmal nicht; es wird keine durchgeführte oder erfolgreiche Validierung behauptet.
+- Die Datenmerkmale `Open Data`, `Attribute beschrieben` und `Datenmodell vorhanden` verwenden Feature-Status-Icons: verfuegbare Merkmale nutzen `var(--dp-color-status-ok-circle)`, nicht verfuegbare Merkmale nutzen den gedämpften Grauton `var(--dp-color-text-muted)`. Diese Icons sind keine Status-Badges; Badge-Background-Tokens wie `var(--dp-color-badge-positive-bg)` sowie rote oder gelbe Warning-Farben duerfen nicht als Icon-Farbe verwendet werden.
 - Zusätzlich zeigt die normale Datensatz-Detailseite die Card `Zuständigkeiten und Kontakt` direkt nach `Themen und Schlagworte`. Sie verwendet dieselben Metadaten-Card-Styles und enthält `Datenproduzent`, `Kontakt` und `Herausgeber`.
 - Die frühere Card `Übrige Informationen` wird auf Datensatz- und Ausgabe-Detailseiten nicht mehr gerendert. `Erhebungs- / Messmethode`, `Hilfsdaten`, `Weitere Verwendungen` und `Verfügbare Daten ab` gehören zur Subseite `Struktur, Qualität und Herkunft`.
 - Die tieferen Metadatenbereiche unterhalb dieser Cards sind auf dieser Seite vorübergehend ausgeblendet und werden in einer Folgephase wieder integriert.

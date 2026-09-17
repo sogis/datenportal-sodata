@@ -1,5 +1,7 @@
 # Agenten-Spezifikation zur Codebereinigung
 
+> Aktualisierung 2026-09-16: Das hier historisch als „Daten validiert“ bezeichnete Merkmal heisst jetzt „Datenmodell vorhanden“. Die Prüfung auf ein vorhandenes Datenmodell bleibt gleich; das Merkmal macht keine Aussage über eine erfolgte Validierung. Massgeblich ist der aktuelle UI-Vertrag.
+
 ## 1. Zweck und Ergebnis
 
 Dieses Dokument ist die verbindliche, ausführbare Arbeitsanweisung für einen LLM-Agenten zur schrittweisen Verbesserung der Codequalität der Datenportal-Webanwendung und der Explore-Insel.

@@ -111,7 +111,7 @@ Beispiele:
 
 - Check-Circle fuer `Open Data`, wenn der Eintrag offen ist
 - Check-Circle fuer `Attribute beschrieben`, wenn Attribute vorhanden sind
-- X-Circle fuer `Daten validiert`, wenn kein Datenmodell vorhanden ist
+- X-Circle fuer `Datenmodell vorhanden`, wenn kein Datenmodell vorhanden ist
 
 Regeln:
 
@@ -162,7 +162,7 @@ Nicht erlaubt:
 - `Aktuelle Ausgabe` = Info-Status-Badge
 - `CSV`, `XLSX`, `Parquet` = Action Pills
 - Keyword-/Themen-Labels auf Cards = neutrale Status-Badge-Familie mit lokaler `14px`-Typografie-Ausnahme
-- Datenmerkmale `Open Data`, `Attribute beschrieben`, `Daten validiert` = Feature-Status-Icons mit positivem Gruen bzw. gedämpftem Text-Grauton
+- Datenmerkmale `Open Data`, `Attribute beschrieben`, `Datenmodell vorhanden` = Feature-Status-Icons mit positivem Gruen bzw. gedämpftem Text-Grauton
 
 ## 4. Benennung im Code
 

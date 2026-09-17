@@ -80,7 +80,7 @@ public final class DetailPageVmFactory {
         return List.of(
                 new DetailFeatureVm("Open Data", entry.isOpenData()),
                 new DetailFeatureVm("Attribute beschrieben", !metadata.attributes().isEmpty()),
-                new DetailFeatureVm("Daten validiert", metadata.model().isPresent()));
+                new DetailFeatureVm("Datenmodell vorhanden", metadata.model().isPresent()));
     }
 
     public SeriesDetailPageVm series(DatasetSeriesEntry series) {

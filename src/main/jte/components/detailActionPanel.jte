@@ -21,29 +21,6 @@
         </a>
       </div>
     </article>
-    <article class="${openData && !exploreHref.isBlank() ? "dp-detail-action-item" : "dp-detail-action-item dp-detail-action-item--disabled"}">
-      <div class="dp-detail-action-item__icon" aria-hidden="true">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-        </svg>
-      </div>
-      <div class="dp-detail-action-item__content">
-        <h3>Erkunden</h3>
-        <p>Datenvorschau öffnen und Inhalte fachlich einordnen.</p>
-        @if(openData && !exploreHref.isBlank())
-          <a class="dp-detail-action-link" href="${exploreHref}" aria-label="Datenvorschau anzeigen: Daten erkunden">
-            Datenvorschau anzeigen <span aria-hidden="true">&rarr;</span>
-          </a>
-        @else
-          <span class="dp-detail-action-link dp-detail-action-link--disabled" aria-disabled="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock dp-detail-action-lock" viewBox="0 0 16 16" aria-hidden="true">
-              <path fill-rule="evenodd" d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7zM8 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3"/>
-            </svg>
-            <span class="dp-visually-hidden">Datenvorschau nicht verfügbar</span>
-          </span>
-        @endif
-      </div>
-    </article>
     <article class="${openData ? "dp-detail-action-item" : "dp-detail-action-item dp-detail-action-item--disabled"}">
       <div class="dp-detail-action-item__icon" aria-hidden="true">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-code-slash" viewBox="0 0 16 16">
@@ -63,6 +40,29 @@
               <path fill-rule="evenodd" d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7zM8 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3"/>
             </svg>
             <span class="dp-visually-hidden">Downloads nicht verfügbar</span>
+          </span>
+        @endif
+      </div>
+    </article>
+    <article class="${openData && !exploreHref.isBlank() ? "dp-detail-action-item" : "dp-detail-action-item dp-detail-action-item--disabled"}">
+      <div class="dp-detail-action-item__icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+        </svg>
+      </div>
+      <div class="dp-detail-action-item__content">
+        <h3>Erkunden</h3>
+        <p>Datenvorschau öffnen und Inhalte fachlich einordnen.</p>
+        @if(openData && !exploreHref.isBlank())
+          <a class="dp-detail-action-link" href="${exploreHref}" aria-label="Datenvorschau anzeigen: Daten erkunden">
+            Datenvorschau anzeigen <span aria-hidden="true">&rarr;</span>
+          </a>
+        @else
+          <span class="dp-detail-action-link dp-detail-action-link--disabled" aria-disabled="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock dp-detail-action-lock" viewBox="0 0 16 16" aria-hidden="true">
+              <path fill-rule="evenodd" d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7zM8 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3"/>
+            </svg>
+            <span class="dp-visually-hidden">Datenvorschau nicht verfügbar</span>
           </span>
         @endif
       </div>

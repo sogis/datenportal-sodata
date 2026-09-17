@@ -77,7 +77,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("href=\"mailto:agi@bd.so.ch\"")))
                 .andExpect(content().string(containsString("agi@bd.so.ch")))
                 .andExpect(content().string(containsString("Attribute beschrieben")))
-                .andExpect(content().string(containsString("Daten validiert")))
+                .andExpect(content().string(containsString("Datenmodell vorhanden")))
                 .andExpect(content().string(containsString("class=\"bi bi-check-circle\"")))
                 .andExpect(content().string(containsString("<aside class=\"dp-detail-side\" aria-label=\"Daten nutzen\">")))
                 .andExpect(content().string(containsString("Daten nutzen")))
@@ -114,9 +114,13 @@ class CatalogDetailControllerMvcTest {
                     int downloads = html.indexOf("class=\"dp-detail-downloads\"");
                     int features = html.indexOf("class=\"dp-detail-features\"");
                     int overview = html.indexOf("id=\"metadata-overview\"");
+                    int usage = html.indexOf("<h3>Verwenden</h3>");
+                    int explore = html.indexOf("<h3>Erkunden</h3>");
                     assertThat(downloads).isGreaterThanOrEqualTo(0);
                     assertThat(features).isGreaterThan(downloads);
                     assertThat(overview).isGreaterThan(features);
+                    assertThat(usage).isGreaterThanOrEqualTo(0);
+                    assertThat(explore).isGreaterThan(usage);
                 });
     }
 
@@ -266,7 +270,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Wasserqualität Grundwasser")))
                 .andExpect(content().string(containsString("Attribute beschrieben")))
-                .andExpect(content().string(containsString("Daten validiert")))
+                .andExpect(content().string(containsString("Datenmodell vorhanden")))
                 .andExpect(content().string(containsString("class=\"bi bi-check-circle\"")))
                 .andExpect(content().string(containsString("class=\"bi bi-x-circle\"")))
                 .andExpect(content().string(not(containsString("Übrige Informationen"))))
@@ -331,7 +335,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("Datenmerkmale")))
                 .andExpect(content().string(containsString("Open Data")))
                 .andExpect(content().string(containsString("Attribute beschrieben")))
-                .andExpect(content().string(containsString("Daten validiert")))
+                .andExpect(content().string(containsString("Datenmodell vorhanden")))
                 .andExpect(content().string(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.abstimmungsresultate_2026.csv\"")))
                 .andExpect(content().string(containsString("Übersicht")))
                 .andExpect(content().string(containsString("Identifier")))
@@ -376,7 +380,8 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(not(containsString("id=\"metadata-responsibility\""))))
                 .andExpect(content().string(not(containsString("id=\"metadata-usage\""))))
                 .andExpect(content().string(not(containsString("id=\"metadata-time\""))))
-                .andExpect(content().string(not(containsString("id=\"metadata-resources\""))));
+                .andExpect(content().string(not(containsString("id=\"metadata-resources\""))))
+                .andExpect(result -> assertActionPanelOrder(result.getResponse().getContentAsString()));
     }
 
     @Test
@@ -487,7 +492,8 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(not(containsString("href=\"#\""))))
                 .andExpect(content().string(not(containsString("Datenvorschau anzeigen <span aria-hidden=\"true\">&rarr;</span>"))))
                 .andExpect(content().string(not(containsString("Downloads anzeigen <span aria-hidden=\"true\">&rarr;</span>"))))
-                .andExpect(content().string(not(containsString("dp-status-badge dp-status-badge--positive"))));
+                .andExpect(content().string(not(containsString("dp-status-badge dp-status-badge--positive"))))
+                .andExpect(result -> assertActionPanelOrder(result.getResponse().getContentAsString()));
     }
 
     @Test
@@ -598,6 +604,14 @@ class CatalogDetailControllerMvcTest {
         mockMvc.perform(get("/datasets/ch.so.abstimmungsresultate/structure-quality-origin"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("Seite nicht gefunden")));
+    }
+
+    private static void assertActionPanelOrder(String html) {
+        int usage = html.indexOf("<h3>Verwenden</h3>");
+        int explore = html.indexOf("<h3>Erkunden</h3>");
+
+        assertThat(usage).isGreaterThanOrEqualTo(0);
+        assertThat(explore).isGreaterThan(usage);
     }
 
     @Test

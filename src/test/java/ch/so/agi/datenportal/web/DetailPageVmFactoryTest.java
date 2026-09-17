@@ -337,7 +337,7 @@ class DetailPageVmFactoryTest {
                 .containsExactly(
                         tuple("Open Data", true),
                         tuple("Attribute beschrieben", true),
-                        tuple("Daten validiert", true));
+                        tuple("Datenmodell vorhanden", true));
     }
 
     @Test
@@ -432,6 +432,9 @@ class DetailPageVmFactoryTest {
         var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(metadata));
 
         assertThat(page.quality().modelName()).isEmpty();
+        assertThat(factory.dataset(datasetWithMetadata(metadata)).features())
+                .extracting("label", "available")
+                .contains(tuple("Datenmodell vorhanden", false));
         assertThat(page.quality().validationReportName()).contains("Validierungsreport");
         assertThat(page.quality().validationReportHref())
                 .contains("https://data.so.ch?entry=dataset");
@@ -510,7 +513,7 @@ class DetailPageVmFactoryTest {
                 .containsExactly(
                         tuple("Open Data", false),
                         tuple("Attribute beschrieben", false),
-                        tuple("Daten validiert", false));
+                        tuple("Datenmodell vorhanden", false));
     }
 
     @Test
@@ -601,7 +604,7 @@ class DetailPageVmFactoryTest {
                 .containsExactly(
                         tuple("Open Data", true),
                         tuple("Attribute beschrieben", true),
-                        tuple("Daten validiert", true));
+                        tuple("Datenmodell vorhanden", true));
         assertThat(page.overview().items())
                 .extracting(item -> item.label(), item -> item.lines().getFirst().value())
                 .contains(
