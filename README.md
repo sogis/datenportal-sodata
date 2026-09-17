@@ -34,7 +34,7 @@ Nicht enthalten:
 - Admin-UI
 - Kubernetes-Deployment und Publish-Workflow für Containerimages
 - CI/CD-Pipeline
-- Erzeugung und automatische Aktualisierung der separat benötigten `catalog.duckdb`
+- Erzeugung von `catalog.duckdb` in der Webapp (diese übernimmt GRETL im Themenrepo)
 
 Für den lokalen JVM-Betrieb als Container existiert ein Dockerfile im
 Repository; Details stehen in [Container-Deployment](docs/container-deployment.md).
@@ -71,7 +71,7 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082'
 
 Der Standardstart verwendet gebündelte Fixtures. Im lokalen Gesamtstack
 (`datenportal-dev-stack`) läuft das Portal als Container auf **8082** mit
-Manifestquelle und gebündelter DuckDB-Fixture; der Stack baut und startet das
+gemeinsamer Manifestquelle für XTF und DuckDB; der Stack baut und startet das
 Image aus diesem Repository. Die Host-Variante bleibt als Alternative
 dokumentiert in [Betrieb](docs/operations.md#an-den-lokalen-dev-stack-anschliessen).
 
@@ -158,7 +158,7 @@ weiterhin auch zurückgehaltene Einträge offenlegen.
 
 Die Quelle `datenportal.catalog.source-type=manifest` löst eine unter
 `datenportal.catalog.http-url` konfigurierte `current.json` auf. Details zu
-Erstinitialisierung ohne Katalog und zur getrennten DuckDB-Konfiguration stehen
+Erstinitialisierung ohne Katalog und zum gemeinsamen DuckDB-Manifestmodus stehen
 in [Konfiguration](docs/configuration.md#veröffentlichungsverweis-auf-s3).
 
 Die Anwendung liest das PublishedCatalog-XTF vollständig ein, überführt es in ein internes Read-Model und rendert daraus sowohl die Suchresultate als auch die Detailseiten. Lucene dient dabei der Katalogsuche; Detailseiten lesen ihren Eintrag direkt aus dem aktiven Snapshot.

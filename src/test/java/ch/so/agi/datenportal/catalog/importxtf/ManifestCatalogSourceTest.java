@@ -39,6 +39,13 @@ class ManifestCatalogSourceTest {
             exchange.getResponseBody().write(body);
             exchange.close();
         });
+        server.createContext("/catalog-a.duckdb", exchange -> {
+            byte[] body = new byte[16];
+            System.arraycopy("DUCK".getBytes(StandardCharsets.US_ASCII), 0, body, 8, 4);
+            exchange.sendResponseHeaders(200, body.length);
+            exchange.getResponseBody().write(body);
+            exchange.close();
+        });
         server.start();
     }
     @AfterEach void stop() { server.stop(0); }
@@ -88,5 +95,49 @@ class ManifestCatalogSourceTest {
     @Test void missingReferencedFileIsNotAnEmptyCatalog() {
         manifest="{\"schemaVersion\":1,\"releaseId\":\"missing\",\"datasheets\":\"datasheets-missing.xtf\",\"catalog\":\"published-catalog-missing.xtf\"}";
         assertThatThrownBy(() -> source().load()).isInstanceOf(CatalogSourceException.class).hasMessageContaining("404");
+    }
+
+    @Test void pairUsesOneManifestEvenIfPointerChangesBetweenDownloads() {
+        manifest = manifest("\"published-catalog-a.xtf\"").replace("}", ",\"duckdb\":\"catalog-a.duckdb\"}");
+        var inputs = source().loadInputs(Duration.ofSeconds(1), Duration.ofSeconds(2), DataSize.ofMegabytes(1));
+        assertThat(new String(inputs.publishedCatalog().bytes(), StandardCharsets.UTF_8)).isEqualTo("<example/>");
+        assertThat(inputs.duckDbCatalog().sourceDescription()).endsWith("/catalog-a.duckdb");
+        assertThat(inputs.duckDbCatalog().bytes()).hasSize(16);
+        assertThat(manifest).isEqualTo("{}");
+        assertThat(reads.get()).isEqualTo(1);
+    }
+
+    @Test void emptyPublicationStillLoadsDuckDb() {
+        manifest = manifest("null").replace("}", ",\"duckdb\":\"catalog-a.duckdb\"}");
+        var inputs = source().loadInputs(Duration.ofSeconds(1), Duration.ofSeconds(2), DataSize.ofMegabytes(1));
+        assertThat(inputs.publishedCatalog().absent()).isTrue();
+        assertThat(inputs.duckDbCatalog().bytes()).hasSize(16);
+        assertThat(reads.get()).isEqualTo(1);
+    }
+
+    @Test void missingDuckDbIsOnlyAcceptedByLegacyXtfSource() {
+        manifest = manifest("null");
+        assertThat(source().load().absent()).isTrue();
+        assertThatThrownBy(() -> source().loadInputs(Duration.ofSeconds(1), Duration.ofSeconds(2), DataSize.ofMegabytes(1)))
+                .isInstanceOf(CatalogSourceException.class).hasMessageContaining("DuckDB reference");
+    }
+
+    @ParameterizedTest @ValueSource(strings={"null", "42", "\"../catalog-a.duckdb\"", "\"https://example.org/catalog-a.duckdb\"", "\"catalog-b.duckdb\""})
+    void rejectsInvalidDuckDbReference(String value) {
+        manifest = manifest("null").replace("}", ",\"duckdb\":" + value + "}");
+        assertThatThrownBy(() -> source().loadInputs(Duration.ofSeconds(1), Duration.ofSeconds(2), DataSize.ofMegabytes(1)))
+                .isInstanceOf(CatalogSourceException.class).hasMessageContaining("DuckDB reference");
+    }
+
+    @Test void duckDbSizeLimitIsIndependentOfXtfLimit() {
+        manifest = manifest("null").replace("}", ",\"duckdb\":\"catalog-a.duckdb\"}");
+        assertThatThrownBy(() -> source().loadInputs(Duration.ofSeconds(1), Duration.ofSeconds(2), DataSize.ofBytes(12)))
+                .isInstanceOf(CatalogSourceException.class);
+    }
+
+    @Test void missingDuckDbFileFailsTheWholeLoad() {
+        manifest = "{\"schemaVersion\":1,\"releaseId\":\"missing\",\"datasheets\":\"datasheets-missing.xtf\",\"catalog\":null,\"duckdb\":\"catalog-missing.duckdb\"}";
+        assertThatThrownBy(() -> source().loadInputs(Duration.ofSeconds(1), Duration.ofSeconds(2), DataSize.ofMegabytes(1)))
+                .isInstanceOf(CatalogSourceException.class).hasMessageContaining("404");
     }
 }

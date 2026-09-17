@@ -2,6 +2,8 @@ package ch.so.agi.datenportal.config;
 
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogSource;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogInputs;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogInputsSource;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogDownloadUrlPlaceholderResolver;
 import ch.so.agi.datenportal.catalog.importxtf.ClasspathCatalogSource;
 import ch.so.agi.datenportal.catalog.importxtf.DownloadUrlPlaceholderCatalogSource;
@@ -16,7 +18,6 @@ import java.time.Clock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ResourceLoader;
 
 @Configuration
@@ -36,7 +37,25 @@ public class CatalogImportConfiguration {
     }
 
     @Bean
-    @Primary
+    CatalogInputsSource catalogInputsSource(CatalogProperties properties, CatalogDuckDbProperties duckDb,
+            ResourceLoader resourceLoader, Clock clock) {
+        if (duckDb.sourceType() == CatalogProperties.SourceType.MANIFEST) {
+            if (properties.sourceType() != CatalogProperties.SourceType.MANIFEST) {
+                throw new IllegalArgumentException("DuckDB manifest mode requires datenportal.catalog.source-type=manifest.");
+            }
+            var source = new ManifestCatalogSource(properties.httpUrl(), properties.httpConnectTimeout(),
+                    properties.httpReadTimeout(), properties.maxSize(), clock);
+            var resolver = new CatalogDownloadUrlPlaceholderResolver();
+            return () -> {
+                var inputs = source.loadInputs(duckDb.httpConnectTimeout(), duckDb.httpReadTimeout(), duckDb.maxSize());
+                return new CatalogInputs(inputs.publishedCatalog().absent() ? inputs.publishedCatalog()
+                        : resolver.resolve(inputs.publishedCatalog(), properties.downloadUrl()), inputs.duckDbCatalog());
+            };
+        }
+        return CatalogInputsSource.independent(catalogSource(properties, resourceLoader, clock),
+                catalogDuckDbSource(duckDb, resourceLoader, clock));
+    }
+
     CatalogSource catalogSource(CatalogProperties properties, ResourceLoader resourceLoader, Clock clock) {
         CatalogSource source = switch (properties.sourceType()) {
             case CLASSPATH -> new ClasspathCatalogSource(
@@ -57,7 +76,6 @@ public class CatalogImportConfiguration {
                 properties.downloadUrl());
     }
 
-    @Bean
     CatalogSource catalogDuckDbSource(CatalogDuckDbProperties properties, ResourceLoader resourceLoader, Clock clock) {
         return switch (properties.sourceType()) {
             case CLASSPATH -> new ClasspathCatalogSource(

@@ -7,7 +7,7 @@ import org.springframework.util.unit.DataSize;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-/** Resolves one immutable XTF generation per load, without requiring an S3 SDK. */
+/** Resolves one immutable publication generation per load, without requiring an S3 SDK. */
 public final class ManifestCatalogSource implements CatalogSource {
     private final URI uri;
     private final Duration connectTimeout;
@@ -28,8 +28,27 @@ public final class ManifestCatalogSource implements CatalogSource {
 
     @Override
     public CatalogBytes load() {
+        return loadPublished(resolve(false));
+    }
+
+    /** Resolves the pointer once, then downloads both immutable files from that generation. */
+    public CatalogInputs loadInputs(Duration duckDbConnectTimeout, Duration duckDbReadTimeout, DataSize duckDbMaxSize) {
+        var publication = resolve(true);
+        var published = loadPublished(publication);
+        var duckDb = new HttpCatalogSource(uri.resolve(publication.duckdb()), duckDbConnectTimeout,
+                duckDbReadTimeout, duckDbMaxSize, clock).load();
+        return new CatalogInputs(published, duckDb);
+    }
+
+    private CatalogBytes loadPublished(Publication publication) {
+        return publication.catalog() == null ? CatalogBytes.absent(publication.manifest())
+                : new HttpCatalogSource(uri.resolve(publication.catalog()), connectTimeout, readTimeout, maxSize, clock).load();
+    }
+
+    private record Publication(CatalogBytes manifest, String catalog, String duckdb) {}
+
+    private Publication resolve(boolean requireDuckDb) {
         CatalogBytes manifest = new HttpCatalogSource(uri, connectTimeout, readTimeout, DataSize.ofKilobytes(64), clock).load();
-        String catalog;
         try {
             JsonNode root = JsonMapper.builder().build().readTree(manifest.bytes());
             String release = root.path("releaseId").asString("");
@@ -43,14 +62,18 @@ public final class ManifestCatalogSource implements CatalogSource {
                         && catalogNode.asString().equals("published-catalog-" + release + ".xtf"))) {
                 throw new CatalogSourceException("Invalid publication manifest: " + description());
             }
-            if (catalogNode.isNull()) return CatalogBytes.absent(manifest);
-            catalog = catalogNode.asString();
+            JsonNode duckDbNode = root.get("duckdb");
+            if ((requireDuckDb && duckDbNode == null) || (duckDbNode != null &&
+                    (!duckDbNode.isString() || !duckDbNode.asString().equals("catalog-" + release + ".duckdb")))) {
+                throw new CatalogSourceException("Invalid or missing DuckDB reference in publication manifest: " + description());
+            }
+            return new Publication(manifest, catalogNode.isNull() ? null : catalogNode.asString(),
+                    duckDbNode == null ? null : duckDbNode.asString());
         } catch (CatalogSourceException ex) {
             throw ex;
         } catch (RuntimeException ex) {
             throw new CatalogSourceException("Cannot parse publication manifest: " + description(), ex);
         }
-        return new HttpCatalogSource(uri.resolve(catalog), connectTimeout, readTimeout, maxSize, clock).load();
     }
 
     @Override

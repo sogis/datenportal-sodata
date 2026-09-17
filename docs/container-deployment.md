@@ -19,9 +19,9 @@ aber keine eigene Kopie der Buildlogik.
   ein fehlendes oder ungültiges `current.json` bleibt ein Fehler
 - der Container-Healthcheck prüft `/actuator/health/liveness`; die öffentliche
   Antwort zeigt nur den Gesamtstatus
-- `catalog.duckdb` liegt als Fixture über `spec/fixtures` im Jar und wird mit
-  `source-type=classpath` gelesen; Erzeugung und Synchronisierung mit neuen
-  Lieferungen sind noch nicht implementiert
+- Im Dev-Stack werden XTF und DuckDB gemeinsam aus dem Manifest geladen.
+  GRETL erzeugt und prüft die DuckDB. `spec/fixtures` bleibt ausschliesslich
+  für explizite Classpath-Konfigurationen und Tests verfügbar.
 
 ## Voraussetzungen
 
@@ -106,7 +106,7 @@ werden sie als Umgebungsvariablen übergeben (Spring-Boot-Relaxed-Binding):
 | `DATENPORTAL_CATALOG_SOURCE_TYPE` | `manifest` im Stackbetrieb; alternativ `classpath`, `http`, `file` |
 | `DATENPORTAL_CATALOG_HTTP_URL` | Manifestadresse, im Compose-Netz z. B. `http://downloads:8081/ch.so.daten/current.json` |
 | `DATENPORTAL_CATALOG_DOWNLOAD_URL` | öffentlich erreichbare Downloadbasis für den Browser, z. B. `http://localhost:8081/ch.so.daten` |
-| `DATENPORTAL_CATALOG_DUCKDB_SOURCE_TYPE` | `classpath` (Fixtures), `file` oder `http` |
+| `DATENPORTAL_CATALOG_DUCKDB_SOURCE_TYPE` | `manifest` (gemeinsam mit XTF), `classpath` (Fixtures), `file` oder `http` |
 | `DATENPORTAL_CATALOG_DUCKDB_CLASSPATH_LOCATION` | `catalog.duckdb` für die gebündelte Fixture |
 | `SERVER_PORT` | optional; Default im Container ist `8080` |
 
@@ -118,8 +118,7 @@ docker run --rm -p 18082:8080 \
   -e DATENPORTAL_CATALOG_SOURCE_TYPE=manifest \
   -e DATENPORTAL_CATALOG_HTTP_URL=http://host.docker.internal:8081/ch.so.daten/current.json \
   -e DATENPORTAL_CATALOG_DOWNLOAD_URL=http://localhost:8081/ch.so.daten \
-  -e DATENPORTAL_CATALOG_DUCKDB_SOURCE_TYPE=classpath \
-  -e DATENPORTAL_CATALOG_DUCKDB_CLASSPATH_LOCATION=catalog.duckdb \
+  -e DATENPORTAL_CATALOG_DUCKDB_SOURCE_TYPE=manifest \
   datenportal-sodata:local
 ```
 
@@ -205,4 +204,4 @@ wechseln.
 | Port belegt | Host-Port `8082` frei machen oder `SODATA_PORT` ändern |
 | Reload `503` | `DATENPORTAL_ADMIN_RELOAD_TOKEN` im Container leer |
 | Reload `401` | Token stimmt nicht mit Jenkins `DATENPORTAL_PORTAL_RELOAD_TOKEN` überein |
-| Erkunden zeigt falsche/fehlende Tabellen | Verwendete `catalog.duckdb` passt nicht zur Lieferung; Sync ist noch nicht implementiert |
+| Erkunden zeigt falsche/fehlende Tabellen | Manifestgeneration, Reload und View-Erzeugung im GRETL-Job prüfen; offene Playgrounds neu laden |

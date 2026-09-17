@@ -8,6 +8,11 @@ Die zentrale Architekturidee ist ein vollständiger, atomar austauschbarer `Cata
 
 ```mermaid
 flowchart LR
+    manifest["current.json: eine Generation"]
+    inputs["CatalogInputsSource: XTF + DuckDB"]
+    manifest --> inputs
+    inputs --> parser
+    inputs --> builder
     xtf["PublishedCatalog CatalogSource<br/>Classpath / File / HTTP"]
     duckdb["DuckDB CatalogSource<br/>Classpath / File / HTTP"]
     parser["Parser / Validator<br/>XTF nach Domain"]
@@ -21,8 +26,8 @@ flowchart LR
     browser["Browser"]
     admin["Admin Reload"]
 
-    xtf --> parser
-    duckdb --> builder
+    xtf --> inputs
+    duckdb --> inputs
     parser --> builder
     builder --> lucene
     builder --> snapshot
@@ -39,7 +44,9 @@ flowchart LR
 ## Laufzeitmodell
 
 Beim Start oder Reload werden die PublishedCatalog-XTF/XML-Quelle und die
-fertige DuckDB-Datei jeweils genau einmal geladen. XTF wird sicher geparst und
+fertige DuckDB-Datei jeweils genau einmal geladen. Im gemeinsamen Manifestmodus
+liefert `CatalogInputsSource` beide Artefakte aus einer einzigen Auflösung von
+`current.json`; Start und Reload verwenden dieselbe Ladeabstraktion. XTF wird sicher geparst und
 validiert, der Lucene-Index wird vollständig neu gebaut, und erst danach
 werden beide Artefakte gemeinsam mit dem Domain-Read-Model als
 `CatalogSnapshot` veröffentlicht. Die Anwendung erzeugt oder transformiert
@@ -87,7 +94,7 @@ Wichtige Verantwortlichkeiten:
 ## Startup
 
 1. Spring bindet `datenportal.catalog.*`.
-2. Die XTF- und DuckDB-`CatalogSource` laden ihre vollständigen Bytes jeweils einmal.
+2. `CatalogInputsSource` lädt beide Artefakte; im Manifestmodus stammen sie aus derselben einmaligen Manifestauflösung.
 3. Der DuckDB-Header wird technisch auf mindestens zwölf Bytes und `DUCK` an Byteposition 8 bis 11 geprüft.
 4. `XtfPublishedCatalogParser` parst namespace-aware und XXE-sicher, inklusive exakter `accessRights` sowie strukturbezogener Metadaten (`attributes`, `model`).
 5. `CatalogValidator` prüft Pflichtregeln.
@@ -103,7 +110,7 @@ Fehlschläge beim initialen Laden sind fail-fast. Die Anwendung startet nicht st
 
 Reload-Ablauf:
 
-1. XTF- und DuckDB-Quelle laden.
+1. Beide Artefakte über `CatalogInputsSource` laden; ein Manifestabruf je Versuch.
 2. DuckDB minimal technisch prüfen.
 3. XTF-Kandidat parsen.
 4. Kandidat validieren.

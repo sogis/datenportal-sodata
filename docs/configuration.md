@@ -90,7 +90,7 @@ Mit `DATENPORTAL_CATALOG_SOURCE_TYPE=manifest` und
 Anwendung je Start/Reload genau einen Veröffentlichungsverweis und danach dessen
 Katalog-XTF. Es wird kein S3-SDK benötigt. Der Manifestvertrag ist im
 [Themenrepo](https://codeberg.org/edigonzales/datenportal-themenrepo/src/branch/main/docs/biblios/lieferverarbeitung.adoc)
-definiert: `schemaVersion: 1`, `releaseId`, `datasheets` und `catalog`; Dateinamen
+definiert: `schemaVersion: 1`, `releaseId`, `datasheets`, `catalog` und `duckdb`; Dateinamen
 müssen zur Kennung passen und dürfen keine fremden URLs oder Pfadwechsel enthalten.
 
 `catalog: null` ist ein gültiger Zustand vor der ersten Datenlieferung: leere
@@ -101,8 +101,22 @@ die öffentliche Health-Antwort blendet Details aus. Der geschützte Admin-Statu
 zeigt Quelle und Eintragszahlen. Es wird keine künstliche XTF erzeugt.
 Eine fehlende referenzierte Datei oder ein ungültiger Verweis bleibt dagegen ein
 Fehler. Fehlgeschlagene Reloads erhalten den bisherigen Snapshot und Suchindex.
-Die bestehende separat konfigurierte `catalog.duckdb` bleibt erforderlich; ihre
-Erzeugung und Synchronisierung mit dem Verweis erfolgt in einem späteren Schritt.
+Mit `DATENPORTAL_CATALOG_DUCKDB_SOURCE_TYPE=manifest` lädt dieselbe Auflösung
+zusätzlich `duckdb: "catalog-<releaseId>.duckdb"`. XTF und DuckDB stammen dadurch
+immer aus derselben Manifestgeneration, auch wenn sich `current.json` während
+der Downloads ändert. Auch `catalog: null` benötigt eine gültige DuckDB mit
+leerem `opendata`-Schema. Bei Fehlern bleiben beide bisherigen Artefakte aktiv.
+Es gibt keinen automatischen Rückfall auf eine gebündelte Fixture.
+
+DuckDB-Manifestmodus setzt `datenportal.catalog.source-type=manifest` voraus.
+Eine separate DuckDB-HTTP-Adresse, Datei- oder Classpath-Location darf dann
+nicht gesetzt sein. Die XTF-Konfiguration bestimmt Manifestadresse und
+Manifest-Timeouts; beide Artefakte behalten ihre jeweiligen Timeouts und
+Grössenlimits. Explizit unabhängige Classpath-/Datei-/HTTP-Quellen bleiben möglich.
+
+Bei der Umstellung zuerst den Publisher und dessen Laufzeit aktualisieren und
+eine reguläre Veröffentlichung ausführen. Erst danach DuckDB auf `manifest`
+umstellen; alte Manifeste ohne `duckdb` werden in diesem Modus abgewiesen.
 
 ## DuckDB-Catalog fuer Erkunden
 
@@ -116,7 +130,7 @@ passenden Download-URLs erzeugt wurden.
 datenportal:
   catalog:
     duckdb:
-      source-type: classpath # classpath | http | file
+      source-type: classpath # classpath | http | file | manifest
       classpath-location: catalog.duckdb
       file-location: ./config/catalog.duckdb
       http-url: https://example.org/catalog.duckdb
@@ -146,10 +160,11 @@ Snapshot aktiviert. Die Anwendung prüft bei DuckDB nur die technische
 Signatur (mindestens zwölf Bytes, `DUCK` an Byteposition 8 bis 11); sie
 erzeugt, repariert oder fachlich analysiert die Datei nicht. Die externe
 Publishing-Pipeline muss daher sicherstellen, dass XTF und DuckDB zueinander
-passen. Der aktuelle `current.json`-Vertrag umfasst nur die beiden Gesamt-XTF,
-keine DuckDB. Er bestätigt daher keine semantische Gleichheit zwischen Katalog
-und DuckDB. Eine gültige separate DuckDB-Quelle bleibt auch bei `catalog: null`
-erforderlich; Erzeugung und Synchronisierung sind noch nicht implementiert.
+passen. GRETL erzeugt die Views aus dem vollständigen Publikationskandidaten,
+prüft ihre Bindung und publiziert XTF und DuckDB über denselben Manifeststand.
+Auch bei `catalog: null` verweist dieser auf eine gültige leere DuckDB.
+Bereits offene Playgrounds behalten ihre eingelesene Datenbank bis zum Neuladen.
+Parquet-Dateien behalten feste URLs und sind nicht Teil der atomaren Versionierung.
 
 ## WebR fuer Erkunden
 

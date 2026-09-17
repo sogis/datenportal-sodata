@@ -128,4 +128,17 @@ class CatalogDuckDbPropertiesTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("file-location");
     }
+
+    @Test
+    void manifestModeHasNoIndependentLocation() {
+        var properties = new CatalogDuckDbProperties(CatalogProperties.SourceType.MANIFEST,
+                null, null, null, null, null, null, null);
+        assertThat(properties.sourceType()).isEqualTo(CatalogProperties.SourceType.MANIFEST);
+        assertThatThrownBy(() -> new CatalogDuckDbProperties(CatalogProperties.SourceType.MANIFEST,
+                null, null, URI.create("https://example.org/another.json"), null, null, null, null))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("separate locations");
+        assertThatThrownBy(() -> new CatalogDuckDbProperties(CatalogProperties.SourceType.MANIFEST,
+                "catalog.duckdb", null, null, null, null, null, null))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("separate locations");
+    }
 }

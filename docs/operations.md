@@ -31,8 +31,7 @@ Im Dev-Stack läuft das Portal als Compose-Service `sodata` auf Host-Port 8082:
   (`./scripts/up.sh --local-sodata`) oder verwendet ein Registry-Image mit
   lokalem Fallback.
 - Compose setzt die Manifestadresse intern (`http://downloads:8081/...`), die
-  öffentliche Downloadbasis auf dem Host-Port sowie die gebündelte
-  DuckDB-Fixture (`source-type=classpath`).
+  öffentliche Downloadbasis auf dem Host-Port und DuckDB auf `source-type=manifest`.
 - Derselbe `.env`-Wert `DATENPORTAL_PORTAL_RELOAD_TOKEN` versorgt Jenkins und
   den Portal-Container; die frühere Host-Gateway-Adresse entfällt.
 - Vor der ersten Veröffentlichung fehlt `current.json`. Der Dev-Stack startet
@@ -41,11 +40,12 @@ Im Dev-Stack läuft das Portal als Compose-Service `sodata` auf Host-Port 8082:
 
 Details und Grenzen: [Container-Deployment](container-deployment.md).
 
-Die Quelle wird bei Start und jedem Reload einmal aufgelöst. Die derzeit
-verwendete DuckDB ist die gebündelte Fixture; für «Erkunden» mit neuen
-Lieferungen ist eine dazu passende DuckDB erforderlich. Der Standardjob erzeugt
-oder synchronisiert sie noch nicht. Auch ein Null-Katalog benötigt eine gültige
-DuckDB-Quelle.
+Die Quelle wird bei Start und jedem Reload einmal aufgelöst. GRETL publiziert
+XTF und DuckDB gemeinsam über versionierte Manifestverweise. Auch ein
+Null-Katalog besitzt eine gültige DuckDB mit leerem `opendata`-Schema.
+Für Altstände ohne `duckdb` zuerst einen regulären Publikationslauf mit dem
+aktualisierten Publisher ausführen; keine Neuinitialisierung. Erst danach das
+Portal auf den gemeinsamen Manifestmodus umstellen.
 
 Bei `catalog: null` sind leere Trefferlisten und ein leerer Suchindex korrekt;
 `/catalog/published-catalog.xtf` liefert 404, da keine XTF vorliegt. Ein gültiger
@@ -61,7 +61,7 @@ Ohne Container und mit JDK 25 im Portal-Repository starten (Port 8082 darf dann
 nicht durch den Compose-Service belegt sein):
 
 ```bash
-SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082 --datenportal.catalog.source-type=manifest --datenportal.catalog.http-url=http://localhost:8081/ch.so.daten/current.json --datenportal.catalog.download-url=http://localhost:8081/ch.so.daten --datenportal.catalog.duckdb.source-type=classpath --datenportal.catalog.duckdb.classpath-location=catalog.duckdb'
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082 --datenportal.catalog.source-type=manifest --datenportal.catalog.http-url=http://localhost:8081/ch.so.daten/current.json --datenportal.catalog.download-url=http://localhost:8081/ch.so.daten --datenportal.catalog.duckdb.source-type=manifest --datenportal.catalog.duckdb.classpath-location='
 ```
 
 Dann muss der Reload-Token weiterhin extern als `DATENPORTAL_ADMIN_RELOAD_TOKEN`

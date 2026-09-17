@@ -16,6 +16,7 @@ import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogBytes;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogSource;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogInputsSource;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogSourceException;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogValidator;
 import ch.so.agi.datenportal.catalog.importxtf.PublishedCatalogParser;
@@ -231,8 +232,7 @@ class CatalogReloadServiceTest {
             PublishedCatalogParser parser,
             CatalogSearchIndexBuilder indexBuilder) {
         return new CatalogReloadService(
-                source,
-                duckDbSource,
+                CatalogInputsSource.independent(source, duckDbSource),
                 new CatalogSnapshotBuilder(
                         parser,
                         new CatalogValidator(),

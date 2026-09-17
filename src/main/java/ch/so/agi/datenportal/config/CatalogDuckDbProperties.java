@@ -58,7 +58,11 @@ public record CatalogDuckDbProperties(
                 }
             }
             case HTTP -> validateHttpUrl(httpUrl);
-            case MANIFEST -> throw new IllegalArgumentException("DuckDB remains a separately configured source.");
+            case MANIFEST -> {
+                if (httpUrl != null || fileLocation != null || classpathLocation != null) {
+                    throw new IllegalArgumentException("DuckDB manifest mode uses the catalog manifest URL; separate locations are not allowed.");
+                }
+            }
         }
     }
 

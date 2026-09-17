@@ -4,7 +4,7 @@ import ch.so.agi.datenportal.admin.reload.ReloadFailureType;
 import ch.so.agi.datenportal.admin.reload.ReloadResult;
 import ch.so.agi.datenportal.admin.reload.ReloadStatus;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
-import ch.so.agi.datenportal.catalog.importxtf.CatalogSource;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogInputsSource;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogSourceException;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogValidationException;
 import ch.so.agi.datenportal.catalog.importxtf.XtfParseException;
@@ -24,8 +24,7 @@ public final class CatalogReloadService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogReloadService.class);
 
-    private final CatalogSource publishedCatalogSource;
-    private final CatalogSource duckDbCatalogSource;
+    private final CatalogInputsSource inputsSource;
     private final CatalogSnapshotBuilder snapshotBuilder;
     private final CatalogService catalogService;
     private final Clock clock;
@@ -34,13 +33,11 @@ public final class CatalogReloadService {
     private final AtomicReference<ReloadResult> lastFailedReload = new AtomicReference<>();
 
     public CatalogReloadService(
-            CatalogSource publishedCatalogSource,
-            @org.springframework.beans.factory.annotation.Qualifier("catalogDuckDbSource") CatalogSource duckDbCatalogSource,
+            CatalogInputsSource inputsSource,
             CatalogSnapshotBuilder snapshotBuilder,
             CatalogService catalogService,
             Clock clock) {
-        this.publishedCatalogSource = Objects.requireNonNull(publishedCatalogSource, "publishedCatalogSource must not be null");
-        this.duckDbCatalogSource = Objects.requireNonNull(duckDbCatalogSource, "duckDbCatalogSource must not be null");
+        this.inputsSource = Objects.requireNonNull(inputsSource, "inputsSource must not be null");
         this.snapshotBuilder = Objects.requireNonNull(snapshotBuilder, "snapshotBuilder must not be null");
         this.catalogService = Objects.requireNonNull(catalogService, "catalogService must not be null");
         this.clock = Objects.requireNonNull(clock, "clock must not be null");
@@ -61,16 +58,17 @@ public final class CatalogReloadService {
             return conflict;
         }
 
-        LOGGER.info("Catalog reload {} started from source {}.", attemptId, publishedCatalogSource.description());
+        LOGGER.info("Catalog reload {} started.", attemptId);
         try {
-            var publishedCatalog = publishedCatalogSource.load();
+            var inputs = inputsSource.load();
+            var publishedCatalog = inputs.publishedCatalog();
             LOGGER.info(
                     "Catalog reload {} downloaded {} bytes from {}.",
                     attemptId,
                     publishedCatalog.sizeInBytes(),
                     publishedCatalog.sourceDescription());
 
-            var duckDbCatalog = duckDbCatalogSource.load();
+            var duckDbCatalog = inputs.duckDbCatalog();
             LOGGER.info(
                     "Catalog reload {} downloaded {} bytes from {}.",
                     attemptId,

@@ -15,6 +15,7 @@ import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.Theme;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogBytes;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogSource;
+import ch.so.agi.datenportal.catalog.importxtf.CatalogInputsSource;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogSourceException;
 import ch.so.agi.datenportal.catalog.importxtf.CatalogValidator;
 import ch.so.agi.datenportal.search.CatalogDocumentMapper;
@@ -57,8 +58,7 @@ class CatalogSnapshotLoaderTest {
     @Test
     void loadedSnapshotContainsBuiltSearchIndex() {
         var loader = new CatalogSnapshotLoader(
-                source(),
-                duckSource(),
+                CatalogInputsSource.independent(source(), duckSource()),
                 new CatalogSnapshotBuilder(
                         (inputStream, sourceDescription) -> catalog(),
                         new CatalogValidator(),
@@ -76,8 +76,7 @@ class CatalogSnapshotLoaderTest {
     @Test
     void indexBuildFailurePreventsSnapshotCreation() {
         var loader = new CatalogSnapshotLoader(
-                source(),
-                duckSource(),
+                CatalogInputsSource.independent(source(), duckSource()),
                 new CatalogSnapshotBuilder(
                         (inputStream, sourceDescription) -> catalog(),
                         new CatalogValidator(),
@@ -94,8 +93,8 @@ class CatalogSnapshotLoaderTest {
         AtomicInteger publishedLoads = new AtomicInteger();
         AtomicInteger duckDbLoads = new AtomicInteger();
         var loader = new CatalogSnapshotLoader(
-                countingSource(publishedLoads, CatalogTestArtifacts.published("published")),
-                countingSource(duckDbLoads, CatalogTestArtifacts.duckDb("duckdb")),
+                CatalogInputsSource.independent(countingSource(publishedLoads, CatalogTestArtifacts.published("published")),
+                        countingSource(duckDbLoads, CatalogTestArtifacts.duckDb("duckdb"))),
                 new CatalogSnapshotBuilder(
                         (inputStream, sourceDescription) -> catalog(),
                         new CatalogValidator(),
