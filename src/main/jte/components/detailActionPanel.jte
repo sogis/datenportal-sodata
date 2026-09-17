@@ -15,9 +15,9 @@
       </div>
       <div class="dp-detail-action-item__content">
         <h3>${structureQualityOriginLabel}</h3>
-        <p>Attribute, Datenmodell, Validierung und Qualitätshinweise einsehen.</p>
-        <a class="dp-detail-action-link" href="${structureQualityOriginHref}" aria-label="Struktur, Qualität und Herkunft anzeigen">
-          Struktur, Qualität und Herkunft anzeigen <span aria-hidden="true">&rarr;</span>
+        <p>Aufbau, Herkunft und Prüfergebnisse der Daten nachvollziehen.</p>
+        <a class="dp-detail-action-link" href="${structureQualityOriginHref}" aria-label="Mehr über die Daten erfahren: Struktur, Qualität und Herkunft">
+          Mehr über die Daten erfahren <span aria-hidden="true">&rarr;</span>
         </a>
       </div>
     </article>
@@ -29,17 +29,17 @@
       </div>
       <div class="dp-detail-action-item__content">
         <h3>Verwenden</h3>
-        <p>Downloads, Formate und Codebeispiele anzeigen.</p>
+        <p>Daten herunterladen und mit Codebeispielen in eigene Anwendungen einbinden.</p>
         @if(openData)
-          <a class="dp-detail-action-link" href="${usageHref}" aria-label="Downloads anzeigen: Daten verwenden">
-            Downloads anzeigen <span aria-hidden="true">&rarr;</span>
+          <a class="dp-detail-action-link" href="${usageHref}" aria-label="Downloads und Codebeispiele anzeigen: Daten verwenden">
+            Downloads und Codebeispiele anzeigen <span aria-hidden="true">&rarr;</span>
           </a>
         @else
           <span class="dp-detail-action-link dp-detail-action-link--disabled" aria-disabled="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock dp-detail-action-lock" viewBox="0 0 16 16" aria-hidden="true">
               <path fill-rule="evenodd" d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7zM8 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3"/>
             </svg>
-            <span class="dp-visually-hidden">Downloads nicht verfügbar</span>
+            <span class="dp-visually-hidden">Downloads und Codebeispiele nicht verfügbar</span>
           </span>
         @endif
       </div>
@@ -52,17 +52,17 @@
       </div>
       <div class="dp-detail-action-item__content">
         <h3>Erkunden</h3>
-        <p>Datenvorschau öffnen und Inhalte fachlich einordnen.</p>
+        <p>Daten direkt im Browser abfragen, auswerten und visualisieren.</p>
         @if(openData && !exploreHref.isBlank())
-          <a class="dp-detail-action-link" href="${exploreHref}" aria-label="Datenvorschau anzeigen: Daten erkunden">
-            Datenvorschau anzeigen <span aria-hidden="true">&rarr;</span>
+          <a class="dp-detail-action-link" href="${exploreHref}" aria-label="Daten erkunden: Daten im Browser abfragen, auswerten und visualisieren">
+            Daten erkunden <span aria-hidden="true">&rarr;</span>
           </a>
         @else
           <span class="dp-detail-action-link dp-detail-action-link--disabled" aria-disabled="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock dp-detail-action-lock" viewBox="0 0 16 16" aria-hidden="true">
               <path fill-rule="evenodd" d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7zM8 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3"/>
             </svg>
-            <span class="dp-visually-hidden">Datenvorschau nicht verfügbar</span>
+            <span class="dp-visually-hidden">Daten erkunden nicht verfügbar</span>
           </span>
         @endif
       </div>
