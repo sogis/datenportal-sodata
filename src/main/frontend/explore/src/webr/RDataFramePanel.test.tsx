@@ -8,6 +8,9 @@ describe('RDataFramePanel', () => {
   it('renders R type badges before column names with schema-explorer color classes', () => {
     render(<RDataFramePanel snapshot={snapshot()} laboratory={sampleExploreContext.rLaboratory} />);
 
+    expect(screen.getByRole('heading', {name: 'Datengrundlage'})).toBeInTheDocument();
+    expect(screen.queryByRole('heading', {name: 'Data Frame'})).not.toBeInTheDocument();
+    expect(screen.getByText('Data Frame', {selector: 'dt'})).toBeInTheDocument();
     expect(screen.getByText('Anzahl Zeilen')).toBeInTheDocument();
     expect(screen.getByText('Anzahl Spalten')).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'Spalten'})).toBeInTheDocument();

@@ -18,8 +18,7 @@ export function RDataFramePanel({
   return (
     <section className="dp-r-dataframe-panel" aria-label="Datenbasis R-Labor">
       <header className="dp-r-dataframe-panel__header">
-        <p className="dp-explore-kicker">Datengrundlage</p>
-        <h2>Data Frame</h2>
+        <h2>Datengrundlage</h2>
       </header>
 
       {!snapshot && (

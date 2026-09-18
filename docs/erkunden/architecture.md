@@ -267,6 +267,8 @@ Die R-Ausgabe folgt der kompakten SQL-Labor-Flaechenlogik: Konsole und Plot werd
 
 Das R-Labor kann ohne vorherige SQL-Ausfuehrung starten. In diesem Zustand wird WebR initialisiert, ein eigenstaendiges R-Beispiel angeboten und die linke Datenbasis-Spalte weist nur darauf hin, dass noch kein SQL-Resultat als `daten` uebernommen wurde. Nach einer Uebernahme werden datenbezogene Rezepte generiert. Die Rezeptauswahl bevorzugt fachliche Messwertspalten gegenueber Jahren, IDs, Nummern und Codes; Plotrezepte begrenzen Rohdatenplots intern auf 10'000 Zeilen und setzen Spaltennamen in Titeln mit Schweizer Anfuehrungszeichen.
 
+Die linke R-Datenbasis-Spalte verwendet dieselbe kompakte Titelhierarchie wie der SQL-Schema-Explorer: `DATENGRUNDLAGE` ist der einzige Seitentitel in Grossbuchstaben. `DATA FRAME`, `QUELLE`, Zeilen-/Spaltenanzahl und weitere Angaben bleiben kompakte Metadatenlabels.
+
 ## Explore-Erweiterungen
 
 Nicht implementierte Erweiterungen sind kein Bestandteil des Kontextes oder des

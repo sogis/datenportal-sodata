@@ -1244,13 +1244,11 @@
 }
 
 .dp-r-dataframe-panel__header h2 {
-  color: #24364b;
-  font-size: 15px;
+  color: #66758a;
+  font-size: 13px;
   font-weight: 400;
-}
-
-.dp-r-dataframe-panel .dp-explore-kicker {
-  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .dp-r-dataframe-panel__facts {
