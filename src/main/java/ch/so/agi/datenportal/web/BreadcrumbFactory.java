@@ -58,7 +58,7 @@ public class BreadcrumbFactory {
     public BreadcrumbVm issueDetail(DatasetSeriesEntry series, DatasetIssueEntry issue) {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(series.title(), Optional.of("/series/" + encode(series.identifier())), false));
-        items.add(new BreadcrumbItemVm(issue.title(), Optional.empty(), true));
+        items.add(new BreadcrumbItemVm(issue.issueLabel(), Optional.empty(), true));
         return new BreadcrumbVm(items);
     }
 
@@ -66,7 +66,7 @@ public class BreadcrumbFactory {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(series.title(), Optional.of("/series/" + encode(series.identifier())), false));
         String issueHref = issueHref(series, issue);
-        items.add(new BreadcrumbItemVm(issue.title(), Optional.of(issueHref), false));
+        items.add(new BreadcrumbItemVm(issue.issueLabel(), Optional.of(issueHref), false));
         items.add(new BreadcrumbItemVm("Struktur, Qualität und Herkunft", Optional.empty(), true));
         return new BreadcrumbVm(items);
     }
@@ -74,7 +74,7 @@ public class BreadcrumbFactory {
     public BreadcrumbVm issueUsage(DatasetSeriesEntry series, DatasetIssueEntry issue) {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(series.title(), Optional.of("/series/" + encode(series.identifier())), false));
-        items.add(new BreadcrumbItemVm(issue.title(), Optional.of(issueHref(series, issue)), false));
+        items.add(new BreadcrumbItemVm(issue.issueLabel(), Optional.of(issueHref(series, issue)), false));
         items.add(new BreadcrumbItemVm("Daten verwenden", Optional.empty(), true));
         return new BreadcrumbVm(items);
     }
@@ -82,7 +82,7 @@ public class BreadcrumbFactory {
     public BreadcrumbVm issueExplore(DatasetSeriesEntry series, DatasetIssueEntry issue) {
         var items = catalogItems();
         items.add(new BreadcrumbItemVm(series.title(), Optional.of("/series/" + encode(series.identifier())), false));
-        items.add(new BreadcrumbItemVm(issue.title(), Optional.of(issueHref(series, issue)), false));
+        items.add(new BreadcrumbItemVm(issue.issueLabel(), Optional.of(issueHref(series, issue)), false));
         items.add(new BreadcrumbItemVm("Erkunden", Optional.empty(), true));
         return new BreadcrumbVm(items);
     }

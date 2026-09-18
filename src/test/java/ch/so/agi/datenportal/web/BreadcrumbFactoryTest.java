@@ -46,8 +46,20 @@ class BreadcrumbFactoryTest {
         var breadcrumb = factory.issueDetail(series, issue);
 
         assertThat(breadcrumb.items()).extracting("label")
-                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken", "Datenreihe", "Ausgabe 2026");
+                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken", "Datenreihe", "2026");
         assertThat(breadcrumb.items().get(3).href()).contains("/series/series");
+        assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
+    }
+
+    @Test
+    void seriesDetailBreadcrumbKeepsFullSeriesTitle() {
+        DatasetIssueEntry issue = issue("series-2026", "Ausgabe 2026");
+        DatasetSeriesEntry series = series("series", "Datenreihe", issue);
+
+        var breadcrumb = factory.seriesDetail(series);
+
+        assertThat(breadcrumb.items()).extracting("label")
+                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken", "Datenreihe");
         assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
     }
 
@@ -79,9 +91,22 @@ class BreadcrumbFactoryTest {
                         "Datenportal",
                         "Daten und Statistiken",
                         "Datenreihe",
-                        "Ausgabe 2026",
+                        "2026",
                         "Struktur, Qualität und Herkunft");
         assertThat(breadcrumb.items().get(3).href()).contains("/series/series");
+        assertThat(breadcrumb.items().get(4).href()).contains("/series/series/issues/current");
+        assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
+    }
+
+    @Test
+    void issueUsageBreadcrumbUsesIssueLabel() {
+        DatasetIssueEntry issue = issue("series-2026", "Ausgabe 2026");
+        DatasetSeriesEntry series = series("series", "Datenreihe", issue);
+
+        var breadcrumb = factory.issueUsage(series, issue);
+
+        assertThat(breadcrumb.items()).extracting("label")
+                .containsExactly("so.ch", "Datenportal", "Daten und Statistiken", "Datenreihe", "2026", "Daten verwenden");
         assertThat(breadcrumb.items().get(4).href()).contains("/series/series/issues/current");
         assertThat(breadcrumb.items().getLast().currentPage()).isTrue();
     }
@@ -99,7 +124,7 @@ class BreadcrumbFactoryTest {
                         "Datenportal",
                         "Daten und Statistiken",
                         "Datenreihe",
-                        "Ausgabe 2026",
+                        "2026",
                         "Erkunden");
         assertThat(breadcrumb.items().get(3).href()).contains("/series/series");
         assertThat(breadcrumb.items().get(4).href()).contains("/series/series/issues/current");

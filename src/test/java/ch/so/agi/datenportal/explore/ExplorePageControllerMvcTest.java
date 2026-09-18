@@ -93,7 +93,7 @@ class ExplorePageControllerMvcTest {
                 .andExpect(content().string(containsString("<so-header")))
                 .andExpect(content().string(containsString("<so-breadcrumb>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate\">Abstimmungsresultate</so-breadcrumb-item>")))
-                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/current\">Abstimmungsresultate 2026</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/current\">2026</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Erkunden</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("class=\"dp-page dp-page--explore\"")))
                 .andExpect(content().string(containsString("id=\"datenportal-explore-root\"")))

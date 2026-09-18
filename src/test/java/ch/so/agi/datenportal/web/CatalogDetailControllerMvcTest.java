@@ -287,6 +287,8 @@ class CatalogDetailControllerMvcTest {
     void seriesDetailRendersSimplifiedIssueListWithoutCurrentIssuePanelDownloadsOrMetadata() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate"))
                 .andExpect(status().isOk())
+                .andExpect(content().string(containsString(
+                        "<so-breadcrumb-item iscurrentpage>Abstimmungsresultate</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("Abstimmungsresultate")))
                 .andExpect(content().string(containsString("Kantonale und eidgenössische Abstimmungsresultate nach Gemeinde.")))
                 .andExpect(content().string(containsString("<p class=\"dp-series-issues-intro\">Zu dieser Serie sind folgende Ausgaben verfügbar:</p>")))
@@ -329,7 +331,7 @@ class CatalogDetailControllerMvcTest {
                 .andExpect(content().string(containsString("<section class=\"dp-detail-page dp-issue-detail-page\">")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets\">Daten und Statistiken</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate\">Abstimmungsresultate</so-breadcrumb-item>")))
-                .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Abstimmungsresultate 2026</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>2026</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2026")))
                 .andExpect(content().string(containsString("<span class=\"dp-status-badge dp-status-badge--info\">Aktuelle Ausgabe</span>")))
                 .andExpect(content().string(containsString("Ausgabe 2026 der Datenreihe Abstimmungsresultate.")))
@@ -392,7 +394,7 @@ class CatalogDetailControllerMvcTest {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/current/structure-quality-origin"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate\">Abstimmungsresultate</so-breadcrumb-item>")))
-                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/current\">Abstimmungsresultate 2026</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/current\">2026</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Struktur, Qualität und Herkunft</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<th scope=\"row\">datum</th>")))
                 .andExpect(content().string(containsString("Datum der Abstimmung oder Wahl.")))
@@ -409,7 +411,7 @@ class CatalogDetailControllerMvcTest {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/current/usage"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate\">Abstimmungsresultate</so-breadcrumb-item>")))
-                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/current\">Abstimmungsresultate 2026</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/current\">2026</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item iscurrentpage>Daten verwenden</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<h1 class=\"dp-detail-title\">Daten verwenden</h1>")))
                 .andExpect(content().string(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.abstimmungsresultate_2026.csv\"")))
@@ -426,6 +428,10 @@ class CatalogDetailControllerMvcTest {
     void historicalIssueDetailRendersSelectedIssue() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025"))
                 .andExpect(status().isOk())
+                .andExpect(content().string(containsString(
+                        "<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate\">Abstimmungsresultate</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString(
+                        "<so-breadcrumb-item iscurrentpage>2025</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("Abstimmungsresultate 2025")))
                 .andExpect(content().string(containsString("<section class=\"dp-detail-page dp-issue-detail-page\">")))
                 .andExpect(content().string(containsString("Ausgabe 2025")))
@@ -457,7 +463,7 @@ class CatalogDetailControllerMvcTest {
     void historicalIssueStructureQualityOriginRendersSelectedIssue() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025/structure-quality-origin"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\">Abstimmungsresultate 2025</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\">2025</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("<th scope=\"row\">stimmbeteiligung_prozent</th>")))
                 .andExpect(content().string(containsString("Stimmbeteiligung in Prozent.")))
                 .andExpect(content().string(containsString("SO_SK_Politik_Abstimmungen_Publikation_20260624")));
@@ -467,7 +473,7 @@ class CatalogDetailControllerMvcTest {
     void historicalIssueUsageRendersSelectedIssueDownloads() throws Exception {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025/usage"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\">Abstimmungsresultate 2025</so-breadcrumb-item>")))
+                .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/series/ch.so.abstimmungsresultate/issues/ch.so.abstimmungsresultate_2025\">2025</so-breadcrumb-item>")))
                 .andExpect(content().string(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.abstimmungsresultate_2025.csv\"")))
                 .andExpect(content().string(not(containsString("href=\"http://localhost:8081/ch.so.datenportal/downloads/ch.so.abstimmungsresultate_2026.csv\""))))
                 .andExpect(content().string(not(containsString("<aside"))));

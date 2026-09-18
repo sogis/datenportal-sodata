@@ -146,7 +146,7 @@ Pflichtpfade:
 ```text
 so.ch > Datenportal > Daten und Statistiken
 so.ch > Datenportal > Daten und Statistiken > <Titel>
-so.ch > Datenportal > Daten und Statistiken > <Datenreihe> > <Ausgabe>
+so.ch > Datenportal > Daten und Statistiken > <Datenreihe> > <Ausgabenlabel>
 ```
 
 JTE-Komponente:
@@ -999,7 +999,7 @@ public class HeaderViewModelFactory {
 public class BreadcrumbFactory {
     public BreadcrumbVm catalog() { ... }
     public BreadcrumbVm datasetDetail(String title) { ... }
-    public BreadcrumbVm seriesIssueDetail(String seriesTitle, String issueTitle) { ... }
+    public BreadcrumbVm seriesIssueDetail(String seriesTitle, String issueLabel) { ... }
 }
 ```
 
