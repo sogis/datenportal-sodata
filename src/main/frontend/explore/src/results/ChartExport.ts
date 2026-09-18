@@ -24,9 +24,9 @@ export async function exportChartAsPng(
   clone.classList.add('dp-explore-chart--export');
   const bounds = chartElement.getBoundingClientRect();
   const width = Math.max(1, Math.ceil(bounds.width || chartElement.offsetWidth || 1));
-  const height = Math.max(1, Math.ceil(chartElement.scrollHeight || bounds.height || chartElement.offsetHeight || 1));
+  let height = Math.max(1, Math.ceil(chartElement.scrollHeight || bounds.height || chartElement.offsetHeight || 1));
   clone.style.width = `${width}px`;
-  clone.style.height = `${height}px`;
+  clone.style.height = 'auto';
   clone.style.minHeight = '0';
   clone.style.overflow = 'visible';
   clone.style.background = '#ffffff';
@@ -35,12 +35,16 @@ export async function exportChartAsPng(
   exportHost.style.left = '-100000px';
   exportHost.style.top = '0';
   exportHost.style.width = `${width}px`;
-  exportHost.style.height = `${height}px`;
+  exportHost.style.height = 'auto';
   exportHost.style.overflow = 'hidden';
   exportHost.append(clone);
   documentRef.body.append(exportHost);
 
   try {
+    // Measure the export layout after removing controls, including all wrapped legend entries.
+    height = Math.max(1, Math.ceil(clone.scrollHeight || height));
+    clone.style.height = `${height}px`;
+    exportHost.style.height = `${height}px`;
     const dataUrl = await toPng(clone, {
       backgroundColor: '#ffffff',
       cacheBust: true,

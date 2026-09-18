@@ -331,3 +331,18 @@ Wichtige Leitplanken:
 - SQLRooms transitive Peer-Warnings mit React 19, insbesondere `react-virtual` und `react-dnd-multi-backend`.
 - Das installierte `@sqlrooms/sql-editor@0.28.0` exportiert `SqlMonacoEditor`, aber nicht den in neueren SQLRooms-Dokumenten beschriebenen `SqlCodeMirrorEditor`.
 - Vitest kann die extensionless ESM-Internals von `@sqlrooms/sql-editor` und `@sqlrooms/recharts` nicht direkt aufloesen; die Tests mocken diese UI-Pakete und testen die Datenportal-Query- und Chartlogik separat.
+
+## Y-Mehrfachauswahl im SQL-Labor
+
+`ChartPanel` verwaltet eine geordnete lokale Y-Liste für Linie/Balken/Punkte
+und eine unabhängige Pie-/Donut-Wertespalte. Der Kontext V4 und das einzelne
+`preferredChart.y` bleiben unverändert. Neue Resultatobjekte setzen Auswahl,
+Farben und Zeilenlimit zurück. Der Farbregisterzustand merkt die Reihenfolge
+der erstmals gewählten Attribute bis zum nächsten Resultat.
+
+`chartSeries` erzeugt sichere interne Schlüssel und normalisierte Messwerte;
+SQL-Spaltennamen werden nie als Recharts-Pfade oder CSS-Schlüssel eingesetzt.
+Scatter verwendet je Reihe gemeinsame interne X-/Y-Felder und entfernt nur
+Punkte mit fehlenden Koordinaten. Die Renderer ändern das SQL-Resultat nicht.
+Die Reihenlegende liegt im Exportziel, die Checkbox-Auswahl als positioniertes
+Portal ausserhalb der abschneidenden Panels. Es gibt keine neue Abhängigkeit.

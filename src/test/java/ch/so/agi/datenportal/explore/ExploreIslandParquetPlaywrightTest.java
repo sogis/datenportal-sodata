@@ -49,6 +49,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -339,8 +341,9 @@ class ExploreIslandParquetPlaywrightTest {
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
-            page.keyboard().type("select 42 as answer;");
+            page.keyboard().insertText("select 42 as answer;");
             page.keyboard().press("Escape");
+            assertThat(page.locator("#dp-explore-sql-fallback").inputValue()).isEqualTo("select 42 as answer;");
 
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
 
@@ -366,22 +369,22 @@ class ExploreIslandParquetPlaywrightTest {
 
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
-            page.keyboard().type("SEL");
+            page.keyboard().insertText("SEL");
             waitForSuggestion(page, "SELECT", browserErrors);
 
             page.keyboard().press("Escape");
             page.keyboard().press("ControlOrMeta+A");
-            page.keyboard().type("select * from " + tableName.substring(0, Math.min(5, tableName.length())));
+            page.keyboard().insertText("select * from " + tableName.substring(0, Math.min(5, tableName.length())));
             waitForSuggestion(page, tableName, browserErrors);
 
             page.keyboard().press("Escape");
             page.keyboard().press("ControlOrMeta+A");
-            page.keyboard().type("select " + tableName + ".");
+            page.keyboard().insertText("select " + tableName + ".");
             waitForSuggestion(page, firstColumn, browserErrors);
 
             page.keyboard().press("Escape");
             page.keyboard().press("ControlOrMeta+A");
-            page.keyboard().type("select " + tableName + ".we");
+            page.keyboard().insertText("select " + tableName + ".we");
             waitForSuggestion(page, "wert", browserErrors);
         }
     }
@@ -417,8 +420,9 @@ class ExploreIslandParquetPlaywrightTest {
             var editor = page.locator("[data-testid='sql-monaco-editor'] .monaco-editor");
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
-            page.keyboard().type("select range as n from range(1000);");
+            page.keyboard().insertText("select range as n from range(1000);");
             page.keyboard().press("Escape");
+            assertThat(page.locator("#dp-explore-sql-fallback").inputValue()).isEqualTo("select range as n from range(1000);");
 
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
             page.waitForSelector("[aria-label='SQL Ergebnis']");
@@ -679,6 +683,83 @@ class ExploreIslandParquetPlaywrightTest {
             page.getByLabel("Typ").selectOption("donut");
             page.waitForSelector("[data-chart-type='donut']");
             assertThat(page.locator("button[role='tab']:has-text('Diagramm')").count()).isZero();
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1000, 600})
+    void multipleYAttributesRenderAndExportAcrossChartTypes(int viewportWidth) throws IOException {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(viewportWidth, 800))) {
+            Page page = context.newPage();
+            List<String> errors = collectBrowserErrors(page);
+            page.navigate(baseUrl("/series/explore-series/issues/current/explore"));
+            waitForExploreReady(page, errors);
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
+            page.locator("[data-testid='sql-monaco-editor'] .monaco-editor").click();
+            page.keyboard().press("ControlOrMeta+A");
+            page.keyboard().insertText("""
+                    select * from (values
+                      (2020, 'A', 2, 4, 6), (2021, 'B', NULL, 5, 7), (2022, 'C', 4, 6, 8)
+                    ) t(jahr, gemeinde, "Messung.A", "Messung B", "Messung C")
+                    """);
+            page.keyboard().press("Escape");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Ausführen")).click();
+            waitForSqlResult(page, errors);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Diagramm")).click();
+            page.waitForSelector("[data-chart-type='line'] .recharts-line");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Y (Zahl)")).click();
+            page.getByLabel("Messung B", new Page.GetByLabelOptions().setExact(true)).check();
+            page.getByLabel("Messung C", new Page.GetByLabelOptions().setExact(true)).check();
+            assertThat(page.getByLabel("Farbe").inputValue()).isEqualTo("multi");
+            assertThat(page.locator(".recharts-line").count()).isEqualTo(3);
+            assertThat(page.locator(".dp-explore-chart__legend--series li").allTextContents())
+                    .containsExactly("Messung.A", "Messung B", "Messung C");
+            page.keyboard().press("Escape");
+            var before = legendSwatchColors(page);
+            assertThat(new java.util.HashSet<>(before)).hasSize(3);
+            page.getByLabel("Typ").selectOption("pie");
+            assertThat(page.getByLabel("Wert").inputValue()).isEqualTo("Messung.A");
+            page.getByLabel("Typ").selectOption("bar");
+            page.waitForSelector(".recharts-bar");
+            assertThat(page.locator(".recharts-bar").count()).isEqualTo(3);
+            assertThat(legendSwatchColors(page)).isEqualTo(before);
+            page.getByLabel("Typ").selectOption("scatter");
+            page.waitForSelector(".recharts-scatter");
+            assertThat(page.locator(".recharts-scatter").count()).isEqualTo(3);
+            assertThat(page.locator(".recharts-scatter-symbol").count()).isEqualTo(8);
+            page.locator(".recharts-scatter-symbol").first().hover();
+            page.waitForSelector(".dp-explore-series-tooltip");
+            assertThat(page.locator(".dp-explore-series-tooltip").textContent()).contains("Messung.A", "jahr");
+            page.getByLabel("Typ").selectOption("line");
+            // Stay within the layout breakpoint: ExploreApp currently remounts the laboratory across it.
+            page.setViewportSize(viewportWidth - 60, 800);
+            if (viewportWidth > 896) {
+                dragHandle(page, "Schema und SQL-Labor Grösse anpassen", 60, 0);
+            }
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Y (Zahl)")).click();
+            var popup = page.getByRole(com.microsoft.playwright.options.AriaRole.DIALOG);
+            var bounds = popup.boundingBox();
+            assertThat(bounds.x).isGreaterThanOrEqualTo(0);
+            assertThat(bounds.x + bounds.width).isLessThanOrEqualTo(viewportWidth - 60);
+            assertThat(bounds.y + bounds.height).isLessThanOrEqualTo(800);
+            assertThat(popup.evaluate("el => el.contains(document.elementFromPoint(el.getBoundingClientRect().x + 10, el.getBoundingClientRect().y + 10))"))
+                    .isEqualTo(true);
+            page.screenshot(new Page.ScreenshotOptions().setPath(Path.of("build/multi-series-selector-" + viewportWidth + ".png")).setFullPage(true));
+            page.keyboard().press("Escape");
+            assertThat(page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")).isEqualTo(true);
+            page.screenshot(new Page.ScreenshotOptions().setPath(Path.of("build/multi-series-chart-" + viewportWidth + ".png")).setFullPage(true));
+            Download png = page.waitForDownload(() -> page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Diagramm als PNG herunterladen")).click());
+            BufferedImage image = ImageIO.read(png.path().toFile());
+            assertThat(image).isNotNull();
+            assertThat(sampledRgbCount(image)).isGreaterThan(8);
+            Files.copy(png.path(), Path.of("build/multi-series-export-" + viewportWidth + ".png"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            assertThat(page.locator(".dp-explore-export-error").count()).isZero();
+            assertThat(errors).isEmpty();
         }
     }
 

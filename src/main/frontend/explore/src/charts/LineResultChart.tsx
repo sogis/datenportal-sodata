@@ -9,42 +9,35 @@ import {
   YAxis
 } from '@sqlrooms/recharts';
 
-const chartConfig = {
-  value: {
-    label: 'Wert',
-    color: 'var(--dp-color-action)'
-  }
-};
+import {buildSeriesRows, seriesChartConfig, type ChartSeries} from './chartSeries';
 
 export function LineResultChart({
   rows,
   x,
-  y,
-  title,
-  color
+  series
 }: {
   rows: Array<Record<string, unknown>>;
   x: string;
-  y: string;
-  title?: string;
-  color: string;
+  series: ChartSeries[];
 }) {
   return (
-    <ChartContainer className="dp-explore-chart__canvas" config={chartConfig}>
-      <LineChart data={rows} accessibilityLayer margin={{top: 12, right: 12, bottom: 8, left: 8}}>
+    <ChartContainer className="dp-explore-chart__canvas" config={seriesChartConfig(series)}>
+      <LineChart data={buildSeriesRows(rows, x, series)} accessibilityLayer margin={{top: 12, right: 12, bottom: 8, left: 8}}>
         <CartesianGrid vertical={false} stroke="var(--dp-color-border)" />
-        <XAxis dataKey={x} tickLine={false} axisLine={false} minTickGap={16} />
+        <XAxis dataKey="axisX" tickLine={false} axisLine={false} minTickGap={16} />
         <YAxis tickLine={false} axisLine={false} width={52} />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <Line
+        {series.map((item) => <Line
+          key={item.key}
+          connectNulls={false}
           type="monotone"
-          dataKey={y}
-          name={title ?? y}
-          stroke={color}
+          dataKey={item.key}
+          name={item.name}
+          stroke={item.color}
           strokeWidth={2}
           dot={{r: 2}}
           isAnimationActive={false}
-        />
+        />)}
       </LineChart>
     </ChartContainer>
   );

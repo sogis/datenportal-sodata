@@ -36,6 +36,25 @@ describe('ChartExport', () => {
     expect(documentRef.body.querySelector('.dp-explore-chart--export')).toBeNull();
   });
 
+  it('includes every series legend entry and excludes an open selector', async () => {
+    const {documentRef} = downloadHarness();
+    const chart = chartElement(documentRef);
+    const legend = chart.querySelector('.dp-explore-chart__legend')!;
+    legend.classList.add('dp-explore-chart__legend--series');
+    legend.innerHTML = '<li>Messung.A</li><li>Messung B</li><li>Messung C</li>';
+    const popup = documentRef.createElement('div');
+    popup.setAttribute('role', 'dialog');
+    popup.textContent = 'Y-Attribute auswählen';
+    documentRef.body.append(popup);
+    toPng.mockImplementationOnce(async (clone: HTMLElement) => {
+      expect(clone.querySelectorAll('.dp-explore-chart__legend--series li')).toHaveLength(3);
+      expect(clone.textContent).toContain('Messung C');
+      expect(clone.querySelector('[role="dialog"]')).toBeNull();
+      return 'data:image/png;base64,UE5H';
+    });
+    await exportChartAsPng(chart, 'fixture', documentRef);
+  });
+
   it('removes the temporary clone when PNG creation fails', async () => {
     const {documentRef} = downloadHarness();
     const chart = chartElement(documentRef);

@@ -12,7 +12,6 @@ import {
 } from './chartInference';
 import {
   CHART_SINGLE_COLOR_OPTIONS,
-  DEFAULT_CHART_COLOR,
   MULTI_CHART_COLOR_OPTION,
   MULTI_CHART_COLOR_VALUE,
   chartColorHex,
@@ -34,6 +33,9 @@ import {HistogramResultChart} from './HistogramResultChart';
 import {LineResultChart} from './LineResultChart';
 import {buildPieRows, hasPieValues, PieResultChart} from './PieResultChart';
 import {ScatterResultChart} from './ScatterResultChart';
+import {YColumnSelect} from './YColumnSelect';
+import {SeriesLegend} from './SeriesLegend';
+import {buildChartSeries, type ChartSeries} from './chartSeries';
 
 export function ChartPanel({
   result,
@@ -74,6 +76,8 @@ function SuccessfulChartPanel({
   const [type, setType] = useState<ResultChartType>(suggestion?.type ?? 'bar');
   const [x, setX] = useState<string>(suggestion?.x ?? '');
   const [y, setY] = useState<string>(suggestion?.y ?? '');
+  const [ys, setYs] = useState<string[]>(suggestion?.y ? [suggestion.y] : []);
+  const [colorNames, setColorNames] = useState<string[]>(suggestion?.y ? [suggestion.y] : []);
   const [color, setColor] = useState<ChartColorValue>(normalizeChartColor(suggestion?.color));
   const [rowLimit, setRowLimit] = useState<number>(DEFAULT_CHART_ROW_LIMIT);
   const stableColorSeed = useMemo(() => buildStableColorSeed(columns, rows), [columns, rows]);
@@ -84,21 +88,29 @@ function SuccessfulChartPanel({
     setType(suggestion?.type ?? 'bar');
     setX(suggestion?.x ?? '');
     setY(suggestion?.y ?? '');
+    setYs(suggestion?.y ? [suggestion.y] : []);
+    setColorNames(suggestion?.y ? [suggestion.y] : []);
     setColor(normalizeChartColor(suggestion?.color));
     setRowLimit(DEFAULT_CHART_ROW_LIMIT);
     setColorSeedVersion(0);
-  }, [stableColorSeed, suggestion?.color, suggestion?.type, suggestion?.x, suggestion?.y]);
-
-  useEffect(() => {
-    if (color === MULTI_CHART_COLOR_VALUE && !chartTypeSupportsMultiColor(type)) {
-      setColor(DEFAULT_CHART_COLOR);
-    }
-  }, [color, type]);
+  }, [rows, columns, suggestion?.color, suggestion?.type, suggestion?.x, suggestion?.y]);
 
   const compatibleXColumns = suggestion ? xColumns(type, resultColumns, rows) : [];
   const compatibleYColumns = suggestion ? yColumns(type, resultColumns) : [];
   const safeX = selectSafeColumn(x, compatibleXColumns);
-  const safeY = selectSafeColumn(y, compatibleYColumns);
+  const validYs = ys.filter((name) => compatibleYColumns.some((column) => column.name === name));
+  const safeYs = validYs.length ? validYs : compatibleYColumns.slice(0, 1).map((column) => column.name);
+  const safeY = supportsSeries(type) ? safeYs[0] ?? '' : selectSafeColumn(y, compatibleYColumns);
+  const changeType = (next: ResultChartType) => {
+    if (isPieChartType(next) && !isPieChartType(type)) setY(ys[0] ?? '');
+    if (supportsSeries(next) && !supportsSeries(type) && ys.length > 1) setColor(MULTI_CHART_COLOR_VALUE);
+    setType(next);
+  };
+  const changeYs = (next: string[]) => {
+    if (safeYs.length <= 1 && next.length > 1) setColor(MULTI_CHART_COLOR_VALUE);
+    setYs(next);
+    setColorNames((previous) => [...new Set([...previous, ...safeYs, ...next])]);
+  };
   const limitedRows = rows.slice(0, rowLimit);
   const canRender = Boolean(suggestion) && canRenderChart(type, safeX, safeY, limitedRows);
 
@@ -116,8 +128,12 @@ function SuccessfulChartPanel({
   }
 
   const chartColor = chartColorHex(color);
-  const isMultiColor = color === MULTI_CHART_COLOR_VALUE && chartTypeSupportsMultiColor(type);
+  const isMultiColor = color === MULTI_CHART_COLOR_VALUE;
   const colorSeed = isMultiColor ? `${stableColorSeed}:${colorSeedVersion}` : undefined;
+  const series = buildChartSeries(
+    safeYs, columns, chartColor, isMultiColor ? stableColorSeed : undefined,
+    colorSeedVersion, [...new Set([...colorNames, ...safeYs])]
+  );
   const pieSegmentCount = isPieChartType(type) ? buildPieRows(limitedRows, safeX, safeY, chartColor, colorSeed).length : 0;
   const segmentWarning = canRender && isPieChartType(type) && pieSegmentCount > LARGE_SEGMENT_WARNING_THRESHOLD
     ? 'Viele Segmente. Fuer Pie- und Donut-Diagramme eignet sich ein staerker aggregiertes SQL-Resultat.'
@@ -145,7 +161,7 @@ function SuccessfulChartPanel({
       <div className="dp-explore-chart__controls" aria-label="Diagrammsteuerung" data-export-ignore="true">
         <label>
           <span>Typ</span>
-          <select value={type} onChange={(event) => setType(event.target.value as ResultChartType)}>
+          <select value={type} onChange={(event) => changeType(event.target.value as ResultChartType)}>
             {Object.entries(chartTypeLabels).map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
             ))}
@@ -161,7 +177,14 @@ function SuccessfulChartPanel({
             </select>
           </label>
         )}
-        {chartTypeRequiresY(type) && (
+        {supportsSeries(type) && (
+          <YColumnSelect
+            columns={compatibleYColumns.map((column) => column.name)}
+            selected={safeYs}
+            onChange={changeYs}
+          />
+        )}
+        {chartTypeRequiresY(type) && !supportsSeries(type) && (
           <label>
             <span>{isPieChartType(type) ? 'Wert' : 'Y (Zahl)'}</span>
             <select value={safeY} onChange={(event) => setY(event.target.value)}>
@@ -210,7 +233,8 @@ function SuccessfulChartPanel({
 
       {canRender ? (
         <div className="dp-explore-chart__figure" data-chart-type={type}>
-          {renderChart(type, limitedRows, safeX, safeY, suggestion.title, chartColor, colorSeed)}
+          {renderChart(type, limitedRows, safeX, safeY, suggestion.title, chartColor, colorSeed, series)}
+          {supportsSeries(type) && <SeriesLegend series={series} />}
         </div>
       ) : (
         <p className="dp-explore-muted">Die gewählten Spalten passen nicht zu diesem Diagrammtyp.</p>
@@ -264,16 +288,17 @@ function renderChart(
   title: string | undefined,
   color: string,
   colorSeed: string
-    | undefined
+    | undefined,
+  series: ChartSeries[]
 ) {
   const chartRows = rows.map(normalizeChartRow);
   switch (type) {
     case 'bar':
-      return <BarResultChart rows={chartRows} x={x} y={y} title={title} color={color} colorSeed={colorSeed} />;
+      return <BarResultChart rows={chartRows} x={x} series={series} colorSeed={colorSeed} />;
     case 'line':
-      return <LineResultChart rows={chartRows} x={x} y={y} title={title} color={color} />;
+      return <LineResultChart rows={chartRows} x={x} series={series} />;
     case 'scatter':
-      return <ScatterResultChart rows={chartRows} x={x} y={y} title={title} color={color} />;
+      return <ScatterResultChart rows={chartRows} x={x} series={series} />;
     case 'histogram':
       return <HistogramResultChart rows={chartRows} column={x} title={title} color={color} colorSeed={colorSeed} />;
     case 'pie':
@@ -308,8 +333,8 @@ function isPieChartType(type: ResultChartType): boolean {
   return type === 'pie' || type === 'donut';
 }
 
-function chartTypeSupportsMultiColor(type: ResultChartType): boolean {
-  return type === 'bar' || type === 'histogram' || isPieChartType(type);
+function supportsSeries(type: ResultChartType): boolean {
+  return type === 'bar' || type === 'line' || type === 'scatter';
 }
 
 function xControlLabel(type: ResultChartType): string {

@@ -23,7 +23,7 @@ describe('ChartPanel', () => {
     expect(screen.getByLabelText('Diagrammsteuerung')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Balken')).toBeInTheDocument();
     expect(screen.getByDisplayValue('gemeinde')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('anzahl')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Y (Zahl)'})).toHaveTextContent('anzahl');
     expect(screen.getByDisplayValue('Dunkelblau')).toBeInTheDocument();
     expect(screen.getByTestId('chart-bar')).toHaveAttribute('data-fill', '#104E8B');
     expect(document.querySelector('[data-chart-type="bar"]')).toBeInTheDocument();

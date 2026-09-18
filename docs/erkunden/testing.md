@@ -623,3 +623,21 @@ npm --prefix src/main/frontend/explore test
 npm --prefix src/main/frontend/explore run typecheck
 npm --prefix src/main/frontend/explore run build
 ```
+
+## Y-Mehrfachauswahl
+
+`MultiSeries.test.tsx` prüft Reihen, stabile Farben, manuelle Farbwahl,
+Typwechsel mit gemerkter Auswahl, Resultatwechsel, Tastatur/Fokus und
+fehlende Werte sowie SQL-Spaltennamen mit Sonderzeichen. Der Exporttest
+prüft die vollständige Reihenlegende und den Ausschluss des Auswahl-Popups.
+`multipleYAttributesRenderAndExportAcrossChartTypes` prüft mit echtem
+DuckDB/Recharts drei Reihen, Linienlücken, Balken und Punkte, schmale
+Viewports, Popup-Sichtbarkeit und einen tatsächlich dekodierbaren PNG-Export.
+
+Die SQL-Editor-, Autocomplete- und Zeilenlimit-Smokes fügen ihre Testabfragen
+mit Playwright `insertText` ein; Editor- und Zeilenlimit-Smokes prüfen den
+Editorinhalt vor dem Ausführen. Autocomplete wird weiterhin explizit mit
+Control+Space ausgelöst und auf Keywords, Tabellen und Spalten geprüft.
+Zeichenweises `keyboard.type` verlor in diesen Testabläufen gelegentlich
+SQL-Teile (beispielsweise `from ran`), wodurch die Ergebnisprüfung in einen
+Timeout lief. Die produktive Editorimplementierung bleibt unverändert.

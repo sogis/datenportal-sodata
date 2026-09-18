@@ -1264,3 +1264,39 @@ Test evidence:
 Known limitations:
 
 - Real `data.so.ch` CORS, byte Range and Safari/Firefox runtime behavior still need an operator/manual smoke test from a network where `data.so.ch` resolves.
+
+
+## SQL-Labor: mehrere Y-Attribute (2026-09-18)
+
+Implementiert: kompakte Checkbox-Auswahl für Linie/Balken/Punkte, gemerkte
+Mehrfachauswahl bei Typwechseln, automatische Mehrfarbenwahl, stabile
+Reihenfarben, gemeinsame Legende, sichere interne Spaltenschlüssel und
+fehlende Messwerte als Lücken. Der PNG-Export misst die bereinigte Darstellung
+inklusive vollständiger Legende. Pie/Donut/Histogramm bleiben einspaltig;
+Kontext V4, Backend und Dev-Stack-Verträge bleiben unverändert.
+
+Eingabestand: lokales `main` auf `571fd87` im sodata-Working-Tree
+(Schwesterpfad `../datenportal-sodata` aus dem Dev-Stack).
+Vorhandene uncommittete Änderungen an RDataFramePanel, dessen Test sowie
+R-Labor-Abschnitten in CSS und Dokumentation wurden erhalten. Verwendet
+wurden lokale Testfixtures, keine Änderungen an anderen Repositories.
+
+Verifikation mit JDK 25 über `JAVA_HOME`:
+
+- Frontend: 22 Testdateien, 129 Tests erfolgreich; TypeScript und Vite erfolgreich.
+- Backend: 311 Tests erfolgreich.
+- Playwright: 48 Tests, davon 47 erfolgreich und der optionale echte WebR-Smoke
+  übersprungen. Die neuen Tests prüfen Desktop und schmale Fenster, drei
+  Diagrammtypen, Farben, Scatter-Tooltip, Panel-Resize, Popup und PNG-Export.
+- `./gradlew clean check` wurde ausgeführt; erste Läufe scheiterten an
+  beschädigten SQL-Testeingaben bei zeichenweisem Playwright-Tippen.
+  Nach Umstellung der betroffenen Testvorlagen auf `insertText` lief der
+  abschliessende vollständige `./gradlew check` erfolgreich durch (`1m 35s`).
+- `git diff --check` erfolgreich. Erwartete Vite-Warnung zu grossen Bundles bleibt.
+- PNGs und Dropdown-Screenshots aus den Browserprüfungen visuell kontrolliert;
+  generierte Bilder liegen ausschliesslich unter dem ignorierten `build/`.
+
+Bestehende Einschränkung ausserhalb dieser Änderung: Der Wechsel über den
+Desktop-/Mobil-Breakpoint baut das SQL-Labor neu auf und verwirft dessen
+lokalen Zustand. Deshalb werden beide Layouts separat ab Start und
+Grössenänderungen innerhalb des jeweiligen Layouts geprüft.

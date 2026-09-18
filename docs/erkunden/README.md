@@ -31,6 +31,33 @@ Die Seite soll pro Datenthema eine kleine, nuetzliche Explorationsflaeche anbiet
 - Der Kontext enthält nur die produktiven Schalter `chartsEnabled` und `webREnabled`; generische Zukunftsflags gibt es nicht.
 - Es gibt keine serverseitige SQL-Ausfuehrung und keine gespeicherten Sessions.
 
+## Mehrere Messwerte im Diagramm
+
+Linie, Balken und Punkte erlauben im Feld `Y (Zahl)` mehrere numerische
+Resultatspalten. Das kompakte Dropdown zeigt Checkboxen und geschlossen den
+ersten Namen plus Anzahl weiterer Attribute. Mindestens ein Attribut bleibt
+gewählt. Linien und Punktreihen teilen sich die Achsen; Balken stehen pro
+Kategorie nebeneinander. Verglichen werden sollten Werte mit passenden
+Einheiten und Grössenordnungen. Sortierung und Aggregation bleiben im SQL.
+Fehlende Messwerte erscheinen als Lücken, nicht als Null.
+
+Ab dem zweiten Attribut wird automatisch `Mehrfarbig` gewählt. Farben bezeichnen
+bei mehreren Reihen das Attribut; eine manuelle Einzelfarbe bleibt möglich.
+Hinzufügen und Entfernen verändern die Farben bereits verwendeter Attribute
+nicht. `Farben neu` wechselt die Palette; nach zwölf vergebenen Reihenfarben
+wiederholen sich die Farben. Eine Legende unter dem Diagramm benennt die Reihen
+und wird mit dem PNG exportiert.
+
+Pie/Donut verwenden weiterhin eine Wertespalte und Histogramme eine numerische
+Eingangsspalte. Beim Wechsel zu Pie/Donut wird zunächst das erste Y-Attribut
+verwendet. Die Mehrfachauswahl bleibt für die Rückkehr zu Linie, Balken oder
+Punkten erhalten; dann wird erneut `Mehrfarbig` aktiviert. Neue SQL-Resultate
+starten wieder mit dem einzelnen vorgeschlagenen Attribut.
+
+Das Dropdown lässt sich mit Tab und Leertaste sowie Pfeiltasten/Home/End
+bedienen. Escape schliesst es und fokussiert das Y-Feld. Ein Klick ausserhalb
+schliesst ebenfalls; die Liste bleibt beim An-/Abwählen geöffnet.
+
 ## Benennung
 
 Die Nutzeroberflaeche verwendet deutschsprachige Texte und den Begriff `Erkunden`.
