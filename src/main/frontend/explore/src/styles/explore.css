@@ -2017,6 +2017,23 @@
   font-size: 12px;
 }
 
+/* The library row relies on Tailwind utilities that the portal does not ship. */
+.dp-explore-series-tooltip__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dp-explore-series-tooltip__name {
+  min-width: 0;
+}
+
+.dp-explore-series-tooltip__value {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
 /* PNG export skips web-font embedding. Measure legend labels with a system font
    so the rasterizer uses the same metrics and does not introduce extra wraps. */
 .dp-explore-chart--export .dp-explore-chart__legend--series {

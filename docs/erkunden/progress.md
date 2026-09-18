@@ -1374,3 +1374,31 @@ Bestehende Einschränkung ausserhalb dieser Änderung: Der Wechsel über den
 Desktop-/Mobil-Breakpoint baut das SQL-Labor neu auf und verwirft dessen
 lokalen Zustand. Deshalb werden beide Layouts separat ab Start und
 Grössenänderungen innerhalb des jeweiligen Layouts geprüft.
+
+
+## SQL-Labor: Tooltip-Kopfzeile und de-CH-Zahlen (2026-09-18)
+
+Behoben: Der Tooltip von Linien- und Balkendiagrammen zeigte bei numerischen
+X-Achsen (z. B. `Jahrgang`) das erste Reihenlabel als Überschrift und damit
+„Auslaender" doppelt. Ursache war der Label-Fallback in `@sqlrooms/recharts`
+`ChartTooltipContent`; zusätzlich formatierten die Werte mit der
+Browser-Locale (`1,564`) statt `de-CH`. Linie und Balken verwenden jetzt
+`SeriesTooltipContent`: Die Kopfzeile kommt aus `payload[0].payload.axisX`,
+Reihenwerte werden mit `Intl.NumberFormat('de-CH')` gerendert (`1’564`), `0`
+bleibt sichtbar und fehlende Werte bleiben ausgeblendet. Die Wertzeile nutzt
+eigene Portal-CSS-Klassen, weil die Tailwind-Utilities der Bibliothek im
+Portal nicht vorhanden sind; dadurch stehen Reihenname und Wert mit sichtbarem
+Abstand nebeneinander. Die Y-Mehrfachauswahl und ihr Unicode-Chevron bleiben
+unverändert.
+
+Verifikation mit JDK 25 über `JAVA_HOME`:
+
+- Frontend: 23 Testdateien, 143 Tests erfolgreich (`SeriesTooltip.test.tsx`
+  mit fünf neuen Tests); TypeScript und Vite erfolgreich.
+- Backend: 312 Tests erfolgreich.
+- Playwright: 48 Tests, davon 47 erfolgreich und der optionale echte
+  WebR-Smoke übersprungen. Der Multi-Series-Smoke prüft zusätzlich am echten
+  Balkendiagramm die Tooltip-Überschrift (Jahr) und den einmaligen
+  Reihennamen.
+- `./gradlew clean check` (JDK 25) erfolgreich in `1m 45s`; `git diff --check`
+  ohne Befund.

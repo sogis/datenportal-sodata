@@ -2,7 +2,6 @@ import {
   CartesianGrid,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
   Line,
   LineChart,
   XAxis,
@@ -10,6 +9,7 @@ import {
 } from '@sqlrooms/recharts';
 
 import {buildSeriesRows, seriesChartConfig, type ChartSeries} from './chartSeries';
+import {SeriesTooltipContent} from './SeriesTooltipContent';
 
 export function LineResultChart({
   rows,
@@ -26,7 +26,7 @@ export function LineResultChart({
         <CartesianGrid vertical={false} stroke="var(--dp-color-border)" />
         <XAxis dataKey="axisX" tickLine={false} axisLine={false} minTickGap={16} />
         <YAxis tickLine={false} axisLine={false} width={52} />
-        <ChartTooltip content={<ChartTooltipContent />} />
+        <ChartTooltip content={<SeriesTooltipContent />} />
         {series.map((item) => <Line
           key={item.key}
           connectNulls={false}

@@ -46,7 +46,8 @@ bei mehreren Reihen das Attribut; eine manuelle Einzelfarbe bleibt möglich.
 Hinzufügen und Entfernen verändern die Farben bereits verwendeter Attribute
 nicht. `Farben neu` wechselt die Palette; nach zwölf vergebenen Reihenfarben
 wiederholen sich die Farben. Eine Legende unter dem Diagramm benennt die Reihen
-und wird mit dem PNG exportiert.
+und wird mit dem PNG exportiert. Der Tooltip nennt in der Kopfzeile den X-Wert
+und zeigt die Reihenwerte im Schweizer Zahlenformat (`1’564`).
 
 Pie/Donut verwenden weiterhin eine Wertespalte und Histogramme eine numerische
 Eingangsspalte. Beim Wechsel zu Pie/Donut wird zunächst das erste Y-Attribut

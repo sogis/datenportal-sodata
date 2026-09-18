@@ -39,3 +39,37 @@ export function buildSeriesRows(rows: Array<Record<string, unknown>>, x: string,
 export function seriesChartConfig(series: ChartSeries[]) {
   return Object.fromEntries(series.map((item) => [item.key, {label: item.name, color: item.color}]));
 }
+
+const swissNumberFormat = new Intl.NumberFormat('de-CH');
+
+/**
+ * Recharts passes the x value to a tooltip label formatter only for string labels.
+ * Numeric axes like `Jahrgang` fall back to the first series label inside
+ * `ChartTooltipContent`, so the header is read from the payload row instead.
+ */
+export function axisTooltipLabel(payload: unknown): string {
+  const first = Array.isArray(payload)
+    ? payload[0] as {payload?: Record<string, unknown>} | undefined
+    : undefined;
+  return formatAxisTooltipValue(first?.payload?.axisX);
+}
+
+export function formatTooltipNumber(value: unknown): string {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return swissNumberFormat.format(value);
+  }
+  if (typeof value === 'bigint') {
+    return swissNumberFormat.format(value);
+  }
+  return '';
+}
+
+function formatAxisTooltipValue(value: unknown): string {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+  if (value instanceof Date) {
+    return value.toISOString().slice(0, 10);
+  }
+  return String(value);
+}

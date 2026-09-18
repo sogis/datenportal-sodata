@@ -637,6 +637,12 @@ prüft die vollständige Reihenlegende und den Ausschluss des Auswahl-Popups.
 `multipleYAttributesRenderAndExportAcrossChartTypes` prüft mit echtem
 DuckDB/Recharts drei Reihen, Linienlücken, Balken und Punkte, schmale
 Viewports, Popup-Sichtbarkeit und einen tatsächlich dekodierbaren PNG-Export.
+`SeriesTooltip.test.tsx` prüft, dass die Tooltip-Kopfzeile auch bei
+numerischen Achsen den echten X-Wert zeigt (`1965` statt des ersten
+Reihenlabels), fehlende X-Werte leer bleiben und Reihenwerte in `de-CH`
+(`1’564`) formatiert werden. Der Playwright-Smoke prüft am echten
+Balkendiagramm zusätzlich, dass die Überschrift das Jahr zeigt und der erste
+Reihenname nur einmal vorkommt.
 
 Die SQL-Editor-, Autocomplete- und Zeilenlimit-Smokes fügen ihre Testabfragen
 mit Playwright `insertText` ein; Editor- und Zeilenlimit-Smokes prüfen den

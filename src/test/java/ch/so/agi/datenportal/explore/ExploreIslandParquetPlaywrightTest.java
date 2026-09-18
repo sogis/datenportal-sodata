@@ -726,6 +726,13 @@ class ExploreIslandParquetPlaywrightTest {
             page.waitForSelector(".recharts-bar");
             assertThat(page.locator(".recharts-bar").count()).isEqualTo(3);
             assertThat(legendSwatchColors(page)).isEqualTo(before);
+            page.locator(".recharts-bar-rectangle").first().hover();
+            page.waitForSelector(".recharts-tooltip-wrapper");
+            String barTooltip = page.locator(".recharts-tooltip-wrapper").textContent();
+            assertThat(barTooltip).contains("2020");
+            int firstSeries = barTooltip.indexOf("Messung.A");
+            assertThat(firstSeries).isGreaterThanOrEqualTo(0);
+            assertThat(barTooltip.indexOf("Messung.A", firstSeries + "Messung.A".length())).isEqualTo(-1);
             page.getByLabel("Typ").selectOption("scatter");
             page.waitForSelector(".recharts-scatter");
             assertThat(page.locator(".recharts-scatter").count()).isEqualTo(3);
