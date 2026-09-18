@@ -14,7 +14,7 @@ export interface RTypeMapping {
   warning?: string;
 }
 
-export function mapDuckDbColumnToR(column: DuckDbColumnForR): RTypeMapping {
+export function mapDuckDbColumnToR(column: DuckDbColumnForR, values?: readonly unknown[]): RTypeMapping {
   const normalizedType = normalizeDuckDbType(column.duckdbType);
   if (column.roles.includes('identifier')) {
     return {rType: 'character', warning: 'Identifier werden in R als character übernommen.'};
@@ -23,7 +23,7 @@ export function mapDuckDbColumnToR(column: DuckDbColumnForR): RTypeMapping {
     return {rType: 'character', warning: 'Geometrien werden in R V1 als character übernommen.'};
   }
   if (isWideIntegerType(normalizedType)) {
-    return {rType: 'character', warning: '64-bit Integer werden verlustfrei als character übernommen.'};
+    return wideIntegerMapping(values);
   }
   if (isDecimalType(normalizedType)) {
     return {rType: 'character', warning: 'DECIMAL-Werte werden verlustfrei als character übernommen.'};
@@ -63,6 +63,9 @@ export function normalizeDuckDbValueForR(value: unknown, mapping: RTypeMapping):
     return value.toISOString();
   }
   if (typeof value === 'bigint') {
+    if (mapping.rType === 'integer' || mapping.rType === 'numeric') {
+      return Number(value);
+    }
     return value.toString();
   }
   if (value instanceof Uint8Array) {
@@ -81,6 +84,55 @@ export function normalizeDuckDbValueForR(value: unknown, mapping: RTypeMapping):
     return mapping.rType === 'character' ? String(value) : value;
   }
   return String(value);
+}
+
+const INT32_MIN = -2147483648n;
+const INT32_MAX = 2147483647n;
+// 2^53 - 1: largest integer that a double (and therefore R numeric) represents exactly.
+const DOUBLE_EXACT_MAX = 9007199254740991n;
+const WIDE_INTEGER_WARNING = 'Zu grosse 64-bit Integer werden verlustfrei als character übernommen.';
+
+// 64-bit integers are only kept as character when the actual values cannot be represented
+// exactly by R integer or R numeric. Small result values therefore stay numeric in R.
+function wideIntegerMapping(values?: readonly unknown[]): RTypeMapping {
+  if (!values) {
+    return {rType: 'character', warning: WIDE_INTEGER_WARNING};
+  }
+  let fitsInt32 = true;
+  for (const value of values) {
+    if (value === null || value === undefined) {
+      continue;
+    }
+    const integer = exactIntegerValue(value);
+    if (integer === undefined || integer > DOUBLE_EXACT_MAX || integer < -DOUBLE_EXACT_MAX) {
+      return {rType: 'character', warning: WIDE_INTEGER_WARNING};
+    }
+    if (integer > INT32_MAX || integer < INT32_MIN) {
+      fitsInt32 = false;
+    }
+  }
+  return fitsInt32 ? {rType: 'integer'} : {rType: 'numeric'};
+}
+
+function exactIntegerValue(value: unknown): bigint | undefined {
+  if (typeof value === 'bigint') {
+    return value;
+  }
+  if (typeof value === 'number') {
+    return Number.isSafeInteger(value) ? BigInt(value) : undefined;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!/^[+-]?\d+$/.test(trimmed)) {
+      return undefined;
+    }
+    try {
+      return BigInt(trimmed);
+    } catch {
+      return undefined;
+    }
+  }
+  return undefined;
 }
 
 function normalizeDuckDbType(type: string): string {

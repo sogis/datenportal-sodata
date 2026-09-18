@@ -1,12 +1,17 @@
 import type {ExploreChartConfigDto} from '../app/ExploreContext';
 import {
+  isDateLikeName,
+  isDateLikeValues,
+  isYearLikeName,
+  isYearLikeValues,
+  recordColumnValues
+} from '../analysis/resultColumnProfiles';
+import {
   LARGE_SERIES_WARNING_THRESHOLD,
   type ChartSuggestion,
   type ResultChartType,
   type ResultColumn
 } from './chartTypes';
-
-const integerYearPattern = /^\d{4}$/;
 
 export function inferResultColumns(
   columns: string[],
@@ -91,61 +96,17 @@ export function inferChartSuggestion(
 }
 
 export function isYearLikeColumn(name: string, rows: Array<Record<string, unknown>>): boolean {
-  const normalizedName = normalizeName(name);
-  if (normalizedName === 'jahr' || normalizedName === 'year' || normalizedName === 'periode') {
+  if (isYearLikeName(name)) {
     return true;
   }
-
-  const values = rows
-    .map((row) => row[name])
-    .filter((value) => value !== null && value !== undefined)
-    .slice(0, 50);
-  if (values.length === 0) {
-    return false;
-  }
-
-  const yearValues = values.filter((value) => {
-    if (typeof value === 'number' && Number.isInteger(value)) {
-      return value >= 1800 && value <= 2200;
-    }
-    if (typeof value === 'bigint') {
-      return value >= 1800n && value <= 2200n;
-    }
-    if (typeof value === 'string' && integerYearPattern.test(value.trim())) {
-      const numeric = Number(value);
-      return numeric >= 1800 && numeric <= 2200;
-    }
-    return false;
-  });
-
-  return yearValues.length / values.length >= 0.7;
+  return isYearLikeValues(recordColumnValues(rows, name));
 }
 
 export function isDateLikeColumn(name: string, rows: Array<Record<string, unknown>>): boolean {
-  const normalizedName = normalizeName(name);
-  if (['datum', 'date', 'stand', 'stichtag', 'gueltig_ab', 'gueltig_bis', 'updated_at'].includes(normalizedName)) {
+  if (isDateLikeName(name)) {
     return true;
   }
-
-  const values = rows
-    .map((row) => row[name])
-    .filter((value) => value !== null && value !== undefined)
-    .slice(0, 50);
-  if (values.length === 0) {
-    return false;
-  }
-
-  const dateValues = values.filter((value) => {
-    if (value instanceof Date) {
-      return !Number.isNaN(value.getTime());
-    }
-    if (typeof value !== 'string') {
-      return false;
-    }
-    return /^\d{4}-\d{2}-\d{2}/.test(value.trim()) && !Number.isNaN(Date.parse(value));
-  });
-
-  return dateValues.length / values.length >= 0.7;
+  return isDateLikeValues(recordColumnValues(rows, name));
 }
 
 export function buildHistogramBins(
@@ -278,8 +239,4 @@ function formatBinLabel(lower: number, upper: number): string {
     return formatter.format(lower);
   }
   return `${formatter.format(lower)}-${formatter.format(upper)}`;
-}
-
-function normalizeName(name: string): string {
-  return name.trim().toLowerCase().replaceAll('ü', 'ue').replaceAll('ä', 'ae').replaceAll('ö', 'oe');
 }

@@ -37,6 +37,80 @@ Status: Phase tracking for `datenportal-erkunden-sqlrooms-mvp-agent-spec.md`
 | Code-Quality Remediation Phase 5 | DONE | ViewModels, Detailtemplates, Starter-Rezepte und weitere vorbereitete Server-UI sind konsolidiert. |
 | Code-Quality Remediation Phase 6 | DONE | XTF, Lucene und DuckDB werden snapshotgebunden und atomar geladen, veröffentlicht und versioniert ausgeliefert. |
 | Code-Quality Remediation Phase 7 | DONE | Nur MVP-DuckDB, produktive Chunks und WebR-Runtime ohne Source-Maps werden im Boot-JAR ausgeliefert. |
+| R-Labor 64-bit-Typisierung | DONE | 64-bit Integer werden wertbasiert als `integer`/`numeric` uebernommen; `character` nur noch bei echten Praezisionsgrenzen. |
+| R-Rezeptvorschlaege ausgebaut | DONE | R-Labor erkennt Jahre wertebasiert und bietet Balken-, Streu- und Mehrfachtrend-Rezepte analog zum SQL-Labor. |
+
+## R-Rezeptvorschlaege Entry
+
+Date: 2026-09-18
+
+Goal:
+
+- R-Rezepte aus dem SQL-Resultat wertebasiert erweitern, damit auch
+  Jahrspalten wie `Jahrgang` Linien-/Trendrezepte erzeugen.
+- Balken-, Streu- und Mehrfachtrend-Rezepte analog zu den SQL-Labor-
+  Vorschlaegen anbieten; Zeitspalten nie als Messwert verwenden.
+- Die Backend-Jahrerkennung fuer SQL-Rezepte um `jahrgang` und `*jahr`
+  ergaenzen.
+
+Changed files:
+
+- `src/main/frontend/explore/src/analysis/resultColumnProfiles.ts` (neu):
+  gemeinsame wertebasierte Jahr-/Datumspruefungen und Spaltenwert-Zugriff.
+- `src/main/frontend/explore/src/charts/chartInference.ts`: nutzt die
+  gemeinsamen Helfer statt eigener Wertpruefungen.
+- `src/main/frontend/explore/src/webr/RRecipes.ts` und Test: neue Auswahl-
+  und Rezeptlogik mit Kandidatenlimits; einfarbige Rezepte zeichnen in
+  Dunkelblau `#104E8B`, der Mehrfachtrend nutzt die ersten Farben der
+  `Mehrfarbig`-Palette aus `chartColors.ts`.
+- `src/main/java/ch/so/agi/datenportal/explore/ExploreColumnRoleDetector.java`
+  und Test: `jahrgang` und `*jahr` als `YEAR`.
+- `docs/erkunden/architecture.md` und `docs/erkunden/testing.md`: Rollen- und
+  Rezeptdokumentation aktualisiert.
+
+Definition of Done:
+
+- Jahrswerte 1800–2200 werden als Zeitachse erkannt und erzeugen Trend-,
+  Mehrfachtrend- und ggf. Streurezepte; kein Histogramm ueber die Jahrspalte.
+- Kategorien erzeugen Balkenrezepte; Zeit ohne Messwert erzeugt den
+  Anzahl-Fallback.
+- Einfarbige R-Plots nutzen Dunkelblau, Linien und Punkte eines Trends sind
+  beide Dunkelblau; der Mehrfachtrend nutzt die `Mehrfarbig`-Palette.
+- Vitest, Typecheck und der vollstaendige Gradle-Check sind erfolgreich.
+
+## R-Labor 64-bit-Typisierung Entry
+
+Date: 2026-09-18
+
+Goal:
+
+- 64-bit-Integer-Spalten aus dem SQL-Labor nur noch dann als `character`
+  uebernehmen, wenn die tatsaechlichen Werte den exakten Wertebereich von R
+  `integer` oder R `numeric` verlassen.
+- Kleine Werte wie Jahrgaenge oder Anzahlwerte ohne manuelles `CAST` als
+  `integer` beziehungsweise `numeric` in R verfuegbar machen und die
+  pauschalen Typ-Hinweise im Datenbasis-Panel entfernen.
+- Identifier-, DECIMAL-, Geometrie- und Binaerspalten bleiben unveraendert
+  konservativ `character`.
+
+Changed files:
+
+- `src/main/frontend/explore/src/webr/DuckDbToWebRTypeMapper.ts` und Test:
+  `mapDuckDbColumnToR` akzeptiert die tatsaechlichen Werte, 64-bit Integer
+  werden anhand von int32- und double-exaktem Bereich auf `integer`, `numeric`
+  oder `character` abgebildet; `normalizeDuckDbValueForR` uebertraegt BigInts
+  fuer numerische R-Typen als Zahl.
+- `src/main/frontend/explore/src/results/sqlResultSnapshot.ts` und Test:
+  Der Snapshot uebergibt die Spaltenwerte an das Typ-Mapping.
+- `docs/erkunden/architecture.md` und `docs/erkunden/testing.md`: Mapping-Regel
+  und Testabdeckung dokumentiert.
+
+Definition of Done:
+
+- Alle nicht-leeren Werte einer 64-bit-Spalte im int32-Bereich ergeben
+  `integer`, bis 2^53 − 1 `numeric`, darueber `character` mit Typ-Hinweis.
+- Der bestehende Identifier-Fall `BIGINT` mit grossem Wert bleibt `character`.
+- Vitest, Typecheck und der vollstaendige Gradle-Check sind erfolgreich.
 
 ## Code-Quality Remediation Phase 1 Entry
 

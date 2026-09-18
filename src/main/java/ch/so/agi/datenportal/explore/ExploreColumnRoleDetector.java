@@ -92,10 +92,11 @@ public final class ExploreColumnRoleDetector {
 
     boolean isYearLike(String name, String type) {
         String normalized = normalize(name);
-        return normalized.equals("jahr")
-                || normalized.equals("year")
+        // `jahr` and `berichtsjahr` are covered by the suffix check; `jahrgang` is an explicit exception.
+        return normalized.equals("year")
                 || normalized.equals("periode")
-                || normalized.equals("berichtsjahr");
+                || normalized.equals("jahrgang")
+                || normalized.endsWith("jahr");
     }
 
     boolean isMeasure(String name, String type) {

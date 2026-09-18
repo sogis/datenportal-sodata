@@ -32,7 +32,8 @@ export function sqlResultSnapshotFromQueryResult(result: QueryResultState, table
     const duckdbType = contextColumn?.type ?? arrowFields[index]?.type?.toString?.() ?? 'VARCHAR';
     const nullable = contextColumn?.nullable ?? (contextColumn?.required === true ? false : arrowFields[index]?.nullable ?? true);
     const roles = contextColumn?.roles ?? inferRoles(name, duckdbType);
-    const mapping = mapDuckDbColumnToR({name, duckdbType, nullable, roles});
+    const values = result.rows.map((row) => row[name]);
+    const mapping = mapDuckDbColumnToR({name, duckdbType, nullable, roles}, values);
     return {
       name,
       duckdbType,

@@ -31,6 +31,21 @@ class ExploreColumnRoleDetectorTest {
     }
 
     @Test
+    void detectsYearLikeNamesIncludingJahrgangAndSuffixes() {
+        assertThat(roles("jahrgang", "BIGINT"))
+                .contains(ExploreColumnRole.YEAR)
+                .doesNotContain(ExploreColumnRole.MEASURE);
+        assertThat(roles("baujahr", "INTEGER"))
+                .contains(ExploreColumnRole.YEAR)
+                .doesNotContain(ExploreColumnRole.MEASURE);
+        assertThat(roles("erfassungsjahr", "INTEGER"))
+                .contains(ExploreColumnRole.YEAR)
+                .doesNotContain(ExploreColumnRole.MEASURE);
+        assertThat(roles("jahreszeit", "VARCHAR"))
+                .doesNotContain(ExploreColumnRole.YEAR);
+    }
+
+    @Test
     void detectsGeometry() {
         assertThat(roles("geom", "GEOMETRY")).contains(ExploreColumnRole.GEOMETRY);
     }

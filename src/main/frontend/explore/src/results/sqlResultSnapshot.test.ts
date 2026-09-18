@@ -9,11 +9,13 @@ describe('sqlResultSnapshotFromQueryResult', () => {
       status: 'success',
       sourceSql: 'select * from daten',
       executedSql: 'select * from daten limit 1000',
-      columns: ['objekt_id', 'betrag', 'datum', 'zeitpunkt', 'geom', 'anzahl', 'nitrat'],
+      columns: ['objekt_id', 'betrag', 'jahrgang', 'einwohner', 'datum', 'zeitpunkt', 'geom', 'anzahl', 'nitrat'],
       rows: [
         {
           objekt_id: 9007199254740999n,
           betrag: '123456789.1234',
+          jahrgang: 2024n,
+          einwohner: 3000000000n,
           datum: new Date('2026-07-06T00:00:00Z'),
           zeitpunkt: new Date('2026-07-06T12:34:56Z'),
           geom: new Uint8Array([1, 2]),
@@ -32,6 +34,8 @@ describe('sqlResultSnapshotFromQueryResult', () => {
       columns: [
         {name: 'objekt_id', type: 'BIGINT', nullable: false, roles: ['identifier']},
         {name: 'betrag', type: 'DECIMAL(18,4)', nullable: true, roles: ['measure']},
+        {name: 'jahrgang', type: 'BIGINT', nullable: true, roles: ['measure']},
+        {name: 'einwohner', type: 'BIGINT', nullable: true, roles: ['measure']},
         {name: 'datum', type: 'DATE', nullable: true, roles: ['date']},
         {name: 'zeitpunkt', type: 'TIMESTAMP', nullable: true, roles: ['date']},
         {name: 'geom', type: 'GEOMETRY', nullable: true, roles: ['geometry']},
@@ -45,6 +49,8 @@ describe('sqlResultSnapshotFromQueryResult', () => {
     expect(snapshot.columns.map((column) => [column.name, column.rType])).toEqual([
       ['objekt_id', 'character'],
       ['betrag', 'character'],
+      ['jahrgang', 'integer'],
+      ['einwohner', 'numeric'],
       ['datum', 'Date'],
       ['zeitpunkt', 'POSIXct'],
       ['geom', 'character'],
@@ -54,11 +60,39 @@ describe('sqlResultSnapshotFromQueryResult', () => {
     expect(snapshot.rows[0]).toEqual([
       '9007199254740999',
       '123456789.1234',
+      2024,
+      3000000000,
       '2026-07-06',
       '2026-07-06T12:34:56.000Z',
       '[2 Bytes]',
       7,
       null
     ]);
+  });
+
+  it('keeps wide integer columns as character only when a value exceeds double precision', () => {
+    const result: QueryResultState = {
+      status: 'success',
+      sourceSql: 'select * from daten',
+      columns: ['objekt_nr'],
+      rows: [{objekt_nr: 9007199254740993n}, {objekt_nr: 9007199254740995n}],
+      rowCount: 2
+    };
+    const tables: ExploreTableDto[] = [{
+      id: 'daten',
+      name: 'daten',
+      title: 'Daten',
+      parquetUrl: '/daten.parquet',
+      primary: true,
+      columns: [{name: 'objekt_nr', type: 'BIGINT', nullable: false, roles: ['measure']}]
+    }];
+
+    const snapshot = sqlResultSnapshotFromQueryResult(result, tables);
+
+    expect(snapshot.columns[0]).toMatchObject({
+      rType: 'character',
+      warning: expect.stringContaining('64-bit Integer')
+    });
+    expect(snapshot.rows).toEqual([['9007199254740993'], ['9007199254740995']]);
   });
 });
