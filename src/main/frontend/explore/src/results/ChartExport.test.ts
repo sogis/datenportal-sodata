@@ -46,6 +46,17 @@ describe('ChartExport', () => {
     expect(documentRef.body.querySelector('.dp-explore-chart--export')).toBeNull();
   });
 
+  it('reports protected canvas readback before starting a download', async () => {
+    const {documentRef, clickedDownloads} = downloadHarness(new Uint8ClampedArray(4 * 4 * 4));
+    const chart = chartElement(documentRef);
+
+    await expect(exportChartAsPng(chart, 'fixture', documentRef)).rejects.toThrow('Canvas-Daten');
+
+    expect(toPng).not.toHaveBeenCalled();
+    expect(clickedDownloads).toEqual([]);
+    expect(documentRef.body.querySelector('.dp-explore-chart--export')).toBeNull();
+  });
+
   it('sanitizes the chart filename', () => {
     expect(chartExportFilename('ch.so/bau inventar')).toBe('datenportal-ch.so-bau-inventar-diagramm.png');
   });
@@ -66,7 +77,7 @@ function chartElement(documentRef: Document): HTMLElement {
   return chart;
 }
 
-function downloadHarness() {
+function downloadHarness(canvasPixels = expectedCanvasPixels()) {
   const documentRef = document.implementation.createHTMLDocument();
   const clickedDownloads: string[] = [];
   const originalCreateElement = documentRef.createElement.bind(documentRef);
@@ -77,7 +88,26 @@ function downloadHarness() {
         value: () => clickedDownloads.push((element as HTMLAnchorElement).download)
       });
     }
+    if (tagName === 'canvas') {
+      const context = {
+        fillStyle: '',
+        fillRect: vi.fn(),
+        getImageData: vi.fn(() => ({data: canvasPixels}))
+      } as unknown as CanvasRenderingContext2D;
+      Object.defineProperty(element, 'getContext', {value: () => context});
+    }
     return element;
   });
   return {documentRef, clickedDownloads};
+}
+
+function expectedCanvasPixels(): Uint8ClampedArray {
+  const pixels = new Uint8ClampedArray(4 * 4 * 4);
+  for (let index = 0; index < pixels.length; index += 4) {
+    pixels[index] = 18;
+    pixels[index + 1] = 52;
+    pixels[index + 2] = 86;
+    pixels[index + 3] = 255;
+  }
+  return pixels;
 }

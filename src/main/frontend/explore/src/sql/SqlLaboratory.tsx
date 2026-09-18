@@ -225,7 +225,9 @@ export function SqlLaboratory({
     try {
       await exportChartAsPng(chartExportTarget, context.datasetId);
     } catch (error) {
-      console.error('Explore chart export failed', error);
+      if (!(error instanceof Error && error.name === 'ChartExportError')) {
+        console.error('Explore chart export failed', error);
+      }
       setExportError(`Export konnte nicht erstellt werden: ${toErrorMessage(error)}`);
     } finally {
       setExportingChart(false);

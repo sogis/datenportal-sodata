@@ -125,13 +125,16 @@ Phase-7-Fund:
 
 ## Safari und WebAssembly
 
-### PNG-Export und Fonts
+### PNG-Export, Fonts und Browser-Schutz
 
-Der Diagramm-PNG-Export verwendet `html-to-image` ohne globale Font-Einbettung. Die App-CSS importiert lokal vendorte Fonts mit relativen URLs; der Font-Inliner von `html-to-image@1.11.13` kann diese URLs insbesondere in Firefox nicht zuverlässig auflösen und bricht anschließend mit `can't access property "trim", e is undefined` ab. Wenn ein PNG-Export fehlschlägt, zuerst den aktuellen Explore-Build laden und im Ergebnis-Header auf einen aktiven PNG-Button sowie eine gültige PNG-Datei prüfen. Die exportierten Texte verwenden bei Bedarf den Browser-Fallback, während Titel, Diagramm und Legende erhalten bleiben.
+Der Diagramm-PNG-Export verwendet `html-to-image` ohne globale Font-Einbettung. Die App-CSS importiert lokal vendorte Fonts mit relativen URLs; der Font-Inliner von `html-to-image@1.11.13` kann diese URLs insbesondere in Firefox nicht zuverlässig auflösen und bricht anschließend mit `can't access property "trim", e is undefined` ab. Deshalb setzt der Export `skipFonts: true` und verwendet für Texte den Browser-Fallback.
+
+Firefox und LibreWolf können zusätzlich Canvas-Daten gegen Fingerprinting schützen. Dann liefert das Canvas trotz erfolgreicher PNG-Erzeugung absichtlich verrauschte Pixel; das heruntergeladene Bild kann als periodisches Streifenmuster erscheinen und enthält kein sichtbares Diagramm. `ChartExport` prüft deshalb vor dem Export, ob ein kleiner Vollton-Canvas unverändert ausgelesen werden kann. Bei aktiviertem Schutz wird kein Download erzeugt, sondern eine Meldung im Ergebnis-Header angezeigt. Den Schutz kann die Anwendung nicht umgehen. Für einen PNG-Export muss der Schutz für diese Seite deaktiviert oder ein Browser ohne diese Einschränkung verwendet werden.
 
 Automatisiert geprueft:
 
-- Chromium Headless via Java Playwright fuer DuckDB-Wasm-Initialisierung, same-origin Parquet, lokales Monaco, SQL-Ausfuehrung, Resultat-Export, fehlende sichtbare Diagramme, Fehlerzustand und mobile Overflow-Checks.
+- Chromium Headless via Java Playwright fuer DuckDB-Wasm-Initialisierung, same-origin Parquet, lokales Monaco, SQL-Ausfuehrung, Resultat-Export, Diagramm-Pixelinhalte, fehlende sichtbare Diagramme, Fehlerzustand und mobile Overflow-Checks.
+- Firefox Headless mit `privacy.resistFingerprinting=true` fuer den Schutzpfad: Der PNG-Button erzeugt eine verständliche Warnung und keinen Download.
 
 Weiterhin manuell/operativ zu pruefen:
 

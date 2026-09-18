@@ -40,6 +40,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.AfterAll;
@@ -643,7 +644,10 @@ class ExploreIslandParquetPlaywrightTest {
             assertThat(pngDownload.suggestedFilename()).isEqualTo("datenportal-explore-series-2026-diagramm.png");
             byte[] pngBytes = Files.readAllBytes(pngDownload.path());
             assertThat(pngBytes).startsWith(new byte[] { (byte) 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a });
-            assertThat(ImageIO.read(new ByteArrayInputStream(pngBytes))).isNotNull();
+            BufferedImage pngImage = ImageIO.read(new ByteArrayInputStream(pngBytes));
+            assertThat(pngImage).isNotNull();
+            assertThat(sampledRgbCount(pngImage)).as("PNG must contain rendered chart pixels").isGreaterThan(8);
+            assertThat(containsRgb(pngImage, 0x104e8b)).as("PNG must contain the chart color").isTrue();
             assertThat(page.locator(".dp-explore-export-error").count()).isZero();
             assertThat(browserErrors)
                     .noneMatch(error -> error.contains("Error loading remote css")
@@ -675,6 +679,37 @@ class ExploreIslandParquetPlaywrightTest {
             page.getByLabel("Typ").selectOption("donut");
             page.waitForSelector("[data-chart-type='donut']");
             assertThat(page.locator("button[role='tab']:has-text('Diagramm')").count()).isZero();
+        }
+    }
+
+    @Test
+    void firefoxCanvasProtectionShowsHelpfulExportErrorWithoutDownload() {
+        try (Browser firefoxBrowser = playwright.firefox().launch(new BrowserType.LaunchOptions()
+                .setHeadless(true)
+                .setFirefoxUserPrefs(Map.of(
+                        "privacy.resistFingerprinting", true,
+                        "privacy.resistFingerprinting.randomDataOnCanvasExtract", true)));
+                BrowserContext context = firefoxBrowser.newContext(new Browser.NewContextOptions()
+                        .setViewportSize(1280, 900)
+                        .setAcceptDownloads(true))) {
+            Page page = context.newPage();
+            List<String> browserErrors = collectBrowserErrors(page);
+            prepareBarChart(page, browserErrors);
+
+            List<Download> downloads = new ArrayList<>();
+            page.onDownload(downloads::add);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Diagramm als PNG herunterladen")).click();
+
+            Locator exportError = page.locator(".dp-explore-export-error");
+            exportError.waitFor();
+            assertThat(exportError.innerText())
+                    .contains("Canvas-Daten")
+                    .contains("Fingerprinting-Schutz");
+            assertThat(downloads).isEmpty();
+            assertThat(browserErrors)
+                    .noneMatch(error -> error.contains("Error loading remote css")
+                            || error.contains("Explore chart export failed"));
         }
     }
 
@@ -713,6 +748,27 @@ class ExploreIslandParquetPlaywrightTest {
                 assertThat(pageLevelHorizontalOverflow(page)).as("viewport width " + width).isLessThanOrEqualTo(1);
             }
         }
+    }
+
+    private void prepareBarChart(Page page, List<String> browserErrors) {
+        page.navigate(baseUrl("/series/explore-series/issues/current/explore"));
+        waitForExploreReady(page, browserErrors);
+        page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
+        String chartSql = """
+                select 'Solothurn' as gemeinde, 3 as anzahl
+                union all select 'Olten' as gemeinde, 2 as anzahl
+                union all select 'Grenchen' as gemeinde, 1 as anzahl;
+                """;
+        page.locator("#dp-explore-sql-fallback").fill(chartSql,
+                new Locator.FillOptions().setForce(true));
+        page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                new Page.GetByRoleOptions().setName("Ausführen")).click();
+        waitForSqlResult(page, browserErrors);
+        page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                new Page.GetByRoleOptions().setName("Diagramm")).click();
+        page.waitForSelector("[aria-label='Diagramm aus Resultat']");
+        page.waitForSelector("[aria-label='Diagrammsteuerung']");
+        page.waitForSelector("[data-chart-type='bar']");
     }
 
     private String baseUrl(String path) {
@@ -883,6 +939,29 @@ class ExploreIslandParquetPlaywrightTest {
                 ) - window.innerWidth
                 """);
         return overflow.intValue();
+    }
+
+    private static int sampledRgbCount(BufferedImage image) {
+        java.util.Set<Integer> colors = new java.util.HashSet<>();
+        int xStep = Math.max(1, image.getWidth() / 100);
+        int yStep = Math.max(1, image.getHeight() / 60);
+        for (int y = 0; y < image.getHeight(); y += yStep) {
+            for (int x = 0; x < image.getWidth(); x += xStep) {
+                colors.add(image.getRGB(x, y) & 0x00ffffff);
+            }
+        }
+        return colors.size();
+    }
+
+    private static boolean containsRgb(BufferedImage image, int expectedRgb) {
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if ((image.getRGB(x, y) & 0x00ffffff) == expectedRgb) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static BoundingBox requireBoundingBox(Locator locator) {

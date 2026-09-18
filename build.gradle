@@ -203,6 +203,15 @@ tasks.register('installPlaywrightChromium', JavaExec) {
     environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
 }
 
+tasks.register('installPlaywrightFirefox', JavaExec) {
+    group = 'verification'
+    description = 'Installs the Firefox browser used by Playwright tests.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.microsoft.playwright.CLI'
+    args 'install', 'firefox'
+    environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
+}
+
 tasks.register('playwrightTest', Test) {
     group = 'verification'
     description = 'Runs Playwright browser tests.'
@@ -211,6 +220,7 @@ tasks.register('playwrightTest', Test) {
     maxParallelForks = 1
     shouldRunAfter tasks.named('test')
     dependsOn tasks.named('installPlaywrightChromium')
+    dependsOn tasks.named('installPlaywrightFirefox')
     environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
     if (System.getProperty('datenportal.playwright.webr') != null) {
         systemProperty 'datenportal.playwright.webr', System.getProperty('datenportal.playwright.webr')
