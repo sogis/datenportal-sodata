@@ -22,6 +22,8 @@ describe('series tooltip', () => {
     expect(formatTooltipNumber(1564)).toBe('1’564');
     expect(formatTooltipNumber(0)).toBe('0');
     expect(formatTooltipNumber(1234.5)).toBe('1’234.5');
+    expect(formatTooltipNumber(-1234567.89)).toBe('-1’234’567.89');
+    expect(formatTooltipNumber(1234567n)).toBe('1’234’567');
     expect(formatTooltipNumber(null)).toBe('');
     expect(formatTooltipNumber(undefined)).toBe('');
   });

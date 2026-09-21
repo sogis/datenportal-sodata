@@ -56,12 +56,18 @@ export function axisTooltipLabel(payload: unknown): string {
 
 export function formatTooltipNumber(value: unknown): string {
   if (typeof value === 'number' && Number.isFinite(value)) {
-    return swissNumberFormat.format(value);
+    return formatSwissTooltipNumber(value);
   }
   if (typeof value === 'bigint') {
-    return swissNumberFormat.format(value);
+    return formatSwissTooltipNumber(value);
   }
   return '';
+}
+
+function formatSwissTooltipNumber(value: number | bigint): string {
+  return swissNumberFormat.formatToParts(value)
+    .map((part) => part.type === 'group' ? '’' : part.value)
+    .join('');
 }
 
 function formatAxisTooltipValue(value: unknown): string {
