@@ -193,22 +193,34 @@ tasks.named('processResources') {
 }
 
 def playwrightBrowsersPath = layout.projectDirectory.dir('.gradle/playwright-browsers').asFile.absolutePath
+def playwrightInstallWithDeps = providers.gradleProperty('datenportal.playwright.withDeps')
+        .getOrElse('false')
+        .toBoolean()
+
+def playwrightInstallArgs = { String browser ->
+    def args = ['install']
+    if (playwrightInstallWithDeps) {
+        args << '--with-deps'
+    }
+    args << browser
+    args
+}
 
 tasks.register('installPlaywrightChromium', JavaExec) {
     group = 'verification'
-    description = 'Installs the Chromium browser used by Playwright tests.'
+    description = 'Installs the Chromium browser used by Playwright tests, optionally with system dependencies.'
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.microsoft.playwright.CLI'
-    args 'install', 'chromium'
+    args playwrightInstallArgs('chromium')
     environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
 }
 
 tasks.register('installPlaywrightFirefox', JavaExec) {
     group = 'verification'
-    description = 'Installs the Firefox browser used by Playwright tests.'
+    description = 'Installs the Firefox browser used by Playwright tests, optionally with system dependencies.'
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.microsoft.playwright.CLI'
-    args 'install', 'firefox'
+    args playwrightInstallArgs('firefox')
     environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
 }
 

@@ -343,7 +343,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.keyboard().press("ControlOrMeta+A");
             page.keyboard().insertText("select 42 as answer;");
             page.keyboard().press("Escape");
-            assertThat(page.locator("#dp-explore-sql-fallback").inputValue()).isEqualTo("select 42 as answer;");
+            waitForSqlFallbackValue(page, "select 42 as answer;");
 
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
 
@@ -422,7 +422,7 @@ class ExploreIslandParquetPlaywrightTest {
             page.keyboard().press("ControlOrMeta+A");
             page.keyboard().insertText("select range as n from range(1000);");
             page.keyboard().press("Escape");
-            assertThat(page.locator("#dp-explore-sql-fallback").inputValue()).isEqualTo("select range as n from range(1000);");
+            waitForSqlFallbackValue(page, "select range as n from range(1000);");
 
             page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Ausführen")).click();
             page.waitForSelector("[aria-label='SQL Ergebnis']");
@@ -875,6 +875,13 @@ class ExploreIslandParquetPlaywrightTest {
             throw new AssertionError("SQL result did not appear. Browser errors: " + browserErrors
                     + ". Body: " + bodyText, error);
         }
+    }
+
+    private static void waitForSqlFallbackValue(Page page, String expectedSql) {
+        page.waitForFunction(
+                "expected => document.querySelector('#dp-explore-sql-fallback')?.value === expected",
+                expectedSql);
+        assertThat(page.locator("#dp-explore-sql-fallback").inputValue()).isEqualTo(expectedSql);
     }
 
     private static void waitForExploreReady(Page page, List<String> browserErrors) {

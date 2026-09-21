@@ -30,6 +30,11 @@ Dieses Dokument sammelt die Teststrategie fuer die Erkunden-Phasen und die Phase
 - Seit der V4-Umstellung pruefen Backend- und Frontend-Tests den Explore-Kontext
   Version 4 mit `rLaboratory`, direkten Chart-/WebR-Booleans und statischen
   Asset-/Cache-Regeln fuer `/webr/**` und `/webr-packages/**`.
+- Im CI kann `playwrightTest` mit
+  `-Pdatenportal.playwright.withDeps=true` gestartet werden. Dann installiert
+  die Java-Playwright-CLI neben Chromium und Firefox auch die benoetigten
+  Linux-Systemabhaengigkeiten. Der GitHub-Workflow verwendet diese Option;
+  lokale Aufrufe ohne Property behalten die bisherige Browserinstallation bei.
 - Vitest prueft DuckDB/Arrow-nahes Type-Mapping, Snapshot-Erzeugung aus SQL-Resultaten, R-Rezeptgenerierung, WebR-Runtime-Ladephasen mit gemocktem `webr`, R-Panel-UI, Limit-Warnungen, Exportbuttons und das Package-Mirror-Script inklusive Dependency-Closure und Lockdatei.
 - Seit dem R-Labor UI-Nachschliff prueft Vitest zusaetzlich, dass R-Exportbuttons in den Outputbereichen statt in der oberen Toolbar sitzen, Paneltitel fuer Konsole/Plot nicht sichtbar gerendert werden, der Resultat-Export erst nach tabellarischem R-Resultat aktiv wird und die Dataframe-Kennzahlen `Anzahl Zeilen`/`Anzahl Spalten` heissen.
 - Seit dem zweiten R-Labor UI-Nachschliff prueft Vitest, dass R ohne SQL-Result startet, Konsole und Plot einen eigenen Resize-Handle haben, die Rezepttitel Schweizer Anfuehrungszeichen verwenden und die Plot-Heuristik Messwerte statt Jahre/Codes priorisiert.

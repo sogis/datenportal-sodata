@@ -43,7 +43,7 @@ jobs:
           cache-dependency-path: src/main/frontend/explore/package-lock.json
 
       - name: Run application and frontend checks
-        run: ./gradlew clean check
+        run: ./gradlew clean check -Pdatenportal.playwright.withDeps=true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
