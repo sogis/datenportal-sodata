@@ -55,12 +55,18 @@ RUN apt-get update \
     && groupadd --system datenportal \
     && useradd --system --gid datenportal --home-dir /opt/datenportal --shell /usr/sbin/nologin datenportal \
     && mkdir -p /opt/datenportal \
-    && chown datenportal:datenportal /opt/datenportal
+    && chown datenportal:0 /opt/datenportal
 
 WORKDIR /opt/datenportal
 
 # Die Katalog-Fixture inklusive catalog.duckdb liegt ueber spec/fixtures im Jar.
 COPY --from=build --chown=datenportal:datenportal /workspace/build/libs/datenportal-sodata-*.jar app.jar
+
+# OpenShift kann dem Container zur Laufzeit eine beliebige UID mit Gruppe 0
+# zuweisen. Die Anwendung schreibt nicht in dieses Verzeichnis, benötigt aber
+# Leserechte unabhängig vom konkreten Laufzeitbenutzer.
+RUN chgrp -R 0 /opt/datenportal \
+    && chmod -R g=u /opt/datenportal
 
 USER datenportal
 EXPOSE 8080

@@ -65,6 +65,60 @@ Der erste Build lädt Gradle-, npm- und WebR-Abhängigkeiten und dauert deshalb
 länger. BuildKit-Cache-Mounts halten Gradle- und npm-Cache zwischen Builds
 erhalten; ein erneuter Build nach einer Quelländerung nutzt sie.
 
+## Veröffentlichte Images
+
+Der Workflow `.github/workflows/container-image.yml` baut und prüft das Image
+bei Pull Requests. Jeder Push auf `main` publiziert den geprüften Stand mit dem
+Tag `0.1.<github-run-number>` in beide öffentlichen Registries:
+
+```text
+docker.io/sogis/datenportal-sodata:0.1.<github-run-number>
+ghcr.io/sogis/datenportal-sodata:0.1.<github-run-number>
+```
+
+Der Präfix `0.1` ist als Workflow-Variable manuell gepflegt. Es gibt bewusst
+kein veränderliches `latest`-Tag; OpenShift-Deployments können dadurch auf einen
+konkreten, nachvollziehbaren Image-Stand zeigen.
+
+Für den Push nach Docker Hub müssen im GitHub-Repository die Secrets
+`DOCKERHUB_USERNAME` und `DOCKERHUB_TOKEN` hinterlegt sein. Der Token muss
+Schreibrechte auf `sogis/datenportal-sodata` besitzen. Für GHCR verwendet der
+Workflow den automatisch bereitgestellten `GITHUB_TOKEN` mit
+`packages: write`. Das Docker-Hub-Repository muss vor dem ersten Lauf angelegt
+sein. Nach dem ersten erfolgreichen GHCR-Push muss das neu angelegte Package in
+den GitHub-Package-Einstellungen auf öffentlich gestellt werden, sofern die
+Organisationsvorgaben dies nicht bereits automatisch tun.
+
+## OpenShift und beliebige UIDs
+
+Der Runtime-Stage läuft standardmässig als Benutzer `datenportal` und damit
+nicht als root. Die Dateien unter `/opt/datenportal` sind zusätzlich über
+Gruppe `0` lesbar, sodass OpenShift das Image mit einer zufällig zugewiesenen
+Nicht-root-UID starten kann. Der Workflow prüft dieses Verhalten mit einer
+simulierten UID vor dem Registry-Push.
+
+Für ein OpenShift-Deployment können die Standard-Sicherheitsvorgaben explizit
+beibehalten werden:
+
+```yaml
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: [ALL]
+  seccompProfile:
+    type: RuntimeDefault
+```
+
+Als HTTP-Probes eignen sich `/actuator/health/liveness` auf Port `8080` für
+Liveness und `/actuator/health/readiness` auf Port `8080` für Readiness.
+
+Der lokale Build und der Dev-Stack bleiben unverändert:
+
+```bash
+docker build -t datenportal-sodata:local .
+```
+
 ## Lokaler Schnelltest mit Fixtures
 
 Für einen Smoke-Test ohne externe Quellen werden die gebündelten Fixtures

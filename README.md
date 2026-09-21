@@ -32,12 +32,13 @@ Nicht enthalten:
 - serverseitige Datenbank für veränderliche Anwendungsdaten
 - Login-System
 - Admin-UI
-- Kubernetes-Deployment und Publish-Workflow für Containerimages
-- CI/CD-Pipeline
+- Kubernetes-/OpenShift-Deployment-Manifeste
 - Erzeugung von `catalog.duckdb` in der Webapp (diese übernimmt GRETL im Themenrepo)
 
 Für den lokalen JVM-Betrieb als Container existiert ein Dockerfile im
 Repository; Details stehen in [Container-Deployment](docs/container-deployment.md).
+Der GitHub-Workflow baut das Image bei Pull Requests zur Prüfung und publiziert
+es bei Pushes auf `main` nach Docker Hub und GitHub Container Registry.
 
 ## Voraussetzungen
 
