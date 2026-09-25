@@ -18,7 +18,7 @@
   <h2 class="dp-result-card__title">
     <a href="${card.detailHref()}">${card.title()}</a>
   </h2>
-  <p class="dp-result-card__description">${card.description()}</p>
+  <p class="dp-result-card__description">${card.description()}@if(card.descriptionTruncated())... <a class="dp-result-card__description-link" href="${card.detailHref()}" aria-label="Details anzeigen: ${card.title()}">[Details anzeigen]</a>@endif</p>
   @if(!card.keywords().isEmpty())
     <ul class="dp-keyword-list">
       @for(var keyword : card.keywords())

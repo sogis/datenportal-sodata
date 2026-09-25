@@ -605,6 +605,7 @@ Pflicht je Card:
 - der Typ-Badge in Cards zeigt als Prefix ein Datei-Icon fuer `Datensatz` und ein Collection-Icon fuer `Datenreihe`, vertikal mittig zum Text ausgerichtet
 - keine zusätzlichen Access- oder Struktur-Badges; nicht offene Eintraege signalisieren fehlende Downloads weiterhin durch ein Schloss im Downloadbereich
 - Titel `18px` und Beschreibung `18px` wie im Screenshot
+- Card-Beschreibungen zeigen höchstens 50 vollständige Wörter. Längere Beschreibungen enden mit `...` und dem Inline-Textlink „[Details anzeigen]“; er und der Footer-Pfeil führen zum selben Ziel.
 - graue Keyword-/Themen-Badges mit `14px`
 - Formate als kompakte Textlinks oder Buttons
 - Downloads, Trennlinie, Datum und Detailpfeil bilden einen gemeinsamen Bottom-Cluster, der bei gleich hohen Cards bündig am unteren Rand sitzt
@@ -619,6 +620,7 @@ public record EntryCardVm(
     String id,
     String title,
     String description,
+    boolean descriptionTruncated,
     String typeLabel,
     AccessStateVm accessState,
     List<String> keywords,

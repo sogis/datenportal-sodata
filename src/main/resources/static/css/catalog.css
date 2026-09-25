@@ -545,6 +545,12 @@
   /*color: var(--dp-color-text-muted);*/
 }
 
+.dp-result-card__description-link {
+  color: var(--dp-color-accent);
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .dp-result-card__bottom {
   margin-top: auto;
   display: grid;

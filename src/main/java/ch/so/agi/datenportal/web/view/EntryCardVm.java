@@ -6,6 +6,7 @@ public record EntryCardVm(
         String id,
         String title,
         String description,
+        boolean descriptionTruncated,
         String typeLabel,
         AccessStateVm accessState,
         List<String> keywords,

@@ -80,10 +80,12 @@ public final class ResultsVmFactory {
     }
 
     private EntryCardVm card(CatalogEntry entry) {
+        var descriptionPreview = CardDescriptionPreview.from(entry.description());
         return new EntryCardVm(
                 entry.identifier(),
                 entry.title(),
-                entry.description(),
+                descriptionPreview.text(),
+                descriptionPreview.truncated(),
                 entry.type().label(),
                 accessState(entry),
                 keywords(entry),
