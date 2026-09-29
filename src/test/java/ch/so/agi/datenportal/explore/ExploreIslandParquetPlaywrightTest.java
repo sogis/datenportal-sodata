@@ -370,22 +370,22 @@ class ExploreIslandParquetPlaywrightTest {
             editor.click();
             page.keyboard().press("ControlOrMeta+A");
             page.keyboard().insertText("SEL");
-            waitForSuggestion(page, "SELECT", browserErrors);
+            waitForSuggestion(page, "SELECT", null, browserErrors);
 
             page.keyboard().press("Escape");
             page.keyboard().press("ControlOrMeta+A");
             page.keyboard().insertText("select * from " + tableName.substring(0, Math.min(5, tableName.length())));
-            waitForSuggestion(page, tableName, browserErrors);
+            waitForSuggestion(page, tableName, tableName + ", Class", browserErrors);
 
             page.keyboard().press("Escape");
             page.keyboard().press("ControlOrMeta+A");
             page.keyboard().insertText("select " + tableName + ".");
-            waitForSuggestion(page, firstColumn, browserErrors);
+            waitForSuggestion(page, firstColumn, firstColumn + ", Field", browserErrors);
 
             page.keyboard().press("Escape");
             page.keyboard().press("ControlOrMeta+A");
             page.keyboard().insertText("select " + tableName + ".we");
-            waitForSuggestion(page, "wert", browserErrors);
+            waitForSuggestion(page, "wert", "wert, Field", browserErrors);
         }
     }
 
@@ -1150,19 +1150,38 @@ class ExploreIslandParquetPlaywrightTest {
         page.mouse().up();
     }
 
-    private static void waitForSuggestion(Page page, String label, List<String> browserErrors) {
+    private static void waitForSuggestion(Page page, String label, String accessibleName, List<String> browserErrors) {
+        Locator suggestion = accessibleName == null
+                ? page.locator(".suggest-widget .monaco-list-row:has-text('" + label + "')")
+                : page.getByRole(com.microsoft.playwright.options.AriaRole.OPTION,
+                        new Page.GetByRoleOptions().setName(accessibleName).setExact(true));
         try {
-            page.waitForSelector("[data-testid='sql-monaco-editor'][data-autocomplete-ready='true']");
+            suggestion.waitFor(new Locator.WaitForOptions().setTimeout(1_000));
+        } catch (TimeoutError quickSuggestionTimeout) {
             page.keyboard().press("Control+Space");
-            page.waitForSelector(
-                    ".suggest-widget .monaco-list-row:has-text('" + label + "')",
-                    new Page.WaitForSelectorOptions().setTimeout(5000));
-        } catch (TimeoutError error) {
+            try {
+                suggestion.waitFor(new Locator.WaitForOptions().setTimeout(15_000));
+            } catch (TimeoutError explicitSuggestionTimeout) {
+                throw suggestionFailure(page, label, browserErrors, explicitSuggestionTimeout);
+            }
+        }
+    }
+
+    private static AssertionError suggestionFailure(Page page, String label, List<String> browserErrors,
+            TimeoutError error) {
+        try {
             String editorText = page.locator("[data-testid='sql-monaco-editor'] .view-lines").textContent();
-            String widgetText = String.join(" | ", page.locator(".suggest-widget").allTextContents());
-            throw new AssertionError("Expected Monaco suggestion '" + label + "'. Editor text: " + editorText
-                    + ". Suggest widget text: " + widgetText + ". Browser errors: " + browserErrors,
+            List<String> suggestions = new ArrayList<>();
+            for (Locator row : page.locator(".suggest-widget .monaco-list-row").all()) {
+                suggestions.add(row.getAttribute("aria-label") + " [" + row.innerText() + "]");
+            }
+            return new AssertionError("Expected Monaco suggestion '" + label + "'. Editor text: " + editorText
+                    + ". Suggestions: " + suggestions + ". Browser errors: " + browserErrors,
                     error);
+        } catch (TimeoutError diagnosticError) {
+            return new AssertionError("Expected Monaco suggestion '" + label
+                    + "', but the editor diagnostics could not be collected. Browser errors: " + browserErrors,
+                    diagnosticError);
         }
     }
 

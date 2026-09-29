@@ -246,6 +246,10 @@ tasks.register('playwrightTest', Test) {
     if (System.getProperty('datenportal.playwright.webr') != null) {
         systemProperty 'datenportal.playwright.webr', System.getProperty('datenportal.playwright.webr')
     }
+    testLogging {
+        events 'failed'
+        exceptionFormat 'full'
+    }
     useJUnitPlatform {
         includeTags 'playwright'
     }
