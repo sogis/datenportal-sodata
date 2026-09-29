@@ -96,7 +96,7 @@ Wichtige Verantwortlichkeiten:
 1. Spring bindet `datenportal.catalog.*`.
 2. `CatalogInputsSource` lädt beide Artefakte; im Manifestmodus stammen sie aus derselben einmaligen Manifestauflösung.
 3. Der DuckDB-Header wird technisch auf mindestens zwölf Bytes und `DUCK` an Byteposition 8 bis 11 geprüft.
-4. `XtfPublishedCatalogParser` parst namespace-aware und XXE-sicher, inklusive exakter `accessRights` sowie strukturbezogener Metadaten (`attributes`, `model`).
+4. `XtfPublishedCatalogParser` parst namespace-aware und XXE-sicher, inklusive exakter `accessRights` sowie strukturbezogener Metadaten (`attributes`, `model`). Für die BAG-Rolle `attributes` liest er alle `DatasetAttribute`-Kinder eines Containers in Dokumentreihenfolge; wiederholte `attributes`-Container bleiben ebenfalls unterstützt.
 5. `CatalogValidator` prüft Pflichtregeln.
 6. `CatalogSearchIndexBuilder` baut einen neuen In-Memory-Lucene-Index.
 7. `CatalogSnapshotBuilder` erzeugt den immutable `CatalogSnapshot` mit beiden Artefakten.

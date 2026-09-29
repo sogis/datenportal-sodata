@@ -211,10 +211,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "accrualPeriodicity" -> series.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
                     case "temporalCoverage" -> series.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
                     case "attributes" -> {
-                        RawDatasetAttribute attribute = parseDatasetAttributeContainer(reader, childPath);
-                        if (attribute != null) {
-                            series.attributes.add(attribute);
-                        }
+                        series.attributes.addAll(parseDatasetAttributesContainer(reader, childPath));
                     }
                     case "model" -> series.model = readOptionalText(reader, childPath).orElse(null);
                     case "surveyMethod" -> series.surveyMethod = readOptionalText(reader, childPath).orElse(null);
@@ -268,10 +265,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "accrualPeriodicity" -> dataset.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
                     case "temporalCoverage" -> dataset.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
                     case "attributes" -> {
-                        RawDatasetAttribute attribute = parseDatasetAttributeContainer(reader, childPath);
-                        if (attribute != null) {
-                            dataset.attributes.add(attribute);
-                        }
+                        dataset.attributes.addAll(parseDatasetAttributesContainer(reader, childPath));
                     }
                     case "model" -> dataset.model = readOptionalText(reader, childPath).orElse(null);
                     case "surveyMethod" -> dataset.surveyMethod = readOptionalText(reader, childPath).orElse(null);
@@ -351,10 +345,7 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
                     case "accrualPeriodicity" -> issue.accrualPeriodicity = parseAccrualPeriodicityContainer(reader, childPath).orElse(null);
                     case "temporalCoverage" -> issue.temporalCoverage = parseTemporalCoverageContainer(reader, childPath).orElse(null);
                     case "attributes" -> {
-                        RawDatasetAttribute attribute = parseDatasetAttributeContainer(reader, childPath);
-                        if (attribute != null) {
-                            issue.attributes.add(attribute);
-                        }
+                        issue.attributes.addAll(parseDatasetAttributesContainer(reader, childPath));
                     }
                     case "model" -> issue.model = readOptionalText(reader, childPath).orElse(null);
                     case "surveyMethod" -> issue.surveyMethod = readOptionalText(reader, childPath).orElse(null);
@@ -676,20 +667,22 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         throw new XMLStreamException("distributions element is not closed");
     }
 
-    private RawDatasetAttribute parseDatasetAttributeContainer(XMLStreamReader reader, XtfElementPath path)
+    private List<RawDatasetAttribute> parseDatasetAttributesContainer(XMLStreamReader reader, XtfElementPath path)
             throws XMLStreamException {
+        List<RawDatasetAttribute> attributes = new ArrayList<>();
         while (reader.hasNext()) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT) {
                 if ("DatasetAttribute".equals(reader.getLocalName())) {
-                    return parseDatasetAttribute(reader, path.push("DatasetAttribute"));
+                    attributes.add(parseDatasetAttribute(reader, path.push("DatasetAttribute")));
+                    continue;
                 }
                 skipElement(reader);
                 continue;
             }
 
             if (event == XMLStreamConstants.END_ELEMENT && "attributes".equals(reader.getLocalName())) {
-                return null;
+                return attributes;
             }
         }
 

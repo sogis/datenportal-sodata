@@ -9,11 +9,20 @@ import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionFormat;
 import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.springframework.core.io.ClassPathResource;
 
 class XtfPublishedCatalogParserTest {
@@ -70,6 +79,77 @@ class XtfPublishedCatalogParserTest {
                         "http://localhost:8081/ch.so.datenportal/downloads/test.csv",
                         "http://localhost:8081/ch.so.datenportal/downloads/test.xlsx",
                         "http://localhost:8081/ch.so.datenportal/downloads/test.parquet");
+    }
+
+    @Test
+    void parsesAllDatasetAttributesFromOneAttributesContainer() throws Exception {
+        String xml = fixtureXml();
+        String datasetIdentifier = "ch.so.wasserqualitaet_grundwasser";
+        DatasetEntry dataset = parseXml(combineAttributesInOneContainer(xml, "Dataset", datasetIdentifier)).datasets().stream()
+                .filter(entry -> entry.identifier().equals(datasetIdentifier))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(dataset.metadata().attributes())
+                .extracting(attribute -> attribute.name())
+                .containsExactly(
+                        "jahr",
+                        "messstelle_code",
+                        "gemeinde",
+                        "parameter",
+                        "messwert",
+                        "einheit",
+                        "messwert_status");
+    }
+
+    @Test
+    void parsesAllSeriesAttributesFromOneAttributesContainer() throws Exception {
+        String xml = fixtureXml();
+        Catalog originalCatalog = parseXml(xml);
+        DatasetSeriesEntry originalSeries = originalCatalog.datasetSeries().stream()
+                .filter(series -> series.metadata().attributes().size() > 1)
+                .findFirst()
+                .orElseThrow();
+        List<String> originalAttributeNames = originalSeries.metadata().attributes().stream()
+                .map(attribute -> attribute.name())
+                .toList();
+
+        DatasetSeriesEntry parsedSeries = parseXml(combineAttributesInOneContainer(
+                        xml, "DatasetSeries", originalSeries.identifier()))
+                .datasetSeries().stream()
+                .filter(series -> series.identifier().equals(originalSeries.identifier()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(parsedSeries.metadata().attributes())
+                .extracting(attribute -> attribute.name())
+                .containsExactlyElementsOf(originalAttributeNames);
+    }
+
+    @Test
+    void parsesAllIssueAttributesFromOneAttributesContainer() throws Exception {
+        String xml = fixtureXml();
+        Catalog originalCatalog = parseXml(xml);
+        var originalIssue = originalCatalog.datasetSeries().stream()
+                .flatMap(series -> series.issues().stream())
+                .filter(issue -> issue.metadata().attributes().size() > 1)
+                .findFirst()
+                .orElseThrow();
+        List<String> originalAttributeNames = originalIssue.metadata().attributes().stream()
+                .map(attribute -> attribute.name())
+                .toList();
+
+        var parsedIssue = parseXml(combineAttributesInOneContainer(
+                        xml, "DatasetIssue", originalIssue.identifier()))
+                .datasetSeries().stream()
+                .flatMap(series -> series.issues().stream())
+                .filter(issue -> issue.identifier().equals(originalIssue.identifier()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(parsedIssue.metadata().attributes())
+                .extracting(attribute -> attribute.name())
+                .containsExactlyElementsOf(originalAttributeNames);
     }
 
     @Test
@@ -435,6 +515,71 @@ class XtfPublishedCatalogParserTest {
                     .resolve(bytes, "http://localhost:8081/ch.so.datenportal/downloads");
             return PARSER.parse(resolvedBytes.inputStream(), sourceDescription);
         }
+    }
+
+    private static String fixtureXml() throws Exception {
+        return new ClassPathResource("published_catalog_full_62_entries.xtf")
+                .getContentAsString(StandardCharsets.UTF_8)
+                .replace("${DOWNLOAD_URL}", "http://localhost:8081/ch.so.datenportal/downloads");
+    }
+
+    private static String combineAttributesInOneContainer(String xml, String entryElementName, String identifier)
+            throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        var document = factory.newDocumentBuilder()
+                .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+        var entries = document.getElementsByTagNameNS("*", entryElementName);
+        Element matchingEntry = null;
+        for (int entryIndex = 0; entryIndex < entries.getLength(); entryIndex++) {
+            Element entry = (Element) entries.item(entryIndex);
+            if (identifier.equals(directChildText(entry, "identifier"))) {
+                matchingEntry = entry;
+                break;
+            }
+        }
+        if (matchingEntry == null) {
+            throw new IllegalArgumentException("Could not find " + entryElementName + " " + identifier);
+        }
+
+        List<Element> containers = new ArrayList<>();
+        for (Node child = matchingEntry.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof Element element && "attributes".equals(element.getLocalName())) {
+                containers.add(element);
+            }
+        }
+        if (containers.size() < 2) {
+            throw new IllegalArgumentException("Expected multiple attributes containers for " + identifier);
+        }
+
+        Element combinedContainer = document.createElementNS(
+                containers.getFirst().getNamespaceURI(), containers.getFirst().getNodeName());
+        for (Element container : containers) {
+            for (Node child = container.getFirstChild(); child != null;) {
+                Node next = child.getNextSibling();
+                if (child instanceof Element element && "DatasetAttribute".equals(element.getLocalName())) {
+                    combinedContainer.appendChild(element);
+                }
+                child = next;
+            }
+        }
+        matchingEntry.insertBefore(combinedContainer, containers.getFirst());
+        containers.forEach(matchingEntry::removeChild);
+
+        var transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        StringWriter output = new StringWriter();
+        transformer.transform(new DOMSource(document), new StreamResult(output));
+        return output.toString();
+    }
+
+    private static String directChildText(Element parent, String localName) {
+        for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof Element element && localName.equals(element.getLocalName())) {
+                return element.getTextContent().trim();
+            }
+        }
+        return "";
     }
 
     private static DatasetEntry parseSingleDatasetWithAccessLevel(String accessLevel) {
