@@ -35,16 +35,17 @@ Nicht enthalten:
 - Kubernetes-/OpenShift-Deployment-Manifeste
 - Erzeugung von `catalog.duckdb` in der Webapp (diese übernimmt GRETL im Themenrepo)
 
-Für den lokalen JVM-Betrieb als Container existiert ein Dockerfile im
-Repository; Details stehen in [Container-Deployment](docs/container-deployment.md).
-Der GitHub-Workflow baut das Image bei Pull Requests zur Prüfung und publiziert
-es bei Pushes auf `main` nach Docker Hub und GitHub Container Registry.
+Für den lokalen Containerbetrieb gibt es native und JVM-Buildziele im Dockerfile;
+Details stehen in [Container-Deployment](docs/container-deployment.md). Der
+GitHub-Workflow baut und prüft beide Images bei Pull Requests und publiziert sie
+bei Pushes auf `main` nach Docker Hub und GitHub Container Registry.
 
 ## Voraussetzungen
 
 - JDK 25
 - Node.js und npm im `PATH` für den von Gradle gestarteten Explore-Build;
   der gesperrte Vite-Stand benötigt Node `^20.19.0 || >=22.12.0`.
+- Optional: GraalVM 25 mit Native Image für einen lokalen `nativeCompile`-Build
 
 Der Build verwendet den Gradle Wrapper; eine lokale Gradle-Installation ist nicht erforderlich.
 Beim ersten Build werden Gradle-/npm-Abhängigkeiten und WebR-Artefakte geladen.
@@ -88,6 +89,12 @@ docker run --rm -p 18082:8080 \
   datenportal-sodata:local
 ```
 
+Das Standard-Dockerziel baut das Native-Image. Für das JVM-Fallback:
+
+```bash
+docker build --target jvm-runtime -t datenportal-sodata-jvm:local .
+```
+
 Das Profil `local` ist für den Host-`bootRun` gedacht; im Container werden die
 vorkompilierten Templates und die explizit konfigurierten Fixtures verwendet.
 
@@ -99,7 +106,7 @@ Die Dokumentation ist nach Zweck getrennt, damit Einstieg, Laufzeit, Betrieb und
 - `docs/architecture.md`: technischer Laufzeitaufbau, Datenfluss vom XTF bis ins Rendering und atomarer Reload.
 - `docs/configuration.md`: Laufzeit-Properties, Katalogquellen, Reload-Token, Actuator, Cache und Security-Header.
 - `docs/operations.md`: lokaler Betrieb, Reload, Health/Info, Fehlerdiagnose und Smoke-Tests.
-- `docs/container-deployment.md`: JVM-Containerimage, Build, Laufzeitkonfiguration, Dev-Stack-Betrieb und Ausblick GraalVM Native.
+- `docs/container-deployment.md`: Native- und JVM-Containerimages, Build, Laufzeitkonfiguration und Dev-Stack-Betrieb.
 - `docs/search.md`: fachliche Soll-Semantik der Suche und Filter.
 - `docs/ui-implementation-contract.md`: verbindlicher UI-Vertrag für Katalog-, Karten- und Detailseiten.
 - `docs/ui-primitives.md`: Source of truth für Chips, Badges und Action Pills.

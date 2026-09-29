@@ -5,7 +5,7 @@ Dieses Dokument ist nur noch eine kompakte Orientierung. Für den aktuellen MVP-
 - `README.md` für Quickstart und Projektüberblick
 - `docs/configuration.md` für alle Laufzeit-Properties
 - `docs/operations.md` für Betrieb, Reload, Health/Info und Smoke-Tests
-- `docs/container-deployment.md` für das JVM-Containerimage und den Stackbetrieb
+- `docs/container-deployment.md` für native und JVM-Containerimages sowie den Stackbetrieb
 - `docs/web-components.md` für Header-/Breadcrumb-Assets
 
 ## Lokaler Start

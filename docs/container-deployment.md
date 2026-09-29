@@ -1,9 +1,10 @@
 # Container-Deployment
 
 Diese Anleitung beschreibt den Containerbetrieb der Datenportal-Webanwendung.
-Das aktuelle Betriebsmodell ist ein JVM-Image auf Basis von Eclipse Temurin.
-Ein GraalVM-Native-Image ist als spätere, getrennte Stage vorgesehen; der
-Stack-Vertrag (Port, Umgebungsvariablen, Healthcheck) soll dabei gleich bleiben.
+Das Standardimage `datenportal-sodata` enthält ein GraalVM Native Image. Das
+JVM-Fallback wird separat als `datenportal-sodata-jvm` veröffentlicht. Beide
+Images verwenden Port `8080`, dieselben Umgebungsvariablen und denselben
+Liveness-Healthcheck.
 
 Der Dockerfile und seine Buildlogik liegen bewusst in diesem Repository. Der
 Dev-Stack `datenportal-dev-stack` baut und verwendet dieses Image, definiert
@@ -11,7 +12,8 @@ aber keine eigene Kopie der Buildlogik.
 
 ## Betriebsmodell
 
-- Spring-Boot-JVM-Anwendung, Container-Port `8080`
+- Spring-Boot-Anwendung, nativ kompiliert oder auf einer JVM ausgeführt,
+  Container-Port `8080`
 - non-root-Benutzer, kein TLS im Container
 - Katalog- und DuckDB-Quelle werden beim Start und bei jedem Reload gelesen;
   ohne gültige Quelle startet die Anwendung nicht
@@ -31,22 +33,41 @@ aber keine eigene Kopie der Buildlogik.
 - Registry-Zugriff, wenn statt des lokalen Builds ein veröffentlichtes Image
   verwendet wird
 
-Der Build läuft vollständig im Container. Auf dem Host wird für den Containerweg
-kein JDK und kein Node installiert; JDK 25 und Node/npm bleiben nur für den
-manuellen `bootRun`-Entwicklungsstart nötig.
+Der Docker-Build läuft vollständig in BuildKit-Stages. Auf dem Host werden für
+den Containerweg weder JDK noch Node installiert. Für `bootRun` genügt JDK 25;
+für den lokalen Native-Compile braucht es GraalVM 25 mit Native Image und Node 22
+im `PATH`.
 
 ## Image bauen
 
 ```bash
 docker build -t datenportal-sodata:local .
+docker build --target jvm-runtime -t datenportal-sodata-jvm:local .
 ```
+
+Der erste Befehl baut das Native-Image und ist der Standard-Target des
+Dockerfiles. Der zweite Befehl baut das JVM-Fallback.
+
+Für einen Native-Compile direkt auf dem Entwicklungsrechner kann die installierte
+GraalVM über SDKMAN aktiviert werden:
+
+```bash
+sdk use java 25.0.3-graal
+./gradlew nativeCompile
+```
+
+Das erzeugte Programm ist für Betriebssystem und Prozessorarchitektur des
+Build-Rechners bestimmt. Der Docker-Build verwendet Linux-Builder und erzeugt
+das für den Container passende Programm.
 
 Buildargumente:
 
 | Argument | Default | Wirkung |
 |---|---|---|
-| `TEMURIN_JDK_IMAGE` | `eclipse-temurin:25-jdk` | Basis des Build-Stage mit Gradle und Node |
-| `TEMURIN_JRE_IMAGE` | `eclipse-temurin:25-jre` | Runtime-Basis |
+| `TEMURIN_JDK_IMAGE` | `eclipse-temurin:25-jdk` | JVM-Build-Stage mit Gradle und Node |
+| `JVM_RUNTIME_IMAGE` | `registry.access.redhat.com/ubi9/openjdk-25-runtime` | Red Hat UBI Laufzeitbasis für das JVM-Image |
+| `GRAALVM_NATIVE_IMAGE` | `ghcr.io/graalvm/native-image-community:25-ol9` | GraalVM Native-Image-Builder auf Oracle Linux 9 |
+| `NATIVE_RUNTIME_IMAGE` | `registry.access.redhat.com/ubi9/ubi-minimal:latest` | Red Hat UBI 9 Laufzeitbasis für das Native-Image |
 | `NODE_IMAGE` | `node:22-bookworm-slim` | Quelle für Node 22 im Build-Stage |
 | `IMAGE_VERSION` | `local` | Label `org.opencontainers.image.version` |
 | `GIT_COMMIT` | `unknown` | Label `org.opencontainers.image.revision` und Commit in `build-info.properties` |
@@ -67,35 +88,42 @@ erhalten; ein erneuter Build nach einer Quelländerung nutzt sie.
 
 ## Veröffentlichte Images
 
-Der Workflow `.github/workflows/container-image.yml` baut und prüft das Image
-bei Pull Requests. Jeder Push auf `main` publiziert den geprüften Stand mit dem
-Tag `0.1.<github-run-number>` in beide öffentlichen Registries:
+Der Workflow `.github/workflows/container-image.yml` baut beide Images und prüft
+sie bei Pull Requests. Jeder Push auf `main` publiziert nach erfolgreichen
+Smoke-Checks beide Versionen nach Docker Hub und GHCR:
 
 ```text
 docker.io/sogis/datenportal-sodata:0.1.<github-run-number>
+docker.io/sogis/datenportal-sodata:latest
+docker.io/sogis/datenportal-sodata-jvm:0.1.<github-run-number>
+docker.io/sogis/datenportal-sodata-jvm:latest
 ghcr.io/sogis/datenportal-sodata:0.1.<github-run-number>
+ghcr.io/sogis/datenportal-sodata:latest
+ghcr.io/sogis/datenportal-sodata-jvm:0.1.<github-run-number>
+ghcr.io/sogis/datenportal-sodata-jvm:latest
 ```
 
-Der Präfix `0.1` ist als Workflow-Variable manuell gepflegt. Es gibt bewusst
-kein veränderliches `latest`-Tag; OpenShift-Deployments können dadurch auf einen
-konkreten, nachvollziehbaren Image-Stand zeigen.
+Der Präfix `0.1` ist als Workflow-Variable manuell gepflegt. `latest` zeigt je
+Repository auf den zuletzt erfolgreich geprüften Push auf `main`; produktive
+Deployments können weiterhin auf einen konkreten Versionstag zeigen.
 
 Für den Push nach Docker Hub müssen im GitHub-Repository die Secrets
 `DOCKERHUB_USERNAME` und `DOCKERHUB_TOKEN` hinterlegt sein. Der Token muss
-Schreibrechte auf `sogis/datenportal-sodata` besitzen. Für GHCR verwendet der
+Schreibrechte auf `sogis/datenportal-sodata` und
+`sogis/datenportal-sodata-jvm` besitzen. Für GHCR verwendet der
 Workflow den automatisch bereitgestellten `GITHUB_TOKEN` mit
-`packages: write`. Das Docker-Hub-Repository muss vor dem ersten Lauf angelegt
-sein. Nach dem ersten erfolgreichen GHCR-Push muss das neu angelegte Package in
-den GitHub-Package-Einstellungen auf öffentlich gestellt werden, sofern die
-Organisationsvorgaben dies nicht bereits automatisch tun.
+`packages: write`. Beide Docker-Hub-Repositories müssen vor dem ersten Lauf
+angelegt sein. Nach dem ersten erfolgreichen GHCR-Push müssen die neu
+angelegten Packages in den GitHub-Package-Einstellungen auf öffentlich gestellt
+werden, sofern die Organisationsvorgaben dies nicht bereits automatisch tun.
 
 ## OpenShift und beliebige UIDs
 
-Der Runtime-Stage läuft standardmässig als Benutzer `datenportal` und damit
-nicht als root. Die Dateien unter `/opt/datenportal` sind zusätzlich über
-Gruppe `0` lesbar, sodass OpenShift das Image mit einer zufällig zugewiesenen
-Nicht-root-UID starten kann. Der Workflow prüft dieses Verhalten mit einer
-simulierten UID vor dem Registry-Push.
+Die Runtime-Stages laufen nicht als root: Das JVM-Image verwendet UID `185`,
+das Native-Image UID `1001`. Die Dateien unter `/opt/datenportal` sind zusätzlich
+über Gruppe `0` lesbar, sodass OpenShift beide Images mit einer zufällig
+zugewiesenen Nicht-root-UID starten kann. Der Workflow prüft dieses Verhalten
+mit einer simulierten UID vor dem Registry-Push.
 
 Für ein OpenShift-Deployment können die Standard-Sicherheitsvorgaben explizit
 beibehalten werden:
@@ -241,13 +269,18 @@ curl -fS http://localhost:8082/actuator/health/liveness
 curl -fS http://localhost:8082/actuator/health/readiness
 ```
 
-## Ausblick GraalVM Native
+## Native Image und JVM-Fallback
 
-Der Aufbau trennt `build`, `runtime` und die spätere Native-Stage. Für ein
-Native-Image kommen zusätzlich Spring-AOT-Konfiguration und ein GraalVM-Builder
-hinzu; das JVM-Image bleibt als Referenz und Rückfallweg erhalten. Der
-Dev-Stack-Vertrag (Image-Name, Port, Umgebungsvariablen) soll dabei nicht
-wechseln.
+Der Native-Compile wird über das GraalVM Native Build Tools Gradle-Plugin
+ausgeführt. Das Spring-Boot-Gradle-Plugin bindet dafür die AOT-Verarbeitung ein.
+Der Native- und der JVM-Container verwenden getrennte Build- und Runtime-Stages;
+beide behalten dieselbe Anwendungskonfiguration und den Port `8080`.
+
+Die Native-Hinweise registrieren die gebündelten XTF-/DuckDB-Ressourcen sowie
+die generierten JTE-Templates für Reflection. JTE lädt diese Klassen zur
+Laufzeit dynamisch und ruft deren `renderMap`-Methode reflektiv auf. Der
+Hint-Registrar leitet die Templateklassen aus den generierten `.class`-Dateien
+ab, damit neu hinzukommende Templates ebenfalls im Native-Image funktionieren.
 
 ## Fehlerdiagnose
 

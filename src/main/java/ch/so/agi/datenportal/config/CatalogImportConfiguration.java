@@ -18,9 +18,11 @@ import java.time.Clock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.core.io.ResourceLoader;
 
 @Configuration
+@ImportRuntimeHints(CatalogResourceRuntimeHints.class)
 @EnableConfigurationProperties({
         AdminProperties.class,
         CatalogDuckDbProperties.class,
