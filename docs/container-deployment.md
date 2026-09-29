@@ -88,9 +88,14 @@ erhalten; ein erneuter Build nach einer Quelländerung nutzt sie.
 
 ## Veröffentlichte Images
 
-Der Workflow `.github/workflows/container-image.yml` baut beide Images und prüft
-sie bei Pull Requests. Jeder Push auf `main` publiziert nach erfolgreichen
-Smoke-Checks beide Versionen nach Docker Hub und GHCR:
+Der Workflow `.github/workflows/container-image.yml` baut beide Images für
+`linux/amd64` und `linux/arm64`. Die Builds laufen auf passenden nativen
+GitHub-Runnern; beide Varianten bestehen ihre Container-Smoke-Checks, bevor
+der Workflow die gemeinsamen Versions- und `latest`-Tags als Multiarch-Manifeste
+veröffentlicht. Docker wählt beim Pull automatisch die passende Architektur.
+Pull Requests bauen und prüfen beide Architekturen, publizieren aber keine Images.
+
+Die kanonischen Tags bleiben:
 
 ```text
 docker.io/sogis/datenportal-sodata:0.1.<github-run-number>
@@ -103,9 +108,29 @@ ghcr.io/sogis/datenportal-sodata-jvm:0.1.<github-run-number>
 ghcr.io/sogis/datenportal-sodata-jvm:latest
 ```
 
+Zusätzlich bleiben die geprüften Architektur-Images unter Versions-Tags mit
+Suffix verfügbar, zum Beispiel:
+
+```text
+docker.io/sogis/datenportal-sodata:0.1.<github-run-number>-amd64
+docker.io/sogis/datenportal-sodata:0.1.<github-run-number>-arm64
+```
+
+Für jedes Image in beiden Registries wird zuerst das Versions-Manifest aus
+diesen beiden Varianten erstellt. `latest` wird erst aktualisiert, nachdem alle
+Versions-Manifeste erfolgreich veröffentlicht wurden. Die Manifest-Inhalte
+lassen sich mit folgendem Befehl prüfen:
+
+```bash
+docker buildx imagetools inspect docker.io/sogis/datenportal-sodata:latest
+```
+
+Die Ausgabe muss sowohl `linux/amd64` als auch `linux/arm64` aufführen.
+
 Der Präfix `0.1` ist als Workflow-Variable manuell gepflegt. `latest` zeigt je
-Repository auf den zuletzt erfolgreich geprüften Push auf `main`; produktive
-Deployments können weiterhin auf einen konkreten Versionstag zeigen.
+Repository auf den zuletzt erfolgreich für beide Architekturen geprüften Push
+auf `main`; produktive Deployments können weiterhin auf einen konkreten
+Versionstag zeigen.
 
 Für den Push nach Docker Hub müssen im GitHub-Repository die Secrets
 `DOCKERHUB_USERNAME` und `DOCKERHUB_TOKEN` hinterlegt sein. Der Token muss
