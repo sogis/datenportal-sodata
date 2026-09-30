@@ -172,6 +172,61 @@ Der lokale Build und der Dev-Stack bleiben unverändert:
 docker build -t datenportal-sodata:local .
 ```
 
+## Container-Regressionstest für Native und JVM
+
+Der gemeinsame Test benötigt Python 3 und Docker auf dem Host. Er startet das
+fertig gebaute Runtime-Image mit UID `1001230000:0`, einem eindeutigen Namen und
+einem dynamischen Port auf `127.0.0.1`. Er verwendet ausschliesslich gebündelte
+Classpath-Fixtures und entfernt seinen Container auch bei einem Fehler.
+Es sind weder ein Dev-Stack noch S3 oder Schwester-Repositories erforderlich.
+
+```bash
+docker build --target native-runtime -t datenportal-sodata:native-test .
+python3 tools/test-container.py --image datenportal-sodata:native-test --runtime native
+
+docker build --target jvm-runtime -t datenportal-sodata-jvm:jvm-test .
+python3 tools/test-container.py --image datenportal-sodata-jvm:jvm-test --runtime jvm
+```
+
+`--runtime native` verlangt den Entrypoint `/opt/datenportal/app`; der Test
+führt damit das kompilierte native Binary im Runtime-Container aus.
+Die Prüfungen umfassen Liveness, tatsächliche UID, Startseite, DuckDB-Datei und
+Explore-HTML sowie JSON-Kontext für `ch.so.bauinventar`, die aktuelle Ausgabe
+von `ch.so.abstimmungsresultate` und deren Ausgabe 2025. Der eingebettete Kontext
+muss mit dem JSON-Endpunkt übereinstimmen. Geprüft werden insbesondere Tabellen,
+Spalten, Rezepte, optionale Chart-Konfigurationen, Enum-Werte und das R-Labor.
+Unbekannte Datensätze müssen weiterhin HTTP 404 liefern. Fehler melden den
+betroffenen Aufruf und Containerlogs; der Prozess endet mit Exitcode 1.
+
+Der Workflow führt denselben Test vor der Veröffentlichung für Native und JVM
+auf den vorhandenen AMD64- und ARM64-Runnern aus. Ein fehlgeschlagener Test
+blockiert den nachfolgenden Image-Push dieser Architektur und die gemeinsamen
+Multiarch-Tags. Der Test ergänzt `./gradlew clean check`: Browserseitige SQL-
+und R-Ausführung bleiben Aufgabe der bestehenden Frontend-/Playwright-Tests.
+
+### Native-Reflection für den Explore-Kontext
+
+Explore erzeugt JSON manuell mit Jackson und gibt es als String aus. Spring MVC
+kann deshalb den DTO-Typ nicht aus dem Rückgabetyp der Endpunkte ableiten.
+`CatalogResourceRuntimeHints` registriert den gesamten Typbaum ab
+`ExploreContextDto` mit `BindingReflectionHintsRegistrar`, einschliesslich
+Record-Accessoren und generischer `List`-/`Optional`-Elemente. Die drei
+Explore-Enums registrieren zusätzlich ihre `@JsonValue`-Methoden, damit die
+bestehenden kleingeschriebenen JSON-Werte erhalten bleiben.
+
+Das veröffentlichte native Image `0.1.10` enthält diese Hints noch nicht und
+liefert bei Explore HTTP 500 (`UnsupportedFeatureError` für
+`ExploreContextDto`). Als einmalige Negativkontrolle muss der Test deshalb
+an diesem Image scheitern:
+
+```bash
+docker pull sogis/datenportal-sodata:0.1.10
+python3 tools/test-container.py --image sogis/datenportal-sodata:0.1.10 --runtime native
+```
+
+Erwartet wird ein Fehler beim Explore-Aufruf, kein Start- oder Registryfehler.
+Diese historische Negativkontrolle ist kein regulärer CI-Schritt.
+
 ## Lokaler Schnelltest mit Fixtures
 
 Für einen Smoke-Test ohne externe Quellen werden die gebündelten Fixtures

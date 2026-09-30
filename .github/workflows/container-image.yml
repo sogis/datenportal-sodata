@@ -106,61 +106,11 @@ jobs:
           cache-from: type=gha,scope=datenportal-sodata-jvm-${{ matrix.architecture }}
           cache-to: type=gha,mode=max,scope=datenportal-sodata-jvm-${{ matrix.architecture }}
 
-      - name: Smoke-test both images as an OpenShift-style arbitrary UID
-        shell: bash
-        run: |
-          set -euo pipefail
+      - name: Test native binary as an OpenShift-style arbitrary UID
+        run: python3 tools/test-container.py --image "$LOCAL_NATIVE_IMAGE" --runtime native
 
-          cleanup() {
-            for container_name in datenportal-sodata-native-smoke datenportal-sodata-jvm-smoke; do
-              docker logs "$container_name" 2>/dev/null || true
-              docker rm --force "$container_name" >/dev/null 2>&1 || true
-            done
-          }
-          trap cleanup EXIT
-
-          smoke_test_image() {
-            local image="$1"
-            local container_name="$2"
-            local host_port="$3"
-
-            docker run --detach \
-              --name "$container_name" \
-              --user 1001230000:0 \
-              --publish "${host_port}:8080" \
-              --env DATENPORTAL_CATALOG_SOURCE_TYPE=classpath \
-              --env DATENPORTAL_CATALOG_CLASSPATH_LOCATION=published_catalog_full_62_entries.xtf \
-              --env DATENPORTAL_CATALOG_DOWNLOAD_URL=http://localhost:8081/ch.so.datenportal/downloads \
-              --env DATENPORTAL_CATALOG_DUCKDB_SOURCE_TYPE=classpath \
-              --env DATENPORTAL_CATALOG_DUCKDB_CLASSPATH_LOCATION=catalog.duckdb \
-              "$image" >/dev/null
-
-            local ready=false
-            for attempt in $(seq 1 60); do
-              if curl --fail --silent "http://127.0.0.1:${host_port}/actuator/health/liveness" >/dev/null; then
-                ready=true
-                break
-              fi
-              sleep 2
-            done
-
-            if [ "$ready" != true ]; then
-              echo "Container $image did not become live in time." >&2
-              return 1
-            fi
-
-            if [ "$(docker exec "$container_name" id -u)" = 0 ]; then
-              echo "Container $image is running as root." >&2
-              return 1
-            fi
-
-            curl --fail --silent "http://127.0.0.1:${host_port}/" >/dev/null
-            curl --fail --silent "http://127.0.0.1:${host_port}/catalog/catalog.duckdb" >/dev/null
-            docker rm --force "$container_name" >/dev/null
-          }
-
-          smoke_test_image "$LOCAL_NATIVE_IMAGE" datenportal-sodata-native-smoke 18082
-          smoke_test_image "$LOCAL_JVM_IMAGE" datenportal-sodata-jvm-smoke 18083
+      - name: Test JVM image as an OpenShift-style arbitrary UID
+        run: python3 tools/test-container.py --image "$LOCAL_JVM_IMAGE" --runtime jvm
 
       - name: Log in to Docker Hub
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
