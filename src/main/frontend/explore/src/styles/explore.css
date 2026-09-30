@@ -721,7 +721,8 @@
 .dp-explore-editor {
   display: flex;
   min-width: 0;
-  min-height: 13rem;
+  /* The resizable panel owns the height; an editor minimum can scroll its toolbar out of view. */
+  min-height: 0;
   height: 100%;
   overflow: hidden;
 }
@@ -751,14 +752,15 @@
 .dp-explore-editor__textarea {
   display: none;
   width: 100%;
-  min-height: 14rem;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
   font-family: var(--dp-font-mono);
   font-size: 13px;
 }
 
 .dp-explore-r-editor__textarea {
   display: block;
-  min-height: 100%;
   padding: 0.75rem;
   border: 0;
   resize: none;
@@ -1820,6 +1822,8 @@
   }
 
   .dp-explore-query-pane {
+    /* Mobile toolbars wrap, so reserve their natural height above the editor. */
+    flex: 0 0 auto !important;
     grid-template-rows: auto minmax(16rem, 1fr);
   }
 
@@ -1842,10 +1846,6 @@
 
   .dp-explore-recipe-picker {
     width: min(22rem, 100%);
-  }
-
-  .dp-explore-editor {
-    min-height: 16rem;
   }
 
   .dp-explore-resize-handle {

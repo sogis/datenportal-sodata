@@ -896,6 +896,17 @@ Keine rote Hervorhebung für `Datenreihe`.
 
 ---
 
+### 9.6 Editoren im SQL- und R-Labor
+
+- Beispielauswahl, Ausführen und Kopieren stehen ausserhalb des intern scrollenden Editorinhalts. Einfügen langer Texte und Cursorbewegungen dürfen die Toolbar nicht aus dem Panel scrollen.
+- Auf Desktop bestimmt das skalierbare Panel die verfügbare Höhe. Der Editor belegt den Rest unterhalb der Toolbar und erzwingt keine eigene Mindesthöhe. Das R-Textfeld ist auf diese Höhe begrenzt.
+- Unterhalb des bestehenden `56rem`-Breakpoints darf die Toolbar umbrechen. Das Query-Panel reserviert ihre natürliche Höhe plus mindestens `16rem` Editorfläche; die Seite darf vertikal scrollen.
+- Bei fokussiertem Editor verwendet normale Textbearbeitung die native Undo-Historie des R-Textfelds beziehungsweise die Monaco-Historie im SQL-Labor: `Command+Z` auf macOS, `Ctrl+Z` auf Windows/Linux. Wiederholen: `Command+Shift+Z` auf macOS; auf Windows/Linux das vom Browser/Editor unterstützte `Ctrl+Shift+Z` beziehungsweise `Ctrl+Y`.
+- `Command+Enter` beziehungsweise `Ctrl+Enter` führt den Code aus. Beispielwechsel und die Übernahme neuer Daten erhalten keine zusätzliche Undo-Garantie.
+- `ExploreEditorPlaywrightTest` prüft beide Editoren in Chromium und Firefox mit normaler und geringer Desktop-Höhe sowie mobilem Viewport. Der Test verwendet echte Tastatureingaben und Copy/Paste; nur die WebR-Initialisierung ist ersetzt, da kein R-Code ausgeführt wird.
+
+---
+
 ## 10. Controller und Methoden
 
 ### 10.1 Query-Parameter
