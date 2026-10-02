@@ -633,6 +633,12 @@ npm --prefix src/main/frontend/explore run typecheck
 npm --prefix src/main/frontend/explore run build
 ```
 
+## DATE-Diagrammachsen
+
+`chartInference.test.ts`, `chartRows.test.ts` und `ChartPanel.test.tsx` prüfen mit echten Arrow-Date32-/Date64-Spalten die schema-basierte Datumserkennung, unabhängig vom Spaltennamen oder SQL-Alias. DATE plus Zahl ergibt einen Linienvorschlag; DATE wird nicht als Y-Messwert angeboten. Die Diagrammkopie zeigt ISO-Daten und liefert dieselben Strings an den Tooltip, während Query-Zeilen und Arrow-Tabelle unverändert bleiben. Abgedeckt sind Nullwerte, Epoch-Wert `0`, Daten vor 1970, ein Datum am Schweizer Sommerzeitwechsel, ungültige Datumszahlen sowie unveränderte Jahres-/Zahlen-/TIMESTAMP-Behandlung und der Fallback ohne Schema.
+
+`ExploreIslandParquetPlaywrightTest.dateResultChartUsesIsoDatesForAxisAndTooltip` führt eine echte DuckDB-Abfrage mit DATE-Literalen aus und prüft den automatischen Linienvorschlag sowie ISO-Daten auf der Achse und im Tooltip. Derselbe Test läuft in `Europe/Zurich` und `America/Los_Angeles`, um Datumsverschiebungen durch die Browser-Zeitzone auszuschliessen.
+
 ## Y-Mehrfachauswahl
 
 `MultiSeries.test.tsx` prüft Reihen, stabile Farben, manuelle Farbwahl,

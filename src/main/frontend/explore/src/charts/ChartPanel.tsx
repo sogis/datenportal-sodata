@@ -1,4 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
+import type {Schema} from 'apache-arrow';
 import type {ExploreChartConfigDto} from '../app/ExploreContext';
 import type {QueryResultState} from '../results/queryResultTypes';
 import {BarResultChart} from './BarResultChart';
@@ -36,6 +37,7 @@ import {ScatterResultChart} from './ScatterResultChart';
 import {YColumnSelect} from './YColumnSelect';
 import {SeriesLegend} from './SeriesLegend';
 import {buildChartSeries, type ChartSeries} from './chartSeries';
+import {normalizeChartRows} from './chartRows';
 
 export function ChartPanel({
   result,
@@ -54,6 +56,7 @@ export function ChartPanel({
     <SuccessfulChartPanel
       rows={result.rows}
       columns={result.columns}
+      schema={result.arrowTable?.schema}
       preferred={preferred}
       onExportTargetChange={onExportTargetChange}
     />
@@ -63,15 +66,17 @@ export function ChartPanel({
 function SuccessfulChartPanel({
   rows,
   columns,
+  schema,
   preferred,
   onExportTargetChange
 }: {
   rows: Array<Record<string, unknown>>;
   columns: string[];
+  schema?: Schema;
   preferred?: ExploreChartConfigDto;
   onExportTargetChange?: (element: HTMLElement | null) => void;
 }) {
-  const resultColumns = useMemo(() => inferResultColumns(columns, rows), [columns, rows]);
+  const resultColumns = useMemo(() => inferResultColumns(columns, rows, schema), [columns, rows, schema]);
   const suggestion = useMemo(() => inferChartSuggestion(resultColumns, rows, preferred), [preferred, resultColumns, rows]);
   const [type, setType] = useState<ResultChartType>(suggestion?.type ?? 'bar');
   const [x, setX] = useState<string>(suggestion?.x ?? '');
@@ -233,7 +238,7 @@ function SuccessfulChartPanel({
 
       {canRender ? (
         <div className="dp-explore-chart__figure" data-chart-type={type}>
-          {renderChart(type, limitedRows, safeX, safeY, suggestion.title, chartColor, colorSeed, series)}
+          {renderChart(type, normalizeChartRows(limitedRows, resultColumns), safeX, safeY, suggestion.title, chartColor, colorSeed, series)}
           {supportsSeries(type) && <SeriesLegend series={series} />}
         </div>
       ) : (
@@ -291,38 +296,20 @@ function renderChart(
     | undefined,
   series: ChartSeries[]
 ) {
-  const chartRows = rows.map(normalizeChartRow);
   switch (type) {
     case 'bar':
-      return <BarResultChart rows={chartRows} x={x} series={series} colorSeed={colorSeed} />;
+      return <BarResultChart rows={rows} x={x} series={series} colorSeed={colorSeed} />;
     case 'line':
-      return <LineResultChart rows={chartRows} x={x} series={series} />;
+      return <LineResultChart rows={rows} x={x} series={series} />;
     case 'scatter':
-      return <ScatterResultChart rows={chartRows} x={x} series={series} />;
+      return <ScatterResultChart rows={rows} x={x} series={series} />;
     case 'histogram':
-      return <HistogramResultChart rows={chartRows} column={x} title={title} color={color} colorSeed={colorSeed} />;
+      return <HistogramResultChart rows={rows} column={x} title={title} color={color} colorSeed={colorSeed} />;
     case 'pie':
-      return <PieResultChart rows={chartRows} x={x} y={y} title={title} variant="pie" color={color} colorSeed={colorSeed} />;
+      return <PieResultChart rows={rows} x={x} y={y} title={title} variant="pie" color={color} colorSeed={colorSeed} />;
     case 'donut':
-      return <PieResultChart rows={chartRows} x={x} y={y} title={title} variant="donut" color={color} colorSeed={colorSeed} />;
+      return <PieResultChart rows={rows} x={x} y={y} title={title} variant="donut" color={color} colorSeed={colorSeed} />;
   }
-}
-
-function normalizeChartRow(row: Record<string, unknown>): Record<string, unknown> {
-  return Object.fromEntries(Object.entries(row).map(([key, value]) => [key, normalizeChartValue(value)]));
-}
-
-function normalizeChartValue(value: unknown): unknown {
-  if (typeof value === 'bigint') {
-    return Number(value);
-  }
-  if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
-  }
-  if (value instanceof Uint8Array) {
-    return `[${value.byteLength} Bytes]`;
-  }
-  return value;
 }
 
 function formatSwissNumber(value: number): string {

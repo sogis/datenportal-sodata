@@ -1,3 +1,4 @@
+import {DataType, type Schema} from 'apache-arrow';
 import type {ExploreChartConfigDto} from '../app/ExploreContext';
 import {
   isDateLikeName,
@@ -15,11 +16,13 @@ import {
 
 export function inferResultColumns(
   columns: string[],
-  rows: Array<Record<string, unknown>>
+  rows: Array<Record<string, unknown>>,
+  schema?: Schema
 ): ResultColumn[] {
+  const dateColumns = new Set(schema?.fields.filter((field) => DataType.isDate(field.type)).map((field) => field.name));
   return columns.map((name) => ({
     name,
-    typeCategory: inferColumnType(name, rows)
+    typeCategory: dateColumns.has(name) ? 'date' : inferColumnType(name, rows)
   }));
 }
 

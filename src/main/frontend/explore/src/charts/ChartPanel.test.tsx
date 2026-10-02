@@ -1,11 +1,31 @@
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {describe, expect, it} from 'vitest';
+import {DateDay, DateMillisecond, Table, vectorFromArray} from 'apache-arrow';
 import {ChartPanel} from './ChartPanel';
 import {CHART_SINGLE_COLOR_OPTIONS, MULTI_CHART_COLOR_OPTION, MULTI_CHART_COLOR_PALETTE} from './chartColors';
 import type {QueryResultState} from '../results/queryResultTypes';
+import {successfulQueryResult} from '../results/arrowResult';
 
 describe('ChartPanel', () => {
+  it.each([new DateDay(), new DateMillisecond()])('uses Arrow %s for a line chart and excludes DATE from Y measurements', async (type) => {
+    const user = userEvent.setup();
+    const table = new Table({
+      berichtsmonat: vectorFromArray([new Date('2025-12-01T00:00:00Z'), new Date('2026-01-01T00:00:00Z')], type),
+      anzahl: vectorFromArray([53, 70])
+    });
+    const result = successfulQueryResult({sourceSql: '', executedSql: '', table, durationMs: 1, maxRowsApplied: false});
+    render(<ChartPanel result={result} />);
+
+    expect(screen.getByLabelText('Typ')).toHaveValue('line');
+    expect(screen.getByLabelText('X (Zeit/Zahl)')).toHaveValue('berichtsmonat');
+    expect(screen.getByText('Zeit- oder Jahrspalte mit Zahlenwert')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Y (Zahl)'}));
+    expect(screen.getAllByRole('checkbox')).toHaveLength(1);
+    expect(screen.getByRole('checkbox', {name: 'anzahl'})).toBeChecked();
+    expect(result.rows[0]).toEqual({berichtsmonat: 1764547200000, anzahl: 53});
+  });
+
   it('renders an empty state before a successful result exists', () => {
     render(<ChartPanel result={{status: 'idle', sourceSql: '', columns: [], rows: [], rowCount: 0}} />);
 

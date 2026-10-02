@@ -687,6 +687,46 @@ class ExploreIslandParquetPlaywrightTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"Europe/Zurich", "America/Los_Angeles"})
+    void dateResultChartUsesIsoDatesForAxisAndTooltip(String timezone) {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+                .setViewportSize(1280, 900).setTimezoneId(timezone))) {
+            Page page = context.newPage();
+            List<String> errors = collectBrowserErrors(page);
+            page.navigate(baseUrl("/series/explore-series/issues/current/explore"));
+            waitForExploreReady(page, errors);
+            page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
+            page.locator("[data-testid='sql-monaco-editor'] .monaco-editor").click();
+            page.keyboard().press("ControlOrMeta+A");
+            page.keyboard().insertText("""
+                    select * from (values
+                      (DATE '1969-12-31', 10), (DATE '1970-01-01', 0),
+                      (DATE '2025-12-01', 53), (DATE '2026-03-29', 70)
+                    ) t(berichtsmonat, anzahl)
+                    """);
+            page.keyboard().press("Escape");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Ausführen")).click();
+            waitForSqlResult(page, errors);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Diagramm")).click();
+            page.waitForSelector("[data-chart-type='line'] .recharts-line");
+
+            assertThat(page.getByLabel("Typ").inputValue()).isEqualTo("line");
+            assertThat(page.getByLabel("X (Zeit/Zahl)").inputValue()).isEqualTo("berichtsmonat");
+            assertThat(page.locator(".recharts-xAxis .recharts-cartesian-axis-tick-value").allTextContents())
+                    .containsExactly("1969-12-31", "1970-01-01", "2025-12-01", "2026-03-29");
+            page.locator(".recharts-line-dot").nth(2).hover();
+            page.waitForFunction("document.querySelector('.recharts-tooltip-wrapper')?.textContent.includes('2025-12-01')");
+            assertThat(page.locator(".recharts-tooltip-wrapper").textContent())
+                    .contains("2025-12-01", "anzahl", "53").doesNotContain("1764547200000");
+            page.screenshot(new Page.ScreenshotOptions()
+                    .setPath(Path.of("build/date-chart-" + timezone.replace('/', '-') + ".png")).setFullPage(true));
+            assertThat(errors).isEmpty();
+        }
+    }
+
+    @ParameterizedTest
     @ValueSource(ints = {1000, 600})
     void multipleYAttributesRenderAndExportAcrossChartTypes(int viewportWidth) throws IOException {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(viewportWidth, 800))) {

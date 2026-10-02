@@ -1,9 +1,42 @@
 import {describe, expect, it} from 'vitest';
+import {DateDay, DateMillisecond, Table, TimestampMillisecond, vectorFromArray} from 'apache-arrow';
 import type {ExploreChartConfigDto} from '../app/ExploreContext';
-import {buildHistogramBins, inferChartSuggestion, isDateLikeColumn, isYearLikeColumn} from './chartInference';
+import {arrowTableToRows} from '../results/arrowResult';
+import {buildHistogramBins, inferChartSuggestion, inferResultColumns, isDateLikeColumn, isYearLikeColumn} from './chartInference';
 import type {ResultColumn} from './chartTypes';
 
 describe('chart inference', () => {
+  it.each([new DateDay(), new DateMillisecond()])('recognizes Arrow %s as a time axis independent of its name', (type) => {
+    for (const name of ['berichtsmonat', 'alias']) {
+      const table = new Table({
+        [name]: vectorFromArray([new Date('2025-12-01T00:00:00Z'), null], type),
+        anzahl: vectorFromArray([53, 0])
+      });
+      const result = arrowTableToRows(table);
+      const inferred = inferResultColumns(result.columns, result.rows, table.schema);
+
+      expect(result.rows[0][name]).toBe(1764547200000);
+      expect(inferred).toEqual([{name, typeCategory: 'date'}, {name: 'anzahl', typeCategory: 'number'}]);
+      expect(inferChartSuggestion(inferred, result.rows)).toMatchObject({type: 'line', x: name, y: 'anzahl'});
+    }
+  });
+
+  it('keeps years, plain numbers and timestamps numeric and preserves inference without a schema', () => {
+    const table = new Table({
+      Jahrgang: vectorFromArray([2025, 2026]),
+      wert: vectorFromArray([1764547200000, 1767225600000]),
+      zeitpunkt: vectorFromArray([new Date('2025-12-01T12:34:56Z'), null], new TimestampMillisecond())
+    });
+    const result = arrowTableToRows(table);
+
+    expect(inferResultColumns(result.columns, result.rows, table.schema).map((column) => column.typeCategory))
+      .toEqual(['number', 'number', 'number']);
+    expect(inferChartSuggestion(inferResultColumns(result.columns, result.rows), result.rows))
+      .toMatchObject({type: 'line', x: 'Jahrgang', y: 'wert'});
+    expect(inferResultColumns(['datum', 'anzahl'], [{datum: '2025-12-01', anzahl: 53}]))
+      .toEqual([{name: 'datum', typeCategory: 'date'}, {name: 'anzahl', typeCategory: 'number'}]);
+  });
+
   it('suggests bar for string and number columns', () => {
     const suggestion = inferChartSuggestion(
       columns([
