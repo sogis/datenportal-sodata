@@ -3,6 +3,7 @@ package ch.so.agi.datenportal.web;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.search.Facets;
 import ch.so.agi.datenportal.search.SearchResult;
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer;
 import ch.so.agi.datenportal.web.view.CatalogPageVm;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,7 @@ public final class HomePageVmFactory {
         return new CatalogPageVm(
                 pageChromeFactory.catalogPage(PAGE_TITLE + " | Datenportal"),
                 PAGE_TITLE,
-                LEAD,
+                MetadataTextRenderer.full(snapshot.catalog().description().orElse(LEAD)),
                 SECONDARY_LEAD,
                 normalized,
                 filterVmFactory.create(normalized, facets),

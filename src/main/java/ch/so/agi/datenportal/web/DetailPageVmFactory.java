@@ -12,6 +12,7 @@ import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.TemporalCoverage;
 import ch.so.agi.datenportal.catalog.domain.Theme;
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer;
 import ch.so.agi.datenportal.web.view.AccessStateVm;
 import ch.so.agi.datenportal.web.view.AttributeRowVm;
 import ch.so.agi.datenportal.web.view.CodeExampleVm;
@@ -60,7 +61,7 @@ public final class DetailPageVmFactory {
                 Optional.empty(),
                 Optional.empty(),
                 dataset.title(),
-                dataset.description(),
+                MetadataTextRenderer.full(dataset.description()),
                 datasetAccessState,
                 urlFactory.datasetStructureQualityOrigin(dataset.identifier()),
                 urlFactory.datasetExplore(dataset.identifier()),
@@ -87,7 +88,7 @@ public final class DetailPageVmFactory {
         return new SeriesDetailPageVm(
                 pageChromeFactory.seriesDetailPage(series),
                 series.title(),
-                series.description(),
+                MetadataTextRenderer.full(series.description()),
                 seriesIssues(series));
     }
 
@@ -100,7 +101,7 @@ public final class DetailPageVmFactory {
                 Optional.of(series.title()),
                 Optional.of(urlFactory.seriesDetail(series.identifier())),
                 issue.title(),
-                issue.description(),
+                MetadataTextRenderer.full(issue.description()),
                 issueAccessState,
                 currentIssue
                         ? urlFactory.currentIssueStructureQualityOrigin(series.identifier())
@@ -208,7 +209,7 @@ public final class DetailPageVmFactory {
                         attribute.dataType(),
                         attribute.mandatory() ? "Ja" : "Nein",
                         attribute.unit().orElse("–"),
-                        attribute.description().orElse("–")))
+                        MetadataTextRenderer.full(attribute.description().orElse("–"))))
                 .toList();
     }
 
@@ -389,11 +390,11 @@ public final class DetailPageVmFactory {
     private List<MetadataItemVm> originUsageItems(CatalogEntry entry) {
         List<MetadataItemVm> items = new ArrayList<>();
         entry.metadata().surveyMethod()
-                .ifPresent(value -> items.add(item("Erhebungs- / Messmethode", value)));
+                .ifPresent(value -> items.add(formattedItem("Erhebungs- / Messmethode", value)));
         entry.metadata().auxiliaryData()
-                .ifPresent(value -> items.add(item("Hilfsdaten", value)));
+                .ifPresent(value -> items.add(formattedItem("Hilfsdaten", value)));
         entry.metadata().furtherUses()
-                .ifPresent(value -> items.add(item("Weitere Verwendungen", value)));
+                .ifPresent(value -> items.add(formattedItem("Weitere Verwendungen", value)));
         entry.metadata().dataAvailableFrom()
                 .ifPresent(value -> items.add(item("Verfügbare Daten ab", value)));
         return items;
@@ -460,6 +461,12 @@ public final class DetailPageVmFactory {
 
     private static MetadataItemVm item(String label, String value) {
         return item(label, value, null);
+    }
+
+    private static MetadataItemVm formattedItem(String label, String value) {
+        var content = MetadataTextRenderer.full(value);
+        return new MetadataItemVm(label, List.of(
+                new MetadataLineVm(content.plainText(), Optional.empty(), Optional.of(content))));
     }
 
     private static MetadataItemVm item(String label, String value, String href) {

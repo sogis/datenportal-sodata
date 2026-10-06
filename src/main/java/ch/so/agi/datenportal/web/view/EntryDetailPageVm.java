@@ -1,5 +1,6 @@
 package ch.so.agi.datenportal.web.view;
 
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer.Html;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,7 +9,7 @@ public record EntryDetailPageVm(
         Optional<String> seriesTitle,
         Optional<String> seriesHref,
         String title,
-        String description,
+        Html description,
         AccessStateVm accessState,
         String structureQualityOriginHref,
         String exploreHref,

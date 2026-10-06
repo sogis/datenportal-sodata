@@ -1,11 +1,12 @@
 package ch.so.agi.datenportal.web.view;
 
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer.Html;
 import java.util.List;
 
 public record EntryCardVm(
         String id,
         String title,
-        String description,
+        Html description,
         boolean descriptionTruncated,
         String typeLabel,
         AccessStateVm accessState,

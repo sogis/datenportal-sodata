@@ -7,6 +7,7 @@ Dieses Dokument ist nur noch eine kompakte Orientierung. Für den aktuellen MVP-
 - `docs/operations.md` für Betrieb, Reload, Health/Info und Smoke-Tests
 - `docs/container-deployment.md` für native und JVM-Containerimages sowie den Stackbetrieb
 - `docs/web-components.md` für Header-/Breadcrumb-Assets
+- `docs/metadata-text.md` für Auszeichnungen und Zeilenumbrüche in beschreibenden Metadaten
 
 ## Lokaler Start
 

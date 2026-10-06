@@ -4,7 +4,7 @@
   <section class="dp-catalog-intro">
     <div class="dp-container">
       <h1 class="dp-page-title">${page.title()}</h1>
-      <p class="dp-lead">${page.lead()}</p>
+      <div class="dp-lead dp-metadata-text">${page.lead()}</div>
       <p class="dp-lead-secondary">${page.secondaryLead()}</p>
       <div class="dp-catalog-shell">
         <div class="dp-control-band">

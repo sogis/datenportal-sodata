@@ -40,6 +40,39 @@ p {
   line-height: 1.6;
 }
 
+/* Metadata prose uses the surrounding typography in every presentation. */
+.dp-metadata-text {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.dp-metadata-text p,
+.dp-metadata-text ul,
+.dp-metadata-text ol {
+  margin: 0 0 var(--dp-space-3);
+}
+
+.dp-metadata-text > :last-child,
+.dp-metadata-text li > :last-child {
+  margin-bottom: 0;
+}
+
+.dp-metadata-text ul,
+.dp-metadata-text ol {
+  padding-left: var(--dp-space-5);
+}
+
+.dp-metadata-text code,
+.dp-entry-description code,
+.dp-result-card__description code {
+  font-family: var(--dp-font-mono);
+  font-size: .9em;
+  background: var(--dp-color-surface-subtle);
+  border-radius: var(--dp-radius-sm);
+  padding: .05em .2em;
+  overflow-wrap: anywhere;
+}
+
 .dp-skip-link {
   position: absolute;
   left: var(--dp-space-4);

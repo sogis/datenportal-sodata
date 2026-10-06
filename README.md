@@ -18,6 +18,7 @@ Enthalten:
 - Lucene-backed Suche, Sortierung und Filter
 - Listenansicht, Kartenansicht und Datenreihen-Expansion
 - Detailseiten für Datensätze, Datenreihen und Ausgaben
+- eingeschränktes Markdown für Beschreibungen mit sichtbaren Zeilenumbrüchen; [Erfassungsregeln](docs/metadata-text.md)
 - Classpath-, Datei-, HTTP- und Manifest-Katalogquelle
 - Explore-Schema-Explorer mit DuckDB-Catalog-Artefakt
 - geschützter Runtime-Reload unter `/admin/catalog/reload`

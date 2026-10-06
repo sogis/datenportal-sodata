@@ -31,6 +31,19 @@ import org.junit.jupiter.api.Test;
 class ExploreContextServiceTest {
 
     @Test
+    void exploreDescriptionsUsePlainTextWithoutMarkdownOrHtmlFormatting() {
+        var original = dataset("markdown", "Titel", List.of(distribution(DistributionFormat.PARQUET)), metadataWithAttributes());
+        var dataset = new DatasetEntry(original.identifier(), original.title(), "Gemeinde**nummer** `2401`\nZweite Zeile",
+                original.publisher(), original.creator(), original.themes(), original.keywords(), original.modified(),
+                original.accessLevel(), original.metadata(), original.distributions());
+        var context = service(dataset).buildContext("markdown");
+
+        assertThat(context.description()).contains("Gemeindenummer 2401 Zweite Zeile");
+        assertThat(context.tables().getFirst().description()).contains("Gemeindenummer 2401 Zweite Zeile");
+        assertThat(context.tables().getFirst().columns().getFirst().description()).contains("BFS-Nummer.");
+    }
+
+    @Test
     void contextContainsTablesRecipesAndActiveCapabilities() {
         var service = service(dataset(
                 "ch.so.gemeinden",
@@ -209,7 +222,7 @@ class ExploreContextServiceTest {
                 Optional.empty(),
                 Optional.empty(),
                 List.of(
-                        new DatasetAttribute("bfs_nr", "INTEGER", Optional.of("BFS-Nummer."), Optional.empty(), true),
+                        new DatasetAttribute("bfs_nr", "INTEGER", Optional.of("**BFS-Nummer**."), Optional.empty(), true),
                         new DatasetAttribute("gemeindename", "VARCHAR", Optional.of("Gemeindename."), Optional.empty(), false),
                         new DatasetAttribute("flaeche_ha", "DOUBLE", Optional.of("Fläche."), Optional.of("ha"), false)),
                 Optional.empty());

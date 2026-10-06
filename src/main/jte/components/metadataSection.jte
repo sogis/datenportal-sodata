@@ -13,6 +13,8 @@
             @endif
             @if(item.lines().get(i).href().isPresent())
               <a href="${item.lines().get(i).href().get()}" target="_blank">${item.lines().get(i).value()}</a>
+            @elseif(item.lines().get(i).formattedValue().isPresent())
+              <div class="dp-metadata-text">${item.lines().get(i).formattedValue().get()}</div>
             @else
               ${item.lines().get(i).value()}
             @endif

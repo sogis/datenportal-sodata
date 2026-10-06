@@ -34,6 +34,14 @@ Sie beschreibt bewusst nicht in jedem Punkt das aktuelle Ist-Verhalten der Anwen
 16. `Thema`, `Fachstelle / Amt` und `Beschreibung` dürfen aus Kompatibilitätsgründen weiterhin sekundär textsuchbar bleiben.
 17. Für diese sekundären Felder ist kein gleich starkes oder gleich stabiles Substring-Verhalten garantiert wie für `Identifier`, `Titel` und `Keywords`.
 
+Beschreibungen werden vor der Indexierung über das [Metadaten-Textprofil](metadata-text.md)
+in Klartext überführt. Das gilt für Top-Level-Einträge sowie aktuelle und
+historische Ausgaben. Unterstützte Markdown-Marker gehören nicht zum Suchtext;
+technische Begriffe, Werte und hervorgehobene Wörter bleiben enthalten. Auch
+Wörter, deren Auszeichnung innerhalb des Worts beginnt, werden als der sichtbare
+zusammenhängende Begriff indexiert. Die Liste der Suchfelder und die Filtersemantik
+bleiben unverändert.
+
 ## Beispiele
 
 - Suche nach `boden`: Treffer sind erlaubt, wenn `boden` als Teilstring in Identifier, Titel oder Keywords vorkommt.

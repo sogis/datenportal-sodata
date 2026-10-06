@@ -64,6 +64,17 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Weitere Ausgaben | `components/relatedIssuesCard.jte` | `List<RelatedIssueVm>` | schlanke Linkliste anderer Ausgaben auf Ausgabendetails |
 | Fehlerseite | `pages/notFound.jte` | `CatalogErrorControllerAdvice` | unbekannte Identifier liefern 404 |
 
+## Beschreibende Metadaten
+
+Beschreibungen in Katalogeinführung, Detail-Hero, Attributtabelle und den
+Freitexten zu Herkunft/Verwendung erhalten vorbereiteten
+`MetadataTextRenderer.Html`-Inhalt. Katalogeinführung und Detailtexte verwenden
+Blockdarstellung; `entryRow`, `issueRow` und `entryCard` verwenden kompakte
+Inline-Darstellung. `MetadataLineVm.formattedValue` kennzeichnet ausschliesslich
+die drei beschreibenden Freitexte; normale Metadaten und Kontaktlinks bleiben
+maskierte Strings. Parsing, Rendering und Wortkürzung liegen zentral in
+`support.metadata`, siehe [Erfassungsregeln](metadata-text.md).
+
 ## CSS
 
 | Datei | Zweck |

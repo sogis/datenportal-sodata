@@ -25,7 +25,7 @@
               <td>${attribute.dataType()}</td>
               <td>${attribute.mandatoryLabel()}</td>
               <td>${attribute.unit()}</td>
-              <td>${attribute.description()}</td>
+              <td><div class="dp-metadata-text">${attribute.description()}</div></td>
             </tr>
           @endfor
         </tbody>

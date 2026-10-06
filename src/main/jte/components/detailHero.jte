@@ -1,5 +1,5 @@
 @param String title
-@param String description
+@param ch.so.agi.datenportal.support.metadata.MetadataTextRenderer.Html description
 @param String titleBadgeLabel
 <header class="dp-detail-hero">
   <h1 class="dp-detail-title">
@@ -8,5 +8,5 @@
       <span class="dp-status-badge dp-status-badge--info">${titleBadgeLabel}</span>
     @endif
   </h1>
-  <p class="dp-detail-description">${description}</p>
+  <div class="dp-detail-description dp-metadata-text">${description}</div>
 </header>

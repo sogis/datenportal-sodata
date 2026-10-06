@@ -1,11 +1,12 @@
 package ch.so.agi.datenportal.web.view;
 
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer.Html;
 import java.util.List;
 
 public record EntryRowVm(
         String id,
         String title,
-        String description,
+        Html description,
         String typeLabel,
         String themeLabel,
         String publicationDateLabel,

@@ -239,7 +239,7 @@ Pflicht:
 
 - Breadcrumb via Web Component.
 - Titel: `Daten und Statistiken`.
-- Leadtext:
+- Leadtext aus `Catalog.description`, falls vorhanden, mit dem [Metadaten-Textprofil](metadata-text.md). Ohne Katalogbeschreibung bleibt der bisherige Einführungstext aus `HomePageVmFactory` erhalten. Ursprüngliche Referenz für die Einführung:
 
 ```text
 Finden und nutzen Sie offene Daten, Geodaten und Statistiken des Kantons Solothurn.
@@ -542,7 +542,7 @@ public record ResultsVm(
 public record EntryRowVm(
     String id,
     String title,
-    String description,
+    MetadataTextRenderer.Html description,
     String typeLabel,
     String publicationDateLabel,
     String detailHref,
@@ -557,7 +557,7 @@ public record EntryRowVm(
 public record IssueRowVm(
     String id,
     String title,
-    String description,
+    MetadataTextRenderer.Html description,
     String typeLabel,
     String publicationDateLabel,
     String detailHref,
@@ -619,7 +619,7 @@ Pflicht je Card:
 public record EntryCardVm(
     String id,
     String title,
-    String description,
+    MetadataTextRenderer.Html description,
     boolean descriptionTruncated,
     String typeLabel,
     AccessStateVm accessState,
@@ -759,7 +759,7 @@ public record EntryDetailPageVm(
     Optional<String> seriesTitle,
     Optional<String> seriesHref,
     String title,
-    String description,
+    MetadataTextRenderer.Html description,
     AccessStateVm accessState,
     String structureQualityOriginHref,
     String exploreHref,
@@ -777,7 +777,7 @@ public record EntryDetailPageVm(
 public record SeriesDetailPageVm(
     PageChromeVm chrome,
     String title,
-    String description,
+    MetadataTextRenderer.Html description,
     List<SeriesIssueVm> issues
 ) {}
 
@@ -810,7 +810,11 @@ public record MetadataItemVm(
     List<MetadataLineVm> lines
 ) {}
 
-public record MetadataLineVm(String value, Optional<String> href) {}
+public record MetadataLineVm(
+    String value,
+    Optional<String> href,
+    Optional<MetadataTextRenderer.Html> formattedValue
+) {}
 
 public record SeriesIssueVm(
     String issueLabel,
@@ -1091,3 +1095,30 @@ Keine Screenshot-Pixelvergleiche im MVP. Stattdessen HTML-Struktur, Klassen, ARI
 - Serienausgabe-Detailseite mit weiteren Ausgaben.
 - MetadataSections.
 - Tests.
+
+## 13. Beschreibende Metadaten
+
+Für die in [metadata-text.md](metadata-text.md) benannten Beschreibungsfelder
+gilt ein eingeschränkter Markdown-Umfang mit technischen Begriffen, fett,
+kursiv, Absätzen, sichtbaren Zeilenumbrüchen und Listen. HTML sowie nicht
+unterstützte Markdown-Konstrukte bleiben sichtbarer, maskierter Text.
+
+Die Beschreibungsfelder der Ergebnis- und Detail-ViewModels sowie
+`AttributeRowVm.description` und `CatalogPageVm.lead` sind vorbereitete
+`MetadataTextRenderer.Html`-Inhalte.
+Nur der zentrale Renderer kann ihn erzeugen. Templates übernehmen keine
+Markdown-Verarbeitung und geben keine importierten Strings ungeprüft als HTML aus.
+
+Katalogeinführung, Detail-Hero, Attributbeschreibungen und die Freitexte
+`surveyMethod`, `auxiliaryData`, `furtherUses` verwenden Blockdarstellung in
+`div.dp-metadata-text`. Ein einzelner Zeilenumbruch erzeugt einen sichtbaren
+Umbruch, eine Leerzeile einen neuen Absatz. Absatz- und Listenabstände sowie
+Code-Styling nutzen die vorhandenen Design-Tokens; Absätze werden nicht in
+ein bestehendes `p`-Element verschachtelt.
+
+Liste, Karten und Ausgabezeilen behalten Inline-Auszeichnungen; Block- und
+Zeilengrenzen werden zu Leerzeichen. Karten zählen höchstens 50 vollständige
+Wörter im sichtbaren Text und schliessen Auszeichnungen vor dem vorhandenen
+Detail-Link. Titel, Identifier, Einheiten und strukturierte Angaben bleiben
+normale Textwerte. Technische Begriffe werden in Monospace mit einer dezenten
+neutralen Hintergrundfläche hervorgehoben.

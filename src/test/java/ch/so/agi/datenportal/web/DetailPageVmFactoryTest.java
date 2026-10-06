@@ -394,7 +394,7 @@ class DetailPageVmFactoryTest {
                         attribute -> attribute.dataType(),
                         attribute -> attribute.mandatoryLabel(),
                         attribute -> attribute.unit(),
-                        attribute -> attribute.description())
+                        attribute -> attribute.description().plainText())
                 .containsExactly(
                         tuple("identifier", "TEXT", "Ja", "–", "Fachlicher Identifikator"),
                         tuple("flaeche_m2", "DECIMAL", "Nein", "m2", "–"));
@@ -733,7 +733,7 @@ class DetailPageVmFactoryTest {
                         attribute -> attribute.dataType(),
                         attribute -> attribute.mandatoryLabel(),
                         attribute -> attribute.unit(),
-                        attribute -> attribute.description())
+                        attribute -> attribute.description().plainText())
                 .containsExactly(tuple("bfs_nr", "INTEGER", "Ja", "–", "BFS-Gemeindenummer"));
         assertThat(page.quality().modelName()).contains("SO_AGI_IssueModel");
     }

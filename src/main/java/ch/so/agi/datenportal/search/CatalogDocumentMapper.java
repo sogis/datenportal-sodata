@@ -7,6 +7,7 @@ import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.catalog.domain.Office;
 import ch.so.agi.datenportal.catalog.domain.Theme;
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer;
 import java.util.Locale;
 import java.util.Objects;
 import org.apache.lucene.document.Document;
@@ -31,7 +32,7 @@ public final class CatalogDocumentMapper {
         addExact(document, CatalogSearchFields.TITLE_EXACT, entry.title(), true);
         addNormalizedWholeValue(document, CatalogSearchFields.TITLE_SUBSTRING, entry.title());
 
-        addTokenTerms(document, CatalogSearchFields.DESCRIPTION_TERMS, entry.description());
+        addTokenTerms(document, CatalogSearchFields.DESCRIPTION_TERMS, MetadataTextRenderer.plainText(entry.description()));
 
         entry.keywords().forEach(keyword -> {
             addNormalizedWholeValue(document, CatalogSearchFields.KEYWORD_SUBSTRING, keyword);
@@ -63,7 +64,7 @@ public final class CatalogDocumentMapper {
             addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_TITLE_SUBSTRING, issue.title());
             addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_LABEL_SUBSTRING, issue.issueLabel());
             addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_LABEL_SUBSTRING, issueYear);
-            addTokenTerms(document, CatalogSearchFields.ISSUE_DESCRIPTION_TERMS, issue.description());
+            addTokenTerms(document, CatalogSearchFields.ISSUE_DESCRIPTION_TERMS, MetadataTextRenderer.plainText(issue.description()));
             issue.keywords().forEach(keyword -> addNormalizedWholeValue(document, CatalogSearchFields.ISSUE_KEYWORD_SUBSTRING, keyword));
             issue.themes().forEach(theme -> addTheme(document, theme));
             addOffice(document, issue.creator());

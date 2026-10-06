@@ -1,5 +1,6 @@
 package ch.so.agi.datenportal.explore;
 
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetAttribute;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
@@ -55,7 +56,7 @@ public final class ExploreTableService {
                 safeName,
                 safeName,
                 entry.title(),
-                Optional.of(entry.description()),
+                Optional.of(MetadataTextRenderer.plainText(entry.description())),
                 distribution.preferredHref().toString(),
                 Optional.empty(),
                 entry.metadata().structureSummary().map(summary -> (long) summary.objectCount()),
@@ -76,16 +77,17 @@ public final class ExploreTableService {
     private List<ExploreColumnDto> buildColumns(List<DatasetAttribute> attributes) {
         return attributes.stream()
                 .map(attribute -> {
+                    var description = attribute.description().map(MetadataTextRenderer::plainText);
                     var source = new ExploreColumnSource(
                             attribute.name(),
                             attribute.dataType(),
-                            attribute.description());
+                            description);
                     return new ExploreColumnDto(
                             attribute.name(),
                             attribute.dataType(),
                             Optional.empty(),
                             Optional.of(attribute.mandatory()),
-                            attribute.description(),
+                            description,
                             Optional.empty(),
                             roleDetector.detectRoles(source).stream().toList());
                 })

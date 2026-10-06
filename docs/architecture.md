@@ -91,6 +91,15 @@ Wichtige Verantwortlichkeiten:
 - `admin.actuator`: Health- und Info-Beiträge für Betrieb.
 - `config`: Properties, statisches Asset-Caching und Security-Header.
 
+Beschreibende Metadaten verwenden das [eingeschränkte Markdown-Profil](metadata-text.md).
+Der XTF-Parser behält den Quelltext einschliesslich innerer Zeilenumbrüche;
+`Catalog.description` bleibt auch in der veröffentlichten Sicht erhalten.
+`support.metadata` wandelt Beschreibungen mit CommonMark in eine unveränderliche
+Dokumentstruktur um. ViewModel-Factories verwenden vollständiges oder kompaktes
+HTML; nur der Renderer erzeugt den dafür vorgesehenen JTE-Inhaltstyp.
+Lucene und Explore verwenden die Klartextdarstellung. Eine PDF-Darstellung
+kann später auf derselben Dokumentstruktur aufbauen.
+
 ## Startup
 
 1. Spring bindet `datenportal.catalog.*`.

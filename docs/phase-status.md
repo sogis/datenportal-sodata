@@ -154,3 +154,35 @@ Verifikation:
 - finales JAR: 174.644.557 Bytes, keine EH/COI/Maps, MVP und R-Chunks vorhanden
 
 Commit: `9bb7957`
+
+## Beschreibende Metadaten mit eingeschränktem Markdown
+
+Status: abgeschlossen am 2026-10-06.
+
+Beschreibungen verwenden ein einheitliches Textprofil für technische Begriffe,
+Hervorhebungen, Absätze, Zeilenumbrüche und Listen. CommonMark wird in eine
+unveränderliche Dokumentstruktur überführt; ein kontrollierter Renderer erzeugt
+Detail-HTML, kompakte Vorschauen und Klartext für Lucene und Explore.
+Die Katalogbeschreibung bleibt im Snapshot erhalten und wird als Einführung
+gerendert. Der XTF-Vertrag erhält kein zusätzliches Formatfeld.
+
+Erfassungsregeln: [Beschreibende Metadaten erfassen](metadata-text.md).
+UI-Vertrag, Component Map, Architektur, Suche und Nutzungsdokumentation wurden
+entsprechend aktualisiert. Verwendete visuelle Referenzen:
+`startseite_liste.png`, `cards.png`, `web-components.png`.
+
+Verifikation:
+
+- Fokussierte Parser-, Renderer-, ViewModel-, MVC- und Suchtests: PASS.
+- Prüfung vorhandener XTF-Dateien: 2'959 Beschreibungsfelder, keine möglichen Markdown-Auszeichnungen gefunden.
+- `./gradlew clean check`: PASS, `BUILD SUCCESSFUL in 2m 30s`.
+- Java: 352 Tests, keine Fehler.
+- Vitest: 24 Dateien / 152 Tests, TypeScript: PASS.
+- Playwright: 55 ausgeführte Tests, keine Fehler; ein vorhandener Test übersprungen.
+- Manuelle Browserprüfung mit temporärem XTF: Detailtext, Katalogeinführung und kompakte Kartenvorschau korrekt dargestellt.
+- `git diff --check`: PASS.
+
+Die in `AGENTS.md` genannte v5-Gesamtspezifikation fehlt im Checkout;
+Umsetzungsgrundlage waren der freigegebene Plan und die vorhandenen verbindlichen
+Dokumente. Ein späterer PDF-Renderer kann die Dokumentstruktur verwenden;
+PDF-Erzeugung ist nicht Bestandteil dieser Umsetzung.

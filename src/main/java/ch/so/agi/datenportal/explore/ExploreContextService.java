@@ -1,5 +1,6 @@
 package ch.so.agi.datenportal.explore;
 
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer;
 import ch.so.agi.datenportal.catalog.domain.CatalogEntry;
 import ch.so.agi.datenportal.catalog.domain.CatalogSnapshot;
 import ch.so.agi.datenportal.catalog.domain.DatasetEntry;
@@ -91,7 +92,7 @@ public final class ExploreContextService {
                 4,
                 entry.identifier(),
                 entry.title(),
-                Optional.of(entry.description()),
+                Optional.of(MetadataTextRenderer.plainText(entry.description())),
                 canonicalUrl,
                 Optional.of(entry.modified().toString()),
                 entry.metadata().licenseUri().map(Object::toString),

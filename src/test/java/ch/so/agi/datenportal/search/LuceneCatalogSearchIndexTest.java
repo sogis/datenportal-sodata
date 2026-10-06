@@ -31,6 +31,31 @@ class LuceneCatalogSearchIndexTest {
     private final CatalogSearchIndexBuilder builder = new CatalogSearchIndexBuilder(new CatalogDocumentMapper());
 
     @Test
+    void searchesVisibleDescriptionTextAcrossFormattingBoundaries() {
+        var entry = dataset("markdown", "Test", "Gemeinde**nummer** und `messwert`\n\n- *Wasserqualität*",
+                AGI, REGI, LocalDate.of(2026, 10, 6), List.of(), List.of());
+        try (var index = builder.build(List.of(entry))) {
+            assertThat(index.search("gemeindenummer messwert wasserqualität"))
+                    .extracting(SearchHit::entryId).containsExactly("markdown");
+        }
+    }
+
+    @Test
+    void seriesIsFoundByFormattedCurrentAndHistoricalIssueDescriptions() {
+        var current = new DatasetIssueEntry("current", "Aktuell", "Aktuelle**messung**", AGI, AGI,
+                List.of(REGI), List.of(), LocalDate.of(2026, 10, 6), AccessLevel.OPEN, List.of(), "2026", true);
+        var historical = new DatasetIssueEntry("historical", "Archiv", "Historische**messung**", AGI, AGI,
+                List.of(REGI), List.of(), LocalDate.of(2025, 10, 6), AccessLevel.OPEN, List.of(), "2025", false);
+        var series = new DatasetSeriesEntry("markdown-series", "Serie", "Serie", AGI, AGI,
+                List.of(REGI), List.of(), AccessLevel.OPEN, List.of(current, historical));
+        try (var index = builder.build(List.of(series))) {
+            assertThat(index.search("aktuellemessung")).extracting(SearchHit::entryId).containsExactly("markdown-series");
+            assertThat(index.search("historischemessung")).extracting(SearchHit::entryId).containsExactly("markdown-series");
+            assertThat(index.documentCount()).isEqualTo(1);
+        }
+    }
+
+    @Test
     void exactIdentifierRanksAheadOfOtherMatches() {
         try (CatalogSearchIndex index = index()) {
             assertThat(index.search("gemeindegrenzen"))

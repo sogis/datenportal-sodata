@@ -1059,7 +1059,8 @@ public final class XtfPublishedCatalogParser implements PublishedCatalogParser {
         Catalog toDomain() {
             return new Catalog(
                     datasets.stream().map(RawDataset::toDomain).toList(),
-                    datasetSeries.stream().map(RawSeries::toDomain).toList());
+                    datasetSeries.stream().map(RawSeries::toDomain).toList(),
+                    Optional.ofNullable(description));
         }
     }
 

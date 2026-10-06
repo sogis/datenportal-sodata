@@ -30,6 +30,25 @@ class XtfPublishedCatalogParserTest {
     private static final PublishedCatalogParser PARSER = new XtfPublishedCatalogParser();
 
     @Test
+    void preservesCatalogAndDatasetMarkupAndInteriorLineBreaks() throws Exception {
+        String description = "Das Attribut `gemeinde_nr`.\n**Hinweise:**\n\n- Wert `2401`";
+        var factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        var document = factory.newDocumentBuilder().parse(
+                new ByteArrayInputStream(fixtureXml().getBytes(StandardCharsets.UTF_8)));
+        var descriptions = document.getElementsByTagNameNS("*", "description");
+        descriptions.item(0).setTextContent(description);
+        descriptions.item(1).setTextContent(description);
+        var output = new StringWriter();
+        TransformerFactory.newInstance().newTransformer().transform(new DOMSource(document), new StreamResult(output));
+        Catalog catalog = parseXml(output.toString());
+
+        assertThat(catalog.description()).contains(description);
+        assertThat(catalog.publishedView().description()).contains(description);
+        assertThat(catalog.datasets().getFirst().description()).isEqualTo(description);
+    }
+
+    @Test
     void parsesFullFixtureWithExpectedCounts() throws Exception {
         Catalog catalog = parseFixture();
 

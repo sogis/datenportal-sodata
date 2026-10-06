@@ -36,9 +36,9 @@ class ResultsVmFactoryTest {
         var fiftyWordCard = card(dataset("dataset.50", fiftyWords));
         var fiftyOneWordCard = card(dataset("dataset.51", fiftyWords + " Wort51"));
 
-        assertThat(fiftyWordCard.description()).isEqualTo(fiftyWords);
+        assertThat(fiftyWordCard.description().plainText()).isEqualTo(fiftyWords);
         assertThat(fiftyWordCard.descriptionTruncated()).isFalse();
-        assertThat(fiftyOneWordCard.description()).isEqualTo(fiftyWords);
+        assertThat(fiftyOneWordCard.description().plainText()).isEqualTo(fiftyWords);
         assertThat(fiftyOneWordCard.descriptionTruncated()).isTrue();
 
         var html = renderCard(fiftyWordCard);

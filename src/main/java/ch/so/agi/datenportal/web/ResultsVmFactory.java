@@ -5,6 +5,7 @@ import ch.so.agi.datenportal.catalog.domain.DatasetIssueEntry;
 import ch.so.agi.datenportal.catalog.domain.DatasetSeriesEntry;
 import ch.so.agi.datenportal.catalog.domain.DistributionLink;
 import ch.so.agi.datenportal.search.SearchResult;
+import ch.so.agi.datenportal.support.metadata.MetadataTextRenderer;
 import ch.so.agi.datenportal.web.view.AccessStateVm;
 import ch.so.agi.datenportal.web.view.EntryCardVm;
 import ch.so.agi.datenportal.web.view.DownloadLinkVm;
@@ -47,7 +48,7 @@ public final class ResultsVmFactory {
         return new EntryRowVm(
                 entry.identifier(),
                 entry.title(),
-                entry.description(),
+                MetadataTextRenderer.compact(entry.description()),
                 entry.type().label(),
                 themeLabel(entry),
                 DATE_FORMATTER.format(entry.modified()),
@@ -69,7 +70,7 @@ public final class ResultsVmFactory {
         return new IssueRowVm(
                 issue.identifier(),
                 issue.title(),
-                issue.description(),
+                MetadataTextRenderer.compact(issue.description()),
                 issue.type().label(),
                 DATE_FORMATTER.format(issue.modified()),
                 issueDetailHref(series, issue),
@@ -80,11 +81,11 @@ public final class ResultsVmFactory {
     }
 
     private EntryCardVm card(CatalogEntry entry) {
-        var descriptionPreview = CardDescriptionPreview.from(entry.description());
+        var descriptionPreview = MetadataTextRenderer.preview(entry.description(), 50);
         return new EntryCardVm(
                 entry.identifier(),
                 entry.title(),
-                descriptionPreview.text(),
+                descriptionPreview.content(),
                 descriptionPreview.truncated(),
                 entry.type().label(),
                 accessState(entry),

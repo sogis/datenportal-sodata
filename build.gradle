@@ -97,6 +97,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'gg.jte:jte-spring-boot-starter-4:3.2.4'
+    implementation 'org.commonmark:commonmark:0.30.0'
 
     implementation "org.apache.lucene:lucene-core:${luceneVersion}"
     implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"

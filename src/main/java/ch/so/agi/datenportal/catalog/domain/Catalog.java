@@ -2,14 +2,21 @@ package ch.so.agi.datenportal.catalog.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public record Catalog(
         List<DatasetEntry> datasets,
-        List<DatasetSeriesEntry> datasetSeries) {
+        List<DatasetSeriesEntry> datasetSeries,
+        Optional<String> description) {
+
+    public Catalog(List<DatasetEntry> datasets, List<DatasetSeriesEntry> datasetSeries) {
+        this(datasets, datasetSeries, Optional.empty());
+    }
 
     public Catalog {
         datasets = List.copyOf(datasets);
         datasetSeries = List.copyOf(datasetSeries);
+        description = description == null ? Optional.empty() : description.filter(text -> !text.isBlank());
     }
 
     /** Build the public view only after validating the complete source catalog. */
@@ -28,7 +35,7 @@ public record Catalog(
             }
         }
         return new Catalog(datasets.stream().filter(dataset -> isPublished(dataset.metadata())).toList(),
-                visibleSeries);
+                visibleSeries, description);
     }
 
     private static boolean isPublished(CatalogEntryMetadata metadata) {
