@@ -21,22 +21,30 @@ Standard-URLs:
 
 ## An den lokalen Dev-Stack anschliessen
 
-Zuerst Garage/Jenkins initialisieren, sodass `current.json` öffentlich lesbar
-ist. Die vollständige Reihenfolge steht in der
+Im Dev-Stack `./scripts/up.sh` verwenden. Der gemeinsame Start richtet
+Garage ein, seedet erfolgreich, erzeugt bei HTTP 404 den lokalen Erstbestand
+und startet danach das Portal. Ein bestehender Publikationsstand wird geprüft
+und erhalten. Die vollständige Reihenfolge steht in der
 [Stack-Inbetriebnahme](https://codeberg.org/edigonzales/datenportal-dev-stack/src/branch/main/docs/biblios/inbetriebnahme.adoc).
 
-Im Dev-Stack läuft das Portal als Compose-Service `sodata` auf Host-Port 8082:
+Im Dev-Stack läuft das Portal als Compose-Service `sodata` hinter APISIX unter `http://localhost:8081/`:
 
 - Der Stack baut das Image lokal aus diesem Repository
   (`./scripts/up.sh --local-sodata`) oder verwendet ein Registry-Image mit
   lokalem Fallback.
-- Compose setzt die Manifestadresse intern (`http://downloads:8081/...`), die
+- Compose setzt die Manifestadresse intern (`http://jenkins:8081/ch.so.daten/current.json`), die
   öffentliche Downloadbasis auf dem Host-Port und DuckDB auf `source-type=manifest`.
 - Derselbe `.env`-Wert `DATENPORTAL_PORTAL_RELOAD_TOKEN` versorgt Jenkins und
   den Portal-Container; die frühere Host-Gateway-Adresse entfällt.
-- Vor der ersten Veröffentlichung fehlt `current.json`. Der Dev-Stack startet
-  Sodata in diesem Zustand nicht. Nach der administrativen Erstpublikation wird
-  der Container mit den lokalen Compose-Overrides gestartet.
+- Der normale Start übernimmt die lokale Erstpublikation und startet Sodata
+  danach automatisch mit den gewählten Compose-Overrides. Vor dem Start werden
+  Manifest und referenzierte Artefakte geprüft.
+- Ein fehlender Reload-Token wird in der ignorierten Stack-`.env` erzeugt;
+  bestehende Secrets bleiben erhalten. Der Start prüft den geschützten
+  `/admin/catalog/status` intern, ohne einen Reload auszulösen.
+- Jeder erneute Stackstart seedet neu. Er publiziert keine späteren
+  Repository-Änderungen automatisch; dafür weiterhin eine Lieferung oder einen
+  gezielten Repository-Abgleich ausführen.
 
 Details und Grenzen: [Container-Deployment](container-deployment.md).
 
@@ -57,8 +65,7 @@ werden; bei Reload bleibt der alte Zustand erhalten.
 
 ### Alternative: Start als Hostprozess
 
-Ohne Container und mit JDK 25 im Portal-Repository starten (Port 8082 darf dann
-nicht durch den Compose-Service belegt sein):
+Alternativ mit JDK 25 im Portal-Repository auf freiem Host-Port 8082 starten:
 
 ```bash
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082 --datenportal.catalog.source-type=manifest --datenportal.catalog.http-url=http://localhost:8081/ch.so.daten/current.json --datenportal.catalog.download-url=http://localhost:8081/ch.so.daten --datenportal.catalog.duckdb.source-type=manifest --datenportal.catalog.duckdb.classpath-location='
@@ -67,7 +74,10 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082 --date
 Dann muss der Reload-Token weiterhin extern als `DATENPORTAL_ADMIN_RELOAD_TOKEN`
 gesetzt und Jenkins auf eine erreichbare Hostadresse konfiguriert werden. Der
 Reload ändert weder Quellkonfiguration noch Startport. Die folgenden
-Standalone-Beispiele verwenden Port 8080; im Stack entsprechend 8082 einsetzen.
+Standalone-Beispiele verwenden Port 8080. Im Compose-Stack Health und
+Admin-Endpunkte intern aufrufen, beispielsweise mit
+`docker compose exec -T jenkins curl -fS http://sodata:8080/actuator/health`.
+APISIX sperrt diese Endpunkte öffentlich mit HTTP 403.
 
 ## Health und Info
 

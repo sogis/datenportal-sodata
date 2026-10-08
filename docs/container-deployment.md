@@ -266,7 +266,7 @@ werden sie als Umgebungsvariablen übergeben (Spring-Boot-Relaxed-Binding):
 | `SPRING_PROFILES_ACTIVE` | nur für Host-`bootRun`; im Container nicht verwenden (JTE-Development-Mode erwartet Template-Quellen aus dem Checkout) |
 | `DATENPORTAL_ADMIN_RELOAD_TOKEN` | Token für `/admin/catalog/reload` und `/admin/catalog/status`; ohne Wert antworten die Endpunkte `503` |
 | `DATENPORTAL_CATALOG_SOURCE_TYPE` | `manifest` im Stackbetrieb; alternativ `classpath`, `http`, `file` |
-| `DATENPORTAL_CATALOG_HTTP_URL` | Manifestadresse, im Compose-Netz z. B. `http://downloads:8081/ch.so.daten/current.json` |
+| `DATENPORTAL_CATALOG_HTTP_URL` | Manifestadresse, im Compose-Netz z. B. `http://jenkins:8081/ch.so.daten/current.json` |
 | `DATENPORTAL_CATALOG_DOWNLOAD_URL` | öffentlich erreichbare Downloadbasis für den Browser, z. B. `http://localhost:8081/ch.so.daten` |
 | `DATENPORTAL_CATALOG_DUCKDB_SOURCE_TYPE` | `manifest` (gemeinsam mit XTF), `classpath` (Fixtures), `file` oder `http` |
 | `DATENPORTAL_CATALOG_DUCKDB_CLASSPATH_LOCATION` | `catalog.duckdb` für die gebündelte Fixture |
@@ -288,15 +288,18 @@ docker run --rm -p 18082:8080 \
 
 Der Dev-Stack startet die Anwendung als Compose-Service `sodata`:
 
-- Host-Port `8082` auf Container-Port `8080`
-- Manifest intern über `http://downloads:8081/...`, öffentliche Downloadbasis
-  über den Host-Port
-- Reload-Token kommt aus derselben lokalen `.env` wie der Jenkins-Aufruf
-- vor der ersten Veröffentlichung startet der Dev-Stack den Sodata-Container
-  nicht, wenn `current.json` mit HTTP 404 fehlt; die Erstpublikation muss zuerst
-  über den dokumentierten Jenkins-/Bootstrap-Ablauf erfolgen
-- nach der Erstpublikation wird Sodata mit denselben Compose-Overrides explizit
-  gestartet und auf seinen Healthcheck geprüft
+- Öffentlicher Einstieg über APISIX auf `http://localhost:8081/`; Sodata hat
+  keinen eigenen Host-Port und verwendet intern Port `8080`.
+- Manifest intern über `http://jenkins:8081/ch.so.daten/current.json`,
+  öffentliche Downloadbasis `http://localhost:8081/ch.so.daten`.
+- `scripts/up.sh` führt einen erfolgreichen Seed aus, erzeugt den lokalen
+  Erstbestand bei HTTP 404 und startet danach Sodata automatisch.
+- Vorhandene Manifeste werden samt XTF-/DuckDB-Artefakten geprüft und erhalten;
+  Altmanifest ohne DuckDB oder beschädigter Bestand ist ein Fehler.
+- Ein fehlender gemeinsamer Reload-Token wird lokal in der ignorierten `.env`
+  erzeugt. Start prüft Health und den geschützten Portalstatus intern.
+- Für bewusste Migration den Stack mit `--infrastructure-only` vorbereiten
+  und den bestehenden administrativen Initialaufbau verwenden.
 
 Details, Startoptionen und die Reihenfolge nach der Erstpublikation stehen in
 der Stack-Dokumentation
@@ -341,12 +344,12 @@ Die konkreten Deployment-, Secret-, Registry- und Zeitparameter gehören in
 das zuständige OpenShift-/Inbetriebnahme-Repository. Dieses Repository liefert
 keine konkreten OpenShift-Manifeste.
 
-Nach der administrativen Initialpublikation kann ein laufender lokaler
-Container so geprüft werden:
+Nach dem vollständigen Stackstart den Container intern prüfen; öffentlich
+sperrt APISIX Actuator und Admin-Endpunkte:
 
 ```bash
-curl -fS http://localhost:8082/actuator/health/liveness
-curl -fS http://localhost:8082/actuator/health/readiness
+docker compose exec -T jenkins curl -fS http://sodata:8080/actuator/health/liveness
+docker compose exec -T jenkins curl -fS http://sodata:8080/actuator/health/readiness
 ```
 
 ## Native Image und JVM-Fallback
@@ -368,7 +371,7 @@ ab, damit neu hinzukommende Templates ebenfalls im Native-Image funktionieren.
 |---|---|
 | Container startet wiederholt neu | Manifestadresse und `current.json` prüfen; Logs mit `docker compose logs sodata` bzw. `docker logs <container>` |
 | Healthcheck bleibt `unhealthy`, Anwendung läuft | Startzeit verkürzen/`start-period` prüfen; `/actuator/health/liveness` direkt mit `curl` testen |
-| Port belegt | Host-Port `8082` frei machen oder `SODATA_PORT` ändern |
+| Port belegt | Im Stack `GARAGE_PUBLIC_PORT` (Default 8081) prüfen; bei Standalone-Containern das gewählte `-p`-Mapping |
 | Reload `503` | `DATENPORTAL_ADMIN_RELOAD_TOKEN` im Container leer |
 | Reload `401` | Token stimmt nicht mit Jenkins `DATENPORTAL_PORTAL_RELOAD_TOKEN` überein |
 | Erkunden zeigt falsche/fehlende Tabellen | Manifestgeneration, Reload und View-Erzeugung im GRETL-Job prüfen; offene Playgrounds neu laden |

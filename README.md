@@ -73,9 +73,12 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun --args='--server.port=8082'
 ```
 
 Der Standardstart verwendet gebündelte Fixtures. Im lokalen Gesamtstack
-(`datenportal-dev-stack`) läuft das Portal als Container auf **8082** mit
-gemeinsamer Manifestquelle für XTF und DuckDB; der Stack baut und startet das
-Image aus diesem Repository. Die Host-Variante bleibt als Alternative
+(`datenportal-dev-stack`) läuft das Portal hinter APISIX unter
+`http://localhost:8081/`, mit gemeinsamer Manifestquelle für XTF und DuckDB.
+`scripts/up.sh` im Stack richtet Garage ein, wartet auf einen erfolgreichen
+Seed, erzeugt bei einem frischen lokalen Bestand die Erstpublikation und startet
+das Portal. Veröffentlichte Images werden verwendet; `--local-sodata` baut
+dieses Repository. Ein fehlender gemeinsamer Reload-Token wird lokal erzeugt. Die Host-Variante bleibt als Alternative
 dokumentiert in [Betrieb](docs/operations.md#an-den-lokalen-dev-stack-anschliessen).
 
 Container-Schnellstart mit den gebündelten Fixtures:
