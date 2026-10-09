@@ -9,6 +9,8 @@ plugins {
 graalvmNative {
     binaries {
         main {
+            // Deploy the same image on nodes with different CPU feature sets.
+            buildArgs.add('-march=compatibility')
             buildArgs.add('--initialize-at-run-time=org.apache.lucene.util.AttributeFactory')
         }
     }

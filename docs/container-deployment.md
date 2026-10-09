@@ -86,6 +86,28 @@ Der erste Build lädt Gradle-, npm- und WebR-Abhängigkeiten und dauert deshalb
 länger. BuildKit-Cache-Mounts halten Gradle- und npm-Cache zwischen Builds
 erhalten; ein erneuter Build nach einer Quelländerung nutzt sie.
 
+### CPU-Kompatibilität des Native-Images
+
+`graalvmNative.binaries.main` setzt in `build.gradle` fest
+`-march=compatibility`. Diese Vorgabe gilt für den direkten `nativeCompile`,
+den Docker-Build und beide CI-Architekturen. Native Image erzeugt damit Code
+für die kompatible CPU-Basis der jeweiligen Architektur. Betriebssystem,
+Architektur und Anforderungen der UBI-9-Laufzeitbasis müssen weiterhin zum
+Deployment passen.
+
+Ohne diese Vorgabe verwendet GraalVM 25 auf AMD64 standardmässig
+`x86-64-v3`. Ein solcher Build kann beim Start auf OpenShift-Nodes mit älteren
+oder durch die Virtualisierung eingeschränkten CPU-Funktionen abbrechen:
+`The current machine does not support all of the following CPU features`.
+Insbesondere AVX-/AVX2-Funktionen können fehlen. Die portable Vorgabe ist in
+den [GraalVM-25-Buildoptionen](https://www.graalvm.org/jdk25/reference-manual/native-image/overview/Options/)
+dokumentiert.
+
+Die Einstellung wirkt beim Kompilieren. Ein bereits veröffentlichtes Image
+wie `0.1.11` enthält weiterhin das bisherige Binary. Für den Fix das Image
+neu bauen und mit einem neuen Versions-Tag beziehungsweise Digest deployen;
+eine Laufzeit-Umgebungsvariable repariert das bestehende Binary nicht.
+
 ## Veröffentlichte Images
 
 Der Workflow `.github/workflows/container-image.yml` baut beide Images für
@@ -365,10 +387,41 @@ Laufzeit dynamisch und ruft deren `renderMap`-Methode reflektiv auf. Der
 Hint-Registrar leitet die Templateklassen aus den generierten `.class`-Dateien
 ab, damit neu hinzukommende Templates ebenfalls im Native-Image funktionieren.
 
+## Kompatibilität mit `0.1.11` und dem OpenShift-Stack
+
+Vergleichsstand: Portal-Commit `49ef7af`, OpenShift-Stack-Commit `28a281d`.
+Das veröffentlichte Portalimage `sogis/datenportal-sodata:0.1.11` verweist für
+AMD64 und ARM64 auf Commit `5214dfa`. Seit diesem Stand kamen
+Datumsdarstellung in Charts, eingeschränktes Markdown und Drucklayouts hinzu.
+Diese Änderungen erfordern keine Migration der Stack-Schnittstellen.
+
+Der Abgleich mit `datenportal-stack/deploy/base/sodata.yaml`, der internen
+Jenkins-Reload-Konfiguration und dem APISIX-Gateway bestätigt folgende
+Betriebsverträge:
+
+- Container-Port `8080` und die bestehenden `DATENPORTAL_CATALOG_*`-
+  beziehungsweise `DATENPORTAL_ADMIN_RELOAD_TOKEN`-Umgebungsvariablen.
+- Manifest `schemaVersion: 1` mit `releaseId`, `datasheets`, `catalog` und
+  `duckdb`; XTF und DuckDB werden aus derselben Veröffentlichung geladen.
+  `catalog: null` bleibt mit gültiger DuckDB eine zulässige leere Erstlieferung.
+- Interner `POST /admin/catalog/reload` mit `X-Reload-Token` und atomarem
+  Austausch; ein Fehler erhält den vorherigen Katalog und Suchindex.
+- `/actuator/health/liveness` und `/actuator/health/readiness` für die
+  OpenShift-Probes; APISIX sperrt die öffentlichen Admin-/Actuator-Pfade.
+- Explore-Kontextversion `4` mit denselben JSON-Feldern; Markdown-Beschreibungen
+  werden dort als Klartext ausgegeben.
+
+Die gezielten Tests für Konfiguration, Manifestauflösung, Reload, Admin/Health
+und Katalog-Artefakte bestätigen diese Verträge. Das ist ein Schnittstellen-
+und Testabgleich, keine Live-Abnahme des OpenShift-Stacks. Nach dem Deployment
+des neu gebauten Images auf den betroffenen Nodes sind der Start ohne
+CPU-Fehler, erfolgreiche Probes und Katalog-/Explore-Seiten zu prüfen.
+
 ## Fehlerdiagnose
 
 | Symptom | Prüfung |
 |---|---|
+| Native-Binary meldet fehlende CPU-Funktionen | Mit `-march=compatibility` neu bauen und neuen Image-Tag/Digest deployen; bestehende Images enthalten die alte CPU-Vorgabe |
 | Container startet wiederholt neu | Manifestadresse und `current.json` prüfen; Logs mit `docker compose logs sodata` bzw. `docker logs <container>` |
 | Healthcheck bleibt `unhealthy`, Anwendung läuft | Startzeit verkürzen/`start-period` prüfen; `/actuator/health/liveness` direkt mit `curl` testen |
 | Port belegt | Im Stack `GARAGE_PUBLIC_PORT` (Default 8081) prüfen; bei Standalone-Containern das gewählte `-p`-Mapping |
