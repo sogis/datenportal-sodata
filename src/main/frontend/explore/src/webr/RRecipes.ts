@@ -102,6 +102,14 @@ export function buildRRecipes(snapshot: SqlResultSnapshot | undefined, dataFrame
     recipes.push(timeCountRecipe(time, dataFrameName));
   }
 
+  if (snapshot.columns.some((column) => column.geometry)) {
+    const mapBase = `library(sf)\nlibrary(ggplot2)\nggplot(${dataFrameName})`;
+    recipes.unshift({id: 'map', title: 'Karte', code: `${mapBase} +\n  geom_sf(fill = NA, color = "${SINGLE_PLOT_COLOR}", linewidth = 0.3) +\n  coord_sf(datum = NA) + theme_void()`});
+    for (const column of [measure, category].filter((value): value is SnapshotColumn => Boolean(value))) {
+      const aes = `aes(fill = .data[[${rString(column.name)}]], color = .data[[${rString(column.name)}]])`;
+      recipes.push({id: `map-${column.name}`, title: `Karte nach «${column.name}»`, code: `${mapBase} +\n  geom_sf(${aes}, linewidth = 0.3) +\n  coord_sf(datum = NA) + theme_void()`});
+    }
+  }
   return recipes;
 }
 

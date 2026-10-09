@@ -24,6 +24,11 @@ public record ExploreContextDto(
         boolean webREnabled,
         ExploreRLaboratoryDto rLaboratory) {
 
+    @com.fasterxml.jackson.annotation.JsonProperty("map")
+    public ExploreMapDto map() {
+        return ExploreMapDto.defaults();
+    }
+
     public ExploreContextDto {
         description = description == null ? Optional.empty() : description.filter(value -> !value.isBlank());
         updatedAt = updatedAt == null ? Optional.empty() : updatedAt.filter(value -> !value.isBlank());

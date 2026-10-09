@@ -1,3 +1,4 @@
+import type {ResultGeometry} from '../geometry/resultGeometry';
 import type {Table} from 'apache-arrow';
 import type {ExploreChartConfigDto} from '../app/ExploreContext';
 import type {ExploreQueryErrorKind} from '../app/ExploreRuntimeError';
@@ -14,6 +15,7 @@ export interface QueryResultState {
   durationMs?: number;
   maxRowsApplied?: boolean;
   arrowTable?: Table;
+  geometries?: ResultGeometry[];
   preferredChart?: ExploreChartConfigDto;
   errorKind?: ExploreQueryErrorKind;
   error?: string;

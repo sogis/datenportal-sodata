@@ -29,6 +29,8 @@ class ExplorePageControllerMvcTest {
                 .andExpect(header().string(
                         "Content-Security-Policy",
                         containsString("script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'")))
+                .andExpect(header().string("Content-Security-Policy",
+                        containsString("img-src 'self' data: https://geo.so.ch")))
                 .andExpect(content().string(containsString("<so-header")))
                 .andExpect(content().string(containsString("<so-breadcrumb>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets/ch.so.bauinventar\">Bauinventar</so-breadcrumb-item>")))
@@ -59,7 +61,7 @@ class ExplorePageControllerMvcTest {
         mockMvc.perform(get("/datasets/ch.so.bauinventar/explore/context.json"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, containsString("no-cache")))
-                .andExpect(jsonPath("$.version").value(4))
+                .andExpect(jsonPath("$.version").value(5))
                 .andExpect(jsonPath("$.datasetId").value("ch.so.bauinventar"))
                 .andExpect(jsonPath("$.title").value("Bauinventar"))
                 .andExpect(jsonPath("$.canonicalUrl").value("/datasets/ch.so.bauinventar"))
@@ -110,7 +112,7 @@ class ExplorePageControllerMvcTest {
         mockMvc.perform(get("/series/ch.so.abstimmungsresultate/issues/current/explore/context.json"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, containsString("no-cache")))
-                .andExpect(jsonPath("$.version").value(4))
+                .andExpect(jsonPath("$.version").value(5))
                 .andExpect(jsonPath("$.datasetId").value("ch.so.abstimmungsresultate_2026"))
                 .andExpect(jsonPath("$.title").value("Abstimmungsresultate 2026"))
                 .andExpect(jsonPath("$.canonicalUrl").value("/series/ch.so.abstimmungsresultate/issues/current"))

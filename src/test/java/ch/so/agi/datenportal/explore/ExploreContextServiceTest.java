@@ -53,7 +53,7 @@ class ExploreContextServiceTest {
 
         ExploreContextDto context = service.buildContext("ch.so.gemeinden");
 
-        assertThat(context.version()).isEqualTo(4);
+        assertThat(context.version()).isEqualTo(5);
         assertThat(context.datasetId()).isEqualTo("ch.so.gemeinden");
         assertThat(context.canonicalUrl()).isEqualTo("/datasets/ch.so.gemeinden");
         assertThat(context.catalogDatabase().url())

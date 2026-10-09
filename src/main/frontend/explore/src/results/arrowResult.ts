@@ -1,3 +1,4 @@
+import {geometryColumns} from '../geometry/resultGeometry';
 import type {Table} from 'apache-arrow';
 import type {QueryResultState} from './queryResultTypes';
 
@@ -31,6 +32,7 @@ export function successfulQueryResult(args: {
     rowCount: args.table.numRows,
     durationMs: args.durationMs,
     maxRowsApplied: args.maxRowsApplied,
+    geometries: geometryColumns(args.table),
     arrowTable: args.table
   };
 }

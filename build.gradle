@@ -246,6 +246,7 @@ tasks.register('playwrightTest', Test) {
     dependsOn tasks.named('installPlaywrightChromium')
     dependsOn tasks.named('installPlaywrightFirefox')
     environment 'PLAYWRIGHT_BROWSERS_PATH', playwrightBrowsersPath
+    systemProperty 'datenportal.playwright.liveWmts', System.getProperty('datenportal.playwright.liveWmts', 'false')
     if (System.getProperty('datenportal.playwright.webr') != null) {
         systemProperty 'datenportal.playwright.webr', System.getProperty('datenportal.playwright.webr')
     }

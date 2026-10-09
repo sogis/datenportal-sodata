@@ -89,7 +89,7 @@ public final class ExploreContextService {
         String canonicalUrl) {
         List<ExploreTableDto> tables = properties.enabled() ? tableService.buildTables(entry) : List.of();
         return new ExploreContextDto(
-                4,
+                5,
                 entry.identifier(),
                 entry.title(),
                 Optional.of(MetadataTextRenderer.plainText(entry.description())),

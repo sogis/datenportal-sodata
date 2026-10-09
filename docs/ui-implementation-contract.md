@@ -911,6 +911,26 @@ Keine rote Hervorhebung für `Datenreihe`.
 
 ---
 
+### 9.7 Karten im SQL- und R-Labor
+
+- Das SQL-Ergebnis bietet neben Tabelle und Diagramm die Ansicht `Karte`.
+- Darstellung in LV95 / EPSG:2056 mit OpenLayers, unabhängig von numerischen
+  Kennzahlen. Punkte, Linien, Polygone und deren Multi-Varianten sind zulässig.
+- Geometriespalte, Tooltip und Farbspalte sind wählbar. Numerische Attribute
+  erhalten einen Verlauf, Kategorien diskrete Farben mit sichtbarer Legende.
+- Die kantonale WMTS-Hintergrundkarte ist standardmässig aktiv und abschaltbar.
+  Attribution bleibt sichtbar. Zoomen, Verschieben und «Auf Ergebnis zoomen»
+  sind verfügbar. Attribut-/Hintergrundwechsel erhalten den Kartenausschnitt.
+- NULL, leere Geometrien, SQL-Begrenzungen und Geometriefehler werden benannt.
+  Karten übernehmen das Diagrammlimit von 500 Zeilen nicht.
+- PNG exportiert den aktuellen Ausschnitt, Legende und Quellenhinweis.
+  Fehlende Hintergrundkacheln verhindern einen irreführend vollständigen Export.
+- Nach R übernommene Geometrien ergeben ein sf-Objekt mit Kartenrezepten.
+  R-Karten erscheinen in der bestehenden statischen Plot-Ausgabe.
+- Controls folgen den vorhandenen Explore-Primitiven und umbrechen bei wenig Platz.
+
+---
+
 ## 10. Controller und Methoden
 
 ### 10.1 Query-Parameter

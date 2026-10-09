@@ -87,6 +87,157 @@ class ExploreIslandParquetPlaywrightTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"chromium", "firefox"})
+    void municipalityWkbRendersInLv95AndExportsWithBackground(String engine) throws Exception {
+        Browser mapBrowser = engine.equals("firefox") ? playwright.firefox().launch(new BrowserType.LaunchOptions().setHeadless(true)) : browser;
+        try (BrowserContext context = mapBrowser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 1000))) {
+            // Keep this test deterministic; the live service is checked separately.
+            var tile = new java.io.ByteArrayOutputStream();
+            ImageIO.write(new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB), "png", tile);
+            List<String> tileRequests = new ArrayList<>();
+            context.onRequest(request -> {
+                if (request.url().startsWith("https://geo.so.ch/")) tileRequests.add(request.url());
+            });
+            if (!Boolean.getBoolean("datenportal.playwright.liveWmts")) {
+                context.route("https://geo.so.ch/**", route -> route.fulfill(
+                        new com.microsoft.playwright.Route.FulfillOptions().setContentType("image/png")
+                                .setHeaders(Map.of("Access-Control-Allow-Origin", "*")).setBodyBytes(tile.toByteArray())));
+            }
+            Page page = context.newPage();
+            List<String> errors = collectBrowserErrors(page);
+            prepareMunicipalityResult(page, errors);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Karte").setExact(true)).click();
+            try {
+                page.waitForSelector("[aria-label='SQL Karte'] :text('106 Geometrien')");
+            } catch (TimeoutError error) {
+                throw new AssertionError("Map failed: " + page.locator("body").innerText() + " Errors: " + errors, error);
+            }
+            assertThat(page.locator("[aria-label='Geometriespalte']").inputValue()).isEqualTo("6");
+            assertThat(page.locator("[aria-label='Karte in LV95'] canvas").count()).isPositive();
+            page.locator("[aria-label='Farbspalte']").selectOption("bezirksname");
+            assertThat(page.locator("[aria-label='Kartenlegende']").innerText()).contains("Lebern", "Wasseramt");
+            Download png = page.waitForDownload(() -> page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Karte als PNG herunterladen")).click());
+            BufferedImage exported = ImageIO.read(png.path().toFile());
+            assertThat(exported.getWidth()).isGreaterThan(500);
+            assertThat(exported.getHeight()).isGreaterThan(300);
+            assertThat(tileRequests).isNotEmpty().allMatch(url -> url.contains("/default/2056/"));
+            if (!Boolean.getBoolean("datenportal.playwright.liveWmts")) {
+                page.getByLabel("Hintergrundkarte", new Page.GetByLabelOptions().setExact(true)).uncheck();
+            }
+            Path screenshot = Path.of("build/screenshots/lv95-gemeinden.png");
+            Files.createDirectories(screenshot.getParent());
+            page.locator("[aria-label='SQL Karte']").screenshot(new Locator.ScreenshotOptions().setPath(screenshot));
+            assertThat(errors).isEmpty();
+        } finally {
+            if (mapBrowser != browser) mapBrowser.close();
+        }
+    }
+
+    @Test
+    void municipalityWkbTransfersToSfAndDrawsInRealWebR() {
+        Assumptions.assumeTrue(Boolean.getBoolean("datenportal.playwright.webr"), "Real WebR is opt-in.");
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 1000))) {
+            Page page = context.newPage();
+            List<String> errors = collectBrowserErrors(page);
+            List<String> requests = collectWebRRequests(page);
+            List<String> responses = collectWebRResponses(page);
+            List<String> failures = collectWebRRequestFailures(page);
+            List<String> workers = collectWebRWorkerEvents(page);
+            prepareMunicipalityResult(page, errors);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Nach R übernehmen")).click();
+            waitForWebRDataFrame(page, errors, requests, responses, failures, workers);
+            page.getByLabel("R-Rezept auswählen").selectOption("map");
+            String recipe = page.getByLabel("R bearbeiten").inputValue();
+            page.getByLabel("R bearbeiten").fill("stopifnot(inherits(daten, 'sf'), nrow(daten) == 106, "
+                    + "sf::st_crs(daten)$epsg == 2056, nrow(sf::st_coordinates(daten)) == 55559, "
+                    + "length(attr(daten, 'datenportal_geometry_wkb')$geometry) == 106)\n" + recipe);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("R ausführen")).click();
+            page.waitForSelector("[aria-label='Aktueller R Plot']", new Page.WaitForSelectorOptions().setTimeout(120_000));
+            assertThat(page.locator("[aria-label='R Konsole']").innerText()).doesNotContain("Error in");
+            assertThat(errors).isEmpty();
+        }
+    }
+
+    @Test
+    void mapKeepsMoreThan500FeaturesAndExplainsNullEmptyAndInvalidWkb() {
+        try (BrowserContext context = browser.newContext()) {
+            // Deliberate tile failure must not prevent the vector result.
+            context.route("https://geo.so.ch/**", route -> route.fulfill(
+                    new com.microsoft.playwright.Route.FulfillOptions().setStatus(503)));
+            Page page = context.newPage();
+            prepareSqlResult(page, new ArrayList<>(), "select case when i=0 then NULL when i=1 then 'POINT EMPTY'::GEOMETRY "
+                    + "else ('POINT(' || (2610000+i*10) || ' 1240000)')::GEOMETRY end as renamed from range(503) t(i)");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Karte").setExact(true)).click();
+            page.waitForSelector("[aria-label='SQL Karte'] :text('501 Geometrien · 1 NULL · 1 leer')");
+            page.waitForSelector("[aria-label='SQL Karte'] :text('Hintergrundkarte nicht vollständig verfügbar')");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Karte als PNG herunterladen")).click();
+            page.waitForSelector("[aria-label='SQL Karte'] [role='alert']:has-text('Hintergrundkacheln fehlen')");
+            prepareSqlResult(page, new ArrayList<>(), "select from_hex('010100') as bad_wkb");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Karte").setExact(true)).click();
+            page.getByLabel("Geometriespalte").selectOption("0");
+            page.waitForSelector("[aria-label='SQL Karte'] [role='alert']:has-text('Zeile 1')");
+        }
+    }
+
+    @Test
+    void mapMultipleGeometriesRetainNullEmptyAndHolesInRealWebR() {
+        Assumptions.assumeTrue(Boolean.getBoolean("datenportal.playwright.webr"), "Real WebR is opt-in.");
+        try (BrowserContext context = browser.newContext()) {
+            context.route("https://geo.so.ch/**", route -> route.abort());
+            Page page = context.newPage();
+            prepareSqlResult(page, new ArrayList<>(), "select case i when 0 then NULL when 1 then 'POLYGON EMPTY'::GEOMETRY "
+                    + "else 'POLYGON((2600000 1200000,2600010 1200000,2600010 1200010,2600000 1200000),"
+                    + "(2600002 1200001,2600003 1200001,2600003 1200002,2600002 1200001))'::GEOMETRY end as renamed, "
+                    + "'MULTIPOINT((2600000 1200000),(2600020 1200020))'::GEOMETRY as secondary from range(3) t(i)");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Karte").setExact(true)).click();
+            page.getByLabel("Geometriespalte").selectOption("1");
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("Nach R übernehmen")).click();
+            waitForWebRDataFrame(page, List.of(), List.of(), List.of(), List.of(), List.of());
+            page.getByLabel("R bearbeiten").fill("""
+                    stopifnot(inherits(daten, 'sf'), nrow(daten) == 3,
+                      attr(daten, 'sf_column') == 'secondary',
+                      inherits(daten$renamed, 'sfc'), sf::st_crs(daten)$epsg == 2056,
+                      identical(attr(daten, 'datenportal_geometry_nulls')$renamed, c(TRUE,FALSE,FALSE)),
+                      identical(sf::st_is_empty(daten$renamed), c(TRUE,TRUE,FALSE)),
+                      length(daten$renamed[[3]]) == 2,
+                      is.null(attr(daten, 'datenportal_geometry_wkb')$renamed[[1]]),
+                      length(attr(daten, 'datenportal_geometry_wkb')$renamed[[2]]) > 0)
+                    cat('WKB_ROUNDTRIP_OK')
+                    """);
+            page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                    new Page.GetByRoleOptions().setName("R ausführen")).click();
+            page.waitForSelector("[aria-label='R Konsole'] .dp-explore-r-console__line--stdout:has-text('WKB_ROUNDTRIP_OK')",
+                    new Page.WaitForSelectorOptions().setTimeout(60_000));
+        }
+    }
+
+    private void prepareMunicipalityResult(Page page, List<String> errors) {
+        prepareSqlResult(page, errors, "select * from read_parquet('" + baseUrl("/explore-fixtures/ch.so.gemeinden_2025.parquet") + "')");
+    }
+
+    private void prepareSqlResult(Page page, List<String> errors, String sql) {
+        page.navigate(baseUrl("/datasets/explore-fixture/explore"));
+        waitForExploreReady(page, errors);
+        page.waitForSelector("[data-testid='sql-monaco-editor'] .view-line:has-text('SELECT')");
+        page.locator("[data-testid='sql-monaco-editor'] .monaco-editor").click();
+        page.keyboard().press("ControlOrMeta+A");
+        page.keyboard().insertText(sql);
+        waitForSqlFallbackValue(page, sql);
+        page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+                new Page.GetByRoleOptions().setName("Ausführen")).click();
+        waitForSqlResult(page, errors);
+    }
+
     @Test
     void explorePageRegistersSameOriginParquetAndShowsPreviewRows() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1280, 900))) {

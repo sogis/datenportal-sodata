@@ -8,7 +8,7 @@ describe('loadEmbeddedExploreContext', () => {
     documentRef.body.innerHTML = `<script id="datenportal-explore-context" type="application/json">${JSON.stringify(sampleExploreContext)}</script>`;
 
     expect(loadEmbeddedExploreContext(documentRef)).toMatchObject({
-      version: 4,
+      version: 5,
       datasetId: 'ch.so.bauinventar',
       title: 'Bauinventar',
       catalogDatabase: {

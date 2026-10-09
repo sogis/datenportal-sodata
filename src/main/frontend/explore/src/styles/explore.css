@@ -1130,7 +1130,8 @@
   font-size: 11px;
 }
 
-.dp-explore-chart__controls select {
+.dp-explore-chart__controls select,
+.dp-explore-map__controls select {
   min-width: 0;
   min-height: 1.8rem;
   padding: 0 1.8rem 0 0.55rem;
@@ -1143,7 +1144,8 @@
   font-weight: 400;
 }
 
-.dp-explore-chart__controls select:focus-visible {
+.dp-explore-chart__controls select:focus-visible,
+.dp-explore-map__controls select:focus-visible {
   outline: 2px solid #94a3b8;
   outline-offset: 1px;
 }
@@ -2038,4 +2040,65 @@
    so the rasterizer uses the same metrics and does not introduce extra wraps. */
 .dp-explore-chart--export .dp-explore-chart__legend--series {
   font-family: Arial, sans-serif;
+}
+
+/* Spatial result view shares the resizable laboratory result panel. */
+.dp-explore-map {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: .5rem;
+}
+
+.dp-explore-map__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem 1rem;
+}
+
+.dp-explore-map__controls label {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.dp-explore-map__controls select {
+  max-width: 14rem;
+}
+
+.dp-explore-map__viewport {
+  flex: 1;
+  min-height: 12rem;
+  position: relative;
+  background: #f5f6f7;
+}
+
+.dp-explore-map__viewport:focus-visible {
+  outline: 2px solid var(--dp-color-primary, #c00);
+}
+
+.dp-explore-map__tooltip, .dp-explore-map p {
+  margin: 0;
+}
+
+.dp-explore-map__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  max-height: 8rem;
+  overflow: auto;
+}
+
+.dp-explore-map__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.dp-explore-map__legend i {
+  display: inline-block;
+  width: .8rem;
+  height: .8rem;
 }

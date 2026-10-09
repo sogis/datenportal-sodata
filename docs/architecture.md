@@ -300,3 +300,61 @@ Statische CSS-, HTMX-, Web-Component-, Font- und optionale Bildpfade werden übe
 - Keine CI/CD-Pipeline.
 - Keine Datenvorschau.
 - Keine fachlichen Such- oder UI-Erweiterungen in Phase 8.
+
+## LV95-Geometrien im SQL- und R-Labor
+
+Explore-Kontext V5 enthält `map` (EPSG:2056, kantonaler WMTS, Attribution,
+Geometriebudgets) und `rLaboratory.geometryPackages`. Der bestehende
+DuckDB-WASM-Build (Engine 1.5.4) liefert `GEOMETRY` als Arrow Binary mit
+`geoarrow.wkb`-Extension-Metadaten. Dieser Ergebnisvertrag, inklusive
+Spaltenindex, ist für die Geometrieerkennung massgebend, auch bei SQL-Aliasnamen.
+Quellspaltennamen allein sind kein Geometrienachweis. Unmarkierte Binärspalten,
+etwa aus `ST_AsWKB`, können ausdrücklich in der Karte ausgewählt werden.
+Fehlende CRS-Angaben werden gemäss dem Datenprofil als LV95 interpretiert;
+explizit andere CRS werden abgewiesen. Keine automatische Reprojektion.
+
+`resultGeometry.ts` validiert WKB-Struktur, Koordinaten, Verschachtelung und
+Budgets vor Verarbeitung. Doppelte Ergebnis-Spaltennamen erfordern SQL-Aliasse.
+Der SQL-Renderer liest die Bytes mit OpenLayers WKB direkt in EPSG:2056.
+GeoJSON und WKT sind keine Zwischenformate. Die bestehende DuckDB-Engine reicht
+für Lesen und WKB-Ausgabe; die Spatial-Extension wird hierfür nicht zusätzlich
+installiert. Weitere räumliche SQL-Operationen sind ein separater Ausbau.
+
+R erhält WKB verlustfrei als Base64 im JSON-Snapshot, mit Kodierung, CRS und
+aktiver Geometriespalte. `sf` und dessen gesperrte Abhängigkeiten werden beim
+Build vom bestehenden R-WASM-Repository gespiegelt, im Browser erst bei einer
+Geometrieübernahme geladen. Die Bridge dekodiert WKB zu `sfc` und erstellt ein
+`sf`-Objekt. NULL wird für `sf` als leere GeometryCollection dargestellt; die
+Attribute `datenportal_geometry_nulls` und `datenportal_geometry_wkb` erhalten
+die Unterscheidung zu EMPTY und die Originalbytes. Mehrere Geometriespalten
+bleiben erhalten. Die bestehende R-Bildausgabe verarbeitet `geom_sf()`.
+
+Geometriebudgets: höchstens 10'000 Kartenobjekte, 32 MiB WKB und 1'000'000
+Koordinaten. Überläufe werden gemeldet, nicht still abgeschnitten. SQL- und
+R-Zeilenlimits gelten weiterhin und werden sichtbar ausgewiesen; das
+500-Zeilenlimit der Diagramme gilt nicht für Karten. Strukturell defektes WKB
+wird mit Spalten-/Zeilenhinweis abgewiesen; eine topologische Reparatur erfolgt
+nicht.
+
+Der WMTS verwendet die Capabilities von
+<https://geo.so.ch/api/wmts/1.0.0/WMTSCapabilities.xml>: Matrixset `2056`,
+Ursprung `[2420000,1350000]`, 256-Pixel-Kacheln und die in `lv95Map.ts`
+festgehaltenen Auflösungen/Matrixgrenzen. Die REST-Matrixkennungen sind `0` bis
+`14`, ohne `2056:`-Präfix. Änderungen am Dienst erfordern einen Abgleich dieser
+Konfiguration. CSP erlaubt auf Explore-Seiten Bilder von `geo.so.ch`; CORS
+wird für Canvas/PNG vorausgesetzt. Bei fehlenden Kacheln bleibt die Vektorkarte
+nutzbar; ein unvollständiger Hintergrund wird nicht als erfolgreicher PNG-Export
+angeboten.
+
+Testdaten: `src/test/resources/static/explore-fixtures/ch.so.gemeinden_2025.parquet`
+ist die bereitgestellte GeoParquet-1.1-Datei: 106 MultiPolygone, 55'559
+Koordinaten, CRS2056, WKB/Snappy. Sie enthält keine Löcher, NULL oder EMPTY;
+diese Fälle werden deshalb zusätzlich synthetisch getestet. Der Playwright-Test
+liest die echte Datei mit dem gebündelten DuckDB und prüft Karte/WMTS/PNG.
+Der echte WebR-Test bleibt wie die bestehende Runtime-Prüfung opt-in:
+`./gradlew playwrightTest --tests '*municipality*' -Ddatenportal.playwright.webr=true`.
+Mit `-Ddatenportal.playwright.liveWmts=true` prüfen die Gemeinde-Kartentests
+zusätzlich den echten WMTS einschliesslich CORS und PNG-Export; im normalen
+Check werden Kacheln kontrolliert bereitgestellt, damit externe Ausfälle den
+Build nicht beeinflussen. Der synthetische Fehlertest simuliert einen
+Kachelausfall ausdrücklich.

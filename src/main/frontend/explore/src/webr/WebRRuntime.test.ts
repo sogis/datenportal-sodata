@@ -47,6 +47,17 @@ describe('WebRRuntime', () => {
     expect(mockWebR.installPackages).toHaveBeenCalledTimes(1);
   });
 
+  it('loads sf only on first geometry use and shares concurrent requests', async () => {
+    const runtime = new WebRRuntime(sampleExploreContext.rLaboratory);
+    await runtime.initialize();
+    expect(mockWebR.installPackages).toHaveBeenCalledTimes(1);
+    expect(mockWebR.installPackages.mock.calls[0][0]).not.toContain('sf');
+    await Promise.all([runtime.ensureGeometryPackages(), runtime.ensureGeometryPackages()]);
+    await runtime.ensureGeometryPackages();
+    expect(mockWebR.installPackages).toHaveBeenCalledTimes(2);
+    expect(mockWebR.installPackages.mock.calls[1][0]).toEqual(['sf']);
+  });
+
   it('closes the runtime exactly once when close is called repeatedly', async () => {
     const runtime = new WebRRuntime(sampleExploreContext.rLaboratory);
     await runtime.initialize();

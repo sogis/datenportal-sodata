@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {makeQualifiedTableName, type DataTable, type DuckDbConnector, type QueryHandle} from '@sqlrooms/duckdb';
 import type {Table} from 'apache-arrow';
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
@@ -18,9 +18,12 @@ import {copyTextToClipboard} from './clipboard';
 import {SqlEditorField} from './SqlEditorField';
 import {SqlToolbar} from './SqlToolbar';
 
+import type {ResultGeometry} from '../geometry/resultGeometry';
+const MapPanel = lazy(() => import('../geometry/MapPanel'));
+
 const DEFAULT_ROW_LIMIT = 1000;
 const ROW_LIMIT_OPTIONS = [100, 1000, 10000] as const;
-type ResultView = 'table' | 'chart';
+type ResultView = 'table' | 'chart' | 'map';
 
 export function SqlLaboratory({
   context,
@@ -48,6 +51,7 @@ export function SqlLaboratory({
   const [sql, setSql] = useState(initialSql);
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | undefined>(initialRecipe?.id);
   const [result, setResult] = useState<QueryResultState>(idleQueryResult);
+  const [selectedGeometry, setSelectedGeometry] = useState<ResultGeometry | undefined>(undefined);
   const [resultView, setResultView] = useState<ResultView>('table');
   const [copied, setCopied] = useState(false);
   const [rowLimit, setRowLimit] = useState(Math.min(DEFAULT_ROW_LIMIT, context.execution.maxResultRows));
@@ -159,6 +163,7 @@ export function SqlLaboratory({
         }),
         preferredChart: preferredChartForSql(sourceSql, recipeForExecution)
       };
+      setSelectedGeometry(successResult.geometries?.[0]);
       setResult(successResult);
     } catch (error) {
       if (!mountedRef.current) {
@@ -239,7 +244,7 @@ export function SqlLaboratory({
       return;
     }
     try {
-      onTransferToR?.(sqlResultSnapshotFromQueryResult(result, context.tables));
+      onTransferToR?.(sqlResultSnapshotFromQueryResult(result, context.tables, selectedGeometry, context.map));
     } catch (error) {
       setExportError(`Resultat konnte nicht nach R übernommen werden: ${toErrorMessage(error)}`);
     }
@@ -315,7 +320,7 @@ export function SqlLaboratory({
         <div className="dp-explore-result-pane__header">
           <div className="dp-explore-result-pane__header-row">
             <div className="dp-explore-result-pane__actions">
-              {chartsEnabled && resultView === 'chart' ? (
+              {chartsEnabled && resultView === 'map' ? null : chartsEnabled && resultView === 'chart' ? (
                 <button
                   type="button"
                   className="dp-explore-button dp-explore-button--secondary"
@@ -342,7 +347,11 @@ export function SqlLaboratory({
           )}
         </div>
         <div className="dp-explore-result-pane__body">
-          {chartsEnabled && resultView === 'chart' ? (
+          {chartsEnabled && resultView === 'map' ? (
+            <Suspense fallback={<p role="status">Karte wird geladen.</p>}>
+              <MapPanel result={result} config={context.map} selected={selectedGeometry} onSelect={setSelectedGeometry} datasetId={context.datasetId} />
+            </Suspense>
+          ) : chartsEnabled && resultView === 'chart' ? (
             <ChartPanel
               result={result}
               preferred={result.preferredChart}
@@ -421,6 +430,7 @@ function ResultViewToggle({
       >
         Diagramm
       </button>
+      <button type="button" className={view === 'map' ? 'is-active' : undefined} aria-pressed={view === 'map'} onClick={() => onChange('map')}>Karte</button>
     </div>
   );
 }

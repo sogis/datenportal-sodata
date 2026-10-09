@@ -13,6 +13,11 @@ public record ExploreRLaboratoryDto(
         int plotWidth,
         int plotHeight) {
 
+    @com.fasterxml.jackson.annotation.JsonProperty("geometryPackages")
+    public List<String> geometryPackages() {
+        return List.of("sf");
+    }
+
     public ExploreRLaboratoryDto {
         packages = packages == null ? List.of() : List.copyOf(packages);
     }

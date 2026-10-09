@@ -174,6 +174,8 @@ export function RPanel({
     }
     bridgeRef.current = new WebRBridge(webR);
     updateStep(operationId, {step: 'data', status: 'running'});
+    if (nextSnapshot.columns.some((column) => column.geometry)) await runtimeRef.current.ensureGeometryPackages();
+    if (!isCurrentOperation(operationId)) return;
     const info = await bridgeRef.current.loadDataFrame(nextSnapshot, laboratory.dataFrameName, limitedFrom);
     if (!isCurrentOperation(operationId)) {
       return;

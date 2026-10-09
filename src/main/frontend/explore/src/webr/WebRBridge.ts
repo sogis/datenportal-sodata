@@ -52,6 +52,7 @@ export class WebRBridge {
       columns: snapshot.columns,
       rows: snapshot.rows,
       rowCount: snapshot.rowCount,
+      activeGeometryColumn: snapshot.activeGeometryColumn,
       sourceSql: snapshot.sourceSql,
       executedSql: snapshot.executedSql,
       schemaJson: JSON.stringify({
@@ -68,6 +69,11 @@ export class WebRBridge {
     }
 
     const warnings = snapshot.columns.map((column) => column.warning).filter((warning): warning is string => Boolean(warning));
+    snapshot.columns.forEach((column, index) => {
+      if (!column.geometry) return;
+      const nulls = snapshot.rows.filter((row) => row[index] === null).length;
+      if (nulls) warnings.push(`«${column.name}»: ${nulls} NULL-Geometrien als leere Geometrien dargestellt. Die NULL-Maske bleibt im Attribut datenportal_geometry_nulls erhalten.`);
+    });
     return {
       name: dataFrameName,
       sourceSql: snapshot.sourceSql,
@@ -157,6 +163,14 @@ coerce_column <- function(index) {
     }
     value_or_na(row[[index]])
   })
+  if (!is.null(column$geometry)) {
+    raw_values <- lapply(rows, function(row) {
+      value <- row[[index]]
+      if (is.null(value)) return(as.raw(c(1, 7, 0, 0, 0, 0, 0, 0, 0)))
+      jsonlite::base64_dec(value)
+    })
+    return(sf::st_as_sfc(structure(raw_values, class = "WKB"), crs = 2056))
+  }
   r_type <- column$rType
   if (identical(r_type, "integer")) {
     return(as.integer(unlist(values, use.names = FALSE)))
@@ -179,7 +193,21 @@ coerce_column <- function(index) {
 
 data_columns <- lapply(seq_along(columns), coerce_column)
 names(data_columns) <- vapply(columns, function(column) column$name, character(1))
-${dataFrameName} <- as.data.frame(data_columns, stringsAsFactors = FALSE, optional = TRUE, check.names = FALSE)
+geometry_indices <- which(vapply(columns, function(column) !is.null(column$geometry), logical(1)))
+if (length(geometry_indices) > 0) {
+  ${dataFrameName} <- data.frame(row.names = seq_along(rows))
+  for (i in seq_along(data_columns)) ${dataFrameName}[[names(data_columns)[i]]] <- data_columns[[i]]
+  ${dataFrameName} <- sf::st_as_sf(${dataFrameName}, sf_column_name = payload$activeGeometryColumn)
+  null_masks <- lapply(geometry_indices, function(i) vapply(rows, function(row) is.null(row[[i]]), logical(1)))
+  original_wkb <- lapply(geometry_indices, function(i) lapply(rows, function(row) {
+    if (is.null(row[[i]])) NULL else jsonlite::base64_dec(row[[i]])
+  }))
+  names(null_masks) <- names(original_wkb) <- names(data_columns)[geometry_indices]
+  attr(${dataFrameName}, "datenportal_geometry_nulls") <- null_masks
+  attr(${dataFrameName}, "datenportal_geometry_wkb") <- original_wkb
+} else {
+  ${dataFrameName} <- as.data.frame(data_columns, stringsAsFactors = FALSE, optional = TRUE, check.names = FALSE)
+}
 
 field <- function(name) {
   vapply(columns, function(column) {

@@ -104,3 +104,12 @@ Build-Artefakte für die visuelle Kontrolle, keine eingecheckten Referenzbilder.
 |---|---|
 | `vendor/jetbrains-mono/2.304/fonts.css` | lokal vendorte JetBrains-Mono-Webfont-Definition fuer Codebeispiele |
 | `vendor/jetbrains-mono/2.304/JetBrainsMono-Regular.woff2` | JetBrains Mono Regular, nur fuer Codetext |
+
+## Geometrieausgabe der Labore
+
+| Bereich | Komponenten / Vertrag | Aufgabe |
+|---|---|---|
+| SQL-Karte | `geometry/MapPanel.tsx`, `lv95Map.ts`, `mapStyle.ts` | OpenLayers, LV95-WMTS, Attribute, Legende, PNG; vom SQL-Labor bei Bedarf geladen |
+| Ergebnisgeometrie | `geometry/resultGeometry.ts`, `results/arrowResult.ts`, `sqlResultSnapshot.ts` | Arrow-WKB erkennen/validieren; unveränderte Bytes und CRS übertragen |
+| R-Geometrie | `WebRRuntime.ts`, `WebRBridge.ts`, `RRecipes.ts` | sf bei Bedarf laden, Base64-WKB zu sf, Kartenrezepte, vorhandene Plot-Ausgabe |
+| Kontext | `ExploreMapDto`, `ExploreRLaboratoryDto`, `ExploreContextDto` V5 | WMTS, Attribution, Budgets und Geo-Paketliste |

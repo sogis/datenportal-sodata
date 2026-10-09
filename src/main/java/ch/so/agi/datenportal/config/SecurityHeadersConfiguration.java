@@ -65,7 +65,7 @@ public class SecurityHeadersConfiguration {
         return "default-src 'self'; "
                 + "script-src 'self' 'wasm-unsafe-eval'" + (allowUnsafeEval ? " 'unsafe-eval'" : "") + "; "
                 + "style-src 'self' 'unsafe-inline'; "
-                + "img-src 'self' data:; "
+                + "img-src 'self' data:" + (allowUnsafeEval ? " https://geo.so.ch" : "") + "; "
                 + "font-src 'self'; "
                 + "connect-src " + connectSrc() + "; "
                 + "worker-src 'self' blob:; "

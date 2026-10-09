@@ -186,3 +186,38 @@ Die in `AGENTS.md` genannte v5-Gesamtspezifikation fehlt im Checkout;
 Umsetzungsgrundlage waren der freigegebene Plan und die vorhandenen verbindlichen
 Dokumente. Ein späterer PDF-Renderer kann die Dokumentstruktur verwenden;
 PDF-Erzeugung ist nicht Bestandteil dieser Umsetzung.
+
+## LV95-Karten und WKB im SQL-/R-Labor
+
+Stand: 2026-10-09.
+
+Umgesetzt: OpenLayers-Karte in LV95, kantonaler WMTS, Geometrie-/Attributwahl,
+kontinuierliche und kategoriale Farben, Legende, Tooltip, Zoom/Pan und PNG.
+Arrow-WKB bleibt als Geometrie erkennbar; R erhält Base64-WKB mit CRS und baut
+sf-Objekte samt NULL-Maske. sf wird bei Bedarf aus dem bestehenden gespiegelten
+Paketbestand geladen. Explore-Kontext V5 dokumentiert Konfiguration und Budgets.
+Die vorhandene DuckDB-Engine 1.5.4 liest die Gemeinde-Datei ohne zusätzliche
+Spatial-Extension. GeoJSON und WKT sind keine Austauschformate dieses Ablaufs.
+
+Referenz: bereitgestellte GeoParquet-Datei mit 106 Gemeinden und 55'559
+Koordinaten. Zusätzliche Fälle: Polygonlöcher, NULL/EMPTY, mehrere
+Geometriespalten, berechnete Aliasse, mehr als 500 Objekte, beschädigtes WKB,
+Budgets und fehlende WMTS-Kacheln. Live-WMTS/PNG wurden in Chromium und Firefox
+geprüft; sf und Geometrieattribute in echtem WebR.
+
+Dokumentation: Architektur, UI-Vertrag und Component Map. Verwendete visuelle
+Referenzen: aktuelle Listen-/Karten-Mockups und Web-Components-Referenz;
+Laborkontrollen übernehmen die vorhandenen Explore-Primitiven. Die in AGENTS.md
+genannte v5-Gesamtspezifikation fehlt weiterhin im Checkout.
+
+Verifikation:
+
+- `./gradlew clean check -Ddatenportal.playwright.webr=true`: PASS, 2m 9s.
+- Java: 354 Tests; Playwright: 105 Tests, keine Fehler oder übersprungenen Tests.
+- Nach visueller Nachschärfung: Frontend 25 Dateien / 163 Tests und TypeScript PASS;
+  Live-WMTS-Kartentests/PNG erneut in Chromium und Firefox PASS.
+- `git diff --check`: PASS.
+
+Umfang: LV95-Darstellung und sf-Übernahme; weitere Spatial-SQL-Funktionen und
+interaktive HTML-Widgets aus R sind nicht Teil dieser Phase. Bei Bedarf können
+sie auf dem WKB-Ergebnisvertrag aufbauen.

@@ -1,6 +1,6 @@
 import type {ExploreColumnRole} from '../app/ExploreContext';
 
-export type RColumnType = 'integer' | 'numeric' | 'character' | 'logical' | 'Date' | 'POSIXct';
+export type RColumnType = 'integer' | 'numeric' | 'character' | 'logical' | 'Date' | 'POSIXct' | 'sfc';
 
 export interface DuckDbColumnForR {
   name: string;

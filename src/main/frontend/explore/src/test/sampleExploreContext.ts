@@ -1,7 +1,7 @@
 import type {ExploreContextDto} from '../app/ExploreContext';
 
 export const sampleExploreContext: ExploreContextDto = {
-  version: 4,
+  version: 5,
   datasetId: 'ch.so.bauinventar',
   title: 'Bauinventar',
   description: 'Schützenswerte und geschützte Gebäude.',
@@ -54,7 +54,15 @@ export const sampleExploreContext: ExploreContextDto = {
   ],
   chartsEnabled: true,
   webREnabled: true,
+  map: {
+    crs: 'EPSG:2056',
+    wmtsUrl: 'https://geo.so.ch/api/wmts/1.0.0/ch.so.agi.hintergrundkarte_sw/default/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png',
+    layer: 'ch.so.agi.hintergrundkarte_sw',
+    attribution: 'Hintergrundkarte: Kanton Solothurn',
+    maxFeatures: 10000, maxBytes: 33554432, maxCoordinates: 1000000
+  },
   rLaboratory: {
+    geometryPackages: ['sf'],
     dataFrameName: 'daten',
     runtimeBaseUrl: '/webr/0.6.0/',
     packageRepoUrl: '/webr-packages/',

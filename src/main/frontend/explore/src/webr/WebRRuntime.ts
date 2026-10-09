@@ -40,6 +40,7 @@ export class WebRRuntime {
   private webRPromise?: Promise<WebRLike>;
   private webR?: WebRLike;
   private closed = false;
+  private geometryPackagesPromise?: Promise<void>;
 
   constructor(config: ExploreRLaboratoryDto, onStep?: (state: WebRStepState) => void) {
     this.config = config;
@@ -60,6 +61,23 @@ export class WebRRuntime {
       });
     }
     return this.webRPromise;
+  }
+
+  async ensureGeometryPackages(): Promise<void> {
+    this.geometryPackagesPromise ??= this.initialize().then(async (webR) => {
+      this.report('packages', 'running');
+      await withTimeout(webR.installPackages(this.config.geometryPackages, {
+        repos: this.config.packageRepoUrl, quiet: true, mount: true
+      }), 180_000, 'Die Geometriepakete konnten nicht geladen werden.', () => this.closeWebR(webR));
+      this.report('packages', 'done');
+      this.ensureOpen();
+    }).catch((error) => {
+      this.geometryPackagesPromise = undefined;
+      if (!this.webR) this.webRPromise = undefined;
+      this.report('packages', 'error');
+      throw error;
+    });
+    return this.geometryPackagesPromise;
   }
 
   close(): void {

@@ -73,6 +73,7 @@ export const exploreRLaboratorySchema = z.object({
   runtimeBaseUrl: z.string(),
   packageRepoUrl: z.string(),
   packages: z.array(z.string()),
+  geometryPackages: z.array(z.string()),
   recommendedRows: z.number(),
   warningRows: z.number(),
   hardRows: z.number(),
@@ -80,8 +81,19 @@ export const exploreRLaboratorySchema = z.object({
   plotHeight: z.number()
 });
 
+export const exploreMapSchema = z.object({
+  crs: z.literal('EPSG:2056'),
+  wmtsUrl: z.string(),
+  layer: z.string(),
+  attribution: z.string(),
+  maxFeatures: z.number().positive(),
+  maxBytes: z.number().positive(),
+  maxCoordinates: z.number().positive()
+});
+export type ExploreMapDto = z.infer<typeof exploreMapSchema>;
+
 export const exploreContextSchema = z.object({
-  version: z.literal(4),
+  version: z.literal(5),
   datasetId: z.string(),
   title: z.string(),
   description: z.string().optional(),
@@ -94,6 +106,7 @@ export const exploreContextSchema = z.object({
   recipes: z.array(exploreRecipeSchema),
   chartsEnabled: z.boolean(),
   webREnabled: z.boolean(),
+  map: exploreMapSchema,
   rLaboratory: exploreRLaboratorySchema
 });
 

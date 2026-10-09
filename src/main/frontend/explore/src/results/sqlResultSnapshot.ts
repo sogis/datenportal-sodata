@@ -1,3 +1,4 @@
+import {geometryColumns, geometryValue, validateGeometryResult, wkbBase64, type ResultGeometry, type GeometryLimits, DEFAULT_GEOMETRY_LIMITS} from '../geometry/resultGeometry';
 import type {ExploreColumnDto, ExploreColumnRole, ExploreTableDto} from '../app/ExploreContext';
 import type {QueryResultState} from './queryResultTypes';
 import {mapDuckDbColumnToR, normalizeDuckDbValueForR} from '../webr/DuckDbToWebRTypeMapper';
@@ -9,6 +10,7 @@ export interface SqlResultColumn {
   roles: ExploreColumnRole[];
   rType: ReturnType<typeof mapDuckDbColumnToR>['rType'];
   warning?: string;
+  geometry?: ResultGeometry & {transportEncoding: 'base64'};
 }
 
 export interface SqlResultSnapshot {
@@ -18,20 +20,25 @@ export interface SqlResultSnapshot {
   columns: SqlResultColumn[];
   rows: Array<Array<string | number | boolean | null>>;
   maxRowsApplied?: boolean;
+  activeGeometryColumn?: string;
 }
 
-export function sqlResultSnapshotFromQueryResult(result: QueryResultState, tables: ExploreTableDto[]): SqlResultSnapshot {
+export function sqlResultSnapshotFromQueryResult(result: QueryResultState, tables: ExploreTableDto[], selectedGeometry?: ResultGeometry, limits: GeometryLimits = DEFAULT_GEOMETRY_LIMITS): SqlResultSnapshot {
   if (result.status !== 'success') {
     throw new Error('Nur erfolgreiche SQL-Resultate können ins R-Labor übernommen werden.');
   }
 
+  const geometries = [...(result.geometries ?? geometryColumns(result.arrowTable))];
+  if (selectedGeometry && !geometries.some((g) => g.columnIndex === selectedGeometry.columnIndex)) geometries.push(selectedGeometry);
+  validateGeometryResult(result, geometries, limits);
   const contextColumns = contextColumnIndex(tables);
   const arrowFields = result.arrowTable?.schema.fields ?? [];
   const columns = result.columns.map((name, index) => {
+    const geometry = geometries.find((g) => g.columnIndex === index);
     const contextColumn = contextColumns.get(name.toLowerCase());
-    const duckdbType = contextColumn?.type ?? arrowFields[index]?.type?.toString?.() ?? 'VARCHAR';
+    const duckdbType = geometry ? 'GEOMETRY' : contextColumn?.type ?? arrowFields[index]?.type?.toString?.() ?? 'VARCHAR';
     const nullable = contextColumn?.nullable ?? (contextColumn?.required === true ? false : arrowFields[index]?.nullable ?? true);
-    const roles = contextColumn?.roles ?? inferRoles(name, duckdbType);
+    const roles: ExploreColumnRole[] = geometry ? ['geometry'] : contextColumn?.roles ?? inferRoles(name, duckdbType);
     const values = result.rows.map((row) => row[name]);
     const mapping = mapDuckDbColumnToR({name, duckdbType, nullable, roles}, values);
     return {
@@ -39,14 +46,15 @@ export function sqlResultSnapshotFromQueryResult(result: QueryResultState, table
       duckdbType,
       nullable,
       roles,
-      rType: mapping.rType,
-      warning: mapping.warning
+      rType: geometry ? 'sfc' as const : mapping.rType,
+      warning: geometry ? undefined : mapping.warning,
+      geometry: geometry ? {...geometry, transportEncoding: 'base64' as const} : undefined
     };
   });
 
-  const rows = result.rows.map((row) =>
+  const rows = result.rows.map((row, rowIndex) =>
     columns.map((column) =>
-      normalizeDuckDbValueForR(row[column.name], {
+      column.geometry ? wkbBase64(geometryValue(result, column.geometry, rowIndex)) : normalizeDuckDbValueForR(row[column.name], {
         rType: column.rType,
         warning: column.warning
       })
@@ -59,6 +67,7 @@ export function sqlResultSnapshotFromQueryResult(result: QueryResultState, table
     rowCount: result.rowCount,
     columns,
     rows,
+    activeGeometryColumn: selectedGeometry?.column ?? geometries[0]?.column,
     maxRowsApplied: result.maxRowsApplied
   };
 }
