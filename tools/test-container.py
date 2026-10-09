@@ -79,7 +79,7 @@ def get(base, path, status=200, content_type=None):
 
 
 def verify_context(context, canonical, dataset_id):
-    require(context['version'] == 4, 'Unexpected context version')
+    require(context['version'] == 5, 'Unexpected context version')
     require(context['datasetId'] == dataset_id, 'Wrong dataset/issue selected')
     require(context['canonicalUrl'] == canonical, 'Wrong canonical URL')
     require(bool(context['title']), 'Missing title')
@@ -95,8 +95,19 @@ def verify_context(context, canonical, dataset_id):
     require(laboratory['dataFrameName'] == 'daten', 'Wrong R data frame')
     require(laboratory['runtimeBaseUrl'] == '/webr/0.6.0/', 'Wrong WebR runtime')
     require(laboratory['packageRepoUrl'] == '/webr-packages/' and 'ggplot2' in laboratory['packages'], 'Missing R packages')
+    require('sf' in laboratory['geometryPackages'], 'Missing R geometry packages')
     require(0 < laboratory['recommendedRows'] <= laboratory['warningRows'] <= laboratory['hardRows'], 'Wrong R limits')
     require(laboratory['plotWidth'] > 0 and laboratory['plotHeight'] > 0, 'Missing R plot dimensions')
+    map_config = context['map']
+    require(map_config['crs'] == 'EPSG:2056', 'Wrong map CRS')
+    require(map_config['layer'] == 'ch.so.agi.hintergrundkarte_sw', 'Wrong WMTS layer')
+    require(map_config['wmtsUrl'] == (
+        'https://geo.so.ch/api/wmts/1.0.0/ch.so.agi.hintergrundkarte_sw/'
+        'default/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png'
+    ), 'Wrong WMTS URL template')
+    require(bool(map_config['attribution']), 'Missing map attribution')
+    for key in ('maxFeatures', 'maxBytes', 'maxCoordinates'):
+        require(map_config[key] > 0, f'Missing map limit: {key}')
     require(bool(context['tables']) and bool(context['recipes']), 'Empty Explore tables/recipes')
     table_ids = set()
     column_count = 0

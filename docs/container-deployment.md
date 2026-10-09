@@ -217,6 +217,8 @@ Explore-HTML sowie JSON-Kontext für `ch.so.bauinventar`, die aktuelle Ausgabe
 von `ch.so.abstimmungsresultate` und deren Ausgabe 2025. Der eingebettete Kontext
 muss mit dem JSON-Endpunkt übereinstimmen. Geprüft werden insbesondere Tabellen,
 Spalten, Rezepte, optionale Chart-Konfigurationen, Enum-Werte und das R-Labor.
+Der Kontext muss Version 5 liefern, einschliesslich LV95-Kartenkonfiguration,
+WMTS-URL, Geometriebudgets und `sf` in den nachladbaren R-Geometriepaketen.
 Unbekannte Datensätze müssen weiterhin HTTP 404 liefern. Fehler melden den
 betroffenen Aufruf und Containerlogs; der Prozess endet mit Exitcode 1.
 
@@ -232,7 +234,11 @@ Explore erzeugt JSON manuell mit Jackson und gibt es als String aus. Spring MVC
 kann deshalb den DTO-Typ nicht aus dem Rückgabetyp der Endpunkte ableiten.
 `CatalogResourceRuntimeHints` registriert den gesamten Typbaum ab
 `ExploreContextDto` mit `BindingReflectionHintsRegistrar`, einschliesslich
-Record-Accessoren und generischer `List`-/`Optional`-Elemente. Die drei
+Record-Accessoren und generischer `List`-/`Optional`-Elemente. Rückgabetypen
+berechneter `@JsonProperty`-Methoden müssen zusätzlich explizit registriert
+werden: `ExploreMapDto` wird über `ExploreContextDto.map()` geliefert und ist
+kein Record-Bestandteil des Kontextes. Der Runtime-Hints-Test prüft deshalb
+auch sämtliche Accessoren dieses DTOs. Die drei
 Explore-Enums registrieren zusätzlich ihre `@JsonValue`-Methoden, damit die
 bestehenden kleingeschriebenen JSON-Werte erhalten bleiben.
 

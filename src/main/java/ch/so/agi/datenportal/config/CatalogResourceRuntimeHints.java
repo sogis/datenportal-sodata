@@ -3,6 +3,7 @@ package ch.so.agi.datenportal.config;
 import ch.so.agi.datenportal.explore.ExploreChartType;
 import ch.so.agi.datenportal.explore.ExploreColumnRole;
 import ch.so.agi.datenportal.explore.ExploreContextDto;
+import ch.so.agi.datenportal.explore.ExploreMapDto;
 import ch.so.agi.datenportal.explore.ExploreRecipeCategory;
 import java.io.IOException;
 import java.util.List;
@@ -38,8 +39,10 @@ final class CatalogResourceRuntimeHints implements RuntimeHintsRegistrar {
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         // Explore serializes DTOs manually to a String, so MVC AOT cannot infer
         // the binding types. Include nested records and generic Optional/List types.
+        // Computed @JsonProperty return types are not record components and need
+        // explicit registration so all their record accessors survive native AOT.
         new BindingReflectionHintsRegistrar().registerReflectionHints(
-                hints.reflection(), ExploreContextDto.class);
+                hints.reflection(), ExploreContextDto.class, ExploreMapDto.class);
         registerExploreEnumValues(hints);
         for (String resourceName : CATALOG_RESOURCES) {
             hints.resources().registerPattern(resourceName);

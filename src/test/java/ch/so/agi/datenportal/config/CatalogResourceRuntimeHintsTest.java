@@ -9,6 +9,7 @@ import ch.so.agi.datenportal.explore.ExploreColumnDto;
 import ch.so.agi.datenportal.explore.ExploreColumnRole;
 import ch.so.agi.datenportal.explore.ExploreContextDto;
 import ch.so.agi.datenportal.explore.ExploreExecutionDto;
+import ch.so.agi.datenportal.explore.ExploreMapDto;
 import ch.so.agi.datenportal.explore.ExploreRLaboratoryDto;
 import ch.so.agi.datenportal.explore.ExploreRecipeCategory;
 import ch.so.agi.datenportal.explore.ExploreRecipeDto;
@@ -23,14 +24,14 @@ import org.springframework.aot.hint.predicate.RuntimeHintsPredicates;
 class CatalogResourceRuntimeHintsTest {
 
     @Test
-    void registersEveryExploreRecordAccessorIncludingNestedOptionalTypes() {
+    void registersEveryExploreRecordAccessorIncludingComputedJsonProperties() {
         var hints = new RuntimeHints();
         new CatalogResourceRuntimeHints().registerHints(hints, getClass().getClassLoader());
 
         for (Class<?> type : List.of(
                 ExploreContextDto.class, ExploreExecutionDto.class, ExploreCatalogDatabaseDto.class,
                 ExploreTableDto.class, ExploreColumnDto.class, ExploreRecipeDto.class,
-                ExploreChartConfigDto.class, ExploreRLaboratoryDto.class)) {
+                ExploreChartConfigDto.class, ExploreRLaboratoryDto.class, ExploreMapDto.class)) {
             for (var component : type.getRecordComponents()) {
                 assertThat(RuntimeHintsPredicates.reflection().onMethodInvocation(component.getAccessor()))
                         .as("%s.%s", type.getSimpleName(), component.getName())

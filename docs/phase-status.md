@@ -221,3 +221,30 @@ Verifikation:
 Umfang: LV95-Darstellung und sf-Übernahme; weitere Spatial-SQL-Funktionen und
 interaktive HTML-Widgets aus R sind nicht Teil dieser Phase. Bei Bedarf können
 sie auf dem WKB-Ergebnisvertrag aufbauen.
+
+## Native-Container-Regression nach der LV95-Erweiterung
+
+Stand: 2026-10-09.
+
+Die ARM64- und AMD64-CI-Logs zeigten einen HTTP-500-Fehler beim Explore-Aufruf:
+GraalVM konnte die Record-Komponenten von `ExploreMapDto` nicht reflektieren.
+Der Typ wird über eine berechnete `@JsonProperty` geliefert und musste deshalb
+zusätzlich zum Kontext explizit für Reflection registriert werden. Der erweiterte
+Runtime-Hints-Test reproduzierte den Fehler vor der Korrektur und besteht danach.
+
+Der Container-Smoke-Test erwartet jetzt Kontext-Version 5 und prüft zusätzlich
+LV95, WMTS, Kartenbudgets und die nachladbaren R-Geometriepakete. Damit wird auch
+die zuvor veraltete Erwartung an Kontext-Version 4 korrigiert.
+
+Verifikation:
+
+- `./gradlew clean check`: PASS; 354 Java- und 163 Frontend-Tests, TypeScript PASS.
+- Playwright: 102 Tests bestanden; die drei optionalen WebR-Tests sind im
+  Standardlauf deaktiviert.
+- ARM64: natives Runtime-Image gebaut und `tools/test-container.py --runtime native`
+  bestanden, einschliesslich Explore-HTML und JSON für alle drei Testfälle.
+- ARM64: JVM-Runtime-Image gebaut und derselbe Smoke-Test mit `--runtime jvm`
+  bestanden. Ein paralleler Buildversuch scheiterte an der gemeinsamen
+  Gradle-Cache-Sperre; die anschliessende sequenzielle Ausführung bestand.
+- AMD64 wurde lokal nicht gebaut; die bestehende CI-Matrix prüft beide Architekturen.
+- `git diff --check`: PASS.
