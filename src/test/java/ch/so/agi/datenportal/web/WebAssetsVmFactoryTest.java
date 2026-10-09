@@ -24,6 +24,7 @@ class WebAssetsVmFactoryTest {
                         "/vendor/so-web-components/0.1.10/styles/tokens.css");
         assertThat(assets.webComponentStylesheets()).doesNotHaveDuplicates();
         assertThat(assets.appCss()).isEqualTo("/css/app.css");
+        assertThat(assets.printCss()).isEqualTo("/css/print.css");
         assertThat(assets.htmxJs()).isEqualTo("/js/htmx.min.js");
         assertThat(assets.appJs()).isEqualTo("/js/catalog-filters.js");
     }
@@ -39,6 +40,7 @@ class WebAssetsVmFactoryTest {
         assertThat(assets.webComponentsIndexJs()).isEmpty();
         assertThat(assets.webComponentStylesheets()).isEmpty();
         assertThat(assets.appCss()).isEqualTo("/css/app.css");
+        assertThat(assets.printCss()).isEqualTo("/css/print.css");
         assertThat(assets.htmxJs()).isEqualTo("/js/htmx.min.js");
         assertThat(assets.appJs()).isEqualTo("/js/catalog-filters.js");
     }

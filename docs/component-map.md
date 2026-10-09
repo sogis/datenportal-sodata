@@ -10,6 +10,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Header | `components/chrome/soHeader.jte`, `components/chrome/headerFallback.jte` | `HeaderVm`, `HeaderViewModelFactory` | enthält `<so-header` oder Fallback |
 | Breadcrumb | `components/chrome/soBreadcrumb.jte`, `components/chrome/breadcrumbFallback.jte` | `BreadcrumbVm`, `BreadcrumbFactory` | Detailseite enthält letztes Breadcrumb-Element |
 | Layout | `layouts/main.jte` | `PageChromeVm`, `PageChromeFactory` | Skip-Link und `main#main-content` |
+| Druckkopf | `components/chrome/printHeader.jte`, `layouts/main.jte` | vorhandene `HeaderVm` und `BreadcrumbVm`, `WebAssetsVm.printCss` | nur im Druck sichtbar, Portal und Seitenpfad auch ohne JavaScript; Explore-Layout ausgenommen |
 
 ## Katalogseite
 
@@ -23,7 +24,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Mobile-Sheet | `fragments/mobileFilters.jte`, `components/mobileFilterButton.jte` | `CatalogFilterController`, `FilterPanelVm` | Narrow viewport, Apply/Reset |
 | aktive Filterchips | `components/activeFilterChips.jte` | `FilterChipVm` | einzelner Remove-Href |
 | Ansichttoggle | `components/viewToggle.jte` | `ViewToggleVm` | `aria-current` korrekt |
-| Result Controls | `components/resultControls.jte` | `ResultsVm` | Result count, auto-submit Sortierung, Mobile-Button, im gemeinsamen Resultat-Stack |
+| Result Controls | `components/resultControls.jte` | `ResultsVm`, `CatalogQueryParams` | Result count, auto-submit Sortierung, Mobile-Button, im gemeinsamen Resultat-Stack; Suchbegriff und Sortierung im Druck auch nach HTMX-Updates |
 | Resultat-Shell | `components/resultsShell.jte` | `ResultsVm` | stabiler HTMX-Target-Bereich, verdichteter Abstand zu Result Controls |
 
 ## Listenansicht
@@ -85,6 +86,17 @@ maskierte Strings. Parsing, Rendering und Wortkürzung liegen zentral in
 | `components.css` | Buttons, Filter Chips, Status-Badges, Action Pills, Cards |
 | `catalog.css` | Filter, Toolbar, Tabelle, Cards |
 | `detail.css` | Detailseiten und Metadatenbereiche |
+| `print.css` | nur im Hauptlayout mit `media="print"`: A4, Margin Boxes, Seitenzahlen, Tabellenumbrüche und kompakter Dokumentfluss |
+
+## Druckprüfung
+
+`CatalogPrintPlaywrightTest` prüft die öffentlichen Seitentypen mit Chromium
+und Firefox bei einer bedruckbaren Breite von ca. 680 CSS-Pixeln. Die Tests
+decken HTMX-Suche/Filter/Sortierung, aktive Code-Tabs, lange Beschreibungen,
+URLs, mehrseitige Tabellen und die Ausgrenzung des SQL-/R-Labors ab.
+Chromium erzeugt Prüf-PDFs unter `build/print-previews/` mit CSS-Seitengrösse,
+100 % Skalierung und ausgeschalteten Hintergrundgrafiken. Diese sind
+Build-Artefakte für die visuelle Kontrolle, keine eingecheckten Referenzbilder.
 
 ## Vendor Fonts
 

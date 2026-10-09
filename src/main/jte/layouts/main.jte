@@ -10,6 +10,7 @@
   <title>${chrome.pageTitle()}</title>
   @template.components.chrome.webComponentsLoader(assets = chrome.assets())
   <link rel="stylesheet" href="${chrome.assets().appCss()}">
+  <link rel="stylesheet" href="${chrome.assets().printCss()}" media="print">
   <script src="${chrome.assets().htmxJs()}" defer></script>
   <script src="${chrome.assets().appJs()}" defer></script>
 </head>
@@ -18,6 +19,7 @@
   @template.components.chrome.soHeader(header = chrome.header(), webComponentsEnabled = chrome.assets().webComponentsEnabled())
   @template.components.chrome.soBreadcrumb(breadcrumb = chrome.breadcrumb(), webComponentsEnabled = chrome.assets().webComponentsEnabled())
   <main id="main-content" class="dp-main" tabindex="-1">
+    @template.components.chrome.printHeader(header = chrome.header(), breadcrumb = chrome.breadcrumb())
     ${content}
   </main>
   @template.components.footer(footer = chrome.footer())

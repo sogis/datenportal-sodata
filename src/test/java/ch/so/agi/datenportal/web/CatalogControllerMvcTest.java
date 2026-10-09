@@ -26,6 +26,8 @@ class CatalogControllerMvcTest {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<html lang=\"de\">")))
+                .andExpect(content().string(containsString("href=\"/css/print.css\" media=\"print\"")))
+                .andExpect(content().string(containsString("class=\"dp-print-header dp-print-only\"")))
                 .andExpect(content().string(containsString("<so-header")))
                 .andExpect(content().string(containsString("<so-breadcrumb>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item")))
@@ -65,6 +67,20 @@ class CatalogControllerMvcTest {
 
         assertThat(datasetsResult.getResponse().getContentAsString())
                 .isEqualTo(rootResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    void htmxResponseUpdatesPrintQueryAlongsideResultControls() throws Exception {
+        mockMvc.perform(get("/datasets")
+                        .param("q", "Haltestellen")
+                        .header("HX-Request", "true")
+                        .header("HX-Target", "dataset-results-shell"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Suchbegriff: Haltestellen")))
+                .andExpect(content().string(containsString("Sortierung: Neueste zuerst")))
+                .andExpect(content().string(containsString("id=\"result-controls\" class=\"dp-result-controls\" hx-swap-oob=\"true\"")))
+                .andExpect(content().string(not(containsString("class=\"dp-print-header"))))
+                .andExpect(content().string(not(containsString("/css/print.css"))));
     }
 
     @Test

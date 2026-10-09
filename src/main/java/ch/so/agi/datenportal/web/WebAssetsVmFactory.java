@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 public final class WebAssetsVmFactory {
 
     private static final String APP_CSS = "/css/app.css";
+    private static final String PRINT_CSS = "/css/print.css";
     private static final String HTMX_JS = "/js/htmx.min.js";
     private static final String APP_JS = "/js/catalog-filters.js";
 
@@ -26,7 +27,7 @@ public final class WebAssetsVmFactory {
 
     public WebAssetsVm create() {
         if (!properties.enabled()) {
-            return new WebAssetsVm(false, Optional.empty(), List.of(), APP_CSS, HTMX_JS, APP_JS);
+            return new WebAssetsVm(false, Optional.empty(), List.of(), APP_CSS, PRINT_CSS, HTMX_JS, APP_JS);
         }
 
         List<String> stylesheets = new ArrayList<>();
@@ -41,6 +42,7 @@ public final class WebAssetsVmFactory {
                 Optional.of(properties.indexJsPath()),
                 List.copyOf(new LinkedHashSet<>(stylesheets)),
                 APP_CSS,
+                PRINT_CSS,
                 HTMX_JS,
                 APP_JS);
     }

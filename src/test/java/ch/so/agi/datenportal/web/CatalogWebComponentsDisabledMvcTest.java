@@ -27,6 +27,7 @@ class CatalogWebComponentsDisabledMvcTest {
                 .andExpect(content().string(containsString("<header class=\"dp-site-header\" role=\"banner\">")))
                 .andExpect(content().string(containsString("<nav class=\"dp-breadcrumb\" aria-label=\"Breadcrumb\">")))
                 .andExpect(content().string(containsString("Datenportal")))
+                .andExpect(content().string(containsString("class=\"dp-print-header dp-print-only\"")))
                 .andExpect(content().string(containsString("Daten und Statistiken")))
                 .andExpect(content().string(not(containsString("<so-header"))))
                 .andExpect(content().string(not(containsString("<so-breadcrumb"))))

@@ -25,6 +25,7 @@
       aria-labelledby="usage-tab-${example.id()}"
       data-usage-panel="${example.id()}"
       hidden="${!example.selected()}">
+      <h3 class="dp-print-only">${example.label()}</h3>
       <div class="dp-usage-code-block">
         <pre><code>${example.code()}</code></pre>
         <button class="dp-usage-copy" type="button" data-copy-value="${example.code()}" data-copy-label="${example.label()}-Code kopieren" data-copy-success-label="${example.label()}-Code kopiert" aria-label="${example.label()}-Code kopieren">

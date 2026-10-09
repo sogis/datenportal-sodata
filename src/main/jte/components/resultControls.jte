@@ -8,6 +8,12 @@
 <section id="result-controls" class="dp-result-controls" hx-swap-oob="${outOfBand ? "true" : null}">
   <div class="dp-result-controls__summary">
     <p id="results-summary" class="dp-results-summary">${results.totalLabel()}</p>
+    <div class="dp-print-query dp-print-only">
+      @if(!queryParams.q().isBlank())
+        <p>Suchbegriff: ${queryParams.q()}</p>
+      @endif
+      <p>Sortierung: ${results.sortMode().label()}</p>
+    </div>
   </div>
   <div class="dp-result-controls__center">
     @template.components.mobileFilterButton(filterPanel = filterPanel)

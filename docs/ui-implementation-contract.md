@@ -1122,3 +1122,58 @@ Wörter im sichtbaren Text und schliessen Auszeichnungen vor dem vorhandenen
 Detail-Link. Titel, Identifier, Einheiten und strukturierte Angaben bleiben
 normale Textwerte. Technische Begriffe werden in Monospace mit einer dezenten
 neutralen Hintergrundfläche hervorgehoben.
+
+## 14. Druck und PDF
+
+Die öffentlichen Seiten im Hauptlayout unterstützen die native
+Browser-Druckfunktion. Das SQL-/R-Labor im Explore-Layout ist vorerst
+ausgenommen. `print.css` wird ausschliesslich im Hauptlayout als Stylesheet
+mit `media="print"` geladen; Bildschirmstyles und Web Components bleiben die
+Grundlage der interaktiven Oberfläche.
+
+- Standard: A4 Hochformat, oben/unten 18 mm und links/rechts 15 mm Rand.
+  Fliesstext hat 10,5 pt, Tabellen und Code mindestens 9 pt.
+- CSS Paged Media verwendet `@page`, `@top-left`, `@bottom-right` und die
+  Seitenzähler `page`/`pages`. Die erste Seite erhält ihre Portalbezeichnung
+  im kompakten Druckkopf; Folgeseiten zeigen sie im oberen Seitenrand.
+  Der Druckkopf enthält immer den vorbereiteten Breadcrumb mit Datensatz-
+  beziehungsweise Ausgabenbezug, unabhängig von JavaScript und Margin Boxes.
+- Hauptnavigation, Suche, Filterbedienung, Ansichts-/Sortiersteuerung,
+  Kopierbuttons und das Seitenpanel `Daten nutzen` werden ausgeblendet.
+  Suchbegriff, Sortierung, Trefferzahl und aktive Filter bleiben als Text
+  sichtbar. Die Suchzusammenfassung wird mit den Result Controls per HTMX
+  aktualisiert und entspricht damit dem gedruckten Ergebnis.
+- Gedruckt werden die aktuellen Treffer in ihrer aktuellen Reihenfolge und
+  dem aktuellen Ausklappzustand. Karten bilden eine einspaltige Folge;
+  Listenbeschreibungen erhalten keine CSS-Zeilenbegrenzung. Die serverseitige
+  Kürzung von Kartenbeschreibungen auf 50 Wörter bleibt mit Detail-Link erhalten.
+- Tabellen passen ohne Mindestbreite oder Scrollbereich in die Seite,
+  umbrechen lange Werte und wiederholen den Tabellenkopf. Downloads und
+  Verweise bleiben PDF-Links; bei `Daten verwenden` wird die Direktzugriffs-URL
+  zusätzlich als Text gedruckt. Zugriffseinschränkungen erscheinen neben dem
+  Schloss auch als Text.
+- `Daten verwenden` druckt ausschliesslich den aktiven Code-Tab mit eigener
+  Sprachüberschrift. Verborgene Panels bleiben verborgen, auch ohne JavaScript.
+- Überschriften bleiben beim folgenden Inhalt; kurze Karten, Metadatenpaare,
+  Ausgabe-Einträge und Codebeispiele werden zusammengehalten. Inhalte, die
+  höher als eine Seite sind, dürfen umbrechen. Absatzumbrüche verwenden
+  `orphans`/`widows`; der Herkunftshinweis im Footer bleibt kompakt im normalen
+  Dokumentfluss, die technische Build-Bezeichnung entfällt im Ausdruck.
+
+### Browser und Abnahme
+
+Chromium unterstützt Margin Boxes und Seitenzähler nativ. In Browsern ohne
+diese Unterstützung können die Randüberschriften und Seitenzahlen fehlen;
+alle fachlichen Inhalte und der Seitenbezug stehen deshalb im Dokument selbst.
+Es gibt keine zusätzliche Paged-Media-JavaScript-Bibliothek.
+
+Die Referenzprüfung erfolgt in Chromium mit 100 % Skalierung und deaktivierten
+Hintergrundgrafiken. Automatische Browser-Kopf-/Fusszeilen im Druckdialog
+ausschalten, damit sie die CSS-Randtexte nicht überlagern. Die nutzerseitigen
+Druckeinstellungen können Papierformat, Ränder und Skalierung überschreiben.
+Firefox wird zusätzlich im Druckmodus auf Lesbarkeit und fehlenden horizontalen
+Overflow geprüft; Playwright erzeugt PDFs nur mit Chromium.
+
+Bei Änderungen am Drucklayout sind die PDFs unter `build/print-previews/`
+visuell seitenweise zu prüfen: keine abgeschnittenen Inhalte, überlagerten
+Texte, vermeidbar getrennten kurzen Blöcke oder unnötigen Leerseiten.

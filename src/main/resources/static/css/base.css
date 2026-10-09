@@ -99,3 +99,7 @@ p {
   white-space: nowrap;
   border: 0;
 }
+
+.dp-print-only {
+  display: none;
+}

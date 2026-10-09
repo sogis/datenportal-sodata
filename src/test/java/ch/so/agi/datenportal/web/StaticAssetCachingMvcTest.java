@@ -29,6 +29,14 @@ class StaticAssetCachingMvcTest {
     }
 
     @Test
+    void printCssIsServedWithTheSameShortCacheHeader() throws Exception {
+        mockMvc.perform(get("/css/print.css"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", allOf(containsString("max-age=3600"), containsString("public"))))
+                .andExpect(content().contentTypeCompatibleWith("text/css"));
+    }
+
+    @Test
     void exploreIslandAssetsUseShortCacheHeader() throws Exception {
         mockMvc.perform(get("/explore/assets/explore.js"))
                 .andExpect(status().isOk())

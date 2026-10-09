@@ -1,0 +1,548 @@
+/* Loaded only by layouts/main.jte with media="print"; the laboratories are excluded. */
+@page {
+  size: A4 portrait;
+  margin: 18mm 15mm;
+
+  @top-left {
+    content: "Datenportal · Kanton Solothurn";
+    font-family: Arial, sans-serif;
+    font-size: 9pt;
+    color: #444;
+  }
+
+  @bottom-right {
+    content: "Seite " counter(page) " von " counter(pages);
+    font-family: Arial, sans-serif;
+    font-size: 9pt;
+    color: #444;
+  }
+}
+
+@page :first {
+  @top-left {
+    content: none;
+  }
+}
+
+html {
+  font-size: 14px;
+}
+
+body.dp-page {
+  --dp-color-text: #1d1d1d;
+  --dp-color-text-muted: #444;
+  --dp-color-accent: #1d1d1d;
+  --dp-color-border: #999;
+  --dp-space-1: 1mm;
+  --dp-space-2: 2mm;
+  --dp-space-3: 3mm;
+  --dp-space-4: 4mm;
+  --dp-space-5: 5mm;
+  --dp-space-6: 6mm;
+  --dp-space-8: 4mm;
+  --dp-space-10: 4mm;
+  --dp-space-12: 4mm;
+  display: block;
+  min-height: 0;
+  margin: 0;
+  overflow: visible;
+  background: #fff;
+  color: var(--dp-color-text);
+  font-size: 10.5pt;
+  line-height: 1.4;
+}
+
+*,
+*::before,
+*::after {
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.dp-print-only {
+  display: block;
+}
+
+so-header,
+so-breadcrumb,
+.dp-site-header,
+.dp-breadcrumb,
+.dp-skip-link,
+.dp-search-form,
+.dp-filter-toolbar,
+.dp-filter-fallback,
+.dp-filter-host,
+.dp-filter-overlay,
+.dp-loading-indicator,
+.dp-result-controls__center,
+.dp-result-controls__sort,
+.dp-filter-reset-link,
+.dp-active-filters .dp-filter-chip [aria-hidden],
+.dp-expand-button,
+.dp-detail-side,
+.dp-usage-tabs,
+.dp-usage-copy,
+.dp-usage-copy-action,
+.dp-results-empty-state .dp-button {
+  display: none;
+}
+
+.dp-main,
+.dp-container {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dp-main {
+  break-after: avoid-page;
+}
+
+.dp-print-header {
+  margin-bottom: 4mm;
+  padding-bottom: 3mm;
+  border-bottom: 1px solid var(--dp-color-border);
+  break-inside: avoid-page;
+  break-after: avoid-page;
+}
+
+.dp-print-header__brand {
+  margin: 0 0 2mm;
+  font-weight: 700;
+}
+
+.dp-print-header__breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1mm 2mm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 9pt;
+}
+
+.dp-print-header__breadcrumb li:not(:last-child)::after {
+  content: " ›";
+}
+
+p,
+.dp-metadata-text {
+  line-height: 1.4;
+  orphans: 3;
+  widows: 3;
+}
+
+.dp-metadata-text code,
+.dp-entry-description code,
+.dp-result-card__description code {
+  font-size: inherit;
+}
+
+h1,
+h2,
+h3 {
+  break-after: avoid-page;
+}
+
+.dp-page-title,
+.dp-detail-title {
+  display: block;
+  margin: 0 0 4mm;
+  font-size: 18pt;
+  line-height: 1.2;
+}
+
+.dp-page h2 {
+  margin: 0 0 2mm;
+  font-size: 12pt;
+  line-height: 1.3;
+}
+
+.dp-page h3 {
+  margin: 0 0 2mm;
+  font-size: 10.5pt;
+}
+
+.dp-detail-title .dp-status-badge {
+  vertical-align: middle;
+}
+
+.dp-lead,
+.dp-lead-secondary,
+.dp-detail-description,
+.dp-series-issues-intro {
+  max-width: none;
+  font-size: 10.5pt;
+}
+
+.dp-catalog-intro,
+.dp-detail-page {
+  padding: 0;
+}
+
+/* Block flow fragments reliably; screen grids must not become page-sized boxes. */
+.dp-catalog-shell,
+.dp-control-band,
+.dp-results-stack,
+.dp-result-controls,
+.dp-detail-summary-layout,
+.dp-detail-summary-main,
+.dp-structure-content,
+.dp-structure-section,
+.dp-usage-section,
+.dp-series-issues__list,
+.dp-related-issues__list,
+.dp-card-grid,
+.dp-metadata-list {
+  display: block;
+}
+
+.dp-results-shell,
+.dp-results-empty-state {
+  min-height: 0;
+}
+
+.dp-result-controls,
+.dp-detail-summary-main > section,
+.dp-structure-content > section,
+.dp-structure-content > div,
+.dp-usage-section {
+  margin-bottom: 3mm;
+}
+
+.dp-results-summary,
+.dp-print-query p {
+  margin: 0 0 2mm;
+  font-size: 10.5pt;
+}
+
+.dp-result-controls {
+  break-after: avoid-page;
+}
+
+.dp-active-filters {
+  margin: 0 0 3mm;
+}
+
+.dp-filter-chip,
+.dp-status-badge,
+.dp-keyword-list li,
+.dp-action-pill,
+.dp-usage-format-badge {
+  min-height: 0;
+  height: auto;
+  padding: 1mm 2mm;
+  background: transparent;
+  color: var(--dp-color-text);
+  font-size: 9pt;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.dp-filter-chip {
+  padding: 0;
+}
+
+.dp-entry-table-wrapper,
+.dp-attribute-table-scroll {
+  max-width: none;
+  overflow: visible;
+  border: 0;
+}
+
+.dp-entry-table,
+.dp-attribute-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  font-size: 9pt;
+  line-height: 1.4;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tbody {
+  break-inside: auto;
+}
+
+tr {
+  break-inside: auto;
+}
+
+/* Start oversized rows in the available space instead of leaving the first page empty. */
+.dp-entry-table tbody:first-of-type tr:first-child,
+.dp-attribute-table tbody tr:first-child {
+  break-before: avoid-page;
+}
+
+.dp-entry-table th,
+.dp-entry-table td,
+.dp-attribute-table th,
+.dp-attribute-table td {
+  padding: 2mm;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.dp-entry-table thead th,
+.dp-entry-publication-date,
+.dp-entry-description {
+  font-size: 9pt;
+}
+
+.dp-entry-table__col-expand {
+  width: 3%;
+}
+
+.dp-entry-table__col-summary {
+  width: 49%;
+}
+
+.dp-entry-table__col-date {
+  width: 16%;
+}
+
+.dp-entry-table__col-metadata {
+  width: 10%;
+}
+
+.dp-entry-table__col-downloads {
+  width: 22%;
+}
+
+.dp-entry-title {
+  font-size: 10.5pt;
+  break-after: avoid-page;
+}
+
+.dp-entry-description {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}
+
+.dp-entry-downloads .dp-download-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1mm;
+}
+
+.dp-metadata-link,
+.dp-access-lock,
+.dp-detail-feature__icon {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.dp-metadata-link svg,
+.dp-access-lock svg,
+.dp-detail-feature__icon svg {
+  width: 4mm;
+  height: 4mm;
+  flex-shrink: 0;
+}
+
+.dp-access-lock {
+  display: inline;
+  font-size: 9pt;
+}
+
+.dp-access-lock::after {
+  content: " " attr(title);
+}
+
+.dp-result-card {
+  display: block;
+  min-height: 0;
+  margin-bottom: 4mm;
+  padding: 3mm;
+  /* Card descriptions are capped at 50 words by the view-model factory. */
+  break-inside: avoid-page;
+}
+
+.dp-result-card > * + *,
+.dp-result-card__bottom > * + * {
+  margin-top: 2mm;
+}
+
+.dp-result-card__description,
+.dp-detail-feature,
+.dp-series-issue__detail-link,
+.dp-related-issue__title,
+.dp-related-issue__meta {
+  font-size: 10.5pt;
+}
+
+.dp-result-card__bottom {
+  display: block;
+  margin-top: 2mm;
+  padding-top: 0;
+}
+
+.dp-result-card__footer {
+  padding-top: 2mm;
+  font-size: 9pt;
+}
+
+.dp-detail-hero {
+  display: block;
+  margin-bottom: 4mm;
+}
+
+.dp-detail-panel {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.dp-detail-summary-main > :last-child,
+.dp-structure-content > :last-child {
+  margin-bottom: 0;
+}
+
+.dp-metadata-item {
+  grid-template-columns: minmax(0, 30%) minmax(0, 1fr);
+  gap: 3mm;
+  padding-bottom: 1mm;
+  break-inside: avoid-page;
+  overflow-wrap: anywhere;
+}
+
+.dp-metadata-list dt {
+  font-size: 10.5pt;
+}
+
+.dp-metadata-list dd {
+  min-width: 0;
+}
+
+.dp-series-issue,
+.dp-related-issue {
+  display: block;
+  margin-bottom: 3mm;
+  break-inside: avoid-page;
+}
+
+.dp-series-issue .dp-download-list {
+  margin-top: 2mm;
+}
+
+.dp-structure-kpis {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 4mm;
+  break-inside: avoid-page;
+}
+
+.dp-structure-kpi {
+  display: block;
+  padding: 3mm;
+}
+
+.dp-structure-kpi__icon {
+  display: none;
+}
+
+.dp-structure-kpi__value {
+  font-size: 14pt;
+}
+
+.dp-structure-kpi__detail {
+  font-size: 9pt;
+}
+
+.dp-attribute-table:not(.dp-usage-direct-table) th:first-child {
+  width: 20%;
+}
+
+.dp-attribute-table:not(.dp-usage-direct-table) th:nth-child(2) {
+  width: 15%;
+}
+
+.dp-attribute-table:not(.dp-usage-direct-table) th:nth-child(3),
+.dp-attribute-table:not(.dp-usage-direct-table) th:nth-child(4) {
+  width: 10%;
+}
+
+.dp-usage-direct-table__format {
+  width: 14%;
+}
+
+.dp-usage-direct-table__description {
+  width: 36%;
+}
+
+.dp-usage-direct-table__action {
+  width: 50%;
+}
+
+.dp-usage-direct-table th {
+  width: auto;
+}
+
+.dp-usage-actions,
+.dp-usage-action[href] {
+  display: block;
+}
+
+.dp-usage-action[href] {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  font-size: 9pt;
+  white-space: normal;
+}
+
+.dp-usage-action svg {
+  display: none;
+}
+
+.dp-usage-action[href]::after {
+  content: attr(href);
+  display: block;
+  margin-top: 1mm;
+  overflow-wrap: anywhere;
+}
+
+.dp-usage-code-panel {
+  break-before: avoid-page;
+  break-inside: avoid-page;
+}
+
+.dp-usage-code-block pre {
+  padding: 3mm;
+  font-size: 9pt;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  orphans: 3;
+  widows: 3;
+}
+
+.dp-footer {
+  margin-top: 0;
+  background: transparent;
+  break-before: avoid-page;
+  break-inside: avoid-page;
+}
+
+.dp-footer__inner {
+  display: block;
+  padding: 0;
+  color: var(--dp-color-text-muted);
+  font-size: 9pt;
+}
+
+.dp-footer__inner p {
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dp-footer__inner p:last-child {
+  display: none;
+}

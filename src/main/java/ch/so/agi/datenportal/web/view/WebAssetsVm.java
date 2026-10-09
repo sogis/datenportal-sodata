@@ -8,6 +8,7 @@ public record WebAssetsVm(
         Optional<String> webComponentsIndexJs,
         List<String> webComponentStylesheets,
         String appCss,
+        String printCss,
         String htmxJs,
         String appJs) {
 
