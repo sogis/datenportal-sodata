@@ -14,7 +14,7 @@ class HeaderViewModelFactoryTest {
         var header = factory.create("Verwaltung");
 
         assertThat(header.activeSection()).isEqualTo("Verwaltung");
-        assertThat(header.logoHref()).isEqualTo("/");
+        assertThat(header.logoHref()).isEqualTo("https://so.ch");
         assertThat(header.siteName()).isEqualTo("Datenportal");
         assertThat(header.siteClaim()).isEqualTo("Kanton Solothurn");
         assertThat(header.primaryNav()).extracting("label")

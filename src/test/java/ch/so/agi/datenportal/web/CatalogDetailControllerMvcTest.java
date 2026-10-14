@@ -28,6 +28,8 @@ class CatalogDetailControllerMvcTest {
         mockMvc.perform(get("/datasets/ch.so.bauinventar"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<so-header")))
+                .andExpect(content().string(containsString("logo-href=\"https://so.ch\"")))
+                .andExpect(content().string(containsString("<a class=\"dp-site-brand__link\" href=\"https://so.ch\">")))
                 .andExpect(content().string(containsString("<so-breadcrumb>")))
                 .andExpect(content().string(containsString("<section class=\"dp-detail-page dp-dataset-detail-page\">")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item href=\"/datasets\">Daten und Statistiken</so-breadcrumb-item>")))

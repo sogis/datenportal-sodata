@@ -78,6 +78,21 @@ Aktueller Stand:
 - Das R-Labor nutzt `ChannelType.PostMessage`, `interactive: false`, `captureR()` und `webr::canvas()`. COOP/COEP und SharedArrayBuffer bleiben out of scope.
 - Der echte WebR-Browser-E2E ist opt-in: `./gradlew playwrightTest -Ddatenportal.playwright.webr=true`. Nach CSP- und Paketindex-Fix laeuft der gezielte Smoke in Playwright-Chromium durch; der normale Playwright-Lauf ueberspringt ihn weiterhin aus Laufzeitgruenden und prueft UI-, Transfer- und Same-Origin-Guards ohne echte WebR-Initialisierung.
 
+### Versionskonflikt beim WebR-Paketmirror
+
+`mirrorWebRPackages` prueft die Versionen in `scripts/webr-packages.lock.json`
+gegen den aktuellen `PACKAGES`-Index von `repoBaseUrl`. Das Quellrepository
+wird aktualisiert; ein neuer Paketstand kann deshalb einen Build mit
+`Locked WebR package ... expected ..., found ...` abbrechen.
+
+In diesem Fall alle gelockten Pakete mit dem aktuellen Index vergleichen,
+abweichende Versions-Pins gezielt aktualisieren und die Abhaengigkeitsmenge
+pruefen. Die strikte Versionspruefung beibehalten. Anschliessend
+`./gradlew clean check` ausfuehren, damit der Mirror vollstaendig neu erstellt
+und getestet wird. Der KernSmooth-Abgleich vom 14.10.2026 erforderte neben
+`2.23-27` auch neue Pins fuer MASS, Rcpp, bit64, class, rlang, sf, stringi
+und withr; die Abhaengigkeitsmenge blieb unveraendert.
+
 ## Keine Parquet-Distribution
 
 Verhalten:

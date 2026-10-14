@@ -50,4 +50,20 @@ describe('mirrorWebRPackages helpers', () => {
       packages: [{name: 'ggplot2', version: '1.0.0'}]
     })).toThrow('Lock file is missing resolved WebR dependency');
   });
+
+  it('requires the exact locked KernSmooth version when the upstream index changes', () => {
+    const records = parsePackageIndex('Package: KernSmooth\nVersion: 2.23-27\nDepends: R (>= 2.5.0), stats\n');
+    const lock = {
+      repoBaseUrl: 'https://example.test',
+      rootPackages: ['KernSmooth'],
+      packages: [{name: 'KernSmooth', version: '2.23-26'}]
+    };
+
+    expect(() => selectLockedRecords(records, lock))
+      .toThrow('Locked WebR package KernSmooth expected 2.23-26, found 2.23-27.');
+    expect(selectLockedRecords(records, {
+      ...lock,
+      packages: [{name: 'KernSmooth', version: '2.23-27'}]
+    })).toEqual(records);
+  });
 });

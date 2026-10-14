@@ -48,6 +48,10 @@ Der Page Chrome ist in `src/main/jte/layouts/main.jte` zentralisiert.
 
 HTMX-Fragmente enthalten keinen Page Chrome und keine Asset-Tags.
 
+Das Solothurner Logo oben links verlinkt auf allen Seiten auf `https://so.ch`
+im selben Tab. `HeaderViewModelFactory` setzt das gemeinsame `logoHref`, das
+`soHeader.jte` als `logo-href` und `headerFallback.jte` als Linkziel übernimmt.
+
 ## Caching
 
 `/vendor/so-web-components/**` wird mit langer TTL ausgeliefert:

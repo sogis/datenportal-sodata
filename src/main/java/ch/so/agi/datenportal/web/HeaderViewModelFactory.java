@@ -29,7 +29,7 @@ public class HeaderViewModelFactory {
         List<NavItemVm> utilityNav = utilityNav();
         return new HeaderVm(
                 activeSection,
-                "/",
+                "https://so.ch",
                 "Datenportal",
                 "Kanton Solothurn",
                 primaryNav,

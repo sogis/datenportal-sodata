@@ -29,6 +29,8 @@ class CatalogControllerMvcTest {
                 .andExpect(content().string(containsString("href=\"/css/print.css\" media=\"print\"")))
                 .andExpect(content().string(containsString("class=\"dp-print-header dp-print-only\"")))
                 .andExpect(content().string(containsString("<so-header")))
+                .andExpect(content().string(containsString("logo-href=\"https://so.ch\"")))
+                .andExpect(content().string(containsString("<a class=\"dp-site-brand__link\" href=\"https://so.ch\">")))
                 .andExpect(content().string(containsString("<so-breadcrumb>")))
                 .andExpect(content().string(containsString("<so-breadcrumb-item")))
                 .andExpect(content().string(containsString("Daten und Statistiken")))
