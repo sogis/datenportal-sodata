@@ -435,6 +435,8 @@ class DetailPageVmFactoryTest {
         assertThat(factory.dataset(datasetWithMetadata(metadata)).features())
                 .extracting("label", "available")
                 .contains(tuple("Datenmodell vorhanden", false));
+        assertThat(page.kpis().getFirst().value()).isEqualTo("Nicht prüfbar");
+        assertThat(page.kpis().getFirst().detail()).contains("Kein Datenmodell");
         assertThat(page.quality().validationReportName()).contains("Validierungsreport");
         assertThat(page.quality().validationReportHref())
                 .contains("https://data.so.ch?entry=dataset");
@@ -470,9 +472,24 @@ class DetailPageVmFactoryTest {
         assertThat(page.kpis())
                 .extracting(kpi -> kpi.title(), kpi -> kpi.value(), kpi -> kpi.detail(), kpi -> kpi.iconName())
                 .containsExactly(
-                        tuple("Validierung", "Erfolgreich", Optional.of("0 Fehler"), "shield-check"),
+                        tuple("Validierung", "Valide", Optional.of("Datenmodell vorhanden"), "shield-check"),
                         tuple("Objekte", "26349", Optional.empty(), "database"),
                         tuple("Attribute", "6", Optional.empty(), "table"));
+    }
+
+    @Test
+    void structureQualityOriginShowsValidWithModelWithoutReport() {
+        CatalogEntryMetadata metadata = new CatalogEntryMetadata(
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                List.of(), Optional.of("SO_AGI_TestModel"));
+
+        var page = factory.datasetStructureQualityOrigin(datasetWithMetadata(metadata));
+
+        assertThat(page.kpis().getFirst().value()).isEqualTo("Valide");
+        assertThat(page.kpis().getFirst().detail()).contains("Datenmodell vorhanden");
+        assertThat(page.quality().validationReportHref()).isEmpty();
+        assertThat(page.quality().missingModelMessage()).isEmpty();
     }
 
     @Test

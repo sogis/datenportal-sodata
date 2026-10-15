@@ -235,12 +235,10 @@ public final class DetailPageVmFactory {
     }
 
     private static List<KpiVm> structureKpis(CatalogEntryMetadata metadata) {
-        String validationValue = metadata.qualitySummary()
-                .map(summary -> "success".equalsIgnoreCase(summary.status()) ? "Erfolgreich" : "Nicht erfolgreich")
-                .orElse("Nicht prüfbar");
-        String validationDetail = metadata.qualitySummary()
-                .map(summary -> summary.errors() + " Fehler")
-                .orElse("Kein Datenmodell");
+        // Publication guarantees valid data whenever a data model is present.
+        boolean hasModel = metadata.model().isPresent();
+        String validationValue = hasModel ? "Valide" : "Nicht prüfbar";
+        String validationDetail = hasModel ? "Datenmodell vorhanden" : "Kein Datenmodell";
         String objectCount = metadata.structureSummary()
                 .map(summary -> Integer.toString(summary.objectCount()))
                 .orElse("–");
