@@ -588,7 +588,7 @@
   margin: 0;
 }
 
-.dp-series-issue__meta {
+.dp-series-issue__title {
   display: flex;
   flex-wrap: wrap;
   gap: var(--dp-space-2) var(--dp-space-3);

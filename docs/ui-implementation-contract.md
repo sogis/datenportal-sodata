@@ -709,6 +709,8 @@ Die Serienübersicht unter `/series/{seriesIdentifier}` ist bewusst schlank:
 - Ausgaben-Card ohne sichtbaren Titel innerhalb der Card
 - aktuelle Ausgabe immer zuoberst
 - weitere Ausgaben alphanumerisch absteigend, z. B. `foo 2025` vor `foo 2024`
+- Pro Ausgabe eine verlinkte Titelzeile `Ausgabe: <issueLabel>` in `18px` und Fett (`700`), bei der aktuellen Ausgabe direkt gefolgt vom bestehenden blauen `Aktuelle Ausgabe`-Badge in normaler Schriftstärke. Bei Platzmangel darf die Zeile umbrechen.
+- Vollständiger Ausgabentitel und die separate Metadatenzeile mit Publikationsdatum entfallen in dieser Liste. Der Link `Detailseite anzeigen →` bleibt unter der Titelzeile, Downloads stehen auf Desktop weiterhin rechts. Ausgabendetailseiten und Breadcrumb bleiben unverändert.
 
 Die Serienübersicht zeigt keinen separaten Downloadbereich, keine Current-Issue-Hinweiskarte und keine Metadatenkarten.
 

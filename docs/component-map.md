@@ -61,7 +61,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 | Datensatz-Zuständigkeiten und Kontakt | `components/metadataSection.jte` | `EntryDetailPageVm.responsibilitiesContact`, `MetadataLineVm` | unframed Metadatenbereich, Datenproduzent, Kontakt und Herausgeber mehrzeilig mit Links |
 | Datensatz-Seitenpanel `Daten nutzen` | `components/detailActionPanel.jte` | `EntryDetailPageVm.structureQualityOriginHref`, `EntryDetailPageVm.exploreHref` | unframed Seitenpanel mit vertikalen Nutzungshinweisen und sekundären Textlinks |
 | Metadaten | `components/metadataSection.jte` | `MetadataSectionVm` | erwartete Gruppen |
-| Serien-Ausgabenliste | `components/seriesIssues.jte` | `List<SeriesIssueVm>` | unframed aktuelle/ältere Ausgaben auf der Serienübersicht mit Trennlinien |
+| Serien-Ausgabenliste | `components/seriesIssues.jte` | `List<SeriesIssueVm>`, `issueLabel` | unframed aktuelle/ältere Ausgaben mit Trennlinien; fette verlinkte Titelzeile `Ausgabe: <issueLabel>` mit aktuellem Badge, ohne wiederholten Titel/Publikationsdatum, Detail-Link darunter und Downloads rechts |
 | Weitere Ausgaben | `components/relatedIssuesCard.jte` | `List<RelatedIssueVm>` | schlanke Linkliste anderer Ausgaben auf Ausgabendetails |
 | Fehlerseite | `pages/notFound.jte` | `CatalogErrorControllerAdvice` | unbekannte Identifier liefern 404 |
 

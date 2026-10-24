@@ -11,15 +11,12 @@
       @for(var issue : issues)
         <article class="dp-series-issue">
           <div>
-            <h2>
-              <a href="${issue.detailHref()}">${issue.title()}</a>
-            </h2>
-            <p class="dp-series-issue__meta">
-              <span>Ausgabe ${issue.issueLabel()} · Publiziert ${issue.publicationDateLabel()}</span>
+            <h2 class="dp-series-issue__title">
+              <a href="${issue.detailHref()}">Ausgabe: ${issue.issueLabel()}</a>
               @if(issue.current())
                 <span class="dp-status-badge dp-status-badge--info">Aktuelle Ausgabe</span>
               @endif
-            </p>
+            </h2>
             <p class="dp-series-issue__detail">
               <a class="dp-series-issue__detail-link" href="${issue.detailHref()}">Detailseite anzeigen <span aria-hidden="true">→</span></a>
             </p>

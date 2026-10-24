@@ -667,7 +667,6 @@ class CatalogFiltersPlaywrightTest {
             Locator seriesIssues = page.locator(".dp-series-issues");
             Locator firstSeriesIssue = page.locator(".dp-series-issue").first();
             Locator seriesIssueTitleLink = page.locator(".dp-series-issue h2 a").first();
-            Locator seriesIssueMeta = page.locator(".dp-series-issue__meta").first();
             Locator seriesIssueDetailLink = page.locator(".dp-series-issue__detail-link").first();
 
             assertThat(page.locator(".dp-current-issue").count()).isZero();
@@ -686,7 +685,14 @@ class CatalogFiltersPlaywrightTest {
             assertThat(cssValue(currentIssueBadge, "border-top-width")).isEqualTo("0px");
             assertThat(cssValue(currentIssueBadge, "background-color")).isEqualTo("rgb(228, 240, 251)");
             assertThat(cssValue(currentIssueBadge, "background-color")).isNotEqualTo(neutralBackground);
-            assertThat(cssValue(seriesIssueMeta, "color")).isEqualTo("rgb(47, 72, 88)");
+            assertThat(cssValue(seriesIssueTitleLink, "color")).isEqualTo("rgb(47, 72, 88)");
+            assertThat(fontSize(seriesIssueTitleLink)).isEqualTo("18px");
+            assertThat(cssValue(seriesIssueTitleLink, "font-weight")).isEqualTo("700");
+            assertThat(page.locator(".dp-series-issue__meta").count()).isZero();
+            assertThat(page.locator(".dp-series-issue h2 a").allTextContents())
+                    .containsExactly("Ausgabe: 2026", "Ausgabe: 2025", "Ausgabe: 2024", "Ausgabe: 2023");
+            assertThat(firstSeriesIssue.locator("h2 .dp-status-badge").innerText()).isEqualTo("Aktuelle Ausgabe");
+            assertThat(page.locator(".dp-series-issue .dp-status-badge").count()).isEqualTo(1);
             assertThat(fontSize(seriesIssueDetailLink)).isEqualTo("18px");
             assertThat(seriesIssueDetailLink.getAttribute("href")).isEqualTo("/series/ch.so.abstimmungsresultate/issues/current");
             seriesIssueTitleLink.hover();
@@ -698,6 +704,37 @@ class CatalogFiltersPlaywrightTest {
 
             assertThat(cssValue(issueActionPill, "border-top-width")).isEqualTo("1px");
             assertThat(cssValue(issueActionPill, "border-top-color")).isEqualTo("rgb(217, 224, 230)");
+        }
+    }
+
+    @Test
+    void seriesOverviewKeepsCompactHeadingsAndDetailLinksAtDesktopAndMobileWidths() {
+        for (int width : List.of(1440, 390)) {
+            try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(width, 1100))) {
+                Page page = context.newPage();
+                page.navigate(baseUrl("/series/ch.so.abstimmungsresultate"));
+                Locator issue = page.locator(".dp-series-issue").first();
+                Locator heading = issue.locator("h2");
+                Locator title = heading.locator("a");
+                Locator badge = heading.locator(".dp-status-badge");
+                Locator detail = issue.locator(".dp-series-issue__detail-link");
+                BoundingBox headingBox = requireBoundingBox(heading);
+                BoundingBox badgeBox = requireBoundingBox(badge);
+
+                assertThat(title.innerText()).isEqualTo("Ausgabe: 2026");
+                assertThat(title.getAttribute("href")).isEqualTo(detail.getAttribute("href"));
+                assertThat(requireBoundingBox(detail).y).isGreaterThanOrEqualTo(headingBox.y + headingBox.height);
+                assertThat(badgeBox.x + badgeBox.width).isLessThanOrEqualTo(headingBox.x + headingBox.width);
+                assertThat(hasHorizontalOverflow(heading)).isFalse();
+                assertThat(issue.locator(".dp-download-link").count()).isEqualTo(3);
+                if (width == 1440) {
+                    assertThat(badgeBox.x).isGreaterThan(requireBoundingBox(title).x + requireBoundingBox(title).width);
+                    assertThat(requireBoundingBox(issue.locator(".dp-download-list")).x)
+                            .isGreaterThanOrEqualTo(headingBox.x + headingBox.width);
+                }
+                page.screenshot(new Page.ScreenshotOptions().setFullPage(true)
+                        .setPath(java.nio.file.Path.of("build/list-previews/series-overview-" + width + ".png")));
+            }
         }
     }
 
