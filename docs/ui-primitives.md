@@ -73,6 +73,12 @@ Lokale Ausnahme fuer Card-Keywords:
 - Sie verwenden jedoch bewusst `font-size: 14px`, damit sie sich unterhalb von Titel und Beschreibung ruhiger einordnen.
 - Sie verwenden auf Cards ausserdem nur `6px` horizontales Padding und `min-height: 1.6rem`, damit sie kompakter als Typ- und Status-Badges wirken.
 
+Lokale Ausnahme fuer Datenreihen in der Listenansicht:
+
+- Nur Root-Zeilen von Datenreihen zeigen hinter dem Titel einen kompakten Info-Badge `Datenreihe` mit Collection-Icon.
+- `.dp-entry-series-badge` verwendet `14px` Schrift, normale Schriftstärke, `24px` Mindesthöhe, `6px` horizontales Padding und ein `14px`-Icon.
+- Der Badge darf als Ganzes umbrechen. Kachel- und Detail-Badges behalten ihre bisherige Grösse.
+
 ### 1.3 Action Pill
 
 Zweck:

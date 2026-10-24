@@ -882,6 +882,47 @@ class CatalogFiltersPlaywrightTest {
     }
 
     @Test
+    void seriesListBadgeFitsBesideTitleAndWrapsWithLongTitlesAtNarrowWidths() {
+        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?expanded=ch.so.abstimmungsresultate"));
+            Locator series = page.locator(".dp-entry-row--series")
+                    .filter(new Locator.FilterOptions().setHasText("Abstimmungsresultate")).first();
+            Locator title = series.locator(".dp-entry-title");
+            Locator badge = series.locator(".dp-entry-series-badge");
+
+            assertThat(badge.innerText()).isEqualTo("Datenreihe");
+            assertThat(fontSize(badge)).isEqualTo("14px");
+            assertThat(cssValue(badge, "font-weight")).isEqualTo("400");
+            assertThat(cssValue(badge, "background-color")).isEqualTo("rgb(228, 240, 251)");
+            assertThat(requireBoundingBox(badge).height).isEqualTo(24d);
+            assertThat(requireBoundingBox(badge).y - requireBoundingBox(title).y).isLessThan(8d);
+            assertThat(page.locator(".dp-issue-row .dp-entry-title").allTextContents())
+                    .containsExactlyInAnyOrder("Ausgabe: 2026", "Ausgabe: 2025", "Ausgabe: 2024", "Ausgabe: 2023");
+            assertThat(page.locator(".dp-issue-row .dp-entry-description").count()).isZero();
+            assertThat(cssValue(page.locator(".dp-issue-row").first(), "background-color")).isEqualTo("rgb(255, 255, 255)");
+            assertThat(cssValue(page.locator(".dp-issue-row .dp-entry-title").first(), "font-weight")).isEqualTo("400");
+            assertThat(cssValue(title, "font-weight")).isEqualTo("700");
+            series.screenshot(new Locator.ScreenshotOptions()
+                    .setPath(java.nio.file.Path.of("build/list-previews/series-desktop.png")));
+
+            title.evaluate("element => element.firstChild.textContent = 'Steuerfüsse natürliche und juristische Personen nach Gemeinde Kanton Solothurn '");
+            for (int width : List.of(1440, 390)) {
+                page.setViewportSize(width, 1200);
+                BoundingBox summaryBox = requireBoundingBox(series.locator(".dp-entry-summary"));
+                BoundingBox badgeBox = requireBoundingBox(badge);
+                BoundingBox descriptionBox = requireBoundingBox(series.locator(".dp-entry-description"));
+                assertThat(badgeBox.x).isGreaterThanOrEqualTo(summaryBox.x);
+                assertThat(badgeBox.x + badgeBox.width).isLessThanOrEqualTo(summaryBox.x + summaryBox.width);
+                assertThat(badgeBox.y + badgeBox.height).isLessThanOrEqualTo(descriptionBox.y);
+                assertThat(hasHorizontalOverflow(title)).isFalse();
+                series.screenshot(new Locator.ScreenshotOptions()
+                        .setPath(java.nio.file.Path.of("build/list-previews/series-long-" + width + ".png")));
+            }
+        }
+    }
+
+    @Test
     void desktopListViewKeepsThreeDownloadPillsOnOneLineForSeriesRootAndIssueRows() {
         try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
             Page page = context.newPage();

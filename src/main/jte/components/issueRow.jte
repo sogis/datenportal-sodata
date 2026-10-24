@@ -3,8 +3,7 @@
 <tr class="dp-entry-row dp-issue-row">
   <td class="dp-entry-table__expand"></td>
   <td class="dp-entry-summary">
-    <p class="dp-entry-title">${issue.title()}</p>
-    <p class="dp-entry-description">${issue.description()}</p>
+    <p class="dp-entry-title">${issue.displayLabel()}</p>
   </td>
   <td class="dp-entry-publication-date">${issue.publicationDateLabel()}</td>
   <td>

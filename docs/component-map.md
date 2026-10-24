@@ -33,8 +33,8 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 |---|---|---|---|
 | Tabelle | `components/entryTable.jte` | `ResultsVm.rows` | reduzierte Spalten ohne Typ |
 | Datensatz-Zeile | `components/entryRow.jte` | `EntryRowVm` | keine Themenzeile und kein Typ-Badge |
-| Datenreihen-Root | `components/entryRow.jte` | `EntryRowVm.series=true` | `aria-expanded`, Plus/Minus |
-| Ausgabezeile | `components/issueRow.jte` | `IssueRowVm` | Downloads ohne aktuelle-Ausgabe-Text, ohne Typ-Badge |
+| Datenreihen-Root | `components/entryRow.jte` | `EntryRowVm.series=true` | `aria-expanded`, Plus/Minus, kompakter blauer `Datenreihe`-Badge direkt hinter dem Titel |
+| Ausgabezeile | `components/issueRow.jte` | `IssueRowVm.displayLabel`, `ResultsVmFactory` | nur `Ausgabe: <issueLabel>` ohne Beschreibung, Downloads ohne aktuelle-Ausgabe-Text, ohne Typ-Badge; vollständige Seite und HTMX-Fragment |
 | Downloadlink | `components/downloadLink.jte` | `DownloadLinkVm` | zugänglicher Name |
 
 ## Kartenansicht
@@ -70,8 +70,9 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 Beschreibungen in Katalogeinführung, Detail-Hero, Attributtabelle und den
 Freitexten zu Herkunft/Verwendung erhalten vorbereiteten
 `MetadataTextRenderer.Html`-Inhalt. Katalogeinführung und Detailtexte verwenden
-Blockdarstellung; `entryRow`, `issueRow` und `entryCard` verwenden kompakte
-Inline-Darstellung. `MetadataLineVm.formattedValue` kennzeichnet ausschliesslich
+Blockdarstellung; `entryRow` und `entryCard` verwenden kompakte
+Inline-Darstellung. Ausgabezeilen in der Katalogliste zeigen keine Beschreibung.
+`MetadataLineVm.formattedValue` kennzeichnet ausschliesslich
 die drei beschreibenden Freitexte; normale Metadaten und Kontaktlinks bleiben
 maskierte Strings. Parsing, Rendering und Wortkürzung liegen zentral in
 `support.metadata`, siehe [Erfassungsregeln](metadata-text.md).

@@ -81,13 +81,14 @@ class MetadataRenderingMvcTest {
     }
 
     @Test
-    void fullPagesAndHtmxFragmentsUseCompactInlineFormattingIncludingExpandedIssues() throws Exception {
+    void fullPagesAndHtmxFragmentsUseCompactDescriptionsAndLabelOnlyExpandedIssues() throws Exception {
         for (String header : List.of("false", "true")) {
             var response = mockMvc.perform(get("/datasets").param("expanded", "serie").header("HX-Request", header))
                     .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
             assertThat(response)
                     .contains("<p class=\"dp-entry-description\">Das Attribut <code>gemeinde_nr</code>. Wert <strong>2401</strong>. <em>Hinweis</em> Weiterer Punkt")
-                    .contains("<p class=\"dp-entry-description\">Ausgabe <em>beschrieben</em> Zweite Zeile</p>")
+                    .contains("<p class=\"dp-entry-title\">Ausgabe: 2026</p>")
+                    .doesNotContain("Ausgabe <em>beschrieben</em>")
                     .doesNotContain("<ul>", "<script>alert");
         }
     }

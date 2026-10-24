@@ -454,6 +454,23 @@
   overflow-wrap: anywhere;
 }
 
+.dp-entry-series-badge {
+  min-height: 24px;
+  margin-inline-start: var(--dp-space-2);
+  padding: 0 6px;
+  gap: var(--dp-space-1);
+  font-size: 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.dp-entry-series-badge svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
 .dp-metadata-link {
   display: inline-flex;
   align-items: center;
@@ -487,7 +504,11 @@
 }
 
 .dp-issue-group .dp-issue-row {
-  background: var(--dp-color-surface-muted);
+  background: var(--dp-color-surface);
+}
+
+.dp-issue-row .dp-entry-title {
+  font-weight: 400;
 }
 
 .dp-issue-row td:first-child + td {

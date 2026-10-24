@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -280,7 +282,7 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void listViewOmitsTypeBadgesAndThemesWhileCardsKeepTypeBadges() throws Exception {
+    void listViewShowsCompactTypeBadgeForSeriesWhileCardsKeepTheirTypeBadges() throws Exception {
         var listHtml = mockMvc.perform(get("/datasets"))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -315,7 +317,7 @@ class CatalogControllerMvcTest {
                 .contains("class=\"bi bi-info-circle\"")
                 .contains("width=\"24\" height=\"24\"")
                 .doesNotContain("<th scope=\"col\">Typ</th>")
-                .doesNotContain("dp-type-badge")
+                .contains("dp-type-badge dp-entry-series-badge dp-status-badge--info")
                 .doesNotContain("dp-entry-themes")
                 .doesNotContain("dp-entry-icon")
                 .doesNotContain(">i</a>")
@@ -326,7 +328,7 @@ class CatalogControllerMvcTest {
                 .contains("class=\"bi bi-info-circle\"")
                 .contains("width=\"24\" height=\"24\"")
                 .contains("aria-label=\"Details anzeigen: Abstimmungsresultate 2026\"")
-                .doesNotContain("dp-type-badge")
+                .contains("dp-type-badge dp-entry-series-badge dp-status-badge--info")
                 .doesNotContain(">i</a>")
                 .doesNotContain("<span aria-hidden=\"true\">+</span>")
                 .doesNotContain("<span aria-hidden=\"true\">-</span>");
@@ -335,6 +337,51 @@ class CatalogControllerMvcTest {
                 .contains("dp-result-card__type-badge dp-status-badge--info")
                 .contains("class=\"bi bi-file-earmark\"")
                 .contains("class=\"bi bi-collection\"");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void expandedListShowsShortIssueLabelsAndBadgesOnlyOnSeriesRoots(boolean htmx) throws Exception {
+        var request = get("/datasets").param("expanded", "ch.so.abstimmungsresultate");
+        if (htmx) {
+            request.header("HX-Request", "true").header("HX-Target", "dataset-results-shell");
+        }
+        var html = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        var rows = java.util.regex.Pattern.compile("<tr class=\"([^\"]*)\"[^>]*>(.*?)</tr>",
+                java.util.regex.Pattern.DOTALL).matcher(html);
+        int seriesCount = 0;
+        int issueCount = 0;
+        int datasetCount = 0;
+        while (rows.find()) {
+            String classes = rows.group(1);
+            String row = rows.group(2);
+            if (classes.contains("dp-entry-row--series")) {
+                seriesCount++;
+                assertThat(row).contains("dp-entry-series-badge dp-status-badge--info")
+                        .contains("<span>Datenreihe</span>")
+                        .contains("dp-entry-description");
+            } else {
+                assertThat(row).doesNotContain("dp-type-badge").doesNotContain("dp-entry-series-badge");
+                if (classes.contains("dp-issue-row")) {
+                    issueCount++;
+                    var summary = row.substring(row.indexOf("<td class=\"dp-entry-summary\">"));
+                    summary = summary.substring(0, summary.indexOf("</td>"));
+                    assertThat(summary).containsPattern("<p class=\"dp-entry-title\">Ausgabe: 202[3-6]</p>")
+                            .doesNotContain("Abstimmungsresultate")
+                            .doesNotContain("ch.so.")
+                            .doesNotContain("dp-entry-description");
+                } else {
+                    datasetCount++;
+                    assertThat(row).contains("dp-entry-description");
+                }
+            }
+        }
+        assertThat(seriesCount).isPositive();
+        assertThat(datasetCount).isPositive();
+        assertThat(issueCount).isEqualTo(4);
     }
 
     @Test

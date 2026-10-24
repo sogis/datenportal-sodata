@@ -67,6 +67,28 @@ class ResultsVmFactoryTest {
         assertThat(renderCard(seriesCard)).contains("class=\"dp-card-detail-link\" href=\"/series/series.long\"");
     }
 
+    @Test
+    void issueListLabelUsesIssueLabelWhileKeepingFullTitleForAccessibleLinks() {
+        var series = series("series.test", "Serienbeschreibung");
+        var params = new CatalogQueryParams();
+        params.setExpanded(List.of(series.identifier()));
+        var searchResult = new SearchResult(List.of(series), 1,
+                new SearchQuery("", SearchFilters.empty(), SortMode.defaultMode()));
+
+        var issueRow = factory.create(searchResult, params).rows().getFirst().issueRows().getFirst();
+
+        assertThat(issueRow.displayLabel()).isEqualTo("Ausgabe: 2025");
+        assertThat(issueRow.title()).isEqualTo("Testdatenreihe 2025");
+        assertThat(issueRow.detailHref()).isEqualTo("/series/series.test/issues/series.test.2025");
+        var output = new StringOutput();
+        TEMPLATE_ENGINE.render("components/issueRow.jte", Map.of("issue", issueRow), output);
+        assertThat(output.toString())
+                .contains("<p class=\"dp-entry-title\">Ausgabe: 2025</p>")
+                .contains("aria-label=\"Details anzeigen: Testdatenreihe 2025\"")
+                .doesNotContain("dp-entry-description")
+                .doesNotContain("<p class=\"dp-entry-title\">Testdatenreihe");
+    }
+
     private EntryCardVm card(ch.so.agi.datenportal.catalog.domain.CatalogEntry entry) {
         var result = new SearchResult(
                 List.of(entry),

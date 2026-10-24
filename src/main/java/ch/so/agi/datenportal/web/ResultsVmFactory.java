@@ -70,6 +70,7 @@ public final class ResultsVmFactory {
         return new IssueRowVm(
                 issue.identifier(),
                 issue.title(),
+                "Ausgabe: " + issue.issueLabel(),
                 MetadataTextRenderer.compact(issue.description()),
                 issue.type().label(),
                 DATE_FORMATTER.format(issue.modified()),

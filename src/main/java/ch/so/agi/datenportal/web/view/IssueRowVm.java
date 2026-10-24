@@ -6,6 +6,7 @@ import java.util.List;
 public record IssueRowVm(
         String id,
         String title,
+        String displayLabel,
         Html description,
         String typeLabel,
         String publicationDateLabel,
