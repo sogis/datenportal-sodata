@@ -16,6 +16,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
@@ -29,17 +32,22 @@ class CatalogFiltersPlaywrightTest {
 
     private Playwright playwright;
     private Browser browser;
+    private Browser firefox;
 
     @BeforeAll
     void setUpBrowser() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+        firefox = playwright.firefox().launch(new BrowserType.LaunchOptions().setHeadless(true));
     }
 
     @AfterAll
     void tearDownBrowser() {
         if (browser != null) {
             browser.close();
+        }
+        if (firefox != null) {
+            firefox.close();
         }
         if (playwright != null) {
             playwright.close();
@@ -877,11 +885,54 @@ class CatalogFiltersPlaywrightTest {
         }
     }
 
-    @Test
-    void seriesRootRowClickTogglesUsingDisclosureLinkAndIgnoresInteractiveChildren() {
-        try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 1200))) {
+    @ParameterizedTest(name = "{0}: {1}")
+    @CsvSource({"chromium, mouse", "chromium, keyboard", "firefox, mouse", "firefox, keyboard"})
+    void seriesDisclosurePreservesScrollAndFocus(String engine, String activation) {
+        Browser testBrowser = engine.equals("firefox") ? firefox : browser;
+        try (BrowserContext context = testBrowser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 900))) {
+            Page page = context.newPage();
+            page.navigate(baseUrl("/datasets?view=list&sort=modified-desc"));
+            page.evaluate("() => document.fonts.ready");
+
+            String toggleId = "series-toggle-ch.so.abstimmungsresultate";
+            Locator toggle = page.locator("[id='" + toggleId + "']");
+            Locator issues = page.locator("[id='issues-ch.so.abstimmungsresultate'] .dp-issue-row");
+            toggle.scrollIntoViewIfNeeded();
+            double initialScroll = scrollY(page);
+            assertThat(initialScroll).isGreaterThan(100d);
+            assertThat(toggle.getAttribute("aria-expanded")).isEqualTo("false");
+            assertThat(issues.count()).isZero();
+
+            for (boolean expanded : List.of(true, false)) {
+                if (activation.equals("mouse")) {
+                    toggle.click();
+                } else {
+                    toggle.press("Enter");
+                }
+                waitForSeriesToggle(page, toggleId, expanded);
+
+                assertThat(Math.abs(scrollY(page) - initialScroll))
+                        .as("Viewport after %s with %s in %s", expanded ? "expansion" : "collapse", activation, engine)
+                        .isLessThanOrEqualTo(3d);
+                assertThat(toggle.evaluate("element => element === document.activeElement")).isEqualTo(true);
+                assertThat(issues.count()).isEqualTo(expanded ? 4 : 0);
+                if (expanded) {
+                    assertThat(page.url()).contains("expanded=ch.so.abstimmungsresultate");
+                } else {
+                    assertThat(page.url()).doesNotContain("expanded=");
+                }
+            }
+        }
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = {"chromium", "firefox"})
+    void seriesRootRowClickTogglesUsingDisclosureLinkAndIgnoresInteractiveChildren(String engine) {
+        Browser testBrowser = engine.equals("firefox") ? firefox : browser;
+        try (BrowserContext context = testBrowser.newContext(new Browser.NewContextOptions().setViewportSize(1440, 900))) {
             Page page = context.newPage();
             page.navigate(baseUrl("/datasets"));
+            page.evaluate("() => document.fonts.ready");
 
             Locator seriesRow = page.locator("tr.dp-entry-row--series")
                     .filter(new Locator.FilterOptions().setHasText("Abstimmungsresultate"))
@@ -889,18 +940,21 @@ class CatalogFiltersPlaywrightTest {
             assertThat(seriesRow.getAttribute("data-series-expand-href")).contains("expanded=ch.so.abstimmungsresultate");
             assertThat(seriesRow.locator(".dp-expand-button").getAttribute("aria-expanded")).isEqualTo("false");
 
-            seriesRow.locator(".dp-entry-summary").click();
-            page.waitForFunction(
-                    "() => document.querySelector('tr.dp-entry-row--series .dp-expand-button[aria-expanded=\\\"true\\\"]') !== null");
+            seriesRow.scrollIntoViewIfNeeded();
+            double initialScroll = scrollY(page);
+            assertThat(initialScroll).isGreaterThan(100d);
+            seriesRow.locator(".dp-entry-title").click();
+            waitForSeriesToggle(page, "series-toggle-ch.so.abstimmungsresultate", true);
+            assertThat(Math.abs(scrollY(page) - initialScroll)).isLessThanOrEqualTo(3d);
             assertThat(page.url()).contains("expanded=ch.so.abstimmungsresultate");
             assertThat(page.locator(".dp-issue-row").count()).isGreaterThan(0);
 
             Locator expandedSeriesRow = page.locator("tr.dp-entry-row--series")
                     .filter(new Locator.FilterOptions().setHasText("Abstimmungsresultate"))
                     .first();
-            expandedSeriesRow.locator(".dp-entry-summary").click();
-            page.waitForFunction(
-                    "() => document.querySelector('tr.dp-entry-row--series .dp-expand-button[aria-expanded=\\\"true\\\"]') === null");
+            expandedSeriesRow.locator(".dp-entry-title").click();
+            waitForSeriesToggle(page, "series-toggle-ch.so.abstimmungsresultate", false);
+            assertThat(Math.abs(scrollY(page) - initialScroll)).isLessThanOrEqualTo(3d);
             assertThat(page.locator(".dp-issue-row").count()).isZero();
 
             Locator interactiveRow = page.locator("tr.dp-entry-row--series")
@@ -1031,6 +1085,17 @@ class CatalogFiltersPlaywrightTest {
 
     private static double documentHeight(Page page) {
         return ((Number) page.evaluate("() => document.documentElement.scrollHeight")).doubleValue();
+    }
+
+    private static double scrollY(Page page) {
+        return ((Number) page.evaluate("() => window.scrollY")).doubleValue();
+    }
+
+    private static void waitForSeriesToggle(Page page, String toggleId, boolean expanded) {
+        page.waitForFunction("""
+                ([id, expanded]) => document.getElementById(id)?.getAttribute('aria-expanded') === expanded
+                    && !document.querySelector('#dataset-results-shell.htmx-settling')
+                """, List.of(toggleId, String.valueOf(expanded)));
     }
 
     private static List<Integer> findCardRowWithMixedKeywordHeights(Locator cards) {

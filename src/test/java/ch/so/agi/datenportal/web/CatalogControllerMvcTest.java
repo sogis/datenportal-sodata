@@ -313,6 +313,7 @@ class CatalogControllerMvcTest {
                 .contains("<th scope=\"col\">Details</th>")
                 .contains("<th scope=\"col\">Daten herunterladen</th>")
                 .contains("aria-label=\"Details anzeigen: Abstimmungsresultate\"")
+                .contains("id=\"series-toggle-ch.so.abstimmungsresultate\"")
                 .contains("class=\"bi bi-plus-lg\"")
                 .contains("class=\"bi bi-info-circle\"")
                 .contains("width=\"24\" height=\"24\"")
@@ -324,6 +325,7 @@ class CatalogControllerMvcTest {
                 .doesNotContain("<span aria-hidden=\"true\">+</span>")
                 .doesNotContain("<span aria-hidden=\"true\">-</span>");
         assertThat(expandedHtml)
+                .contains("id=\"series-toggle-ch.so.abstimmungsresultate\"")
                 .contains("class=\"bi bi-dash-lg\"")
                 .contains("class=\"bi bi-info-circle\"")
                 .contains("width=\"24\" height=\"24\"")
@@ -350,6 +352,7 @@ class CatalogControllerMvcTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
+        assertThat(html).contains("id=\"series-toggle-ch.so.abstimmungsresultate\"");
         var rows = java.util.regex.Pattern.compile("<tr class=\"([^\"]*)\"[^>]*>(.*?)</tr>",
                 java.util.regex.Pattern.DOTALL).matcher(html);
         int seriesCount = 0;

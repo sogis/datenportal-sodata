@@ -33,7 +33,7 @@ Dieses Dokument ordnet UI-Anforderungen den Implementierungsartefakten zu.
 |---|---|---|---|
 | Tabelle | `components/entryTable.jte` | `ResultsVm.rows` | reduzierte Spalten ohne Typ |
 | Datensatz-Zeile | `components/entryRow.jte` | `EntryRowVm` | keine Themenzeile und kein Typ-Badge |
-| Datenreihen-Root | `components/entryRow.jte` | `EntryRowVm.series=true` | `aria-expanded`, Plus/Minus, kein Typ-Badge und kein Collection-Icon hinter dem Titel |
+| Datenreihen-Root | `components/entryRow.jte` | `EntryRowVm.series=true` | `aria-expanded`, Plus/Minus mit stabiler Fokus-ID; Chromium/Firefox prüfen Scrollposition und Fokus bei Maus/Enter sowie Titelklick und ausgenommene Info-/Downloadlinks; kein Typ-Badge und kein Collection-Icon hinter dem Titel |
 | Ausgabezeile | `components/issueRow.jte` | `IssueRowVm.displayLabel`, `ResultsVmFactory` | weisser Hintergrund; nur `Ausgabe: <issueLabel>` ohne Beschreibung, Downloads ohne aktuelle-Ausgabe-Text, ohne Typ-Badge; vollständige Seite und HTMX-Fragment |
 | Downloadlink | `components/downloadLink.jte` | `DownloadLinkVm` | zugänglicher Name |
 

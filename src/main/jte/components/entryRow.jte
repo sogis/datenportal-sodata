@@ -4,6 +4,7 @@
   <td class="dp-entry-table__expand">
     @if(row.series())
       <a
+        id="series-toggle-${row.id()}"
         class="dp-expand-button"
         href="${row.expandHref()}"
         hx-get="${row.expandHref()}"

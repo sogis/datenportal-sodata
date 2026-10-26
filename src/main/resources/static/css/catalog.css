@@ -346,6 +346,8 @@
 
 .dp-results-shell {
   min-height: 12rem;
+  /* HTMX inserts the replacement before removing the focused series toggle. */
+  overflow-anchor: none;
 }
 
 .dp-results-empty-state {

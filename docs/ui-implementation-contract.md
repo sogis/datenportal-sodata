@@ -518,6 +518,13 @@ Pflicht für Ausgabezeilen:
 
 Das Plus-/Minus-Verhalten muss ohne eigenes JavaScript über einen Link/Button funktionieren.
 
+Beim Auf- und Zuklappen via HTMX per Plus/Minus, Enter oder Titelklick bleibt der Viewport erhalten.
+Der Disclosure-Link hat die stabile ID `series-toggle-<identifier>`, damit HTMX den Fokus
+nach dem Austausch der Resultate wiederherstellt. `.dp-results-shell` verwendet
+`overflow-anchor: none`: Beim `outerHTML`-Swap fügt HTMX die neue Liste vor der alten
+ein; die automatische Scroll-Verankerung darf dem dabei verschobenen, fokussierten
+Link nicht ans Seitenende folgen.
+
 Zusätzlich darf die bestehende kleine JavaScript-Insel `src/main/resources/static/js/catalog-filters.js` den Zeilenklick komfortabler machen.
 
 Regel für die JS-Insel:
@@ -1071,6 +1078,7 @@ Mindestens automatisiert oder manuell dokumentieren:
 - Tab-Reihenfolge Suche → Filter → Ansichttoggle → Resultate.
 - Filtergruppen sind per Tastatur bedienbar.
 - Row Toggle hat sichtbaren Fokus.
+- Chromium und Firefox prüfen echte Mausklicks auf Plus/Minus, Enter und Titelklick in einer gescrollten Liste: höchstens `3px` Scrollabweichung; Fokus bleibt nach direkter Disclosure-Aktivierung erhalten; Info- und Downloadlinks lösen keinen Row Toggle aus.
 - Downloadlinks haben eindeutige Namen.
 - Playwright deckt mindestens folgende Browserflüsse ab: Desktop-Popover ohne Y-Shift, URL-/Reload-Wiederherstellung, Escape/Outside-Click mit Fokus-Rückgabe und Mobile-Sheet Apply/Reset.
 
