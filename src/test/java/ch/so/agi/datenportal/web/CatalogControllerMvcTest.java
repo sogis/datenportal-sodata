@@ -282,7 +282,7 @@ class CatalogControllerMvcTest {
     }
 
     @Test
-    void listViewShowsCompactTypeBadgeForSeriesWhileCardsKeepTheirTypeBadges() throws Exception {
+    void listViewOmitsTypeBadgesWhileCardsKeepTheirTypeBadges() throws Exception {
         var listHtml = mockMvc.perform(get("/datasets"))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -317,7 +317,7 @@ class CatalogControllerMvcTest {
                 .contains("class=\"bi bi-info-circle\"")
                 .contains("width=\"24\" height=\"24\"")
                 .doesNotContain("<th scope=\"col\">Typ</th>")
-                .contains("dp-type-badge dp-entry-series-badge dp-status-badge--info")
+                .doesNotContain("dp-type-badge", "dp-entry-series-badge", "bi-collection")
                 .doesNotContain("dp-entry-themes")
                 .doesNotContain("dp-entry-icon")
                 .doesNotContain(">i</a>")
@@ -328,7 +328,7 @@ class CatalogControllerMvcTest {
                 .contains("class=\"bi bi-info-circle\"")
                 .contains("width=\"24\" height=\"24\"")
                 .contains("aria-label=\"Details anzeigen: Abstimmungsresultate 2026\"")
-                .contains("dp-type-badge dp-entry-series-badge dp-status-badge--info")
+                .doesNotContain("dp-type-badge", "dp-entry-series-badge", "bi-collection")
                 .doesNotContain(">i</a>")
                 .doesNotContain("<span aria-hidden=\"true\">+</span>")
                 .doesNotContain("<span aria-hidden=\"true\">-</span>");
@@ -341,7 +341,7 @@ class CatalogControllerMvcTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    void expandedListShowsShortIssueLabelsAndBadgesOnlyOnSeriesRoots(boolean htmx) throws Exception {
+    void expandedListShowsShortIssueLabelsWithoutTypeBadges(boolean htmx) throws Exception {
         var request = get("/datasets").param("expanded", "ch.so.abstimmungsresultate");
         if (htmx) {
             request.header("HX-Request", "true").header("HX-Target", "dataset-results-shell");
@@ -358,13 +358,11 @@ class CatalogControllerMvcTest {
         while (rows.find()) {
             String classes = rows.group(1);
             String row = rows.group(2);
+            assertThat(row).doesNotContain("dp-type-badge", "dp-entry-series-badge", "bi-collection");
             if (classes.contains("dp-entry-row--series")) {
                 seriesCount++;
-                assertThat(row).contains("dp-entry-series-badge dp-status-badge--info")
-                        .contains("<span>Datenreihe</span>")
-                        .contains("dp-entry-description");
+                assertThat(row).contains("dp-entry-description");
             } else {
-                assertThat(row).doesNotContain("dp-type-badge").doesNotContain("dp-entry-series-badge");
                 if (classes.contains("dp-issue-row")) {
                     issueCount++;
                     var summary = row.substring(row.indexOf("<td class=\"dp-entry-summary\">"));

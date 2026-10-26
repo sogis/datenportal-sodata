@@ -41,7 +41,7 @@ Die früheren generierten Hero-Startseiten und Detailseiten sind nicht mehr füh
 - keine grosse Landschafts-/Hero-Marketing-Startseite als initiale Ansicht
 - keine Datenvorschau auf Detailseiten
 - keine roten Sonderbuttons für Datenreihen in der Tabellenansicht
-- keine Themen-/Datensatz-Icons in der Tabellenansicht, ausser Plus/Minus für Datenreihen-Expansion und dem Collection-Icon im kompakten Datenreihen-Badge
+- keine Themen-/Datensatz-Icons in der Tabellenansicht, ausser Plus/Minus für Datenreihen-Expansion
 
 ---
 
@@ -450,7 +450,7 @@ Pflichtspalten:
 Thema / Datensatz | Publiziert | Details | Daten herunterladen
 ```
 
-Die erste Spalte enthält keine Themen-/Datensatz-Icons mehr. Ausnahmen: Datenreihen erhalten ganz links einen Plus-/Minus-Button zum Aufklappen und ein Collection-Icon innerhalb ihres kompakten Typ-Badges.
+Die erste Spalte enthält keine Themen-/Datensatz-Icons mehr. Datenreihen erhalten ganz links einen Plus-/Minus-Button zum Aufklappen. Typ-Badges werden in der Listenansicht nicht angezeigt.
 
 In der Desktop-Listenansicht wird die Spalte `Daten herunterladen` mit fester Reserve fuer mindestens drei Standard-Pills `CSV`, `XLSX`, `Parquet` eingeplant. Die Titel-/Beschreibungsspalte nimmt den verbleibenden Platz ein.
 
@@ -475,7 +475,7 @@ Pflicht:
 - Klick auf die Zeile klappt ebenfalls auf/zu
 - Klick auf Info-Link oder Download-Link darf die Zeile nicht toggeln
 - Titel fett in `18px`, Beschreibung in `16px`
-- Direkt hinter dem Titel steht ein blauer Info-Badge `Datenreihe` mit Collection-Icon. Er verwendet lokal `14px`, normale Schriftstärke, `24px` Mindesthöhe, `6px` horizontales Padding und ein `14px`-Icon. Er steht bei genügend Platz auf derselben Zeile und darf bei Platzmangel als Ganzes umbrechen. Kachel- und Detail-Badges bleiben unverändert.
+- kein Typ-Badge und kein Collection-Icon hinter dem Titel; Kachel- und Detail-Badges bleiben unverändert
 - keine zusätzliche Themenzeile in der Listenansicht
 - Publikationsdatum der aktuellen Ausgabe oder der Serien-Aktualisierung in `18px`
 - Info-Link führt auf die Detailseite der aktuellen Ausgabe
@@ -1094,7 +1094,7 @@ Keine Screenshot-Pixelvergleiche im MVP. Stattdessen HTML-Struktur, Klassen, ARI
 - `CatalogQueryParams` mit Mehrfachfiltern.
 - Filterbar mit aktiven Chips.
 - Listenansicht gemäss `startseite_liste.png`.
-- Datensatz-/Datenreihe-Badges im blauen Info-/Ink-Stil.
+- Keine Typ-Badges für Datensätze oder Datenreihen in der Listenansicht.
 - Downloads zur aktuellen Ausgabe.
 - MVC-Tests.
 
