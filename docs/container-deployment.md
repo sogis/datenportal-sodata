@@ -164,6 +164,113 @@ angelegt sein. Nach dem ersten erfolgreichen GHCR-Push müssen die neu
 angelegten Packages in den GitHub-Package-Einstellungen auf öffentlich gestellt
 werden, sofern die Organisationsvorgaben dies nicht bereits automatisch tun.
 
+## Image-SBOMs und Dependency-Track
+
+Nach der erfolgreichen Veröffentlichung **und** Prüfung aller Versions- und
+`latest`-Manifeste startet im selben Workflow der unabhängige Job
+`dependency-track`. Pull Requests bauen und testen weiterhin ohne Upload.
+Die bestehenden Smoke-Checks und die Veröffentlichung hängen nicht vom
+Dependency-Track-Server ab.
+
+Vier Matrix-Einträge laufen mit `max-parallel: 1`, um den kleinen Server
+nicht mit gleichzeitigen Uploads zu belasten:
+
+| Image in GHCR | Architektur | Dependency-Track-Projekt |
+|---|---|---|
+| `ghcr.io/sogis/datenportal-sodata` | amd64 | `datenportal-native-amd64` |
+| `ghcr.io/sogis/datenportal-sodata` | arm64 | `datenportal-native-arm64` |
+| `ghcr.io/sogis/datenportal-sodata-jvm` | amd64 | `datenportal-jvm-amd64` |
+| `ghcr.io/sogis/datenportal-sodata-jvm` | arm64 | `datenportal-jvm-arm64` |
+
+Die Projektversion entspricht dem veröffentlichten Image-Tag, beispielsweise
+`0.1.187`. Damit überschreiben sich verschiedene Architekturen oder Laufzeiten
+nicht gegenseitig. Die Docker-Hub-Images sind Kopien derselben Builds und
+werden nicht zusätzlich gescannt.
+
+### Einmalige Einrichtung
+
+Den Server mit dem separaten
+[dependencytrack-stack](https://github.com/edigonzales/dependencytrack-stack/tree/main/hetzner)
+bereitstellen. Dessen Anleitung behandelt DNS, Caddy/Let's Encrypt, Erstlogin,
+Schwachstellenquellen sowie Backup und Wiederherstellung.
+
+In Dependency-Track ein Team `datenportal-ci` mit `BOM_UPLOAD` und
+`PROJECT_CREATION_UPLOAD` anlegen und einen Team-API-Key erzeugen. Keine
+Administratorrechte vergeben. Bei aktivierter Portfolio-Zugriffskontrolle
+muss das Team Zugriff auf bereits vorhandene Zielprojekte besitzen.
+
+Unter **Settings → Secrets and variables → Actions** dieses GitHub-Repositories:
+
+| Typ | Name | Wert |
+|---|---|---|
+| Repository variable | `DTRACK_URL` | `https://dtrack.sogeo.services` |
+| Repository secret | `DTRACK_API_KEY` | API-Key des CI-Teams |
+
+Die URL enthält nur den HTTPS-Ursprung, keinen `/api`-Pfad. Ein abschliessender
+Slash wird toleriert. Die API muss vom GitHub-Runner aus erreichbar sein.
+Die vier Projekte werden mit `autoCreate=true` beim ersten Upload angelegt.
+
+### Scan und Fehlerverhalten
+
+`tools/scan-and-upload-sbom.py` löst den veröffentlichten Architektur-Tag
+`<version>-<architektur>` zu einem Digest auf. Trivy **0.76.1** scannt diesen
+Digest mit explizitem `--platform linux/amd64` bzw. `linux/arm64` direkt aus
+GHCR. Der Trivy-Container braucht keinen Docker-Socket und führt das
+gescannte Image nicht aus. GHCR-Zugang erfolgt über den vorhandenen
+`GITHUB_TOKEN` mit Leserechten für Packages.
+
+Die Erzeugung verwendet `trivy image --format cyclonedx --output …`.
+Die Datei wird anschliessend per Multipart-POST an
+`$DTRACK_URL/api/v1/bom` mit `X-Api-Key`, `autoCreate`, `projectName`,
+`projectVersion` und `bom` übertragen. Der API-Key liegt für curl nur
+kurzzeitig in einer privaten Headerdatei und erscheint nicht in den
+Prozessargumenten. Registry-Abfragen, Scan und Upload besitzen Timeouts und
+begrenzte Wiederholungen.
+
+- Scanfehler: Warnung und Job Summary; kein Upload einer unvollständigen Datei.
+- Fehlende Variable oder fehlendes Secret: SBOM wird trotzdem erzeugt, Upload
+  wird mit ausdrücklicher Warnung übersprungen.
+- HTTP-Fehler, Timeouts oder ungültige Uploadantwort: Warnung und Job Summary;
+  weitere Matrix-Einträge werden verarbeitet.
+- Erzeugte SBOMs bleiben unter **Actions → Workflow run → Artifacts** 14 Tage
+  als `sbom-<projekt>-<run-number>` verfügbar, auch nach einem Uploadfehler.
+- Ein angenommener Upload wird als **Upload accepted** gemeldet. Import und
+  Schwachstellenanalyse laufen danach asynchron in Dependency-Track.
+
+Die Integration darf die Veröffentlichung nicht blockieren. Deshalb reicht
+ein grüner Gesamtworkflow nicht als Importnachweis: Bei der ersten Einrichtung
+alle vier Job Summaries und danach die Projekte/Versionen in der UI prüfen.
+Für einen späteren Retry nach Serverausfall das passende SBOM-Artefakt
+herunterladen und mit demselben Projektnamen und derselben Version erneut
+hochladen. Schwachstellenfunde sind kein Build-Gate.
+
+Die gezielten Integrationstests laufen auch im Job `application-checks` und
+lassen sich lokal ohne Docker, Trivy oder Serverzugang ausführen (Python 3
+und curl erforderlich):
+
+```bash
+python3 -m unittest discover -s tools -p 'test_sbom_integration.py' -v
+```
+
+Sie prüfen unter anderem echte Multipart-Requests gegen einen lokalen
+HTTP-Endpunkt, vier getrennte Ziele, HTTP-Fehler, Timeout, fehlende
+Konfiguration und das nicht blockierende Verhalten.
+
+### Aussagegrenzen
+
+Das GraalVM-Native-Image enthält kompilierte Java-Abhängigkeiten. Ein Trivy-
+Scan des fertigen Images kann diese nicht vollständig aus dem Binary
+rekonstruieren. Das JVM-Image enthält auswertbare JARs und bietet eine bessere
+Java-Abdeckung. Auch gebündelte/minifizierte Frontend-Pakete werden nicht
+zwingend vollständig erkannt. Die Image-SBOM ersetzt deshalb keine
+vollständige Gradle-/npm-Build-SBOM.
+
+Neue Builds erzeugen neue Projektversionen. Im Serverbetrieb regelmässig
+veraltete Versionen nach einem Backup prüfen und löschen; produktiv genutzte
+Versionen behalten. Die 14 Tage Actions-Aufbewahrung löschen keine
+Dependency-Track-Projekte. Bei Key-Rotation zuerst das GitHub-Secret ersetzen,
+einen Upload prüfen und dann den alten Key widerrufen.
+
 ## OpenShift und beliebige UIDs
 
 Die Runtime-Stages laufen nicht als root: Das JVM-Image verwendet UID `185`,
